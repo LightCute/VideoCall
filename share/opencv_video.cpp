@@ -32,7 +32,9 @@ while(true){
         std::cerr << "Failed to grab frame" << std::endl;
         continue;
     }
-    cv::imshow("Camera", frame);
+    //cv::imshow("Camera", frame);
+    std::cout << "读取到一帧，大小: " 
+              << frame.cols << "x" << frame.rows << std::endl;
     if(cv::waitKey(30) == 'q') break;
 }
 

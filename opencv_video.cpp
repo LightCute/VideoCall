@@ -33,6 +33,8 @@ while(true){
         continue;
     }
     cv::imshow("Camera", frame);
+    std::cout << "读取到一帧，大小: " 
+              << frame.cols << "x" << frame.rows << std::endl;
     if(cv::waitKey(30) == 'q') break;
 }
 
