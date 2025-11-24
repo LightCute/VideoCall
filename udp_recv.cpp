@@ -11,23 +11,28 @@ int main() {
     // ------------------------
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
-        std::cerr << "无法创建 socket\n";
+        perror("socket");
         return -1;
     }
 
+    // ------------------------
+    //  绑定接收端地址和端口
+    // ------------------------
     sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(8888);
-    addr.sin_addr.s_addr = INADDR_ANY; // 监听所有网卡
+
+    // 绑定所有网络接口（Docker 内部网络也会生效）
+    addr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
-        std::cerr << "绑定端口失败\n";
+        perror("bind");
         return -1;
     }
 
-    std::cout << "监听 8888 端口，等待视频帧...\n";
+    std::cout << "接收端监听 UDP 8888 端口，等待视频帧...\n";
 
-    // 最大单包 UDP 大小（MTU 限制：<= 65507）
+    // 最大单包 UDP 大小（MTU 限制 <= 65507）
     std::vector<uchar> buffer(65535);
 
     while (true) {
@@ -50,7 +55,7 @@ int main() {
         }
 
         // ------------------------
-        //  解码 JPEG
+        //  将收到的数据解码成 JPEG
         // ------------------------
         std::vector<uchar> jpg(buffer.begin(), buffer.begin() + recvLen);
         cv::Mat frame = cv::imdecode(jpg, cv::IMREAD_COLOR);
@@ -60,7 +65,9 @@ int main() {
             continue;
         }
 
-        // 显示画面
+        // ------------------------
+        //  显示画面
+        // ------------------------
         cv::imshow("UDP Receiver", frame);
         if (cv::waitKey(1) == 'q') break;
 
@@ -68,5 +75,6 @@ int main() {
     }
 
     close(sock);
+    cv::destroyAllWindows();
     return 0;
 }
