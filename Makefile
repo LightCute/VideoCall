@@ -21,10 +21,10 @@ OPENCV_LIBS = $(shell pkg-config --libs opencv4)
 EXTRA_LIBS = -lpthread -ldl
 
 # 源文件
-SRC = opencv_video.cpp
+SRC = udp_send.cpp
 
 # 输出的可执行文件名
-TARGET = opencv_video
+TARGET = img_show
 
 # 默认命令：编译全部
 all: $(TARGET)

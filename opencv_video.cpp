@@ -26,17 +26,17 @@ int main() {
     int height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
     std::cout << "摄像头分辨率: " << width << "x" << height << std::endl;
 
-cv::Mat frame;
-while(true){
-    if(!cap.read(frame) || frame.empty()){
-        std::cerr << "Failed to grab frame" << std::endl;
-        continue;
+    cv::Mat frame;
+    while(true){
+        if(!cap.read(frame) || frame.empty()){
+            std::cerr << "Failed to grab frame" << std::endl;
+            continue;
+        }
+        cv::imshow("Camera", frame);
+        std::cout << "读取到一帧，大小: " 
+                << frame.cols << "x" << frame.rows << std::endl;
+        if(cv::waitKey(30) == 'q') break;
     }
-    cv::imshow("Camera", frame);
-    std::cout << "读取到一帧，大小: " 
-              << frame.cols << "x" << frame.rows << std::endl;
-    if(cv::waitKey(30) == 'q') break;
-}
 
 
     cap.release();
