@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -std=c++11 -Wall $(shell pkg-config --cflags gstreamer-1.0)
 LDFLAGS = $(shell pkg-config --libs gstreamer-1.0)
 
-TARGET = gst_receiver
+TARGET = gst_recv
 SOURCES = gst_recver.cpp
 
 all: $(TARGET)

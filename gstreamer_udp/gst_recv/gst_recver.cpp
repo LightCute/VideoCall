@@ -1,50 +1,89 @@
-#include <iostream>
 #include <gst/gst.h>
 
 int main(int argc, char *argv[]) {
-    gst_init(&argc, &argv);  // 初始化 GStreamer 库
+    GstElement *pipeline, *udpsrc, *rtph264depay, *h264parse, *avdec_h264, *videoconvert, *autovideosink;
+    GstBus *bus;
+    GstMessage *msg;
+    GstStateChangeReturn ret;
 
-    // 创建接收端管道：通过 UDP 接收视频流并显示
-    std::string pipeline_str = "udpsrc port=5000 ! application/x-rtp,media=video,encoding-name=H264 ! rtph264depay ! avdec_h264 ! queue ! videoconvert ! autovideosink";
+    /* Initialize GStreamer */
+    gst_init(&argc, &argv);
 
-    // 创建管道
-    GstElement *pipeline = gst_parse_launch(pipeline_str.c_str(), NULL);
-    if (!pipeline) {
-        std::cerr << "无法创建 GStreamer 管道" << std::endl;
+    /* Create the elements */
+    udpsrc = gst_element_factory_make("udpsrc", "udpsrc");
+    rtph264depay = gst_element_factory_make("rtph264depay", "rtph264depay");
+    h264parse = gst_element_factory_make("h264parse", "h264parse");
+    avdec_h264 = gst_element_factory_make("avdec_h264", "avdec_h264");
+    videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
+    //autovideosink = gst_element_factory_make("autovideosink", "autovideosink");
+    autovideosink = gst_element_factory_make("xvimagesink", "xvimagesink");
+
+    /* Check if all elements were created successfully */
+    if (!udpsrc || !rtph264depay || !h264parse || !avdec_h264 || !videoconvert || !autovideosink) {
+        g_printerr("Not all elements could be created.\n");
         return -1;
     }
 
-    // 获取管道的总线，用于处理消息
-    GstBus *bus = gst_element_get_bus(pipeline);
-    GstMessage *msg;
+    /* Create the empty pipeline */
+    pipeline = gst_pipeline_new("video-receive-pipeline");
 
-    // 设置管道状态为播放
-    gst_element_set_state(pipeline, GST_STATE_PLAYING);
-    std::cout << "管道设置为 PLAYING 状态" << std::endl;
-
-    // 等待 GStreamer 错误或流结束消息
-    while (true) {
-        // 使用按位或操作符来组合多个事件，并确保传递的是 GstMessageType 类型
-        GstMessageType events = static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS);
-        msg = gst_bus_poll(bus, events, -1);
-        if (msg) {
-            // 检查消息类型
-            if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR) {
-                GError *err;
-                gchar *debug_info;
-                gst_message_parse_error(msg, &err, &debug_info);
-                std::cerr << "GStreamer 错误: " << err->message << std::endl;
-                g_error_free(err);
-                g_free(debug_info);
-                break;
-            } else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS) {
-                std::cout << "流结束" << std::endl;
-                break;
-            }
-        }
+    if (!pipeline) {
+        g_printerr("Failed to create pipeline.\n");
+        return -1;
     }
 
-    // 清理资源
+    /* Set properties */
+    g_object_set(udpsrc, "port", 5000, NULL);  // Set the UDP port to receive data from
+
+    /* Create and set the caps for the video format, resolution, and framerate */
+    GstCaps *caps = gst_caps_new_simple("application/x-rtp",
+                                       "media", G_TYPE_STRING, "video",
+                                       "encoding-name", G_TYPE_STRING, "H264",
+                                       "payload", G_TYPE_INT, 96,  // The payload type depends on the RTP setup
+                                       NULL);
+    g_object_set(udpsrc, "caps", caps, NULL);
+    gst_caps_unref(caps);  // Unreference since it's now set
+
+    /* Add elements to the pipeline */
+    gst_bin_add_many(GST_BIN(pipeline), udpsrc, rtph264depay, h264parse, avdec_h264, videoconvert, autovideosink, NULL);
+
+    /* Link the elements */
+    if (gst_element_link_many(udpsrc, rtph264depay, h264parse, avdec_h264, videoconvert, autovideosink, NULL) != TRUE) {
+        g_printerr("Elements could not be linked for video processing.\n");
+        gst_object_unref(pipeline);
+        return -1;
+    }
+
+    /* Start playing the pipeline */
+    ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+        g_printerr("Unable to set the pipeline to the playing state.\n");
+        gst_object_unref(pipeline);
+        return -1;
+    }
+
+    /* Wait until error or EOS (End of Stream) */
+    bus = gst_element_get_bus(pipeline);
+    msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+
+    /* Handle messages */
+    if (msg != NULL) {
+        GError *err;
+        gchar *debug_info;
+
+        if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR) {
+            gst_message_parse_error(msg, &err, &debug_info);
+            g_printerr("GStreamer error: %s\n", err->message);
+            g_error_free(err);
+            g_free(debug_info);
+        } else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS) {
+            g_print("End of stream\n");
+        }
+
+        gst_message_unref(msg);
+    }
+
+    /* Clean up */
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(bus);
     gst_object_unref(pipeline);
