@@ -3,7 +3,7 @@
 int main(int argc, char *argv[]) {
     GstElement *pipeline, *v4l2src, *capsfilter;
     GstElement *tee, *queue_display, *queue_network;
-    GstElement *jpegdec, *videoconvert, *autovideosink;
+    GstElement *jpegenc, *videoconvert, *autovideosink;
     GstElement *rtpjpegpay, *udpsink;
     GstBus *bus;
     GstMessage *msg;
@@ -17,14 +17,14 @@ int main(int argc, char *argv[]) {
     tee           = gst_element_factory_make("tee", "tee");
     queue_display = gst_element_factory_make("queue", "queue_display");
     queue_network = gst_element_factory_make("queue", "queue_network");
-    jpegdec       = gst_element_factory_make("jpegdec", "jpegdec");
+    jpegenc       = gst_element_factory_make("jpegenc", "jpegenc");
     videoconvert  = gst_element_factory_make("videoconvert", "videoconvert");
     autovideosink = gst_element_factory_make("xvimagesink", "autovideosink");
     rtpjpegpay    = gst_element_factory_make("rtpjpegpay", "rtpjpegpay");
     udpsink       = gst_element_factory_make("udpsink", "udpsink");
 
     if (!v4l2src || !capsfilter || !tee || !queue_display || !queue_network ||
-        !jpegdec || !videoconvert || !autovideosink || !rtpjpegpay || !udpsink) {
+        !jpegenc || !videoconvert || !autovideosink || !rtpjpegpay || !udpsink) {
         g_printerr("Not all elements could be created.\n");
         return -1;
     }
@@ -37,17 +37,20 @@ int main(int argc, char *argv[]) {
     }
 
     // 配置 v4l2src
-    g_object_set(v4l2src, "device", "/dev/video4", NULL);
+    g_object_set(v4l2src, "device", "/dev/video0", NULL);
 
-    // 配置 caps: MJPEG 640x480 @30fps
+    // 配置 caps: 640x480 @30fps
     GstCaps *caps = gst_caps_new_simple(
-        "image/jpeg",
+        "video/x-raw",
         "width", G_TYPE_INT, 640,
         "height", G_TYPE_INT, 480,
         "framerate", GST_TYPE_FRACTION, 30, 1,
         NULL);
     g_object_set(capsfilter, "caps", caps, NULL);
     gst_caps_unref(caps);
+
+    // 配置 jpegenc 压缩质量
+    g_object_set(jpegenc, "quality", 50, NULL); // 0~100, 越低帧越小
 
     // 配置 udpsink
     g_object_set(udpsink,
@@ -57,21 +60,21 @@ int main(int argc, char *argv[]) {
                  "async", FALSE,
                  NULL);
 
-    // 队列配置低延迟
+    // 队列低延迟
     g_object_set(queue_display, "max-size-buffers", 1, "leaky", 2, NULL);
     g_object_set(queue_network, "max-size-buffers", 1, "leaky", 2, NULL);
 
-    // 配置本地显示
+    // 本地显示不等待
     g_object_set(autovideosink, "sync", FALSE, NULL);
 
-    // 配置 RTP MJPEG
-    g_object_set(rtpjpegpay, "mtu", 1400, NULL);  // 分包大小
+    // RTP 分包
+    g_object_set(rtpjpegpay, "mtu", 1400, NULL);
 
-    // 添加元素到 pipeline
+    // 添加元素
     gst_bin_add_many(GST_BIN(pipeline),
                      v4l2src, capsfilter, tee,
-                     queue_display, jpegdec, videoconvert, autovideosink,
-                     queue_network, rtpjpegpay, udpsink,
+                     queue_display, videoconvert, autovideosink,
+                     queue_network, jpegenc, rtpjpegpay, udpsink,
                      NULL);
 
     // 链接 source -> caps -> tee
@@ -80,27 +83,27 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    // tee -> display 分支
+    // tee -> display 分支: queue_display -> videoconvert -> sink
     GstPad *tee_pad_display = gst_element_request_pad_simple(tee, "src_%u");
     GstPad *queue_display_sink = gst_element_get_static_pad(queue_display, "sink");
     gst_pad_link(tee_pad_display, queue_display_sink);
     gst_object_unref(queue_display_sink);
-    if (!gst_element_link_many(queue_display, jpegdec, videoconvert, autovideosink, NULL)) {
+    if (!gst_element_link_many(queue_display, videoconvert, autovideosink, NULL)) {
         g_printerr("Failed to link display branch.\n");
         return -1;
     }
 
-    // tee -> network 分支
+    // tee -> network 分支: queue_network -> jpegenc -> rtpjpegpay -> udpsink
     GstPad *tee_pad_network = gst_element_request_pad_simple(tee, "src_%u");
     GstPad *queue_network_sink = gst_element_get_static_pad(queue_network, "sink");
     gst_pad_link(tee_pad_network, queue_network_sink);
     gst_object_unref(queue_network_sink);
-    if (!gst_element_link_many(queue_network, rtpjpegpay, udpsink, NULL)) {
+    if (!gst_element_link_many(queue_network, jpegenc, rtpjpegpay, udpsink, NULL)) {
         g_printerr("Failed to link network branch.\n");
         return -1;
     }
 
-    // 设置 pipeline 运行
+    // 运行 pipeline
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
         g_printerr("Unable to set pipeline to PLAYING.\n");
