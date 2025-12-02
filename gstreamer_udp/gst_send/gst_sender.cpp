@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     /* Set properties */
     g_object_set(v4l2src, "device", "/dev/video0", NULL);
-    g_object_set(udpsink, "host", "172.18.0.3", "port", 5000, "sync", FALSE, NULL);
+    g_object_set(udpsink, "host", "10.0.0.4", "port", 5000, "sync", FALSE, NULL);
 
     /* Set x264enc parameters for low latency and fast encoding */
     // g_object_set(x264enc, "tune", 0, "speed-preset", 4, NULL);  // tune=zerolatency, speed-preset=ultrafast

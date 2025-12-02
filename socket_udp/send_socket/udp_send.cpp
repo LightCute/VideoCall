@@ -40,7 +40,7 @@ int main() {
     addr.sin_port = htons(8888);
 
     // 使用 Docker 容器名
-    if(inet_pton(AF_INET, "172.18.0.3", &addr.sin_addr) <= 0) { // 可替换成容器名的 IP
+    if(inet_pton(AF_INET, "10.0.0.4", &addr.sin_addr) <= 0) { // 可替换成容器名的 IP
         std::cerr << "IP 地址无效\n";
         return -1;
     }
