@@ -1,4 +1,32 @@
 #include <gst/gst.h>
+#include <gst/video/video.h>
+#include <time.h>
+
+typedef struct {
+    guint64 total_bytes;
+    guint64 last_time;
+} Stats;
+
+static GstPadProbeReturn pad_probe_callback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+    Stats *stats = (Stats *)user_data;
+    GstBuffer *buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (!buf) return GST_PAD_PROBE_OK;
+
+    gsize size = gst_buffer_get_size(buf);
+    stats->total_bytes += size;
+
+    // 每秒打印带宽
+    guint64 now = g_get_real_time() / 1000000; // ms -> s
+    if (now != stats->last_time) {
+        g_print("Frame size: %zu bytes, bandwidth: %.2f KB/s\n",
+                size, stats->total_bytes / 1024.0);
+        stats->total_bytes = 0;
+        stats->last_time = now;
+    }
+
+    return GST_PAD_PROBE_OK;
+}
+
 
 int main(int argc, char *argv[]) {
     GstElement *pipeline, *v4l2src, *capsfilter;
@@ -102,6 +130,13 @@ int main(int argc, char *argv[]) {
         g_printerr("Failed to link network branch.\n");
         return -1;
     }
+
+
+    // pad probe 统计每帧大小
+    GstPad *src_pad = gst_element_get_static_pad(jpegenc, "src");
+    Stats stats = {0, 0};
+    gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, pad_probe_callback, &stats, NULL);
+    gst_object_unref(src_pad);
 
     // 运行 pipeline
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
