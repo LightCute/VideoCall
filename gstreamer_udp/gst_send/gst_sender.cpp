@@ -7,10 +7,14 @@ typedef struct {
     guint64 last_time;
 } Stats;
 
+// pad probe 给每帧打时间戳 + 统计大小
 static GstPadProbeReturn pad_probe_callback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
     Stats *stats = (Stats *)user_data;
     GstBuffer *buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (!buf) return GST_PAD_PROBE_OK;
+
+    // 发送端时间戳
+    GST_BUFFER_PTS(buf) = gst_util_get_timestamp();
 
     gsize size = gst_buffer_get_size(buf);
     stats->total_bytes += size;
@@ -26,6 +30,7 @@ static GstPadProbeReturn pad_probe_callback(GstPad *pad, GstPadProbeInfo *info, 
 
     return GST_PAD_PROBE_OK;
 }
+
 
 
 int main(int argc, char *argv[]) {

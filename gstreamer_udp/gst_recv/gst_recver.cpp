@@ -6,15 +6,16 @@ static GstPadProbeReturn pad_probe_callback(GstPad *pad, GstPadProbeInfo *info, 
     GstBuffer *buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (!buf) return GST_PAD_PROBE_OK;
 
-    GstClockTime pts = GST_BUFFER_PTS(buf); // 发送端时间戳
-    guint64 now = gst_util_get_timestamp(); // 接收端当前时间戳
+    GstClockTime pts = GST_BUFFER_PTS(buf);  // 发送端时间戳
+    guint64 now = gst_util_get_timestamp();  // 接收端当前时间戳
 
-    gdouble latency_ms = (now - pts) / 1000000.0;
+    gdouble latency_ms = (now - pts) / 1000000.0;  // 纳秒 -> 毫秒
     g_print("Frame received, latency: %.2f ms, size: %zu bytes\n",
             latency_ms, gst_buffer_get_size(buf));
 
     return GST_PAD_PROBE_OK;
 }
+
 
 int main(int argc, char *argv[]) {
     GstElement *pipeline, *udpsrc, *rtpjpegdepay, *jpegparse, *jpegdec, *videoconvert, *videosink;
@@ -57,10 +58,10 @@ int main(int argc, char *argv[]) {
     }
 
     // pad probe 测延迟
-    GstPad *sink_pad = gst_element_get_static_pad(rtpjpegdepay, "videosink");
+    GstPad *sink_pad = gst_element_get_static_pad(rtpjpegdepay, "sink");
     gst_pad_add_probe(sink_pad, GST_PAD_PROBE_TYPE_BUFFER, pad_probe_callback, NULL, NULL);
     gst_object_unref(sink_pad);
-
+    
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
         g_printerr("Unable to set pipeline to PLAYING.\n");
