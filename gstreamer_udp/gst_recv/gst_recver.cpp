@@ -21,14 +21,12 @@ static guint64 be_to_host_u64(guint64 v) {
     return v;
 #endif
 }
-
 static GstPadProbeReturn recv_probe_strip_ts(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
     GstBuffer *orig = GST_PAD_PROBE_INFO_BUFFER(info);
     if (!orig) return GST_PAD_PROBE_OK;
 
     gsize orig_size = gst_buffer_get_size(orig);
     if (orig_size <= sizeof(guint64)) {
-        // payload 太小，放行（或者丢帧）
         g_print("Receiver probe: payload too small (%zu)\n", orig_size);
         return GST_PAD_PROBE_OK;
     }
@@ -38,57 +36,51 @@ static GstPadProbeReturn recv_probe_strip_ts(GstPad *pad, GstPadProbeInfo *info,
         return GST_PAD_PROBE_OK;
     }
 
-    // 读取前 8 字节（big-endian）
+    // --- 解析前 8 字节 big-endian 时间戳 ---
     guint64 ts_be = 0;
     memcpy(&ts_be, map.data, sizeof(ts_be));
-    guint64 send_ts_us = be_to_host_u64(ts_be);
 
-    // 当前时间 microseconds
+    guint64 send_ts_us =
+        ((guint64)map.data[0] << 56) |
+        ((guint64)map.data[1] << 48) |
+        ((guint64)map.data[2] << 40) |
+        ((guint64)map.data[3] << 32) |
+        ((guint64)map.data[4] << 24) |
+        ((guint64)map.data[5] << 16) |
+        ((guint64)map.data[6] << 8)  |
+        ((guint64)map.data[7]);
+
     guint64 now_us = g_get_real_time();
-
     double latency_ms = (double)(now_us - send_ts_us) / 1000.0;
-    g_print("Receiver: Latency = %.3f ms (orig payload: %zu bytes)\n", latency_ms, orig_size);
 
-    // 创建新的 buffer（去掉前 8 字节）
+    g_print("Receiver: Latency = %.2f ms (payload %zu bytes)\n",
+            latency_ms, orig_size);
+
+    // --- 构造新的 buffer（去掉前 8 字节） ---
     gsize new_size = orig_size - sizeof(ts_be);
     GstBuffer *newbuf = gst_buffer_new_allocate(NULL, new_size, NULL);
-    if (!newbuf) {
-        gst_buffer_unmap(orig, &map);
-        g_printerr("Receiver probe: failed to allocate new buffer\n");
-        return GST_PAD_PROBE_OK;
-    }
 
     GstMapInfo newmap;
-    if (!gst_buffer_map(newbuf, &newmap, GST_MAP_WRITE)) {
-        gst_buffer_unmap(orig, &map);
-        gst_buffer_unref(newbuf);
-        g_printerr("Receiver probe: failed to map new buffer\n");
-        return GST_PAD_PROBE_OK;
-    }
-
-    // 拷贝原始 payload（跳过前 8 字节）
+    gst_buffer_map(newbuf, &newmap, GST_MAP_WRITE);
     memcpy(newmap.data, map.data + sizeof(ts_be), new_size);
-
     gst_buffer_unmap(newbuf, &newmap);
+
     gst_buffer_unmap(orig, &map);
 
-    // 复制元信息（PTS/DTS），如果需要
+    // 保留时间戳信息
     GST_BUFFER_PTS(newbuf) = GST_BUFFER_PTS(orig);
     GST_BUFFER_DTS(newbuf) = GST_BUFFER_DTS(orig);
 
-    // 用 newbuf 替换 probe 的 buffer（把 orig 放回，probe 接管 newbuf）
-#if GST_PAD_PROBE_INFO_TYPE(info) & GST_PAD_PROBE_TYPE_BUFFER
-    gst_pad_probe_info_set_buffer(info, newbuf);
-#else
-    // older GStreamer API fallback
+    // ----------- 关键：旧版 GStreamer 正确做法 -----------
+    // 直接替换 probe info 中的 buffer
     GST_PAD_PROBE_INFO_DATA(info) = newbuf;
-#endif
 
-    // 释放 orig（probe 已经替换）
+    // 释放原 buffer
     gst_buffer_unref(orig);
 
     return GST_PAD_PROBE_OK;
 }
+
 
 int main(int argc, char *argv[]) {
     gst_init(&argc, &argv);
