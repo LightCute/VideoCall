@@ -9,7 +9,7 @@ int main() {
     // ------------------------
     // 打开摄像头
     // ------------------------
-    cv::VideoCapture cap("/dev/video0", cv::CAP_V4L2);
+    cv::VideoCapture cap("/dev/video4", cv::CAP_V4L2);
 
     if(!cap.isOpened()) {
         std::cerr << "无法打开摄像头" << std::endl;
