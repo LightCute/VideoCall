@@ -1,26 +1,49 @@
 #include <gst/gst.h>
 #include <gst/video/video.h>
-#include <time.h>
+#include <string.h>
 
 typedef struct {
     guint64 total_bytes;
     guint64 last_time;
 } Stats;
 
-// pad probe 给每帧打时间戳 + 统计大小
-static GstPadProbeReturn pad_probe_callback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
+// pad probe：添加 8 字节时间戳 + 统计帧大小
+static GstPadProbeReturn pad_probe_callback(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
+{
     Stats *stats = (Stats *)user_data;
     GstBuffer *buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (!buf) return GST_PAD_PROBE_OK;
 
-    // 发送端时间戳
-    GST_BUFFER_PTS(buf) = gst_util_get_timestamp();
+    //--------------------------
+    // 1. 生成时间戳（微秒级）
+    //--------------------------
+    guint64 ts = g_get_real_time();  // 获取当前时间（us）
 
+    //-----------------------------------
+    // 2. 创建一个 8 字节 memory 放时间戳
+    //-----------------------------------
+    GstMemory *ts_mem = gst_memory_new_wrapped(
+        GST_MEMORY_FLAG_READONLY,
+        g_memdup(&ts, sizeof(ts)),
+        sizeof(ts),
+        0,
+        sizeof(ts),
+        NULL,
+        g_free);
+
+    //--------------------------
+    // 3. 把 timestamp 放到 buffer 最前面
+    //--------------------------
+    buf = gst_buffer_make_writable(buf);
+    gst_buffer_prepend_memory(buf, ts_mem);
+
+    //-----------------------------------
+    // 4. 统计带宽
+    //-----------------------------------
     gsize size = gst_buffer_get_size(buf);
     stats->total_bytes += size;
 
-    // 每秒打印带宽
-    guint64 now = g_get_real_time() / 1000000; // ms -> s
+    guint64 now = g_get_real_time() / 1000000;
     if (now != stats->last_time) {
         g_print("Frame size: %zu bytes, bandwidth: %.2f KB/s\n",
                 size, stats->total_bytes / 1024.0);
@@ -31,20 +54,20 @@ static GstPadProbeReturn pad_probe_callback(GstPad *pad, GstPadProbeInfo *info, 
     return GST_PAD_PROBE_OK;
 }
 
-
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     GstElement *pipeline, *v4l2src, *capsfilter;
     GstElement *tee, *queue_display, *queue_network;
     GstElement *jpegenc, *videoconvert, *autovideosink;
     GstElement *rtpjpegpay, *udpsink;
     GstBus *bus;
     GstMessage *msg;
-    GstStateChangeReturn ret;
 
     gst_init(&argc, &argv);
 
+    //-----------------------
     // 创建元素
+    //-----------------------
     v4l2src       = gst_element_factory_make("v4l2src", "v4l2src");
     capsfilter    = gst_element_factory_make("capsfilter", "capsfilter");
     tee           = gst_element_factory_make("tee", "tee");
@@ -56,36 +79,23 @@ int main(int argc, char *argv[]) {
     rtpjpegpay    = gst_element_factory_make("rtpjpegpay", "rtpjpegpay");
     udpsink       = gst_element_factory_make("udpsink", "udpsink");
 
-    if (!v4l2src || !capsfilter || !tee || !queue_display || !queue_network ||
-        !jpegenc || !videoconvert || !autovideosink || !rtpjpegpay || !udpsink) {
-        g_printerr("Not all elements could be created.\n");
-        return -1;
-    }
-
-    // 创建 pipeline
     pipeline = gst_pipeline_new("mjpeg-rtp-pipeline");
-    if (!pipeline) {
-        g_printerr("Failed to create pipeline.\n");
-        return -1;
-    }
 
-    // 配置 v4l2src
+    //-----------------------
+    // 配置参数
+    //-----------------------
     g_object_set(v4l2src, "device", "/dev/video0", NULL);
 
-    // 配置 caps: 640x480 @30fps
-    GstCaps *caps = gst_caps_new_simple(
-        "video/x-raw",
-        "width", G_TYPE_INT, 640,
-        "height", G_TYPE_INT, 480,
-        "framerate", GST_TYPE_FRACTION, 30, 1,
-        NULL);
+    GstCaps *caps = gst_caps_new_simple("video/x-raw",
+                                        "width", G_TYPE_INT, 640,
+                                        "height", G_TYPE_INT, 480,
+                                        "framerate", GST_TYPE_FRACTION, 30, 1,
+                                        NULL);
     g_object_set(capsfilter, "caps", caps, NULL);
     gst_caps_unref(caps);
 
-    // 配置 jpegenc 压缩质量
-    g_object_set(jpegenc, "quality", 50, NULL); // 0~100, 越低帧越小
+    g_object_set(jpegenc, "quality", 50, NULL);
 
-    // 配置 udpsink
     g_object_set(udpsink,
                  "host", "10.0.0.4",
                  "port", 5000,
@@ -93,88 +103,57 @@ int main(int argc, char *argv[]) {
                  "async", FALSE,
                  NULL);
 
-    // 队列低延迟
     g_object_set(queue_display, "max-size-buffers", 1, "leaky", 2, NULL);
     g_object_set(queue_network, "max-size-buffers", 1, "leaky", 2, NULL);
 
-    // 本地显示不等待
     g_object_set(autovideosink, "sync", FALSE, NULL);
-
-    // RTP 分包
     g_object_set(rtpjpegpay, "mtu", 1400, NULL);
 
-    // 添加元素
+    //-----------------------
+    // 连接元素
+    //-----------------------
     gst_bin_add_many(GST_BIN(pipeline),
                      v4l2src, capsfilter, tee,
                      queue_display, videoconvert, autovideosink,
                      queue_network, jpegenc, rtpjpegpay, udpsink,
                      NULL);
 
-    // 链接 source -> caps -> tee
-    if (!gst_element_link_many(v4l2src, capsfilter, tee, NULL)) {
-        g_printerr("Failed to link source -> caps -> tee.\n");
-        return -1;
-    }
+    gst_element_link_many(v4l2src, capsfilter, tee, NULL);
 
-    // tee -> display 分支: queue_display -> videoconvert -> sink
     GstPad *tee_pad_display = gst_element_request_pad_simple(tee, "src_%u");
-    GstPad *queue_display_sink = gst_element_get_static_pad(queue_display, "sink");
-    gst_pad_link(tee_pad_display, queue_display_sink);
-    gst_object_unref(queue_display_sink);
-    if (!gst_element_link_many(queue_display, videoconvert, autovideosink, NULL)) {
-        g_printerr("Failed to link display branch.\n");
-        return -1;
-    }
+    GstPad *display_sink = gst_element_get_static_pad(queue_display, "sink");
+    gst_pad_link(tee_pad_display, display_sink);
+    gst_object_unref(display_sink);
 
-    // tee -> network 分支: queue_network -> jpegenc -> rtpjpegpay -> udpsink
+    gst_element_link_many(queue_display, videoconvert, autovideosink, NULL);
+
     GstPad *tee_pad_network = gst_element_request_pad_simple(tee, "src_%u");
-    GstPad *queue_network_sink = gst_element_get_static_pad(queue_network, "sink");
-    gst_pad_link(tee_pad_network, queue_network_sink);
-    gst_object_unref(queue_network_sink);
-    if (!gst_element_link_many(queue_network, jpegenc, rtpjpegpay, udpsink, NULL)) {
-        g_printerr("Failed to link network branch.\n");
-        return -1;
-    }
+    GstPad *network_sink = gst_element_get_static_pad(queue_network, "sink");
+    gst_pad_link(tee_pad_network, network_sink);
+    gst_object_unref(network_sink);
 
+    gst_element_link_many(queue_network, jpegenc, rtpjpegpay, udpsink, NULL);
 
-    // pad probe 统计每帧大小
+    //-----------------------
+    // 添加 pad probe（写入时间戳）
+    //-----------------------
     GstPad *src_pad = gst_element_get_static_pad(jpegenc, "src");
     Stats stats = {0, 0};
     gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, pad_probe_callback, &stats, NULL);
     gst_object_unref(src_pad);
 
-    // 运行 pipeline
-    ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
-    if (ret == GST_STATE_CHANGE_FAILURE) {
-        g_printerr("Unable to set pipeline to PLAYING.\n");
-        return -1;
-    }
-
-    // 等待错误或 EOS
+    //-----------------------
+    // 运行
+    //-----------------------
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
     bus = gst_element_get_bus(pipeline);
     msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE,
                                      (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
-    if (msg) {
-        if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR) {
-            GError *err;
-            gchar *debug_info;
-            gst_message_parse_error(msg, &err, &debug_info);
-            g_printerr("GStreamer error: %s\n", err->message);
-            g_error_free(err);
-            g_free(debug_info);
-        } else {
-            g_print("End-Of-Stream reached.\n");
-        }
+    if (msg)
         gst_message_unref(msg);
-    }
 
-    // 清理
     gst_element_set_state(pipeline, GST_STATE_NULL);
-    gst_element_release_request_pad(tee, tee_pad_display);
-    gst_element_release_request_pad(tee, tee_pad_network);
-    gst_object_unref(tee_pad_display);
-    gst_object_unref(tee_pad_network);
     gst_object_unref(bus);
     gst_object_unref(pipeline);
 
