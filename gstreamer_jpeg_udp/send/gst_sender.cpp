@@ -1,3 +1,4 @@
+// gst_sender_fixed.c
 #include <gst/gst.h>
 #include <glib.h>
 #include <stdint.h>
@@ -33,7 +34,7 @@ static GstPadProbeReturn bandwidth_probe(GstPad *pad, GstPadProbeInfo *info, gpo
 int main(int argc, char *argv[]) {
     GstElement *pipeline, *v4l2src, *capsfilter;
     GstElement *tee, *queue_display, *queue_network;
-    GstElement *jpegenc, *videoconvert, *autovideosink;
+    GstElement *jpegdec, *videoconvert, *autovideosink;
     GstElement *rtpjpegpay, *udpsink;
     GstBus *bus;
     GstMessage *msg;
@@ -47,14 +48,14 @@ int main(int argc, char *argv[]) {
     tee           = gst_element_factory_make("tee", "tee");
     queue_display = gst_element_factory_make("queue", "queue_display");
     queue_network = gst_element_factory_make("queue", "queue_network");
-    jpegenc       = gst_element_factory_make("jpegenc", "jpegenc");
+    jpegdec       = gst_element_factory_make("jpegdec", "jpegdec");
     videoconvert  = gst_element_factory_make("videoconvert", "videoconvert");
     autovideosink = gst_element_factory_make("xvimagesink", "autovideosink");
     rtpjpegpay    = gst_element_factory_make("rtpjpegpay", "rtpjpegpay");
     udpsink       = gst_element_factory_make("udpsink", "udpsink");
 
     if (!v4l2src || !capsfilter || !tee || !queue_display || !queue_network ||
-        !jpegenc || !videoconvert || !autovideosink || !rtpjpegpay || !udpsink) {
+        !jpegdec || !videoconvert || !autovideosink || !rtpjpegpay || !udpsink) {
         g_printerr("Not all elements could be created.\n");
         return -1;
     }
@@ -69,18 +70,16 @@ int main(int argc, char *argv[]) {
     // 配置 v4l2src
     g_object_set(v4l2src, "device", "/dev/video0", NULL);
 
-    // 配置 caps: 640x480 @30fps
+    // 配置 caps: MJPEG from camera 640x480@30
     GstCaps *caps = gst_caps_new_simple(
-        "video/x-raw",
+        "image/jpeg",
         "width", G_TYPE_INT, 640,
         "height", G_TYPE_INT, 480,
         "framerate", GST_TYPE_FRACTION, 30, 1,
+        "quality", G_TYPE_INT, 50,    // ⭐ 降低 JPEG 质量
         NULL);
     g_object_set(capsfilter, "caps", caps, NULL);
     gst_caps_unref(caps);
-
-    // 配置 jpegenc 压缩质量
-    g_object_set(jpegenc, "quality", 50, NULL); // 0~100, 越低帧越小
 
     // 配置 udpsink
     g_object_set(udpsink,
@@ -100,49 +99,63 @@ int main(int argc, char *argv[]) {
     // RTP 分包
     g_object_set(rtpjpegpay, "mtu", 1400, NULL);
 
-    // 添加元素
+    // 添加元素（注意顺序不影响，但元素必须都 add 到 pipeline）
     gst_bin_add_many(GST_BIN(pipeline),
                      v4l2src, capsfilter, tee,
-                     queue_display, videoconvert, autovideosink,
-                     queue_network, jpegenc, rtpjpegpay, udpsink,
+                     queue_display, jpegdec, videoconvert, autovideosink,
+                     queue_network, rtpjpegpay, udpsink,
                      NULL);
 
     // 链接 source -> caps -> tee
     if (!gst_element_link_many(v4l2src, capsfilter, tee, NULL)) {
         g_printerr("Failed to link source -> caps -> tee.\n");
+        gst_object_unref(pipeline);
         return -1;
     }
 
-    // tee -> display 分支: queue_display -> videoconvert -> sink
+    // tee -> display 分支: queue_display -> jpegdec -> videoconvert -> sink
     GstPad *tee_pad_display = gst_element_request_pad_simple(tee, "src_%u");
     GstPad *queue_display_sink = gst_element_get_static_pad(queue_display, "sink");
-    gst_pad_link(tee_pad_display, queue_display_sink);
+    if (gst_pad_link(tee_pad_display, queue_display_sink) != GST_PAD_LINK_OK) {
+        g_printerr("Failed to link tee -> queue_display pad.\n");
+        gst_object_unref(pipeline);
+        return -1;
+    }
     gst_object_unref(queue_display_sink);
-    if (!gst_element_link_many(queue_display, videoconvert, autovideosink, NULL)) {
+
+    if (!gst_element_link_many(queue_display, jpegdec, videoconvert, autovideosink, NULL)) {
         g_printerr("Failed to link display branch.\n");
+        gst_object_unref(pipeline);
         return -1;
     }
 
-    // tee -> network 分支: queue_network -> jpegenc -> rtpjpegpay -> udpsink
+    // tee -> network 分支: queue_network -> rtpjpegpay -> udpsink
     GstPad *tee_pad_network = gst_element_request_pad_simple(tee, "src_%u");
     GstPad *queue_network_sink = gst_element_get_static_pad(queue_network, "sink");
-    gst_pad_link(tee_pad_network, queue_network_sink);
+    if (gst_pad_link(tee_pad_network, queue_network_sink) != GST_PAD_LINK_OK) {
+        g_printerr("Failed to link tee -> queue_network pad.\n");
+        gst_object_unref(pipeline);
+        return -1;
+    }
     gst_object_unref(queue_network_sink);
-    if (!gst_element_link_many(queue_network, jpegenc, rtpjpegpay, udpsink, NULL)) {
+
+    if (!gst_element_link_many(queue_network, rtpjpegpay, udpsink, NULL)) {
         g_printerr("Failed to link network branch.\n");
+        gst_object_unref(pipeline);
         return -1;
     }
 
-    // 在 jpegenc 的 src pad 添加带宽统计 probe（rtpjpegpay 前）
-    GstPad *src_pad = gst_element_get_static_pad(jpegenc, "src");
+    // 在 rtpjpegpay 的 src pad 前可以统计帧大小：找 jpeg 原始数据前的 pad 或直接在 queue_network 后 probe。
+    GstPad *probe_pad = gst_element_get_static_pad(queue_network, "src");
     Stats stats = {0, 0};
-    gst_pad_add_probe(src_pad, GST_PAD_PROBE_TYPE_BUFFER, bandwidth_probe, &stats, NULL);
-    gst_object_unref(src_pad);
+    gst_pad_add_probe(probe_pad, GST_PAD_PROBE_TYPE_BUFFER, bandwidth_probe, &stats, NULL);
+    gst_object_unref(probe_pad);
 
     // 运行 pipeline
     ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
         g_printerr("Unable to set pipeline to PLAYING.\n");
+        gst_object_unref(pipeline);
         return -1;
     }
 
