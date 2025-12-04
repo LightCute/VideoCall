@@ -32,7 +32,7 @@ static GstPadProbeReturn bandwidth_probe(GstPad *pad, GstPadProbeInfo *info, gpo
 
 int main(int argc, char *argv[]) {
     GstElement *pipeline, *v4l2src, *capsfilter;
-    GstElement *tee, *queue_display, *queue_network, *queue_receive;
+    GstElement *tee, *queue_display, *queue_network;
     GstElement *jpegenc, *videoconvert, *autovideosink;
     GstElement *rtpjpegpay, *udpsink;
     GstElement *udpsrc_receive, *rtpjpegdepay_receive, *jpegparse_receive, *jpegdec_receive, *videoconvert_receive, *videosink_receive;
@@ -48,7 +48,6 @@ int main(int argc, char *argv[]) {
     tee           = gst_element_factory_make("tee", "tee");
     queue_display = gst_element_factory_make("queue", "queue_display");
     queue_network = gst_element_factory_make("queue", "queue_network");
-    queue_receive = gst_element_factory_make("queue", "queue_receive");
     jpegenc       = gst_element_factory_make("jpegenc", "jpegenc");
     videoconvert  = gst_element_factory_make("videoconvert", "videoconvert");
     autovideosink = gst_element_factory_make("xvimagesink", "autovideosink");
@@ -105,7 +104,6 @@ int main(int argc, char *argv[]) {
     // 队列低延迟
     g_object_set(queue_display, "max-size-buffers", 1, "leaky", 2, NULL);
     g_object_set(queue_network, "max-size-buffers", 1, "leaky", 2, NULL);
-    g_object_set(queue_receive, "max-size-buffers", 1, "leaky", 2, NULL);
 
     // 本地显示不等待
     g_object_set(autovideosink, "sync", FALSE, NULL);
@@ -123,32 +121,7 @@ int main(int argc, char *argv[]) {
     g_object_set(udpsrc_receive, "caps", caps_receive, NULL);
     gst_caps_unref(caps_receive);
 
-    // GstPad *srcpad_receive, *sinkpad_receive;
-    // GstCaps *caps_receive;
-
-    // // 获取 udpsrc 的 src pad
-    // srcpad_receive = gst_element_get_static_pad(udpsrc_receive, "src");
-    // // 获取 queue 的 sink pad
-    // sinkpad_receive = gst_element_get_static_pad(queue_receive, "sink");
-
-    // // 创建 caps 以明确指定格式
-    // caps_receive = gst_caps_new_simple("application/x-rtp", NULL);
-    // gst_pad_set_caps(srcpad_receive, caps_receive);
-
-    // // 尝试连接
-    // if (gst_pad_link(srcpad_receive, sinkpad_receive) != GST_PAD_LINK_OK) {
-    //     g_print("Failed to link udpsrc_receive -> queue_receive\n");
-    // } else {
-    //     g_print("udpsrc_receive -> queue_receive linked successfully\n");
-    // }
-
-    // // 释放资源
-    // gst_caps_unref(caps_receive);
-    // gst_object_unref(srcpad_receive);
-    // gst_object_unref(sinkpad_receive);
-
-
-    // 添加元素
+    // 添加元素到 pipeline
     gst_bin_add_many(GST_BIN(pipeline),
                      v4l2src, capsfilter, tee,
                      queue_display, videoconvert, autovideosink,
@@ -156,13 +129,12 @@ int main(int argc, char *argv[]) {
                      udpsrc_receive, rtpjpegdepay_receive, jpegparse_receive, jpegdec_receive, videoconvert_receive, videosink_receive,
                      NULL);
 
-    // 链接 source -> caps -> tee
+    // 链接元素
     if (!gst_element_link_many(v4l2src, capsfilter, tee, NULL)) {
         g_printerr("Failed to link source -> caps -> tee.\n");
         return -1;
     }
 
-    // tee -> display 分支: queue_display -> videoconvert -> sink
     GstPad *tee_pad_display = gst_element_request_pad_simple(tee, "src_%u");
     GstPad *queue_display_sink = gst_element_get_static_pad(queue_display, "sink");
     gst_pad_link(tee_pad_display, queue_display_sink);
@@ -172,8 +144,6 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-
-    // tee -> network 分支: queue_network -> jpegenc -> rtpjpegpay -> udpsink
     GstPad *tee_pad_network = gst_element_request_pad_simple(tee, "src_%u");
     GstPad *queue_network_sink = gst_element_get_static_pad(queue_network, "sink");
     gst_pad_link(tee_pad_network, queue_network_sink);
@@ -183,13 +153,11 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-
-    // // tee -> receive 分支: queue_receive -> udpsrc_receive -> rtpjpegdepay_receive -> jpegparse_receive -> jpegdec_receive -> videoconvert_receive -> videosink_receive
-    if (!gst_element_link_many(queue_receive, udpsrc_receive, rtpjpegdepay_receive, jpegparse_receive, jpegdec_receive, videoconvert_receive, videosink_receive, NULL)) {
+    // 配置接收端链路
+    if (!gst_element_link_many(udpsrc_receive, rtpjpegdepay_receive, jpegparse_receive, jpegdec_receive, videoconvert_receive, videosink_receive, NULL)) {
         g_printerr("Failed to link receive branch.\n");
         return -1;
     }
-
 
     // 在 jpegenc 的 src pad 添加带宽统计 probe（rtpjpegpay 前）
     GstPad *src_pad_cal_bandwidth = gst_element_get_static_pad(jpegenc, "src");
@@ -225,10 +193,6 @@ int main(int argc, char *argv[]) {
 
     // 清理
     gst_element_set_state(pipeline, GST_STATE_NULL);
-    gst_element_release_request_pad(tee, tee_pad_display);
-    gst_element_release_request_pad(tee, tee_pad_network);
-    gst_object_unref(tee_pad_display);
-    gst_object_unref(tee_pad_network);
     gst_object_unref(bus);
     gst_object_unref(pipeline);
 

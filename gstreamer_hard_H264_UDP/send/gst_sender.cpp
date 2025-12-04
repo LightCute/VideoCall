@@ -76,6 +76,9 @@ int main(int argc, char *argv[])
         "video/x-h264",
         "stream-format", G_TYPE_STRING, "byte-stream",
         "alignment",     G_TYPE_STRING, "au",
+        // "width", G_TYPE_INT, 640, 
+        // "height", G_TYPE_INT, 480, 
+        // "framerate", GST_TYPE_FRACTION, 30, 1,         
         NULL
     );
     g_object_set(capsfilter, "caps", caps, NULL);
