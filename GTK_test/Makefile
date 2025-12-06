@@ -1,29 +1,18 @@
-# ---------------------------
-#  Makefile for GTK + GStreamer + C++
-# ---------------------------
-
 CXX = g++
-CXXFLAGS = -Wall -O2 -std=c++17
+CXXFLAGS = -std=c++17 `pkg-config --cflags gstreamer-1.0 gstreamer-video-1.0 gtk+-3.0`
+LIBS = `pkg-config --libs gstreamer-1.0 gstreamer-video-1.0 gtk+-3.0`
 
-# Use pkg-config to get GTK and GStreamer compile/link flags
-PKG_FLAGS = `pkg-config --cflags --libs gtk+-3.0 gstreamer-1.0 gstreamer-video-1.0`
-
-# Target executable name
-TARGET = app
-
-# Source files
-SRCS = gtk_test.cpp
+SRCS =  gst_video.cpp  main.cpp
 OBJS = $(SRCS:.cpp=.o)
+TARGET = app
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(PKG_FLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< $(PKG_FLAGS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) *.o
-
-.PHONY: clean
+	rm -f $(OBJS) $(TARGET)

@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     queue_network = gst_element_factory_make("queue", "queue_network");
     jpegenc       = gst_element_factory_make("jpegenc", "jpegenc");
     videoconvert  = gst_element_factory_make("videoconvert", "videoconvert");
-    autovideosink = gst_element_factory_make("xvimagesink", "autovideosink");
+    autovideosink = gst_element_factory_make("autovideosink", "autovideosink");
     rtpjpegpay    = gst_element_factory_make("rtpjpegpay", "rtpjpegpay");
     udpsink       = gst_element_factory_make("udpsink", "udpsink");
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     jpegparse_receive    = gst_element_factory_make("jpegparse", "jpegparse_receive");
     jpegdec_receive      = gst_element_factory_make("jpegdec", "jpegdec_receive");
     videoconvert_receive = gst_element_factory_make("videoconvert", "videoconvert_receive");
-    videosink_receive    = gst_element_factory_make("xvimagesink", "videosink_receive");
+    videosink_receive    = gst_element_factory_make("autovideosink", "videosink_receive");
 
     if (!v4l2src || !capsfilter || !tee || !queue_display || !queue_network ||
         !jpegenc || !videoconvert || !autovideosink || !rtpjpegpay || !udpsink ||
