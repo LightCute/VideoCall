@@ -17,8 +17,8 @@ int main() {
     }
 
     // 2. 用户选择摄像头（示例直接选第 0 个）
-    cam.set_device(devs[7]);
-    std::cout << "选择摄像头：" << devs[7] << std::endl;
+    cam.set_device(devs[0]);
+    std::cout << "选择摄像头：" << devs[0] << std::endl;
 
     // 3. 设置分辨率, FPS
     cam.set_resolution(640, 480);

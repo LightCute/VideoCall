@@ -1,0 +1,9 @@
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/qt_gst_25_12_27_2.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/edit_cache.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/rebuild_cache.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/list_install_components.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/install.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/install/local.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/install/strip.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/qt_gst_25_12_27_2_autogen_timestamp_deps.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/CMakeFiles/qt_gst_25_12_27_2_autogen.dir
