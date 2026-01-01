@@ -179,6 +179,30 @@ CameraManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/qt_gst_camera.dir/build.make CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.s
 .PHONY : CameraManager.cpp.s
 
+CommandSocket.o: CommandSocket.cpp.o
+.PHONY : CommandSocket.o
+
+# target to build an object file
+CommandSocket.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/qt_gst_camera.dir/build.make CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o
+.PHONY : CommandSocket.cpp.o
+
+CommandSocket.i: CommandSocket.cpp.i
+.PHONY : CommandSocket.i
+
+# target to preprocess a source file
+CommandSocket.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/qt_gst_camera.dir/build.make CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.i
+.PHONY : CommandSocket.cpp.i
+
+CommandSocket.s: CommandSocket.cpp.s
+.PHONY : CommandSocket.s
+
+# target to generate assembly for a file
+CommandSocket.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/qt_gst_camera.dir/build.make CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.s
+.PHONY : CommandSocket.cpp.s
+
 QtCameraAdapter.o: QtCameraAdapter.cpp.o
 .PHONY : QtCameraAdapter.o
 
@@ -313,6 +337,9 @@ help:
 	@echo "... CameraManager.o"
 	@echo "... CameraManager.i"
 	@echo "... CameraManager.s"
+	@echo "... CommandSocket.o"
+	@echo "... CommandSocket.i"
+	@echo "... CommandSocket.s"
 	@echo "... QtCameraAdapter.o"
 	@echo "... QtCameraAdapter.i"
 	@echo "... QtCameraAdapter.s"

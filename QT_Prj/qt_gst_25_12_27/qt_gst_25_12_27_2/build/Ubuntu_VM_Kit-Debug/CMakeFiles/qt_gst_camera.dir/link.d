@@ -8,6 +8,7 @@ qt_gst_camera: \
   CMakeFiles/qt_gst_camera.dir/VideoWidget.cpp.o \
   CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o \
   CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o \
+  CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o \
   /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13 \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstapp-1.0.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstbase-1.0.so \
@@ -95,6 +96,8 @@ CMakeFiles/qt_gst_camera.dir/VideoWidget.cpp.o:
 CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 
 CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o:
+
+CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o:
 
 /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13:
 

@@ -1,6 +1,7 @@
 /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/moc_widget.cpp: /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/widget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27/qt_gst_25_12_27_2/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/moc_predefs.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/CameraManager.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/VideoWidget.h \
@@ -153,6 +154,7 @@
   /usr/include/c++/13/streambuf \
   /usr/include/c++/13/string \
   /usr/include/c++/13/string_view \
+  /usr/include/c++/13/thread \
   /usr/include/c++/13/tuple \
   /usr/include/c++/13/type_traits \
   /usr/include/c++/13/typeinfo \

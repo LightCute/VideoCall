@@ -66,6 +66,7 @@ else()
     add_executable(${PROJECT_NAME}
         ${UI_SOURCES}
         ${CORE_SOURCES}
+        CommandSocket.h CommandSocket.cpp
     )
 endif()
 

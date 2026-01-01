@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "" "qt_gst_camera_autogen/timestamp" "custom" "qt_gst_camera_autogen/deps"
   "/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/CameraManager.cpp" "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o.d"
+  "/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/CommandSocket.cpp" "CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/QtCameraAdapter.cpp" "CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/VideoWidget.cpp" "CMakeFiles/qt_gst_camera.dir/VideoWidget.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/VideoWidget.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/qt_gst_25_12_27_2/main.cpp" "CMakeFiles/qt_gst_camera.dir/main.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/main.cpp.o.d"

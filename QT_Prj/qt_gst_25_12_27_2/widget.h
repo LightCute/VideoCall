@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "QtCameraAdapter.h"
 #include "CameraManager.h"
+#include "CommandSocket.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,10 +25,13 @@ private slots:
 
     void on_Bt_video_off_clicked();
 
+    void on_Bt_tcp_send_clicked();
+
 private:
     Ui::Widget *ui;
     VideoWidget *video_;
     CameraManager camera_;
     QtCameraAdapter* adapter_;
+    CommandSocket *cmdSocket_ ;
 };
 #endif // WIDGET_H

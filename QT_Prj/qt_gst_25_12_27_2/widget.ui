@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="Bt_video_on_off">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>490</y>
+     <x>230</x>
+     <y>540</y>
      <width>88</width>
      <height>26</height>
     </rect>
@@ -29,7 +29,7 @@
   <widget class="QPushButton" name="Bt_video_off">
    <property name="geometry">
     <rect>
-     <x>670</x>
+     <x>370</x>
      <y>540</y>
      <width>88</width>
      <height>26</height>
@@ -37,6 +37,49 @@
    </property>
    <property name="text">
     <string>OFF</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="videoContainer" native="true">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>10</y>
+     <width>640</width>
+     <height>480</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="Text_tcp_recv_text">
+   <property name="geometry">
+    <rect>
+     <x>33</x>
+     <y>529</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Bt_tcp_send">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>540</y>
+     <width>88</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Send</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_tcp_send">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>540</y>
+     <width>113</width>
+     <height>26</height>
+    </rect>
    </property>
   </widget>
  </widget>
