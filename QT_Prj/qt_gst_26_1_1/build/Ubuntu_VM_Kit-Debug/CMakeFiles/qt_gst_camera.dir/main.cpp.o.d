@@ -503,6 +503,7 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
  /usr/include/c++/13/thread /usr/include/c++/13/bits/std_thread.h \
  /usr/include/c++/13/bits/this_thread_sleep.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
@@ -513,4 +514,9 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qlocale.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvariant.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qmap.h \
- /usr/include/c++/13/variant
+ /usr/include/c++/13/variant \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/AppWindow.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStackedWidget \
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstackedwidget.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidget.h

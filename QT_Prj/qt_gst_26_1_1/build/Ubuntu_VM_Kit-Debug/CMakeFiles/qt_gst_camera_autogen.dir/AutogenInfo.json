@@ -86,6 +86,12 @@
 	"HEADERS" : 
 	[
 		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/AppWindow.h",
+			"MU",
+			"EWIEGA46WW/moc_AppWindow.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h",
 			"MU",
 			"EWIEGA46WW/moc_CameraManager.cpp",
@@ -182,6 +188,11 @@
 	"SETTINGS_FILE" : "/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles/qt_gst_camera_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/AppWindow.cpp",
+			"MU",
+			null
+		],
 		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp",
 			"MU",

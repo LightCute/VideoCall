@@ -68,7 +68,7 @@ else()
         ${CORE_SOURCES}
         CommandSocket.h CommandSocket.cpp
         LoginWidget.h LoginWidget.cpp LoginWidget.ui
-
+        AppWindow.h AppWindow.cpp
 
     )
 endif()

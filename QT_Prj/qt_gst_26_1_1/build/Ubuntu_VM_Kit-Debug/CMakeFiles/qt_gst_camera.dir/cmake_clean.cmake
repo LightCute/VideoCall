@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/qt_gst_camera_autogen.dir/AutogenUsed.txt"
   "CMakeFiles/qt_gst_camera_autogen.dir/ParseCache.txt"
   "qt_gst_camera_autogen"
+  "CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o"
+  "CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o.d"
   "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o"
   "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o.d"
   "CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o"

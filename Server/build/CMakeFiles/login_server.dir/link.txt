@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -O0 -g -Wl,--dependency-file=CMakeFiles/login_server.dir/link.d CMakeFiles/login_server.dir/server_main.cpp.o CMakeFiles/login_server.dir/CommandSocket.cpp.o CMakeFiles/login_server.dir/LoginServer.cpp.o -o login_server  -lpthread

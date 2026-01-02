@@ -66,5 +66,6 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "variant": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1"
 }

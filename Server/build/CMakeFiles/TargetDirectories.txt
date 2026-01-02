@@ -1,0 +1,3 @@
+/home/light/work/Video_Prj/Server/build/CMakeFiles/login_server.dir
+/home/light/work/Video_Prj/Server/build/CMakeFiles/edit_cache.dir
+/home/light/work/Video_Prj/Server/build/CMakeFiles/rebuild_cache.dir

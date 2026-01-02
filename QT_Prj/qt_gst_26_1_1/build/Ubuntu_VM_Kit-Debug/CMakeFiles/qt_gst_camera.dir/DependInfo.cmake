@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "" "qt_gst_camera_autogen/timestamp" "custom" "qt_gst_camera_autogen/deps"
+  "/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/AppWindow.cpp" "CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp" "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.cpp" "CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.cpp" "CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o" "gcc" "CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o.d"
