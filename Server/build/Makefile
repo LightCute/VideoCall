@@ -177,6 +177,54 @@ LoginServer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/LoginServer.cpp.s
 .PHONY : LoginServer.cpp.s
 
+ThreadPool.o: ThreadPool.cpp.o
+.PHONY : ThreadPool.o
+
+# target to build an object file
+ThreadPool.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/ThreadPool.cpp.o
+.PHONY : ThreadPool.cpp.o
+
+ThreadPool.i: ThreadPool.cpp.i
+.PHONY : ThreadPool.i
+
+# target to preprocess a source file
+ThreadPool.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/ThreadPool.cpp.i
+.PHONY : ThreadPool.cpp.i
+
+ThreadPool.s: ThreadPool.cpp.s
+.PHONY : ThreadPool.s
+
+# target to generate assembly for a file
+ThreadPool.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/ThreadPool.cpp.s
+.PHONY : ThreadPool.cpp.s
+
+protocol/LoginProtocol.o: protocol/LoginProtocol.cpp.o
+.PHONY : protocol/LoginProtocol.o
+
+# target to build an object file
+protocol/LoginProtocol.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o
+.PHONY : protocol/LoginProtocol.cpp.o
+
+protocol/LoginProtocol.i: protocol/LoginProtocol.cpp.i
+.PHONY : protocol/LoginProtocol.i
+
+# target to preprocess a source file
+protocol/LoginProtocol.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.i
+.PHONY : protocol/LoginProtocol.cpp.i
+
+protocol/LoginProtocol.s: protocol/LoginProtocol.cpp.s
+.PHONY : protocol/LoginProtocol.s
+
+# target to generate assembly for a file
+protocol/LoginProtocol.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.s
+.PHONY : protocol/LoginProtocol.cpp.s
+
 server_main.o: server_main.cpp.o
 .PHONY : server_main.o
 
@@ -216,6 +264,12 @@ help:
 	@echo "... LoginServer.o"
 	@echo "... LoginServer.i"
 	@echo "... LoginServer.s"
+	@echo "... ThreadPool.o"
+	@echo "... ThreadPool.i"
+	@echo "... ThreadPool.s"
+	@echo "... protocol/LoginProtocol.o"
+	@echo "... protocol/LoginProtocol.i"
+	@echo "... protocol/LoginProtocol.s"
 	@echo "... server_main.o"
 	@echo "... server_main.i"
 	@echo "... server_main.s"

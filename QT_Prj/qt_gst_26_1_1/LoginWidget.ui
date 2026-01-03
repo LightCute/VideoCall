@@ -134,6 +134,29 @@
     <string>send</string>
    </property>
   </widget>
+  <widget class="QPlainTextEdit" name="TextEdit_raw_recv">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>300</y>
+     <width>104</width>
+     <height>70</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_recv_2">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>270</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>recv_raw</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

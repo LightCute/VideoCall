@@ -6,12 +6,15 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CMakeLists.txt \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.cpp \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.cpp \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.cpp \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.ui \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.cpp \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.cpp \
@@ -25,8 +28,13 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.ui \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
@@ -139,6 +147,7 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /usr/include/c++/13/cstddef \
   /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cstring \
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/cwctype \
   /usr/include/c++/13/debug/assertions.h \
@@ -375,7 +384,10 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /usr/include/limits.h \
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
   /usr/include/locale.h \
+  /usr/include/netinet/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
@@ -389,7 +401,12 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /usr/include/unistd.h \
   /usr/include/wchar.h \
   /usr/include/wctype.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
   /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/x86_64-linux-gnu/asm/socket.h \
+  /usr/include/x86_64-linux-gnu/asm/sockios.h \
   /usr/include/x86_64-linux-gnu/asm/unistd.h \
   /usr/include/x86_64-linux-gnu/asm/unistd_64.h \
   /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
@@ -406,6 +423,7 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
@@ -431,6 +449,9 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
@@ -463,7 +484,9 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /usr/include/x86_64-linux-gnu/bits/types/sigval_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -584,6 +607,7 @@ qt_gst_camera_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1
   /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidget.h \
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/syscall.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
@@ -664,12 +688,18 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
@@ -771,6 +801,7 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdio \
   /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cstring \
   /usr/include/c++/13/ctime \
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/debug/assertions.h \
@@ -1008,7 +1039,10 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
   /usr/include/locale.h \
+  /usr/include/netinet/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
@@ -1021,7 +1055,12 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
   /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/x86_64-linux-gnu/asm/socket.h \
+  /usr/include/x86_64-linux-gnu/asm/sockios.h \
   /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
   /usr/include/x86_64-linux-gnu/bits/byteswap.h \
   /usr/include/x86_64-linux-gnu/bits/confname.h \
@@ -1036,6 +1075,7 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
@@ -1061,6 +1101,9 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
@@ -1097,7 +1140,9 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -1222,6 +1267,7 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: /home/light/work/Video_Prj/QT_Prj/
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h \
@@ -1740,8 +1786,198 @@ CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o: /home/light/work/Video_Prj/QT_
   /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h \
   /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h
 
+CMakeFiles/qt_gst_camera.dir/ClientLoginProtocol.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.cpp \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h \
+  /usr/include/alloca.h \
+  /usr/include/asm-generic/errno-base.h \
+  /usr/include/asm-generic/errno.h \
+  /usr/include/c++/13/backward/binders.h \
+  /usr/include/c++/13/bit \
+  /usr/include/c++/13/bits/alloc_traits.h \
+  /usr/include/c++/13/bits/allocator.h \
+  /usr/include/c++/13/bits/basic_ios.h \
+  /usr/include/c++/13/bits/basic_ios.tcc \
+  /usr/include/c++/13/bits/basic_string.h \
+  /usr/include/c++/13/bits/basic_string.tcc \
+  /usr/include/c++/13/bits/char_traits.h \
+  /usr/include/c++/13/bits/charconv.h \
+  /usr/include/c++/13/bits/concept_check.h \
+  /usr/include/c++/13/bits/cpp_type_traits.h \
+  /usr/include/c++/13/bits/cxxabi_forced.h \
+  /usr/include/c++/13/bits/cxxabi_init_exception.h \
+  /usr/include/c++/13/bits/exception.h \
+  /usr/include/c++/13/bits/exception_defines.h \
+  /usr/include/c++/13/bits/exception_ptr.h \
+  /usr/include/c++/13/bits/functexcept.h \
+  /usr/include/c++/13/bits/functional_hash.h \
+  /usr/include/c++/13/bits/hash_bytes.h \
+  /usr/include/c++/13/bits/invoke.h \
+  /usr/include/c++/13/bits/ios_base.h \
+  /usr/include/c++/13/bits/istream.tcc \
+  /usr/include/c++/13/bits/locale_classes.h \
+  /usr/include/c++/13/bits/locale_classes.tcc \
+  /usr/include/c++/13/bits/locale_facets.h \
+  /usr/include/c++/13/bits/locale_facets.tcc \
+  /usr/include/c++/13/bits/localefwd.h \
+  /usr/include/c++/13/bits/memory_resource.h \
+  /usr/include/c++/13/bits/memoryfwd.h \
+  /usr/include/c++/13/bits/move.h \
+  /usr/include/c++/13/bits/nested_exception.h \
+  /usr/include/c++/13/bits/new_allocator.h \
+  /usr/include/c++/13/bits/ostream.tcc \
+  /usr/include/c++/13/bits/ostream_insert.h \
+  /usr/include/c++/13/bits/postypes.h \
+  /usr/include/c++/13/bits/predefined_ops.h \
+  /usr/include/c++/13/bits/ptr_traits.h \
+  /usr/include/c++/13/bits/range_access.h \
+  /usr/include/c++/13/bits/refwrap.h \
+  /usr/include/c++/13/bits/requires_hosted.h \
+  /usr/include/c++/13/bits/sstream.tcc \
+  /usr/include/c++/13/bits/std_abs.h \
+  /usr/include/c++/13/bits/stl_algobase.h \
+  /usr/include/c++/13/bits/stl_construct.h \
+  /usr/include/c++/13/bits/stl_function.h \
+  /usr/include/c++/13/bits/stl_iterator.h \
+  /usr/include/c++/13/bits/stl_iterator_base_funcs.h \
+  /usr/include/c++/13/bits/stl_iterator_base_types.h \
+  /usr/include/c++/13/bits/stl_pair.h \
+  /usr/include/c++/13/bits/streambuf.tcc \
+  /usr/include/c++/13/bits/streambuf_iterator.h \
+  /usr/include/c++/13/bits/string_view.tcc \
+  /usr/include/c++/13/bits/stringfwd.h \
+  /usr/include/c++/13/bits/uses_allocator.h \
+  /usr/include/c++/13/bits/uses_allocator_args.h \
+  /usr/include/c++/13/bits/utility.h \
+  /usr/include/c++/13/cctype \
+  /usr/include/c++/13/cerrno \
+  /usr/include/c++/13/clocale \
+  /usr/include/c++/13/cstddef \
+  /usr/include/c++/13/cstdio \
+  /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cwchar \
+  /usr/include/c++/13/cwctype \
+  /usr/include/c++/13/debug/assertions.h \
+  /usr/include/c++/13/debug/debug.h \
+  /usr/include/c++/13/exception \
+  /usr/include/c++/13/ext/alloc_traits.h \
+  /usr/include/c++/13/ext/atomicity.h \
+  /usr/include/c++/13/ext/numeric_traits.h \
+  /usr/include/c++/13/ext/string_conversions.h \
+  /usr/include/c++/13/ext/type_traits.h \
+  /usr/include/c++/13/initializer_list \
+  /usr/include/c++/13/ios \
+  /usr/include/c++/13/iosfwd \
+  /usr/include/c++/13/istream \
+  /usr/include/c++/13/new \
+  /usr/include/c++/13/ostream \
+  /usr/include/c++/13/pstl/pstl_config.h \
+  /usr/include/c++/13/sstream \
+  /usr/include/c++/13/stdexcept \
+  /usr/include/c++/13/streambuf \
+  /usr/include/c++/13/string \
+  /usr/include/c++/13/string_view \
+  /usr/include/c++/13/system_error \
+  /usr/include/c++/13/tuple \
+  /usr/include/c++/13/type_traits \
+  /usr/include/c++/13/typeinfo \
+  /usr/include/ctype.h \
+  /usr/include/endian.h \
+  /usr/include/errno.h \
+  /usr/include/features-time64.h \
+  /usr/include/features.h \
+  /usr/include/linux/errno.h \
+  /usr/include/locale.h \
+  /usr/include/pthread.h \
+  /usr/include/sched.h \
+  /usr/include/stdc-predef.h \
+  /usr/include/stdio.h \
+  /usr/include/stdlib.h \
+  /usr/include/time.h \
+  /usr/include/wchar.h \
+  /usr/include/wctype.h \
+  /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
+  /usr/include/x86_64-linux-gnu/bits/byteswap.h \
+  /usr/include/x86_64-linux-gnu/bits/cpu-set.h \
+  /usr/include/x86_64-linux-gnu/bits/endian.h \
+  /usr/include/x86_64-linux-gnu/bits/endianness.h \
+  /usr/include/x86_64-linux-gnu/bits/errno.h \
+  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
+  /usr/include/x86_64-linux-gnu/bits/floatn.h \
+  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+  /usr/include/x86_64-linux-gnu/bits/locale.h \
+  /usr/include/x86_64-linux-gnu/bits/long-double.h \
+  /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h \
+  /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
+  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
+  /usr/include/x86_64-linux-gnu/bits/sched.h \
+  /usr/include/x86_64-linux-gnu/bits/select.h \
+  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
+  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
+  /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
+  /usr/include/x86_64-linux-gnu/bits/time.h \
+  /usr/include/x86_64-linux-gnu/bits/time64.h \
+  /usr/include/x86_64-linux-gnu/bits/timesize.h \
+  /usr/include/x86_64-linux-gnu/bits/timex.h \
+  /usr/include/x86_64-linux-gnu/bits/types.h \
+  /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/sigset_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
+  /usr/include/x86_64-linux-gnu/bits/types/time_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/timer_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
+  /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+  /usr/include/x86_64-linux-gnu/bits/uintn-identity.h \
+  /usr/include/x86_64-linux-gnu/bits/waitflags.h \
+  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
+  /usr/include/x86_64-linux-gnu/bits/wchar.h \
+  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
+  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/atomic_word.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/c++locale.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/cpu_defines.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/ctype_base.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/gthr.h \
+  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+  /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+  /usr/include/x86_64-linux-gnu/sys/select.h \
+  /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/types.h \
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h
+
 CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.cpp \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /usr/include/alloca.h \
   /usr/include/arpa/inet.h \
   /usr/include/asm-generic/bitsperlong.h \
@@ -2000,16 +2236,23 @@ CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o: /home/light/work/Video_Prj/QT_
 
 CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.cpp \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h \
   qt_gst_camera_autogen/include/ui_LoginWidget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
@@ -2023,6 +2266,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/c++/13/bits/allocated_ptr.h \
   /usr/include/c++/13/bits/allocator.h \
   /usr/include/c++/13/bits/atomic_base.h \
+  /usr/include/c++/13/bits/atomic_futex.h \
   /usr/include/c++/13/bits/atomic_lockfree_defines.h \
   /usr/include/c++/13/bits/basic_string.h \
   /usr/include/c++/13/bits/basic_string.tcc \
@@ -2068,6 +2312,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/c++/13/bits/shared_ptr_base.h \
   /usr/include/c++/13/bits/std_abs.h \
   /usr/include/c++/13/bits/std_function.h \
+  /usr/include/c++/13/bits/std_mutex.h \
   /usr/include/c++/13/bits/std_thread.h \
   /usr/include/c++/13/bits/stl_algo.h \
   /usr/include/c++/13/bits/stl_algobase.h \
@@ -2096,6 +2341,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/c++/13/bits/stringfwd.h \
   /usr/include/c++/13/bits/this_thread_sleep.h \
   /usr/include/c++/13/bits/uniform_int_dist.h \
+  /usr/include/c++/13/bits/unique_lock.h \
   /usr/include/c++/13/bits/unique_ptr.h \
   /usr/include/c++/13/bits/unordered_map.h \
   /usr/include/c++/13/bits/uses_allocator.h \
@@ -2107,10 +2353,12 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/c++/13/chrono \
   /usr/include/c++/13/clocale \
   /usr/include/c++/13/compare \
+  /usr/include/c++/13/condition_variable \
   /usr/include/c++/13/cstddef \
   /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdio \
   /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cstring \
   /usr/include/c++/13/ctime \
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/debug/assertions.h \
@@ -2124,6 +2372,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/c++/13/ext/string_conversions.h \
   /usr/include/c++/13/ext/type_traits.h \
   /usr/include/c++/13/functional \
+  /usr/include/c++/13/future \
   /usr/include/c++/13/initializer_list \
   /usr/include/c++/13/iosfwd \
   /usr/include/c++/13/iterator \
@@ -2131,6 +2380,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/c++/13/list \
   /usr/include/c++/13/map \
   /usr/include/c++/13/memory \
+  /usr/include/c++/13/mutex \
   /usr/include/c++/13/new \
   /usr/include/c++/13/numeric \
   /usr/include/c++/13/pstl/execution_defs.h \
@@ -2349,7 +2599,10 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
   /usr/include/locale.h \
+  /usr/include/netinet/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
@@ -2362,7 +2615,12 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
   /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/x86_64-linux-gnu/asm/socket.h \
+  /usr/include/x86_64-linux-gnu/asm/sockios.h \
   /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
   /usr/include/x86_64-linux-gnu/bits/byteswap.h \
   /usr/include/x86_64-linux-gnu/bits/confname.h \
@@ -2377,6 +2635,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
@@ -2402,6 +2661,9 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
@@ -2438,7 +2700,9 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -2471,6 +2735,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QMetaObject \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QMetaType \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/QThread \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h \
@@ -2488,7 +2753,9 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qdatastream.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qdeadlinetimer.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qdebug.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qelapsedtimer.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qfiledevice.h \
@@ -2535,6 +2802,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qsystemdetection.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qtextstream.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qthread.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qtypeinfo.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qurl.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qvariant.h \
@@ -2604,6 +2872,7 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o: /home/light/work/Video_Prj/QT_Pr
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h \
@@ -3303,12 +3572,18 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
@@ -3410,6 +3685,7 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdio \
   /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cstring \
   /usr/include/c++/13/ctime \
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/debug/assertions.h \
@@ -3648,7 +3924,10 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
   /usr/include/locale.h \
+  /usr/include/netinet/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
@@ -3661,7 +3940,12 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
   /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/x86_64-linux-gnu/asm/socket.h \
+  /usr/include/x86_64-linux-gnu/asm/sockios.h \
   /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
   /usr/include/x86_64-linux-gnu/bits/byteswap.h \
   /usr/include/x86_64-linux-gnu/bits/confname.h \
@@ -3676,6 +3960,7 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
@@ -3701,6 +3986,9 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
@@ -3737,7 +4025,9 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -3867,6 +4157,7 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gs
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h \
@@ -3883,6 +4174,7 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
@@ -3892,8 +4184,13 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   qt_gst_camera_autogen/EWIEGA46WW/moc_VideoWidget.cpp \
   qt_gst_camera_autogen/EWIEGA46WW/moc_widget.cpp \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
@@ -3995,6 +4292,7 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdio \
   /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cstring \
   /usr/include/c++/13/ctime \
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/debug/assertions.h \
@@ -4232,7 +4530,10 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
   /usr/include/locale.h \
+  /usr/include/netinet/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
@@ -4245,7 +4546,12 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
   /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/x86_64-linux-gnu/asm/socket.h \
+  /usr/include/x86_64-linux-gnu/asm/sockios.h \
   /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
   /usr/include/x86_64-linux-gnu/bits/byteswap.h \
   /usr/include/x86_64-linux-gnu/bits/confname.h \
@@ -4260,6 +4566,7 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
@@ -4285,6 +4592,9 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
@@ -4321,7 +4631,9 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -4441,6 +4753,7 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: qt_gs
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h \
@@ -4455,13 +4768,19 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h \
   qt_gst_camera_autogen/include/ui_widget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
@@ -4563,6 +4882,7 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdio \
   /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cstring \
   /usr/include/c++/13/ctime \
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/debug/assertions.h \
@@ -4801,7 +5121,10 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
   /usr/include/locale.h \
+  /usr/include/netinet/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
@@ -4814,7 +5137,12 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
   /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/x86_64-linux-gnu/asm/socket.h \
+  /usr/include/x86_64-linux-gnu/asm/sockios.h \
   /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
   /usr/include/x86_64-linux-gnu/bits/byteswap.h \
   /usr/include/x86_64-linux-gnu/bits/confname.h \
@@ -4829,6 +5157,7 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
@@ -4854,6 +5183,9 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
@@ -4890,7 +5222,9 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -5039,6 +5373,7 @@ CMakeFiles/qt_gst_camera.dir/widget.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h \
@@ -5106,6 +5441,7 @@ qt_gst_camera: /lib/x86_64-linux-gnu/libGL.so.1 \
   /usr/lib/x86_64-linux-gnu/libc_nonshared.a \
   CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o \
   CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o \
+  CMakeFiles/qt_gst_camera.dir/ClientLoginProtocol.cpp.o \
   CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o \
   CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o \
   CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o \
@@ -5143,13 +5479,13 @@ CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o:
 
 /lib/x86_64-linux-gnu/libz.so.1:
 
-/lib/x86_64-linux-gnu/libpng16.so.16:
-
 /lib/x86_64-linux-gnu/libpcre2-8.so.0:
 
 /lib/x86_64-linux-gnu/libmd.so.0:
 
 /lib/x86_64-linux-gnu/libm.so.6:
+
+CMakeFiles/qt_gst_camera.dir/ClientLoginProtocol.cpp.o:
 
 /lib/x86_64-linux-gnu/libicuuc.so.74:
 
@@ -5182,8 +5518,6 @@ qt_gst_camera_autogen/EWIEGA46WW/moc_VideoWidget.cpp:
 qt_gst_camera_autogen/EWIEGA46WW/moc_LoginWidget.cpp:
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qpainter.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtextedit.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdialog.h:
 
@@ -5229,29 +5563,25 @@ qt_gst_camera_autogen/EWIEGA46WW/moc_LoginWidget.cpp:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qelapsedtimer.h:
+
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qdebug.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/QThread:
+
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QMetaObject:
 
+/usr/include/c++/13/mutex:
+
+/usr/include/c++/13/future:
+
+/usr/include/c++/13/bits/unique_lock.h:
+
+/usr/include/c++/13/bits/atomic_futex.h:
+
 qt_gst_camera_autogen/include/ui_LoginWidget.h:
-
-/usr/include/x86_64-linux-gnu/sys/socket.h:
-
-/usr/include/x86_64-linux-gnu/bits/in.h:
-
-/usr/include/x86_64-linux-gnu/asm/sockios.h:
-
-/usr/include/x86_64-linux-gnu/asm/posix_types.h:
-
-/usr/include/x86_64-linux-gnu/asm/bitsperlong.h:
-
-/usr/include/netinet/in.h:
-
-/usr/include/linux/posix_types.h:
-
-/usr/include/asm-generic/posix_types.h:
 
 /usr/include/c++/13/istream:
 
@@ -5351,8 +5681,6 @@ qt_gst_camera_autogen/include/ui_LoginWidget.h:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake:
 
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake:
-
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake:
@@ -5367,6 +5695,8 @@ qt_gst_camera_autogen/include/ui_LoginWidget.h:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake:
 
+/usr/include/c++/13/condition_variable:
+
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake:
@@ -5377,25 +5707,15 @@ qt_gst_camera_autogen/include/ui_LoginWidget.h:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfig.cmake:
 
+/usr/include/c++/13/bits/sstream.tcc:
+
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
-
-/usr/include/x86_64-linux-gnu/sys/ucontext.h:
-
-/usr/include/asm-generic/socket.h:
-
-/usr/local/share/cmake-4.2/Modules/FindPkgConfig.cmake:
-
-/usr/include/x86_64-linux-gnu/sys/types.h:
+/usr/include/x86_64-linux-gnu/sys/socket.h:
 
 CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o:
 
@@ -5451,39 +5771,41 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o:
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h:
 
-/usr/include/linux/stddef.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake:
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/QImage:
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qsystemdetection.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPlainTextEdit:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qstring.h:
 
-/usr/include/c++/13/bits/stl_uninitialized.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer_impl.h:
 
-/usr/include/c++/13/bits/new_allocator.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qshareddata.h:
 
-/usr/include/c++/13/optional:
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication:
 
-/usr/include/glib-2.0/glib/gstring.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qrefcount.h:
 
-/usr/include/c++/13/bits/hashtable.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qrect.h:
 
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/main.cpp:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qprocessordetection.h:
 
-/usr/include/glib-2.0/glib/gpattern.h:
+/usr/local/share/cmake-4.2/Modules/Platform/Linker/GNU.cmake:
 
-/lib/x86_64-linux-gnu/libdouble-conversion.so.3:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h:
 
-/usr/include/x86_64-linux-gnu/sys/single_threaded.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qpair.h:
 
-/usr/include/glib-2.0/glib/gtimer.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject_impl.h:
 
-/usr/include/gstreamer-1.0/gst/gstbytearrayinterface.h:
+/usr/include/c++/13/ctime:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qnumeric.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qmetatype.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qmargins.h:
 
 /usr/include/glib-2.0/glib/gslist.h:
 
@@ -5501,6 +5823,8 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o:
 
 /usr/include/glib-2.0/glib/gscanner.h:
 
+/usr/include/netinet/in.h:
+
 /usr/include/glib-2.0/glib/guri.h:
 
 /usr/include/glib-2.0/glib/gquark.h:
@@ -5510,6 +5834,8 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o:
 /usr/include/glib-2.0/glib/gqsort.h:
 
 /usr/include/c++/13/bits/stl_algobase.h:
+
+/usr/include/glib-2.0/glib/gpattern.h:
 
 /usr/include/glib-2.0/glib/gmessages.h:
 
@@ -5527,10 +5853,6 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o:
 
 /usr/include/gstreamer-1.0/gst/gstatomicqueue.h:
 
-/usr/include/c++/13/bits/localefwd.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringlist.h:
-
 /usr/include/glib-2.0/glib/glib-autocleanups.h:
 
 /usr/include/c++/13/bits/basic_string.h:
@@ -5547,9 +5869,9 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o:
 
 /usr/include/glib-2.0/glib/gbitlock.h:
 
-/usr/include/c++/13/bits/cxxabi_init_exception.h:
-
 /usr/include/glib-2.0/glib/goption.h:
+
+/usr/include/c++/13/bits/cxxabi_init_exception.h:
 
 /usr/include/glib-2.0/glib/gdatetime.h:
 
@@ -5637,6 +5959,10 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o:
 
 /usr/include/gstreamer-1.0/gst/gstpipeline.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringalgorithms.h:
+
+/usr/include/glib-2.0/glib.h:
+
 /usr/include/c++/13/ext/string_conversions.h:
 
 /usr/include/c++/13/ext/numeric_traits.h:
@@ -5671,6 +5997,8 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o:
 
 /usr/include/c++/13/cwctype:
 
+/usr/include/x86_64-linux-gnu/asm/posix_types.h:
+
 /usr/include/c++/13/memory:
 
 /usr/include/c++/13/bits/parse_numbers.h:
@@ -5689,79 +6017,27 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o:
 
 /usr/include/c++/13/climits:
 
-/usr/include/c++/13/ext/atomicity.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+/usr/include/c++/13/bits/uniform_int_dist.h:
 
-/usr/include/c++/13/cctype:
+/usr/include/c++/13/bits/locale_classes.tcc:
 
-/usr/include/linux/limits.h:
+/usr/include/c++/13/bits/iterator_concepts.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication:
+/usr/include/c++/13/bits/string_view.tcc:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qrefcount.h:
+/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
 
-/usr/include/errno.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qsize.h:
 
-/lib/x86_64-linux-gnu/libmd4c.so.0:
+/usr/include/c++/13/ostream:
 
-/usr/include/c++/13/bits/functional_hash.h:
-
-CMakeFiles/qt_gst_camera.dir/main.cpp.o:
-
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake:
-
-/usr/include/gstreamer-1.0/gst/gstinfo.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h:
-
-/usr/include/c++/13/streambuf:
-
-/usr/include/c++/13/pstl/glue_memory_defs.h:
-
-/usr/include/c++/13/bits/memory_resource.h:
-
-/usr/include/c++/13/bits/exception.h:
-
-/usr/include/c++/13/typeinfo:
+/usr/include/c++/13/bits/streambuf_iterator.h:
 
 /usr/include/glib-2.0/glib/ghook.h:
 
-/usr/include/c++/13/bits/char_traits.h:
-
-/usr/include/c++/13/bits/std_function.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h:
-
-/usr/include/alloca.h:
-
 /usr/include/c++/13/atomic:
-
-/usr/include/c++/13/bits/shared_ptr_base.h:
-
-/usr/include/glib-2.0/glib/gthread.h:
-
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h:
-
-/usr/include/c++/13/ctime:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h:
-
-/usr/include/glib-2.0/glib/gbacktrace.h:
-
-/usr/include/c++/13/bits/node_handle.h:
-
-/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
-
-/usr/include/glib-2.0/glib/gstrvbuilder.h:
-
-/usr/include/c++/13/bits/invoke.h:
-
-qt_gst_camera_autogen/mocs_compilation.cpp:
-
-/usr/include/c++/13/bits/ranges_algo.h:
 
 /usr/include/c++/13/bits/algorithmfwd.h:
 
@@ -5771,17 +6047,9 @@ qt_gst_camera_autogen/mocs_compilation.cpp:
 
 /usr/include/gstreamer-1.0/gst/app/gstappsink.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
-
-/usr/include/x86_64-linux-gnu/bits/socket.h:
-
-/usr/include/x86_64-linux-gnu/bits/long-double.h:
-
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h:
 
 /usr/include/c++/13/backward/auto_ptr.h:
-
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringliteral.h:
 
@@ -5789,65 +6057,11 @@ qt_gst_camera_autogen/mocs_compilation.cpp:
 
 /usr/include/glib-2.0/glib/gutils.h:
 
-/usr/include/x86_64-linux-gnu/bits/socket_type.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake:
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h:
-
-/usr/include/c++/13/bits/stl_pair.h:
-
-/usr/include/gstreamer-1.0/gst/gstversion.h:
-
-/usr/include/x86_64-linux-gnu/bits/errno.h:
-
-/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
-
-/usr/include/glib-2.0/glib/genviron.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
-/usr/include/c++/13/bits/basic_string.tcc:
-
-/usr/include/c++/13/bit:
-
-/usr/include/c++/13/bits/allocated_ptr.h:
-
-/usr/include/glib-2.0/glib/gdir.h:
-
-/usr/include/c++/13/bits/alloc_traits.h:
-
-/usr/include/c++/13/bits/concept_check.h:
-
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp:
-
-/usr/include/glib-2.0/gobject/glib-enumtypes.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qglobal.h:
-
-/usr/include/glib-2.0/glib/glib-visibility.h:
-
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.cpp:
-
-/usr/include/glib-2.0/glib/gversion.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/libgcc.a:
-
-/usr/include/c++/13/numbers:
-
-/usr/include/glib-2.0/glib/gthreadpool.h:
-
-/usr/include/glib-2.0/glib/gpoll.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qregexp.h:
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h:
 
 CMakeFiles/qt_gst_camera.dir/widget.cpp.o:
 
 /usr/include/glib-2.0/glib/gprimes.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qnumeric.h:
 
 /usr/include/glib-2.0/glib/gnode.h:
 
@@ -5857,29 +6071,53 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o:
 
 /usr/include/c++/13/bits/hash_bytes.h:
 
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h:
+/usr/include/c++/13/bit:
 
-/usr/include/c++/13/bits/cpp_type_traits.h:
+/usr/include/c++/13/bits/allocated_ptr.h:
 
-/usr/include/c++/13/bits/streambuf_iterator.h:
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
-/lib/x86_64-linux-gnu/libbrotlicommon.so.1:
+/usr/include/c++/13/bits/basic_string.tcc:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringmatcher.h:
+/usr/include/alloca.h:
 
-/usr/include/c++/13/cwchar:
+/usr/include/c++/13/bits/ranges_base.h:
 
-/usr/include/c++/13/bits/move.h:
+/usr/include/x86_64-linux-gnu/asm/bitsperlong.h:
 
-/usr/include/glib-2.0/gobject/gmarshal.h:
+/usr/include/glib-2.0/glib/gbacktrace.h:
 
-/usr/include/c++/13/bits/utility.h:
+/usr/include/c++/13/bits/node_handle.h:
 
-/usr/include/gstreamer-1.0/gst/gstcontrolsource.h:
+/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
 
-/usr/include/gstreamer-1.0/gst/gstdynamictypefactory.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qglobal.h:
 
-/usr/include/c++/13/bits/stl_function.h:
+/usr/include/glib-2.0/glib/glib-visibility.h:
+
+/usr/local/share/cmake-4.2/Modules/FindPkgConfig.cmake:
+
+/usr/include/x86_64-linux-gnu/sys/types.h:
+
+/usr/include/asm-generic/socket.h:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.cpp:
+
+/usr/include/glib-2.0/glib/gversion.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc.a:
+
+/usr/include/c++/13/numbers:
+
+/usr/include/glib-2.0/glib/gchecksum.h:
+
+/usr/include/c++/13/algorithm:
+
+/usr/include/glib-2.0/glib/gbase64.h:
+
+/usr/include/glib-2.0/glib/deprecated/gmain.h:
+
+/usr/include/c++/13/bits/stl_raw_storage_iter.h:
 
 /usr/include/c++/13/initializer_list:
 
@@ -5899,11 +6137,51 @@ qt_gst_camera_autogen/EWIEGA46WW/moc_AppWindow.cpp:
 
 /usr/include/gstreamer-1.0/gst/gstelementfactory.h:
 
+/usr/include/c++/13/bits/cpp_type_traits.h:
+
+/lib/x86_64-linux-gnu/libbrotlicommon.so.1:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringmatcher.h:
+
+/usr/include/c++/13/cwchar:
+
+/usr/include/c++/13/bits/utility.h:
+
+/usr/include/gstreamer-1.0/gst/gstcontrolsource.h:
+
+/usr/include/gstreamer-1.0/gst/gstdynamictypefactory.h:
+
+/usr/include/c++/13/bits/stl_function.h:
+
+/lib/x86_64-linux-gnu/libpng16.so.16:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter:
+
+/usr/include/gstreamer-1.0/gst/base/gstbasesink.h:
+
+CMakeFiles/qt_gst_camera.dir/main.cpp.o:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake:
+
+/usr/include/gstreamer-1.0/gst/gstinfo.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.ui:
+
+/usr/include/linux/limits.h:
+
+/usr/include/errno.h:
+
+/lib/x86_64-linux-gnu/libmd4c.so.0:
+
+/usr/include/c++/13/bits/functional_hash.h:
+
 /usr/include/glib-2.0/glib/grefcount.h:
-
-/usr/include/asm-generic/bitsperlong.h:
-
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h:
 
 /usr/include/gstreamer-1.0/gst/gstconfig.h:
 
@@ -5915,25 +6193,47 @@ qt_gst_camera_autogen/EWIEGA46WW/moc_AppWindow.cpp:
 
 /usr/include/glib-2.0/gobject/gparam.h:
 
-/usr/include/c++/13/bits/locale_classes.tcc:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h:
-
-/usr/include/c++/13/bits/uniform_int_dist.h:
-
-/usr/include/c++/13/bits/stl_multimap.h:
-
-/usr/include/gstreamer-1.0/gst/gstparse.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h:
-
 /usr/include/c++/13/backward/binders.h:
 
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h:
+/usr/include/c++/13/bits/move.h:
 
-/usr/include/c++/13/bits/iterator_concepts.h:
+/usr/include/glib-2.0/gobject/gmarshal.h:
+
+/usr/include/c++/13/bits/range_access.h:
+
+/usr/include/glib-2.0/glib/gdir.h:
+
+/usr/include/c++/13/bits/alloc_traits.h:
+
+/usr/include/c++/13/bits/concept_check.h:
+
+/usr/include/asm-generic/posix_types.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qtextdocument.h:
+
+/usr/include/c++/13/bits/std_mutex.h:
+
+/usr/include/c++/13/bits/stl_construct.h:
+
+/usr/include/c++/13/optional:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h:
+
+/usr/include/glib-2.0/glib/gthread.h:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp:
+
+/usr/include/glib-2.0/gobject/glib-enumtypes.h:
+
+/usr/include/c++/13/bits/char_traits.h:
+
+/usr/include/c++/13/bits/std_function.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.cpp:
 
 /usr/local/share/cmake-4.2/Modules/Compiler/GNU-CXX.cmake:
 
@@ -5953,6 +6253,20 @@ CMakeFiles/4.2.0-rc4/CMakeSystem.cmake:
 
 /usr/include/x86_64-linux-gnu/bits/sigstack.h:
 
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtextedit.h:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake:
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/QImage:
+
+/usr/include/linux/stddef.h:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h:
+
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextoption.h:
 
 /usr/include/glib-2.0/glib/ghmac.h:
@@ -5960,18 +6274,6 @@ CMakeFiles/4.2.0-rc4/CMakeSystem.cmake:
 /usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h:
 
 /usr/include/c++/13/bits/stl_iterator_base_types.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QObject:
-
-/usr/include/c++/13/bits/exception_defines.h:
-
-/usr/include/gstreamer-1.0/gst/gstprotection.h:
-
-/usr/include/c++/13/bits/this_thread_sleep.h:
-
-/usr/include/c++/13/bits/exception_ptr.h:
-
-/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
 /usr/include/glib-2.0/glib/deprecated/gallocator.h:
 
@@ -5981,29 +6283,15 @@ CMakeFiles/4.2.0-rc4/CMakeSystem.cmake:
 
 /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.cpp:
 
-/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake:
+/usr/include/glib-2.0/gobject/gsourceclosure.h:
 
-/usr/include/c++/13/iosfwd:
+/usr/include/c++/13/bits/unique_ptr.h:
 
-/usr/include/glib-2.0/gobject/gclosure.h:
+/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/signum-generic.h:
+/usr/include/c++/13/bits/align.h:
 
-/usr/include/glib-2.0/glib/gconvert.h:
-
-/usr/include/c++/13/bits/ranges_cmp.h:
-
-/usr/local/share/cmake-4.2/Modules/Platform/Linker/GNU.cmake:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h:
-
-/usr/include/c++/13/bits/predefined_ops.h:
-
-qt_gst_camera_autogen/moc_predefs.h:
-
-/usr/include/gstreamer-1.0/gst/gstpadtemplate.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/QObject:
 
 /usr/include/c++/13/pstl/execution_defs.h:
 
@@ -6013,29 +6301,59 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigevent-consts.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qset.h:
+/usr/include/c++/13/bits/hashtable.h:
 
-/usr/include/c++/13/bits/ranges_util.h:
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/main.cpp:
 
-/usr/include/glib-2.0/gobject/gobject-autocleanups.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringlist.h:
 
-/usr/include/x86_64-linux-gnu/c++/13/bits/ctype_base.h:
+/usr/include/c++/13/bits/localefwd.h:
 
-/usr/include/asm-generic/errno-base.h:
+/usr/include/glib-2.0/glib/gstring.h:
 
-/usr/include/c++/13/bits/stl_iterator_base_funcs.h:
+/usr/include/c++/13/bits/shared_ptr_base.h:
 
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.cpp:
+/usr/include/c++/13/ext/atomicity.h:
 
-/usr/include/glib-2.0/glib/gchecksum.h:
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
 
-/usr/include/c++/13/algorithm:
+/usr/include/c++/13/cctype:
 
-/usr/include/glib-2.0/glib/gbase64.h:
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h:
 
-/usr/include/glib-2.0/glib/deprecated/gmain.h:
+/usr/include/asm-generic/bitsperlong.h:
 
-/usr/include/c++/13/bits/stl_raw_storage_iter.h:
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+
+/usr/include/c++/13/typeinfo:
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h:
+
+/usr/include/c++/13/streambuf:
+
+/usr/include/c++/13/pstl/glue_memory_defs.h:
+
+/usr/include/c++/13/bits/memory_resource.h:
+
+/usr/include/c++/13/bits/exception.h:
+
+/usr/include/glib-2.0/glib/genviron.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake:
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h:
+
+/usr/include/x86_64-linux-gnu/bits/socket_type.h:
+
+/usr/include/c++/13/bits/stl_pair.h:
+
+/usr/include/gstreamer-1.0/gst/gstversion.h:
+
+/usr/include/x86_64-linux-gnu/bits/errno.h:
+
+/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
 
 /usr/include/c++/13/bits/stream_iterator.h:
 
@@ -6045,13 +6363,91 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
 
+/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake:
+
+/usr/include/c++/13/iosfwd:
+
+/usr/include/glib-2.0/gobject/gclosure.h:
+
+/usr/include/x86_64-linux-gnu/bits/signum-generic.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h:
+
+/usr/include/c++/13/bits/predefined_ops.h:
+
+qt_gst_camera_autogen/moc_predefs.h:
+
+/usr/include/gstreamer-1.0/gst/gstpadtemplate.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qthread.h:
+
+/usr/include/glib-2.0/glib/gconvert.h:
+
+/usr/include/c++/13/bits/ranges_cmp.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/c++/13/bits/stl_iterator_base_funcs.h:
+
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.cpp:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qset.h:
+
+/usr/include/c++/13/bits/ranges_util.h:
+
+/usr/include/glib-2.0/gobject/gobject-autocleanups.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/ctype_base.h:
+
+/usr/include/c++/13/bits/exception_defines.h:
+
+/usr/include/gstreamer-1.0/gst/gstprotection.h:
+
+/usr/include/c++/13/bits/stl_multimap.h:
+
+/usr/include/gstreamer-1.0/gst/gstparse.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h:
+
+/usr/include/c++/13/bits/this_thread_sleep.h:
+
+/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
+
+/usr/include/c++/13/bits/exception_ptr.h:
+
+/usr/include/c++/13/bits/invoke.h:
+
+qt_gst_camera_autogen/mocs_compilation.cpp:
+
+/usr/include/c++/13/bits/ranges_algo.h:
+
+/usr/include/glib-2.0/glib/gstrvbuilder.h:
+
 /usr/include/c++/13/stdexcept:
 
 /usr/include/c++/13/clocale:
 
 /usr/include/c++/13/bits/locale_facets.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qline.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qlocale.h:
+
+/usr/include/endian.h:
+
+/usr/include/stdint.h:
+
+/usr/include/c++/13/bits/streambuf.tcc:
+
 /usr/include/glib-2.0/glib/gatomic.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer.h:
+
+/usr/include/glib-2.0/glib/gasyncqueue.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
 
@@ -6071,6 +6467,24 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/c++/13/bits/move_only_function.h:
 
+/usr/include/glib-2.0/glib/deprecated/gcache.h:
+
+/usr/include/c++/13/bits/uses_allocator_args.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qhashfunctions.h:
+
+/usr/include/c++/13/bits/new_allocator.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPlainTextEdit:
+
+/usr/include/c++/13/bits/stl_uninitialized.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qregexp.h:
+
+/usr/include/glib-2.0/glib/gpoll.h:
+
+/usr/include/glib-2.0/glib/gthreadpool.h:
+
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h:
 
 /usr/include/glib-2.0/glib/gsequence.h:
@@ -6085,7 +6499,7 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/c++/13/bits/ptr_traits.h:
 
-/usr/include/c++/13/bits/range_access.h:
+/usr/include/linux/posix_types.h:
 
 /usr/include/c++/13/system_error:
 
@@ -6093,17 +6507,7 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/glib-2.0/glib/gbytes.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qrect.h:
-
 /usr/include/c++/13/bits/ranges_algobase.h:
-
-/usr/include/c++/13/bits/ranges_base.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlineedit.h:
-
-/usr/include/glib-2.0/glib/gspawn.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h:
 
 /usr/include/glib-2.0/glib/giochannel.h:
 
@@ -6119,19 +6523,11 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
-/usr/include/c++/13/bits/string_view.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qregion.h:
 
 /usr/include/c++/13/bits/shared_ptr.h:
 
-.qtc/package-manager/auto-setup.cmake:
-
-/usr/include/glib-2.0/glib/ghostutils.h:
-
-/usr/include/c++/13/cstdint:
+/usr/include/c++/13/bits/uses_allocator.h:
 
 /usr/include/c++/13/bits/postypes.h:
 
@@ -6141,7 +6537,11 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/gstreamer-1.0/gst/gstevent.h:
 
-/usr/include/c++/13/bits/uses_allocator.h:
+.qtc/package-manager/auto-setup.cmake:
+
+/usr/include/glib-2.0/glib/ghostutils.h:
+
+/usr/include/c++/13/cstdint:
 
 /usr/include/c++/13/cstddef:
 
@@ -6152,16 +6552,6 @@ qt_gst_camera_autogen/moc_predefs.h:
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringview.h:
 
 /usr/include/c++/13/bits/stl_bvector.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qline.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qtextdocument.h:
-
-/usr/include/c++/13/bits/std_mutex.h:
-
-/usr/include/c++/13/bits/stl_construct.h:
 
 /usr/include/c++/13/bits/functexcept.h:
 
@@ -6177,9 +6567,9 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/c++/13/bits/stl_numeric.h:
 
-/usr/include/asm-generic/sockios.h:
-
 /usr/include/glib-2.0/glib/gmarkup.h:
+
+/usr/include/asm-generic/sockios.h:
 
 /usr/include/c++/13/bits/stl_relops.h:
 
@@ -6195,29 +6585,27 @@ qt_gst_camera_autogen/moc_predefs.h:
 
 /usr/include/glib-2.0/glib/deprecated/gthread.h:
 
+/usr/include/x86_64-linux-gnu/sys/ucontext.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/sigval_t.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qlocale.h:
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlineedit.h:
 
-/usr/include/endian.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h:
 
-/usr/include/stdint.h:
+/usr/include/glib-2.0/glib/gspawn.h:
 
-/usr/include/c++/13/bits/streambuf.tcc:
+/lib/x86_64-linux-gnu/libdouble-conversion.so.3:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject_impl.h:
+/usr/include/x86_64-linux-gnu/sys/single_threaded.h:
 
-/usr/include/c++/13/bits/align.h:
+/usr/include/glib-2.0/glib/gtimer.h:
 
-/usr/include/glib-2.0/gobject/gsourceclosure.h:
+/usr/include/gstreamer-1.0/gst/gstbytearrayinterface.h:
 
-/usr/include/c++/13/bits/unique_ptr.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
-
-/usr/include/glib-2.0/glib/deprecated/gcache.h:
-
-/usr/include/c++/13/bits/uses_allocator_args.h:
+/usr/include/c++/13/sstream:
 
 /usr/local/share/cmake-4.2/Modules/CMakeInitializeConfigs.cmake:
 
@@ -6285,8 +6673,6 @@ CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasicatomic.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qstring.h:
-
 /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qtypeinfo.h:
@@ -6294,10 +6680,6 @@ CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o:
 /usr/include/glib-2.0/glib/gtestutils.h:
 
 /usr/include/gstreamer-1.0/gst/app/app-prelude.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter:
-
-/usr/include/gstreamer-1.0/gst/base/gstbasesink.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLabel:
 
@@ -6351,10 +6733,6 @@ CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o:
 
 /usr/include/gstreamer-1.0/gst/gstchildproxy.h:
 
-/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.ui:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h:
-
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qpushbutton.h:
 
 /usr/include/gstreamer-1.0/gst/gstclock.h:
@@ -6397,6 +6775,10 @@ CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 
 /usr/include/gstreamer-1.0/gst/gsterror.h:
 
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qnamespace.h:
+
+/usr/include/gstreamer-1.0/gst/gstformat.h:
+
 /usr/include/gstreamer-1.0/gst/gstmacros.h:
 
 /usr/include/gstreamer-1.0/gst/gstsample.h:
@@ -6435,8 +6817,6 @@ CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 
 /usr/include/gstreamer-1.0/gst/gstpreset.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qshareddata.h:
-
 /usr/include/gstreamer-1.0/gst/gstpromise.h:
 
 /usr/include/gstreamer-1.0/gst/gstsegment.h:
@@ -6450,6 +6830,8 @@ CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake:
 
 /usr/include/gstreamer-1.0/gst/gststreamcollection.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qdeadlinetimer.h:
 
 /usr/include/gstreamer-1.0/gst/gststreams.h:
 
@@ -6539,13 +6921,11 @@ CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 
 /usr/include/x86_64-linux-gnu/asm/errno.h:
 
+/usr/include/x86_64-linux-gnu/asm/sockios.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
 /usr/include/x86_64-linux-gnu/asm/unistd.h:
-
-/usr/include/x86_64-linux-gnu/bits/sockaddr.h:
-
-/usr/include/glib-2.0/glib/gunicode.h:
-
-/usr/include/x86_64-linux-gnu/asm/unistd_64.h:
 
 /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
 
@@ -6557,8 +6937,6 @@ CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/confname.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qprocessordetection.h:
-
 /usr/include/x86_64-linux-gnu/bits/dirent_ext.h:
 
 /usr/include/x86_64-linux-gnu/bits/local_lim.h:
@@ -6566,8 +6944,6 @@ CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtras.cmake:
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qmargins.h:
 
 /usr/include/x86_64-linux-gnu/bits/environments.h:
 
@@ -6580,6 +6956,8 @@ CMakeFiles/qt_gst_camera.dir/QtCameraAdapter.cpp.o:
 /usr/include/c++/13/bits/stl_vector.h:
 
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
+
+/usr/include/x86_64-linux-gnu/bits/in.h:
 
 /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.15.13:
 
@@ -6612,6 +6990,18 @@ qt_gst_camera_autogen/EWIEGA46WW/moc_QtCameraAdapter.cpp:
 /usr/include/x86_64-linux-gnu/bits/siginfo-consts-arch.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigstksz.h:
+
+/usr/include/glib-2.0/glib/gunicode.h:
+
+/usr/include/x86_64-linux-gnu/asm/unistd_64.h:
+
+/usr/include/x86_64-linux-gnu/bits/sockaddr.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/usr/include/x86_64-linux-gnu/bits/socket.h:
 
 /usr/include/x86_64-linux-gnu/sys/syscall.h:
 
@@ -6651,8 +7041,6 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 
 /usr/include/x86_64-linux-gnu/bits/types.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qabstracttextdocumentlayout.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h:
@@ -6667,11 +7055,9 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 
 /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
 
-/usr/include/c++/13/ostream:
+/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qsize.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+/usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/stack_t.h:
 
@@ -6747,15 +7133,15 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_cxx11.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qpair.h:
+/usr/include/glib-2.0/glib/glib-typeof.h:
 
 /usr/include/x86_64-linux-gnu/asm/posix_types_64.h:
 
-/usr/include/glib-2.0/glib/glib-typeof.h:
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearraylist.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qhashfunctions.h:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qlogging.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qhash.h:
 
 /usr/include/c++/13/debug/assertions.h:
 
@@ -6764,23 +7150,3 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qiodevice.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qiterator.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qhash.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qlogging.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qmetatype.h:
-
-/usr/include/gstreamer-1.0/gst/gstformat.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qnamespace.h:
-
-/usr/include/glib-2.0/glib/gasyncqueue.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer_impl.h:
-
-/usr/include/glib-2.0/glib.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringalgorithms.h:

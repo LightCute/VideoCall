@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o.d"
   "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o"
   "CMakeFiles/qt_gst_camera.dir/CameraManager.cpp.o.d"
+  "CMakeFiles/qt_gst_camera.dir/ClientLoginProtocol.cpp.o"
+  "CMakeFiles/qt_gst_camera.dir/ClientLoginProtocol.cpp.o.d"
   "CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o"
   "CMakeFiles/qt_gst_camera.dir/CommandSocket.cpp.o.d"
   "CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o"

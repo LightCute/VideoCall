@@ -98,6 +98,12 @@
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h",
+			"MU",
+			"EWIEGA46WW/moc_ClientLoginProtocol.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h",
 			"MU",
 			"EWIEGA46WW/moc_CommandSocket.cpp",
@@ -113,6 +119,12 @@
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h",
 			"MU",
 			"EWIEGA46WW/moc_LoginWidget.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h",
+			"MU",
+			"EWIEGA46WW/moc_PacketCodec.cpp",
 			null
 		],
 		[
@@ -195,6 +207,11 @@
 		],
 		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.cpp",
 			"MU",
 			null
 		],

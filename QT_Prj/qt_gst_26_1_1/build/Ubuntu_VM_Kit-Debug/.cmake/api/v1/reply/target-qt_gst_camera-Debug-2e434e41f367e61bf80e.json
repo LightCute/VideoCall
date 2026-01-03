@@ -37,7 +37,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 88,
+				"line" : 90,
 				"parent" : 0
 			},
 			{
@@ -75,7 +75,7 @@
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 80,
+				"line" : 82,
 				"parent" : 0
 			}
 		]
@@ -183,7 +183,8 @@
 				9,
 				13,
 				15,
-				18
+				18,
+				20
 			]
 		}
 	],
@@ -313,7 +314,8 @@
 				9,
 				13,
 				15,
-				18
+				18,
+				20
 			]
 		},
 		{
@@ -328,9 +330,10 @@
 				12,
 				14,
 				17,
-				20,
+				19,
 				21,
-				22
+				22,
+				23
 			]
 		},
 		{
@@ -339,15 +342,14 @@
 			[
 				4,
 				16,
-				19,
-				23
+				24
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				24
+				25
 			]
 		}
 	],
@@ -460,8 +462,19 @@
 		},
 		{
 			"backtrace" : 1,
-			"path" : "AppWindow.ui",
-			"sourceGroupIndex" : 2
+			"path" : "ClientLoginProtocol.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ClientLoginProtocol.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "PacketCodec.h",
+			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 0,
@@ -473,12 +486,6 @@
 			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/include/ui_LoginWidget.h",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 0,
-			"isGenerated" : true,
-			"path" : "build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/include/ui_AppWindow.h",
 			"sourceGroupIndex" : 1
 		},
 		{

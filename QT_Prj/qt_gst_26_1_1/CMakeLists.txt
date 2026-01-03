@@ -69,6 +69,9 @@ else()
         CommandSocket.h CommandSocket.cpp
         LoginWidget.h LoginWidget.cpp LoginWidget.ui
         AppWindow.h AppWindow.cpp
+        ClientLoginProtocol.h ClientLoginProtocol.cpp
+        PacketCodec.h
+
 
     )
 endif()

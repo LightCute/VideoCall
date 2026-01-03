@@ -16,6 +16,12 @@ void CommandSocket::setMessageCallback(MessageCallback cb) {
     callback_ = std::move(cb);
 }
 
+void CommandSocket::sendPacket(int fd, const std::string& payload) {
+    auto data = PacketCodec::encode(payload);
+    send(fd, data.data(), data.size(), 0);
+}
+
+
 bool CommandSocket::connectToServer(const std::string& host, int port) {
     sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd_ < 0) return false;
@@ -56,12 +62,13 @@ bool CommandSocket::startServer(int port) {
     return true;
 }
 
-bool CommandSocket::sendMessage(const std::string& msg) {
-    if (sockfd_ < 0 && clientfd_ < 0) return false;
+void CommandSocket::sendMessage(const std::string& msg) {
+    //if (sockfd_ < 0 && clientfd_ < 0) return false;
 
     int fd = (clientfd_ >= 0) ? clientfd_ : sockfd_;
-    int n = send(fd, msg.c_str(), msg.size(), 0);
-    return n == (int)msg.size();
+    //int n = send(fd, msg.c_str(), msg.size(), 0);
+    sendPacket(fd,msg);
+    //return n == (int)msg.size();
 }
 
 void CommandSocket::stop() {
@@ -75,14 +82,30 @@ void CommandSocket::stop() {
 }
 
 void CommandSocket::clientThreadFunc() {
-    char buffer[1024];
+    std::vector<char> recvBuffer;
+    char temp[1024];
+
     while (running_) {
-        int n = recv(sockfd_, buffer, sizeof(buffer) - 1, 0);
+        int n = recv(sockfd_, temp, sizeof(temp), 0);
         if (n > 0) {
-            buffer[n] = '\0';
-            if (callback_) callback_(std::string(buffer));
+
+            // 1️⃣ 把收到的字节塞进缓存
+            recvBuffer.insert(recvBuffer.end(), temp, temp + n);
+
+            // 2️⃣ 尝试从缓存中拆完整包
+            std::string payload;
+            while (PacketCodec::tryDecode(recvBuffer, payload)) {
+
+                // 3️⃣ 每一个 payload = 一条完整“应用层消息”
+                if (callback_) {
+                    callback_(payload);
+                }
+            }
+
         } else if (n == 0) {
-            break; // 服务器断开
+            break; // 服务器正常断开
+        } else {
+            break; // 错误
         }
     }
 }

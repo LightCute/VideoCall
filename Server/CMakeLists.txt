@@ -15,6 +15,9 @@ add_executable(login_server
     server_main.cpp
     CommandSocket.cpp
     LoginServer.cpp
+    ./protocol/LoginProtocol.cpp
+    ThreadPool.cpp
+    ./protocol/PacketCodec.h
 )
 
 # Linux 下链接必要的系统库

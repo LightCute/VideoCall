@@ -10,6 +10,10 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#include "./protocol/LoginProtocol.h"
+#include "ThreadPool.h"
+#include "./protocol/PacketCodec.h"
+
 class LoginServer {
 public:
     bool start(int port);
@@ -18,7 +22,8 @@ private:
     void onAccept(int clientfd);
     void clientThread(int clientfd);
     void onMessage(int clientfd, const std::string& msg);
-
+    void broadcastOnlineUsers();
+    void sendPacket(int fd, const std::string& payload);
     struct ClientInfo {
         std::string username;
         int privilegeLevel;
@@ -31,4 +36,5 @@ private:
 
     CommandSocket listener_;
     std::mutex mutex_;
+    ThreadPool pool_{8};
 };
