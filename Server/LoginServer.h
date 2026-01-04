@@ -10,7 +10,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "./protocol/LoginProtocol.h"
 #include "ThreadPool.h"
 #include "./protocol/PacketCodec.h"
 

@@ -33,5 +33,11 @@ ClientLoginProtocol::parseLoginResponse(
         return ResponseType::LOGIN_FAIL;
     }
 
+    if (cmd == "ONLINE_USERS") {
+        //outResp.success = false;
+        //std::getline(iss, outResp.message);
+        return ResponseType::ONLINE_USERS;
+    }
+
     return ResponseType::UNKNOWN;
 }

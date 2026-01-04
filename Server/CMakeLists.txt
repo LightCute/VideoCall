@@ -17,7 +17,9 @@ add_executable(login_server
     LoginServer.cpp
     ./protocol/LoginProtocol.cpp
     ThreadPool.cpp
-    ./protocol/PacketCodec.h
+    ./protocol/protocol_test.cpp
+    ./protocol/protocol_common.h
+    ./protocol/protocol_types.h
 )
 
 # Linux 下链接必要的系统库

@@ -528,6 +528,9 @@ CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o: \
  /usr/include/asm-generic/sockios.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
  /usr/include/x86_64-linux-gnu/bits/in.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_types.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEvent.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QVBoxLayout \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h \

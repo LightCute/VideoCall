@@ -6,6 +6,10 @@
 #include "widget.h"
 #include "CommandSocket.h"
 
+#include "ClientEventFactory.h"
+#include "ClientEvent.h"
+
+
 namespace Ui {
 class LoginWidget;
 }
@@ -32,7 +36,7 @@ private slots:
 private:
     Ui::LoginWidget *ui;
     CommandSocket *cmdSocket_ ;
-
+    void handleEvent(const ClientEvent& e);
 };
 
 #endif // LOGINWIDGET_H

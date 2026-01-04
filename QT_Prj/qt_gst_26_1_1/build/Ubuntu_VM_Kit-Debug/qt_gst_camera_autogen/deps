@@ -4,6 +4,9 @@ qt_gst_camera_autogen/timestamp: \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CMakeLists.txt \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEvent.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.cpp \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.cpp \
@@ -21,6 +24,10 @@ qt_gst_camera_autogen/timestamp: \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles/4.2.0-rc4/CMakeSystem.cmake \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/moc_predefs.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/main.cpp \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_common.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_test.cpp \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_text.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_types.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
 	/usr/include/alloca.h \

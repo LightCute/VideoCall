@@ -12,6 +12,8 @@ qt_gst_camera: \
   CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o \
   CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o \
   CMakeFiles/qt_gst_camera.dir/ClientLoginProtocol.cpp.o \
+  CMakeFiles/qt_gst_camera.dir/protocol_test.cpp.o \
+  CMakeFiles/qt_gst_camera.dir/ClientEventFactory.cpp.o \
   /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13 \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstapp-1.0.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstbase-1.0.so \
@@ -107,6 +109,10 @@ CMakeFiles/qt_gst_camera.dir/LoginWidget.cpp.o:
 CMakeFiles/qt_gst_camera.dir/AppWindow.cpp.o:
 
 CMakeFiles/qt_gst_camera.dir/ClientLoginProtocol.cpp.o:
+
+CMakeFiles/qt_gst_camera.dir/protocol_test.cpp.o:
+
+CMakeFiles/qt_gst_camera.dir/ClientEventFactory.cpp.o:
 
 /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13:
 

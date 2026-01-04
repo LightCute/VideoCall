@@ -71,6 +71,12 @@ else()
         AppWindow.h AppWindow.cpp
         ClientLoginProtocol.h ClientLoginProtocol.cpp
         PacketCodec.h
+        protocol_common.h
+        protocol_types.h
+        protocol_text.h
+        protocol_test.cpp
+        ClientEventFactory.h ClientEventFactory.cpp
+        ClientEvent.h
 
 
     )

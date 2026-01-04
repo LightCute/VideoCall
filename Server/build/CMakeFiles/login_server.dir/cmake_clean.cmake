@@ -8,6 +8,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/login_server.dir/ThreadPool.cpp.o.d"
   "CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o"
   "CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o.d"
+  "CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o"
+  "CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o.d"
   "CMakeFiles/login_server.dir/server_main.cpp.o"
   "CMakeFiles/login_server.dir/server_main.cpp.o.d"
   "login_server"

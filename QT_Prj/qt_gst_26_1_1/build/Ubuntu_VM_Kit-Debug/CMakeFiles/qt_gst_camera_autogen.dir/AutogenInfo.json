@@ -98,6 +98,18 @@
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEvent.h",
+			"MU",
+			"EWIEGA46WW/moc_ClientEvent.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.h",
+			"MU",
+			"EWIEGA46WW/moc_ClientEventFactory.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h",
 			"MU",
 			"EWIEGA46WW/moc_ClientLoginProtocol.cpp",
@@ -137,6 +149,24 @@
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h",
 			"MU",
 			"EWIEGA46WW/moc_VideoWidget.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_common.h",
+			"MU",
+			"EWIEGA46WW/moc_protocol_common.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_text.h",
+			"MU",
+			"EWIEGA46WW/moc_protocol_text.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_types.h",
+			"MU",
+			"EWIEGA46WW/moc_protocol_types.cpp",
 			null
 		],
 		[
@@ -211,6 +241,11 @@
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.cpp",
+			"MU",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.cpp",
 			"MU",
 			null
@@ -237,6 +272,11 @@
 		],
 		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_test.cpp",
 			"MU",
 			null
 		],

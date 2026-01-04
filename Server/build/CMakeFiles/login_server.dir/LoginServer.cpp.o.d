@@ -223,4 +223,7 @@ CMakeFiles/login_server.dir/LoginServer.cpp.o: \
  /usr/include/c++/13/bits/allocated_ptr.h \
  /usr/include/c++/13/ext/concurrence.h \
  /home/light/work/Video_Prj/Server/./protocol/PacketCodec.h \
- /usr/include/c++/13/cstring /usr/include/string.h /usr/include/strings.h
+ /usr/include/c++/13/cstring /usr/include/string.h /usr/include/strings.h \
+ /home/light/work/Video_Prj/Server/./protocol/protocol_text.h \
+ /home/light/work/Video_Prj/Server/./protocol/protocol_types.h \
+ /home/light/work/Video_Prj/Server/./protocol/protocol_common.h

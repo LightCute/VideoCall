@@ -225,6 +225,30 @@ protocol/LoginProtocol.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.s
 .PHONY : protocol/LoginProtocol.cpp.s
 
+protocol/protocol_test.o: protocol/protocol_test.cpp.o
+.PHONY : protocol/protocol_test.o
+
+# target to build an object file
+protocol/protocol_test.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o
+.PHONY : protocol/protocol_test.cpp.o
+
+protocol/protocol_test.i: protocol/protocol_test.cpp.i
+.PHONY : protocol/protocol_test.i
+
+# target to preprocess a source file
+protocol/protocol_test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_test.cpp.i
+.PHONY : protocol/protocol_test.cpp.i
+
+protocol/protocol_test.s: protocol/protocol_test.cpp.s
+.PHONY : protocol/protocol_test.s
+
+# target to generate assembly for a file
+protocol/protocol_test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_test.cpp.s
+.PHONY : protocol/protocol_test.cpp.s
+
 server_main.o: server_main.cpp.o
 .PHONY : server_main.o
 
@@ -270,6 +294,9 @@ help:
 	@echo "... protocol/LoginProtocol.o"
 	@echo "... protocol/LoginProtocol.i"
 	@echo "... protocol/LoginProtocol.s"
+	@echo "... protocol/protocol_test.o"
+	@echo "... protocol/protocol_test.i"
+	@echo "... protocol/protocol_test.s"
 	@echo "... server_main.o"
 	@echo "... server_main.i"
 	@echo "... server_main.s"

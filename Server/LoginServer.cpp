@@ -1,5 +1,7 @@
 #include "LoginServer.h"
-
+#include "./protocol/protocol_text.h"
+#include "./protocol/protocol_common.h"
+using namespace proto;
 
 bool LoginServer::start(int port) {
     listener_.setAcceptCallback(
@@ -54,44 +56,39 @@ void LoginServer::clientThread(int clientfd) {
 void LoginServer::onMessage(int clientfd, const std::string& msg) {
     std::cout << "[Server] recv from " << clientfd << ": " << msg << std::endl;
 
-    LoginProtocol::LoginRequest req;
-    auto cmd = LoginProtocol::parseCommand(msg, req);
+    std::string user, pwd;
+    if (proto::parseLoginRequest(msg, user, pwd) == true) {
+        proto::UserInfo user_temp;
 
-    if (cmd == LoginProtocol::CommandType::LOGIN) {
-
-        LoginProtocol::LoginResponse resp;
-
-        // 👉 这里是“业务逻辑”，不是协议
-        if (req.username == "admin" && req.password == "123456") {
-            std::cout << "Login suceess " << std::endl;
-            resp.success = true;
-            resp.privilegeLevel = 10;
-            resp.message = "welcome";
+        if(user == "admin" && pwd == "123")
+        {
+            std::cout << "Login suceess admin 123" << std::endl;
+            user_temp.username = "admin";
+            user_temp.privilege = 10;
 
             {
                 std::lock_guard<std::mutex> lock(mutex_);
                 clients_[clientfd] = {
-                    req.username,
-                    resp.privilegeLevel,
+                    user,
+                    user_temp.privilege,
                     "unknown",
                     0,
                     true
                 };
             }
 
-            
-        } else {
-            resp.success = false;
-            resp.privilegeLevel = 0;
-            resp.message = "invalid username or password";
+            sendPacket(clientfd, proto::makeLoginOk(user_temp, "welcome"));
+
+            broadcastOnlineUsers();
+        }
+        else {
+            sendPacket(clientfd, proto::makeLoginFail("Login fail !!"));
         }
 
-        std::string reply = LoginProtocol::makeLoginResponse(resp);
-        sendPacket(clientfd, reply);
 
+    }    
 
-        broadcastOnlineUsers();
-    }
+    
 }
 
 

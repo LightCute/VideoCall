@@ -1,12 +1,15 @@
 /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/moc_AppWindow.cpp: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/AppWindow.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/moc_predefs.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEvent.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_types.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h \
   /usr/include/alloca.h \
   /usr/include/arpa/inet.h \
