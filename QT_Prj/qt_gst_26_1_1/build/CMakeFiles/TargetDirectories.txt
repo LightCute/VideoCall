@@ -1,0 +1,5 @@
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/CMakeFiles/qt_gst_camera.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/CMakeFiles/edit_cache.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/CMakeFiles/rebuild_cache.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/CMakeFiles/qt_gst_camera_autogen_timestamp_deps.dir
+/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/CMakeFiles/qt_gst_camera_autogen.dir

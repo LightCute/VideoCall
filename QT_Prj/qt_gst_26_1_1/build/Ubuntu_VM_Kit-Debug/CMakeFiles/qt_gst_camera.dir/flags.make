@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/x86_64-linux-gnu-g++-13
 CXX_DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB
 
-CXX_INCLUDES = -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/include -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+CXX_INCLUDES = -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/include -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1 -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol -I/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 
 CXX_FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -fdiagnostics-color=always -fPIC
 

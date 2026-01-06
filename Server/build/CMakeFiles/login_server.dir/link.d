@@ -3,11 +3,14 @@ login_server: \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/crti.o \
   /usr/lib/gcc/x86_64-linux-gnu/13/crtbeginS.o \
   CMakeFiles/login_server.dir/server_main.cpp.o \
-  CMakeFiles/login_server.dir/CommandSocket.cpp.o \
-  CMakeFiles/login_server.dir/LoginServer.cpp.o \
-  CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o \
-  CMakeFiles/login_server.dir/ThreadPool.cpp.o \
-  CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o \
+  CMakeFiles/login_server.dir/core/LoginServer.cpp.o \
+  CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o \
+  CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o \
+  CMakeFiles/login_server.dir/net/CommandSocket.cpp.o \
+  CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o \
+  CMakeFiles/login_server.dir/service/LoginService.cpp.o \
+  CMakeFiles/login_server.dir/session/SessionManager.cpp.o \
+  CMakeFiles/login_server.dir/util/ThreadPool.cpp.o \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libpthread.a \
   /usr/lib/gcc/x86_64-linux-gnu/13/libstdc++.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
@@ -46,15 +49,21 @@ login_server: \
 
 CMakeFiles/login_server.dir/server_main.cpp.o:
 
-CMakeFiles/login_server.dir/CommandSocket.cpp.o:
+CMakeFiles/login_server.dir/core/LoginServer.cpp.o:
 
-CMakeFiles/login_server.dir/LoginServer.cpp.o:
+CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o:
 
-CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o:
+CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o:
 
-CMakeFiles/login_server.dir/ThreadPool.cpp.o:
+CMakeFiles/login_server.dir/net/CommandSocket.cpp.o:
 
-CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o:
+CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o:
+
+CMakeFiles/login_server.dir/service/LoginService.cpp.o:
+
+CMakeFiles/login_server.dir/session/SessionManager.cpp.o:
+
+CMakeFiles/login_server.dir/util/ThreadPool.cpp.o:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libpthread.a:
 

@@ -1,7 +1,7 @@
 CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/mocs_compilation.cpp \
  /usr/include/stdc-predef.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/moc_AppWindow.cpp \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/moc_AppWindow.cpp \
  /usr/include/c++/13/memory /usr/include/c++/13/bits/memoryfwd.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -116,7 +116,7 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: \
  /usr/include/c++/13/backward/auto_ptr.h \
  /usr/include/c++/13/pstl/glue_memory_defs.h \
  /usr/include/c++/13/pstl/execution_defs.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../AppWindow.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/AppWindow.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \
@@ -288,18 +288,18 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstackedwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidget.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../LoginWidget.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../widget.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../QtCameraAdapter.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/LoginWidget.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/widget.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/QtCameraAdapter.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../Frame.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/Frame.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QMetaType \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qmetatype.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../VideoWidget.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/VideoWidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../CameraManager.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.h \
  /usr/include/gstreamer-1.0/gst/gst.h /usr/include/glib-2.0/glib.h \
  /usr/include/glib-2.0/glib/galloca.h /usr/include/glib-2.0/glib/gtypes.h \
  /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h \
@@ -507,10 +507,10 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: \
  /usr/include/gstreamer-1.0/gst/base/gstbasesink.h \
  /usr/include/gstreamer-1.0/gst/base/base-prelude.h \
  /usr/include/gstreamer-1.0/gst/app/app-prelude.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../CommandSocket.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/CommandSocket.h \
  /usr/include/c++/13/thread /usr/include/c++/13/bits/std_thread.h \
  /usr/include/c++/13/bits/this_thread_sleep.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../PacketCodec.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/PacketCodec.h \
  /usr/include/c++/13/cstring /usr/include/arpa/inet.h \
  /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/sys/socket.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
@@ -529,12 +529,12 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: \
  /usr/include/asm-generic/sockios.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
  /usr/include/x86_64-linux-gnu/bits/in.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../ClientEventFactory.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../protocol_types.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../ClientEvent.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/moc_LoginWidget.cpp \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../LoginWidget.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/moc_QtCameraAdapter.cpp \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/moc_VideoWidget.cpp \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/moc_widget.cpp \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/EWIEGA46WW/../../../../widget.h
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_types.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEvent.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/moc_LoginWidget.cpp \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/LoginWidget.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/moc_QtCameraAdapter.cpp \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/moc_VideoWidget.cpp \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/moc_widget.cpp \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/widget.h

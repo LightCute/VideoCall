@@ -86,98 +86,146 @@ CMakeFiles/login_server.dir/server_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/server_main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/server_main.cpp -o CMakeFiles/login_server.dir/server_main.cpp.s
 
-CMakeFiles/login_server.dir/CommandSocket.cpp.o: CMakeFiles/login_server.dir/flags.make
-CMakeFiles/login_server.dir/CommandSocket.cpp.o: /home/light/work/Video_Prj/Server/CommandSocket.cpp
-CMakeFiles/login_server.dir/CommandSocket.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/login_server.dir/CommandSocket.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/CommandSocket.cpp.o -MF CMakeFiles/login_server.dir/CommandSocket.cpp.o.d -o CMakeFiles/login_server.dir/CommandSocket.cpp.o -c /home/light/work/Video_Prj/Server/CommandSocket.cpp
+CMakeFiles/login_server.dir/core/LoginServer.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/core/LoginServer.cpp.o: /home/light/work/Video_Prj/Server/core/LoginServer.cpp
+CMakeFiles/login_server.dir/core/LoginServer.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/login_server.dir/core/LoginServer.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/core/LoginServer.cpp.o -MF CMakeFiles/login_server.dir/core/LoginServer.cpp.o.d -o CMakeFiles/login_server.dir/core/LoginServer.cpp.o -c /home/light/work/Video_Prj/Server/core/LoginServer.cpp
 
-CMakeFiles/login_server.dir/CommandSocket.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/CommandSocket.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/CommandSocket.cpp > CMakeFiles/login_server.dir/CommandSocket.cpp.i
+CMakeFiles/login_server.dir/core/LoginServer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/core/LoginServer.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/core/LoginServer.cpp > CMakeFiles/login_server.dir/core/LoginServer.cpp.i
 
-CMakeFiles/login_server.dir/CommandSocket.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/CommandSocket.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/CommandSocket.cpp -o CMakeFiles/login_server.dir/CommandSocket.cpp.s
+CMakeFiles/login_server.dir/core/LoginServer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/core/LoginServer.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/core/LoginServer.cpp -o CMakeFiles/login_server.dir/core/LoginServer.cpp.s
 
-CMakeFiles/login_server.dir/LoginServer.cpp.o: CMakeFiles/login_server.dir/flags.make
-CMakeFiles/login_server.dir/LoginServer.cpp.o: /home/light/work/Video_Prj/Server/LoginServer.cpp
-CMakeFiles/login_server.dir/LoginServer.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/login_server.dir/LoginServer.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/LoginServer.cpp.o -MF CMakeFiles/login_server.dir/LoginServer.cpp.o.d -o CMakeFiles/login_server.dir/LoginServer.cpp.o -c /home/light/work/Video_Prj/Server/LoginServer.cpp
+CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o: /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.cpp
+CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o -MF CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o.d -o CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o -c /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.cpp
 
-CMakeFiles/login_server.dir/LoginServer.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/LoginServer.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/LoginServer.cpp > CMakeFiles/login_server.dir/LoginServer.cpp.i
+CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.cpp > CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.i
 
-CMakeFiles/login_server.dir/LoginServer.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/LoginServer.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/LoginServer.cpp -o CMakeFiles/login_server.dir/LoginServer.cpp.s
+CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.cpp -o CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.s
 
-CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o: CMakeFiles/login_server.dir/flags.make
-CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o: /home/light/work/Video_Prj/Server/protocol/LoginProtocol.cpp
-CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o -MF CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o.d -o CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o -c /home/light/work/Video_Prj/Server/protocol/LoginProtocol.cpp
+CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o: /home/light/work/Video_Prj/Server/event/ServerEventFactory.cpp
+CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o -MF CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o.d -o CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o -c /home/light/work/Video_Prj/Server/event/ServerEventFactory.cpp
 
-CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/protocol/LoginProtocol.cpp > CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.i
+CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/event/ServerEventFactory.cpp > CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.i
 
-CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/protocol/LoginProtocol.cpp -o CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.s
+CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/event/ServerEventFactory.cpp -o CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.s
 
-CMakeFiles/login_server.dir/ThreadPool.cpp.o: CMakeFiles/login_server.dir/flags.make
-CMakeFiles/login_server.dir/ThreadPool.cpp.o: /home/light/work/Video_Prj/Server/ThreadPool.cpp
-CMakeFiles/login_server.dir/ThreadPool.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/login_server.dir/ThreadPool.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/ThreadPool.cpp.o -MF CMakeFiles/login_server.dir/ThreadPool.cpp.o.d -o CMakeFiles/login_server.dir/ThreadPool.cpp.o -c /home/light/work/Video_Prj/Server/ThreadPool.cpp
+CMakeFiles/login_server.dir/net/CommandSocket.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/net/CommandSocket.cpp.o: /home/light/work/Video_Prj/Server/net/CommandSocket.cpp
+CMakeFiles/login_server.dir/net/CommandSocket.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/login_server.dir/net/CommandSocket.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/net/CommandSocket.cpp.o -MF CMakeFiles/login_server.dir/net/CommandSocket.cpp.o.d -o CMakeFiles/login_server.dir/net/CommandSocket.cpp.o -c /home/light/work/Video_Prj/Server/net/CommandSocket.cpp
 
-CMakeFiles/login_server.dir/ThreadPool.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/ThreadPool.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/ThreadPool.cpp > CMakeFiles/login_server.dir/ThreadPool.cpp.i
+CMakeFiles/login_server.dir/net/CommandSocket.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/net/CommandSocket.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/net/CommandSocket.cpp > CMakeFiles/login_server.dir/net/CommandSocket.cpp.i
 
-CMakeFiles/login_server.dir/ThreadPool.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/ThreadPool.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/ThreadPool.cpp -o CMakeFiles/login_server.dir/ThreadPool.cpp.s
+CMakeFiles/login_server.dir/net/CommandSocket.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/net/CommandSocket.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/net/CommandSocket.cpp -o CMakeFiles/login_server.dir/net/CommandSocket.cpp.s
 
-CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o: CMakeFiles/login_server.dir/flags.make
-CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o: /home/light/work/Video_Prj/Server/protocol/protocol_test.cpp
-CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o -MF CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o.d -o CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o -c /home/light/work/Video_Prj/Server/protocol/protocol_test.cpp
+CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o: /home/light/work/Video_Prj/Server/protocol/protocol_text.cpp
+CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o -MF CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o.d -o CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o -c /home/light/work/Video_Prj/Server/protocol/protocol_text.cpp
 
-CMakeFiles/login_server.dir/protocol/protocol_test.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/protocol/protocol_test.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/protocol/protocol_test.cpp > CMakeFiles/login_server.dir/protocol/protocol_test.cpp.i
+CMakeFiles/login_server.dir/protocol/protocol_text.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/protocol/protocol_text.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/protocol/protocol_text.cpp > CMakeFiles/login_server.dir/protocol/protocol_text.cpp.i
 
-CMakeFiles/login_server.dir/protocol/protocol_test.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/protocol/protocol_test.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/protocol/protocol_test.cpp -o CMakeFiles/login_server.dir/protocol/protocol_test.cpp.s
+CMakeFiles/login_server.dir/protocol/protocol_text.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/protocol/protocol_text.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/protocol/protocol_text.cpp -o CMakeFiles/login_server.dir/protocol/protocol_text.cpp.s
+
+CMakeFiles/login_server.dir/service/LoginService.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/service/LoginService.cpp.o: /home/light/work/Video_Prj/Server/service/LoginService.cpp
+CMakeFiles/login_server.dir/service/LoginService.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/login_server.dir/service/LoginService.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/service/LoginService.cpp.o -MF CMakeFiles/login_server.dir/service/LoginService.cpp.o.d -o CMakeFiles/login_server.dir/service/LoginService.cpp.o -c /home/light/work/Video_Prj/Server/service/LoginService.cpp
+
+CMakeFiles/login_server.dir/service/LoginService.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/service/LoginService.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/service/LoginService.cpp > CMakeFiles/login_server.dir/service/LoginService.cpp.i
+
+CMakeFiles/login_server.dir/service/LoginService.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/service/LoginService.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/service/LoginService.cpp -o CMakeFiles/login_server.dir/service/LoginService.cpp.s
+
+CMakeFiles/login_server.dir/session/SessionManager.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/session/SessionManager.cpp.o: /home/light/work/Video_Prj/Server/session/SessionManager.cpp
+CMakeFiles/login_server.dir/session/SessionManager.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/login_server.dir/session/SessionManager.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/session/SessionManager.cpp.o -MF CMakeFiles/login_server.dir/session/SessionManager.cpp.o.d -o CMakeFiles/login_server.dir/session/SessionManager.cpp.o -c /home/light/work/Video_Prj/Server/session/SessionManager.cpp
+
+CMakeFiles/login_server.dir/session/SessionManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/session/SessionManager.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/session/SessionManager.cpp > CMakeFiles/login_server.dir/session/SessionManager.cpp.i
+
+CMakeFiles/login_server.dir/session/SessionManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/session/SessionManager.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/session/SessionManager.cpp -o CMakeFiles/login_server.dir/session/SessionManager.cpp.s
+
+CMakeFiles/login_server.dir/util/ThreadPool.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/util/ThreadPool.cpp.o: /home/light/work/Video_Prj/Server/util/ThreadPool.cpp
+CMakeFiles/login_server.dir/util/ThreadPool.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/login_server.dir/util/ThreadPool.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/util/ThreadPool.cpp.o -MF CMakeFiles/login_server.dir/util/ThreadPool.cpp.o.d -o CMakeFiles/login_server.dir/util/ThreadPool.cpp.o -c /home/light/work/Video_Prj/Server/util/ThreadPool.cpp
+
+CMakeFiles/login_server.dir/util/ThreadPool.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/util/ThreadPool.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/util/ThreadPool.cpp > CMakeFiles/login_server.dir/util/ThreadPool.cpp.i
+
+CMakeFiles/login_server.dir/util/ThreadPool.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/util/ThreadPool.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/util/ThreadPool.cpp -o CMakeFiles/login_server.dir/util/ThreadPool.cpp.s
 
 # Object files for target login_server
 login_server_OBJECTS = \
 "CMakeFiles/login_server.dir/server_main.cpp.o" \
-"CMakeFiles/login_server.dir/CommandSocket.cpp.o" \
-"CMakeFiles/login_server.dir/LoginServer.cpp.o" \
-"CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o" \
-"CMakeFiles/login_server.dir/ThreadPool.cpp.o" \
-"CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o"
+"CMakeFiles/login_server.dir/core/LoginServer.cpp.o" \
+"CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o" \
+"CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o" \
+"CMakeFiles/login_server.dir/net/CommandSocket.cpp.o" \
+"CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o" \
+"CMakeFiles/login_server.dir/service/LoginService.cpp.o" \
+"CMakeFiles/login_server.dir/session/SessionManager.cpp.o" \
+"CMakeFiles/login_server.dir/util/ThreadPool.cpp.o"
 
 # External object files for target login_server
 login_server_EXTERNAL_OBJECTS =
 
 login_server: CMakeFiles/login_server.dir/server_main.cpp.o
-login_server: CMakeFiles/login_server.dir/CommandSocket.cpp.o
-login_server: CMakeFiles/login_server.dir/LoginServer.cpp.o
-login_server: CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o
-login_server: CMakeFiles/login_server.dir/ThreadPool.cpp.o
-login_server: CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o
+login_server: CMakeFiles/login_server.dir/core/LoginServer.cpp.o
+login_server: CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o
+login_server: CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o
+login_server: CMakeFiles/login_server.dir/net/CommandSocket.cpp.o
+login_server: CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o
+login_server: CMakeFiles/login_server.dir/service/LoginService.cpp.o
+login_server: CMakeFiles/login_server.dir/session/SessionManager.cpp.o
+login_server: CMakeFiles/login_server.dir/util/ThreadPool.cpp.o
 login_server: CMakeFiles/login_server.dir/build.make
 login_server: CMakeFiles/login_server.dir/compiler_depend.ts
 login_server: CMakeFiles/login_server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable login_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable login_server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/login_server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

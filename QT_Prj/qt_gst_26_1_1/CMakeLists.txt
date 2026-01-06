@@ -30,28 +30,53 @@ pkg_check_modules(GST REQUIRED
     gstreamer-app-1.0
 )
 
-# =========================
-# 源文件分组（工程级推荐）
-# =========================
 
-# ---- UI (Qt) ----
-set(UI_SOURCES
+# =========================
+# 所有工程源文件（统一管理）
+# =========================
+set(PROJECT_SOURCES
     main.cpp
-    widget.cpp
-    widget.h
-    widget.ui
-    VideoWidget.cpp
-    VideoWidget.h
-    QtCameraAdapter.cpp
-    QtCameraAdapter.h
+
+    # app
+    app/ClientEvent.h
+    app/ClientEventFactory.cpp
+    app/ClientEventFactory.h
+    app/ClientLoginProtocol.cpp
+    app/ClientLoginProtocol.h
+
+    # media
+    media/CameraManager.cpp
+    media/CameraManager.h
+    media/Frame.h
+
+    # net
+    net/CommandSocket.cpp
+    net/CommandSocket.h
+    net/PacketCodec.h
+
+    # protocol
+    protocol/protocol_common.h
+    protocol/protocol_text.cpp
+    protocol/protocol_text.h
+    protocol/protocol_types.h
+
+    # ui
+    ui/AppWindow.cpp
+    ui/AppWindow.h
+    ui/LoginWidget.cpp
+    ui/LoginWidget.h
+    ui/QtCameraAdapter.cpp
+    ui/QtCameraAdapter.h
+    ui/VideoWidget.cpp
+    ui/VideoWidget.h
+    ui/widget.cpp
+    ui/widget.h
+
+    # Qt UI files
+    ui/LoginWidget.ui
+    ui/widget.ui
 )
 
-# ---- Core (Pure C++) ----
-set(CORE_SOURCES
-    CameraManager.cpp
-    CameraManager.h
-    Frame.h
-)
 
 # =========================
 # 可执行程序
@@ -59,24 +84,12 @@ set(CORE_SOURCES
 if(QT_VERSION_MAJOR GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
         MANUAL_FINALIZATION
-        ${UI_SOURCES}
-        ${CORE_SOURCES}
+        ${PROJECT_SOURCES}
     )
 else()
     add_executable(${PROJECT_NAME}
-        ${UI_SOURCES}
-        ${CORE_SOURCES}
-        CommandSocket.h CommandSocket.cpp
-        LoginWidget.h LoginWidget.cpp LoginWidget.ui
-        AppWindow.h AppWindow.cpp
-        ClientLoginProtocol.h ClientLoginProtocol.cpp
-        PacketCodec.h
-        protocol_common.h
-        protocol_types.h
-        protocol_text.h
-        protocol_test.cpp
-        ClientEventFactory.h ClientEventFactory.cpp
-        ClientEvent.h
+        ${PROJECT_SOURCES}
+        #media/CameraManager.h
 
 
     )
@@ -88,6 +101,12 @@ endif()
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GST_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/app
+        ${CMAKE_CURRENT_SOURCE_DIR}/media
+        ${CMAKE_CURRENT_SOURCE_DIR}/net
+        ${CMAKE_CURRENT_SOURCE_DIR}/protocol
+        ${CMAKE_CURRENT_SOURCE_DIR}/ui
 )
 
 # =========================

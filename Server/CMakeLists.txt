@@ -12,14 +12,45 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 # 添加可执行文件
 add_executable(login_server
+    # 根目录文件
     server_main.cpp
-    CommandSocket.cpp
-    LoginServer.cpp
-    ./protocol/LoginProtocol.cpp
-    ThreadPool.cpp
-    ./protocol/protocol_test.cpp
+
+    # core目录文件
+    ./core/LoginServer.cpp
+    ./core/LoginServer.h
+
+    # dispatcher目录文件
+    ./dispatcher/ServerEventDispatcher.cpp
+    ./dispatcher/ServerEventDispatcher.h
+
+    # event目录文件
+    ./event/ServerEvent.h
+    ./event/ServerEventFactory.cpp
+    ./event/ServerEventFactory.h
+
+    # net目录文件
+    ./net/CommandSocket.cpp
+    ./net/CommandSocket.h
+    ./net/PacketCodec.h
+
+    # protocol目录文件
     ./protocol/protocol_common.h
+    ./protocol/protocol_text.cpp
+    ./protocol/protocol_text.h
     ./protocol/protocol_types.h
+
+    # service目录文件
+    ./service/LoginService.cpp
+    ./service/LoginService.h
+    ./service/ServerAction.h
+
+    # session目录文件
+    ./session/SessionManager.cpp
+    ./session/SessionManager.h
+
+    # util目录文件
+    ./util/ThreadPool.cpp
+    ./util/ThreadPool.h
 )
 
 # Linux 下链接必要的系统库

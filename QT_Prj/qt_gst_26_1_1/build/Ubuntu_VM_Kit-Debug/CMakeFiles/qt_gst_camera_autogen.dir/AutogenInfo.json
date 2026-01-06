@@ -86,93 +86,93 @@
 	"HEADERS" : 
 	[
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/AppWindow.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEvent.h",
 			"MU",
-			"EWIEGA46WW/moc_AppWindow.cpp",
+			"VJIZ3MDCXP/moc_ClientEvent.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.h",
 			"MU",
-			"EWIEGA46WW/moc_CameraManager.cpp",
+			"VJIZ3MDCXP/moc_ClientEventFactory.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEvent.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.h",
 			"MU",
-			"EWIEGA46WW/moc_ClientEvent.cpp",
+			"VJIZ3MDCXP/moc_ClientLoginProtocol.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.h",
 			"MU",
-			"EWIEGA46WW/moc_ClientEventFactory.cpp",
+			"HTGEZKIBRU/moc_CameraManager.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/Frame.h",
 			"MU",
-			"EWIEGA46WW/moc_ClientLoginProtocol.cpp",
+			"HTGEZKIBRU/moc_Frame.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/CommandSocket.h",
 			"MU",
-			"EWIEGA46WW/moc_CommandSocket.cpp",
+			"Q6KNN7S663/moc_CommandSocket.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/Frame.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/PacketCodec.h",
 			"MU",
-			"EWIEGA46WW/moc_Frame.cpp",
+			"Q6KNN7S663/moc_PacketCodec.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_common.h",
 			"MU",
-			"EWIEGA46WW/moc_LoginWidget.cpp",
+			"ULO4IMYJZC/moc_protocol_common.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/PacketCodec.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_text.h",
 			"MU",
-			"EWIEGA46WW/moc_PacketCodec.cpp",
+			"ULO4IMYJZC/moc_protocol_text.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_types.h",
 			"MU",
-			"EWIEGA46WW/moc_QtCameraAdapter.cpp",
+			"ULO4IMYJZC/moc_protocol_types.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/AppWindow.h",
 			"MU",
-			"EWIEGA46WW/moc_VideoWidget.cpp",
+			"UYX5XTB5RZ/moc_AppWindow.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_common.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/LoginWidget.h",
 			"MU",
-			"EWIEGA46WW/moc_protocol_common.cpp",
+			"UYX5XTB5RZ/moc_LoginWidget.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_text.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/QtCameraAdapter.h",
 			"MU",
-			"EWIEGA46WW/moc_protocol_text.cpp",
+			"UYX5XTB5RZ/moc_QtCameraAdapter.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_types.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/VideoWidget.h",
 			"MU",
-			"EWIEGA46WW/moc_protocol_types.cpp",
+			"UYX5XTB5RZ/moc_VideoWidget.cpp",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.h",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/widget.h",
 			"MU",
-			"EWIEGA46WW/moc_widget.cpp",
+			"UYX5XTB5RZ/moc_widget.cpp",
 			null
 		]
 	],
@@ -192,6 +192,12 @@
 		"/usr/include/gstreamer-1.0",
 		"/usr/include/glib-2.0",
 		"/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+		"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1",
+		"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app",
+		"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media",
+		"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net",
+		"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol",
+		"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui",
 		"/usr/include/x86_64-linux-gnu/qt5",
 		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
 		"/usr/include/x86_64-linux-gnu/qt5/QtGui",
@@ -231,42 +237,12 @@
 	"SOURCES" : 
 	[
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/AppWindow.cpp",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.cpp",
 			"MU",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CameraManager.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientEventFactory.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ClientLoginProtocol.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CommandSocket.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/LoginWidget.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/QtCameraAdapter.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/VideoWidget.cpp",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.cpp",
 			"MU",
 			null
 		],
@@ -276,12 +252,42 @@
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol_test.cpp",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.cpp",
 			"MU",
 			null
 		],
 		[
-			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/widget.cpp",
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/CommandSocket.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_text.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/AppWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/LoginWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/QtCameraAdapter.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/VideoWidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/widget.cpp",
 			"MU",
 			null
 		]

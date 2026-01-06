@@ -129,125 +129,125 @@ login_server/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/build
 .PHONY : login_server/fast
 
-CommandSocket.o: CommandSocket.cpp.o
-.PHONY : CommandSocket.o
+core/LoginServer.o: core/LoginServer.cpp.o
+.PHONY : core/LoginServer.o
 
 # target to build an object file
-CommandSocket.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/CommandSocket.cpp.o
-.PHONY : CommandSocket.cpp.o
+core/LoginServer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/core/LoginServer.cpp.o
+.PHONY : core/LoginServer.cpp.o
 
-CommandSocket.i: CommandSocket.cpp.i
-.PHONY : CommandSocket.i
+core/LoginServer.i: core/LoginServer.cpp.i
+.PHONY : core/LoginServer.i
 
 # target to preprocess a source file
-CommandSocket.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/CommandSocket.cpp.i
-.PHONY : CommandSocket.cpp.i
+core/LoginServer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/core/LoginServer.cpp.i
+.PHONY : core/LoginServer.cpp.i
 
-CommandSocket.s: CommandSocket.cpp.s
-.PHONY : CommandSocket.s
+core/LoginServer.s: core/LoginServer.cpp.s
+.PHONY : core/LoginServer.s
 
 # target to generate assembly for a file
-CommandSocket.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/CommandSocket.cpp.s
-.PHONY : CommandSocket.cpp.s
+core/LoginServer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/core/LoginServer.cpp.s
+.PHONY : core/LoginServer.cpp.s
 
-LoginServer.o: LoginServer.cpp.o
-.PHONY : LoginServer.o
+dispatcher/ServerEventDispatcher.o: dispatcher/ServerEventDispatcher.cpp.o
+.PHONY : dispatcher/ServerEventDispatcher.o
 
 # target to build an object file
-LoginServer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/LoginServer.cpp.o
-.PHONY : LoginServer.cpp.o
+dispatcher/ServerEventDispatcher.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o
+.PHONY : dispatcher/ServerEventDispatcher.cpp.o
 
-LoginServer.i: LoginServer.cpp.i
-.PHONY : LoginServer.i
+dispatcher/ServerEventDispatcher.i: dispatcher/ServerEventDispatcher.cpp.i
+.PHONY : dispatcher/ServerEventDispatcher.i
 
 # target to preprocess a source file
-LoginServer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/LoginServer.cpp.i
-.PHONY : LoginServer.cpp.i
+dispatcher/ServerEventDispatcher.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.i
+.PHONY : dispatcher/ServerEventDispatcher.cpp.i
 
-LoginServer.s: LoginServer.cpp.s
-.PHONY : LoginServer.s
+dispatcher/ServerEventDispatcher.s: dispatcher/ServerEventDispatcher.cpp.s
+.PHONY : dispatcher/ServerEventDispatcher.s
 
 # target to generate assembly for a file
-LoginServer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/LoginServer.cpp.s
-.PHONY : LoginServer.cpp.s
+dispatcher/ServerEventDispatcher.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.s
+.PHONY : dispatcher/ServerEventDispatcher.cpp.s
 
-ThreadPool.o: ThreadPool.cpp.o
-.PHONY : ThreadPool.o
+event/ServerEventFactory.o: event/ServerEventFactory.cpp.o
+.PHONY : event/ServerEventFactory.o
 
 # target to build an object file
-ThreadPool.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/ThreadPool.cpp.o
-.PHONY : ThreadPool.cpp.o
+event/ServerEventFactory.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o
+.PHONY : event/ServerEventFactory.cpp.o
 
-ThreadPool.i: ThreadPool.cpp.i
-.PHONY : ThreadPool.i
+event/ServerEventFactory.i: event/ServerEventFactory.cpp.i
+.PHONY : event/ServerEventFactory.i
 
 # target to preprocess a source file
-ThreadPool.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/ThreadPool.cpp.i
-.PHONY : ThreadPool.cpp.i
+event/ServerEventFactory.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.i
+.PHONY : event/ServerEventFactory.cpp.i
 
-ThreadPool.s: ThreadPool.cpp.s
-.PHONY : ThreadPool.s
+event/ServerEventFactory.s: event/ServerEventFactory.cpp.s
+.PHONY : event/ServerEventFactory.s
 
 # target to generate assembly for a file
-ThreadPool.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/ThreadPool.cpp.s
-.PHONY : ThreadPool.cpp.s
+event/ServerEventFactory.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.s
+.PHONY : event/ServerEventFactory.cpp.s
 
-protocol/LoginProtocol.o: protocol/LoginProtocol.cpp.o
-.PHONY : protocol/LoginProtocol.o
+net/CommandSocket.o: net/CommandSocket.cpp.o
+.PHONY : net/CommandSocket.o
 
 # target to build an object file
-protocol/LoginProtocol.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.o
-.PHONY : protocol/LoginProtocol.cpp.o
+net/CommandSocket.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/net/CommandSocket.cpp.o
+.PHONY : net/CommandSocket.cpp.o
 
-protocol/LoginProtocol.i: protocol/LoginProtocol.cpp.i
-.PHONY : protocol/LoginProtocol.i
+net/CommandSocket.i: net/CommandSocket.cpp.i
+.PHONY : net/CommandSocket.i
 
 # target to preprocess a source file
-protocol/LoginProtocol.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.i
-.PHONY : protocol/LoginProtocol.cpp.i
+net/CommandSocket.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/net/CommandSocket.cpp.i
+.PHONY : net/CommandSocket.cpp.i
 
-protocol/LoginProtocol.s: protocol/LoginProtocol.cpp.s
-.PHONY : protocol/LoginProtocol.s
+net/CommandSocket.s: net/CommandSocket.cpp.s
+.PHONY : net/CommandSocket.s
 
 # target to generate assembly for a file
-protocol/LoginProtocol.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/LoginProtocol.cpp.s
-.PHONY : protocol/LoginProtocol.cpp.s
+net/CommandSocket.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/net/CommandSocket.cpp.s
+.PHONY : net/CommandSocket.cpp.s
 
-protocol/protocol_test.o: protocol/protocol_test.cpp.o
-.PHONY : protocol/protocol_test.o
+protocol/protocol_text.o: protocol/protocol_text.cpp.o
+.PHONY : protocol/protocol_text.o
 
 # target to build an object file
-protocol/protocol_test.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_test.cpp.o
-.PHONY : protocol/protocol_test.cpp.o
+protocol/protocol_text.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o
+.PHONY : protocol/protocol_text.cpp.o
 
-protocol/protocol_test.i: protocol/protocol_test.cpp.i
-.PHONY : protocol/protocol_test.i
+protocol/protocol_text.i: protocol/protocol_text.cpp.i
+.PHONY : protocol/protocol_text.i
 
 # target to preprocess a source file
-protocol/protocol_test.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_test.cpp.i
-.PHONY : protocol/protocol_test.cpp.i
+protocol/protocol_text.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_text.cpp.i
+.PHONY : protocol/protocol_text.cpp.i
 
-protocol/protocol_test.s: protocol/protocol_test.cpp.s
-.PHONY : protocol/protocol_test.s
+protocol/protocol_text.s: protocol/protocol_text.cpp.s
+.PHONY : protocol/protocol_text.s
 
 # target to generate assembly for a file
-protocol/protocol_test.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_test.cpp.s
-.PHONY : protocol/protocol_test.cpp.s
+protocol/protocol_text.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/protocol/protocol_text.cpp.s
+.PHONY : protocol/protocol_text.cpp.s
 
 server_main.o: server_main.cpp.o
 .PHONY : server_main.o
@@ -273,6 +273,78 @@ server_main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/server_main.cpp.s
 .PHONY : server_main.cpp.s
 
+service/LoginService.o: service/LoginService.cpp.o
+.PHONY : service/LoginService.o
+
+# target to build an object file
+service/LoginService.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/service/LoginService.cpp.o
+.PHONY : service/LoginService.cpp.o
+
+service/LoginService.i: service/LoginService.cpp.i
+.PHONY : service/LoginService.i
+
+# target to preprocess a source file
+service/LoginService.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/service/LoginService.cpp.i
+.PHONY : service/LoginService.cpp.i
+
+service/LoginService.s: service/LoginService.cpp.s
+.PHONY : service/LoginService.s
+
+# target to generate assembly for a file
+service/LoginService.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/service/LoginService.cpp.s
+.PHONY : service/LoginService.cpp.s
+
+session/SessionManager.o: session/SessionManager.cpp.o
+.PHONY : session/SessionManager.o
+
+# target to build an object file
+session/SessionManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/session/SessionManager.cpp.o
+.PHONY : session/SessionManager.cpp.o
+
+session/SessionManager.i: session/SessionManager.cpp.i
+.PHONY : session/SessionManager.i
+
+# target to preprocess a source file
+session/SessionManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/session/SessionManager.cpp.i
+.PHONY : session/SessionManager.cpp.i
+
+session/SessionManager.s: session/SessionManager.cpp.s
+.PHONY : session/SessionManager.s
+
+# target to generate assembly for a file
+session/SessionManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/session/SessionManager.cpp.s
+.PHONY : session/SessionManager.cpp.s
+
+util/ThreadPool.o: util/ThreadPool.cpp.o
+.PHONY : util/ThreadPool.o
+
+# target to build an object file
+util/ThreadPool.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/util/ThreadPool.cpp.o
+.PHONY : util/ThreadPool.cpp.o
+
+util/ThreadPool.i: util/ThreadPool.cpp.i
+.PHONY : util/ThreadPool.i
+
+# target to preprocess a source file
+util/ThreadPool.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/util/ThreadPool.cpp.i
+.PHONY : util/ThreadPool.cpp.i
+
+util/ThreadPool.s: util/ThreadPool.cpp.s
+.PHONY : util/ThreadPool.s
+
+# target to generate assembly for a file
+util/ThreadPool.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/util/ThreadPool.cpp.s
+.PHONY : util/ThreadPool.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -282,24 +354,33 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... login_server"
-	@echo "... CommandSocket.o"
-	@echo "... CommandSocket.i"
-	@echo "... CommandSocket.s"
-	@echo "... LoginServer.o"
-	@echo "... LoginServer.i"
-	@echo "... LoginServer.s"
-	@echo "... ThreadPool.o"
-	@echo "... ThreadPool.i"
-	@echo "... ThreadPool.s"
-	@echo "... protocol/LoginProtocol.o"
-	@echo "... protocol/LoginProtocol.i"
-	@echo "... protocol/LoginProtocol.s"
-	@echo "... protocol/protocol_test.o"
-	@echo "... protocol/protocol_test.i"
-	@echo "... protocol/protocol_test.s"
+	@echo "... core/LoginServer.o"
+	@echo "... core/LoginServer.i"
+	@echo "... core/LoginServer.s"
+	@echo "... dispatcher/ServerEventDispatcher.o"
+	@echo "... dispatcher/ServerEventDispatcher.i"
+	@echo "... dispatcher/ServerEventDispatcher.s"
+	@echo "... event/ServerEventFactory.o"
+	@echo "... event/ServerEventFactory.i"
+	@echo "... event/ServerEventFactory.s"
+	@echo "... net/CommandSocket.o"
+	@echo "... net/CommandSocket.i"
+	@echo "... net/CommandSocket.s"
+	@echo "... protocol/protocol_text.o"
+	@echo "... protocol/protocol_text.i"
+	@echo "... protocol/protocol_text.s"
 	@echo "... server_main.o"
 	@echo "... server_main.i"
 	@echo "... server_main.s"
+	@echo "... service/LoginService.o"
+	@echo "... service/LoginService.i"
+	@echo "... service/LoginService.s"
+	@echo "... session/SessionManager.o"
+	@echo "... session/SessionManager.i"
+	@echo "... session/SessionManager.s"
+	@echo "... util/ThreadPool.o"
+	@echo "... util/ThreadPool.i"
+	@echo "... util/ThreadPool.s"
 .PHONY : help
 
 
