@@ -121,9 +121,4 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o: \
  /usr/include/c++/13/bits/enable_special_members.h \
  /usr/include/c++/13/bits/parse_numbers.h \
  /usr/include/c++/13/ext/aligned_buffer.h \
- /home/light/work/Video_Prj/Server/./event/ServerEvents.h \
- /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
- /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_uninitialized.h \
- /usr/include/c++/13/bits/stl_vector.h \
- /usr/include/c++/13/bits/stl_bvector.h \
- /usr/include/c++/13/bits/vector.tcc
+ /home/light/work/Video_Prj/Server/./event/ServerEvents.h

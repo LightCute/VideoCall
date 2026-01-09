@@ -1,4 +1,6 @@
 //LoginServer.cpp
+// LoginServer: protocol ↔ domain 的边界层
+
 #include "./core/LoginServer.h"
 
 
@@ -94,11 +96,14 @@ void LoginServer::handle(const BroadcastOnlineUsers&)
 
     proto::OnlineUsers users;
     for (auto& [fd, info] : snapshot) {
+        const domain::User& u = info.user;
+
         users.users.push_back(proto::UserInfo{
-            info.username,
-            info.privilege
+            u.username,
+            u.privilege
         });
     }
+
 
     auto payload = proto::makeOnlineUsers(users);
 

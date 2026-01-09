@@ -6,9 +6,12 @@
 
 ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 {
-    proto::LoginRequest req;
-    if (proto::parseLoginRequest(msg, req.username, req.password)) {
-        return event::LoginRequest{ req };
+    std::string user, pwd;
+    if (proto::parseLoginRequest(msg, user, pwd)) {
+        return event::LoginRequest{
+            .username = user,
+            .password = pwd
+        };
     }
 
     // ❗ 如果你愿意，可以抛异常 / optional

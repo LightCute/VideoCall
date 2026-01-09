@@ -3,10 +3,10 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include "./domain/User.h"
 
 struct ClientInfo {
-    std::string username;
-    int privilege = 0;
+    domain::User user;
     bool online = false;
 };
 

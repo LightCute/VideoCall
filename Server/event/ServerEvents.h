@@ -1,19 +1,12 @@
 //ServerEvents.h
 #pragma once
 #include <string>
-#include "protocol/protocol_types.h"
 
-namespace proto {
-    struct LoginRequest {
-        std::string username;
-        std::string password;
-    };
-}
 
 
 
 namespace event {
-    
+
 struct ErrorEvent {
     std::string rawMsg;  // 收到的原始消息
     std::string reason;  // 解析失败原因
@@ -21,7 +14,8 @@ struct ErrorEvent {
 
 // 登录请求
 struct LoginRequest {
-    proto::LoginRequest req;
+    std::string username;
+    std::string password;
 };
 
 // 以后可以非常自然地加

@@ -1,7 +1,7 @@
 //LoginService
 #include "LoginService.h"
 
-LoginResult LoginService::handleLogin(const LoginRequest& req) {
+LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
     LoginResult r;
 
     if (req.username == "admin" && req.password == "123") {

@@ -25,7 +25,6 @@ struct SendError {
 
 // 广播：在线用户列表
 struct BroadcastOnlineUsers {
-    std::map<int, ClientInfo> snapshot;
 };
 
 // 未来可无限加

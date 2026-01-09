@@ -26,12 +26,11 @@ ServerEventDispatcher::handle(int fd, const event::LoginRequest& ev)
 {
     std::vector<ServerAction> actions;
 
-    LoginResult r = loginService_.handleLogin(ev.req);
+    LoginResult r = loginService_.handleLogin(ev);
 
     if (r.success) {
         sessionMgr_.login(fd, {
-            r.username,
-            r.privilege,
+            domain::User{ r.username, r.privilege },
             true
         });
 
@@ -42,7 +41,7 @@ ServerEventDispatcher::handle(int fd, const event::LoginRequest& ev)
         });
 
         actions.emplace_back(BroadcastOnlineUsers{
-            .snapshot = sessionMgr_.snapshot()
+            
         });
     } else {
         actions.emplace_back(SendLoginFail{
@@ -64,6 +63,6 @@ ServerEventDispatcher::handle(int fd, const event::ErrorEvent& ev)
         .fd = fd,
         .reason = ev.reason +ev.rawMsg
     });
-    
+
     return actions;
 }

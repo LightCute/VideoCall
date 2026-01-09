@@ -122,13 +122,12 @@ CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o: \
  /usr/include/c++/13/bits/parse_numbers.h \
  /usr/include/c++/13/ext/aligned_buffer.h \
  /home/light/work/Video_Prj/Server/./event/ServerEvents.h \
+ /home/light/work/Video_Prj/Server/protocol/protocol_text.h \
  /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
  /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_uninitialized.h \
  /usr/include/c++/13/bits/stl_vector.h \
  /usr/include/c++/13/bits/stl_bvector.h \
- /usr/include/c++/13/bits/vector.tcc \
- /home/light/work/Video_Prj/Server/protocol/protocol_text.h \
- /usr/include/c++/13/stdexcept /usr/include/c++/13/exception \
- /usr/include/c++/13/bits/exception_ptr.h \
+ /usr/include/c++/13/bits/vector.tcc /usr/include/c++/13/stdexcept \
+ /usr/include/c++/13/exception /usr/include/c++/13/bits/exception_ptr.h \
  /usr/include/c++/13/bits/cxxabi_init_exception.h \
  /usr/include/c++/13/typeinfo /usr/include/c++/13/bits/nested_exception.h

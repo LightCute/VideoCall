@@ -4,11 +4,8 @@
 
 #include "./event/ServerEvent.h" // for proto::LoginRequest
 
-using namespace proto;
 
-namespace proto {
-    struct LoginRequest;
-}
+
 
 
 struct LoginResult {
@@ -21,5 +18,5 @@ struct LoginResult {
 
 class LoginService {
 public:
-    LoginResult handleLogin(const proto::LoginRequest& req);
+    LoginResult handleLogin(const event::LoginRequest& req);
 };

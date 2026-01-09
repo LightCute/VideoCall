@@ -1,4 +1,10 @@
+// proto::*
+// ⚠️ PROTOCOL DTO — do NOT use as domain model
+// ⚠️ 仅用于协议序列化 / 反序列化
+// ⚠️ 禁止在业务层、事件层、服务层中作为业务模型使用
+
 //protocol_common.h
+
 #pragma once
 
 namespace proto {

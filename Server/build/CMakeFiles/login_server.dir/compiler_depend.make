@@ -4,6 +4,7 @@
 CMakeFiles/login_server.dir/core/LoginServer.cpp.o: /home/light/work/Video_Prj/Server/core/LoginServer.cpp \
   /home/light/work/Video_Prj/Server/core/LoginServer.h \
   /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.h \
+  /home/light/work/Video_Prj/Server/domain/User.h \
   /home/light/work/Video_Prj/Server/event/ServerEvent.h \
   /home/light/work/Video_Prj/Server/event/ServerEventFactory.h \
   /home/light/work/Video_Prj/Server/event/ServerEvents.h \
@@ -11,12 +12,12 @@ CMakeFiles/login_server.dir/core/LoginServer.cpp.o: /home/light/work/Video_Prj/S
   /home/light/work/Video_Prj/Server/net/PacketCodec.h \
   /home/light/work/Video_Prj/Server/protocol/protocol_common.h \
   /home/light/work/Video_Prj/Server/protocol/protocol_text.h \
+  /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
   /home/light/work/Video_Prj/Server/service/LoginService.h \
   /home/light/work/Video_Prj/Server/service/ServerAction.h \
   /home/light/work/Video_Prj/Server/service/ServerActions.h \
   /home/light/work/Video_Prj/Server/session/SessionManager.h \
   /home/light/work/Video_Prj/Server/util/ThreadPool.h \
-  /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
   /usr/include/alloca.h \
   /usr/include/arpa/inet.h \
   /usr/include/asm-generic/bitsperlong.h \
@@ -295,13 +296,13 @@ CMakeFiles/login_server.dir/core/LoginServer.cpp.o: /home/light/work/Video_Prj/S
 
 CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o: /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.cpp \
   /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.h \
+  /home/light/work/Video_Prj/Server/domain/User.h \
   /home/light/work/Video_Prj/Server/event/ServerEvent.h \
   /home/light/work/Video_Prj/Server/event/ServerEvents.h \
   /home/light/work/Video_Prj/Server/service/LoginService.h \
   /home/light/work/Video_Prj/Server/service/ServerAction.h \
   /home/light/work/Video_Prj/Server/service/ServerActions.h \
   /home/light/work/Video_Prj/Server/session/SessionManager.h \
-  /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
@@ -1079,6 +1080,7 @@ CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o: /home/light/work/Video
 CMakeFiles/login_server.dir/server_main.cpp.o: /home/light/work/Video_Prj/Server/server_main.cpp \
   /home/light/work/Video_Prj/Server/core/LoginServer.h \
   /home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.h \
+  /home/light/work/Video_Prj/Server/domain/User.h \
   /home/light/work/Video_Prj/Server/event/ServerEvent.h \
   /home/light/work/Video_Prj/Server/event/ServerEventFactory.h \
   /home/light/work/Video_Prj/Server/event/ServerEvents.h \
@@ -1086,12 +1088,12 @@ CMakeFiles/login_server.dir/server_main.cpp.o: /home/light/work/Video_Prj/Server
   /home/light/work/Video_Prj/Server/net/PacketCodec.h \
   /home/light/work/Video_Prj/Server/protocol/protocol_common.h \
   /home/light/work/Video_Prj/Server/protocol/protocol_text.h \
+  /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
   /home/light/work/Video_Prj/Server/service/LoginService.h \
   /home/light/work/Video_Prj/Server/service/ServerAction.h \
   /home/light/work/Video_Prj/Server/service/ServerActions.h \
   /home/light/work/Video_Prj/Server/session/SessionManager.h \
   /home/light/work/Video_Prj/Server/util/ThreadPool.h \
-  /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
   /usr/include/alloca.h \
   /usr/include/arpa/inet.h \
   /usr/include/asm-generic/bitsperlong.h \
@@ -1371,7 +1373,6 @@ CMakeFiles/login_server.dir/server_main.cpp.o: /home/light/work/Video_Prj/Server
 CMakeFiles/login_server.dir/service/LoginService.cpp.o: /home/light/work/Video_Prj/Server/service/LoginService.cpp \
   /home/light/work/Video_Prj/Server/event/ServerEvent.h \
   /home/light/work/Video_Prj/Server/event/ServerEvents.h \
-  /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
   /home/light/work/Video_Prj/Server/service/LoginService.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/errno-base.h \
@@ -1409,21 +1410,17 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o: /home/light/work/Video_P
   /usr/include/c++/13/bits/requires_hosted.h \
   /usr/include/c++/13/bits/std_abs.h \
   /usr/include/c++/13/bits/stl_algobase.h \
-  /usr/include/c++/13/bits/stl_bvector.h \
   /usr/include/c++/13/bits/stl_construct.h \
   /usr/include/c++/13/bits/stl_function.h \
   /usr/include/c++/13/bits/stl_iterator.h \
   /usr/include/c++/13/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/13/bits/stl_iterator_base_types.h \
   /usr/include/c++/13/bits/stl_pair.h \
-  /usr/include/c++/13/bits/stl_uninitialized.h \
-  /usr/include/c++/13/bits/stl_vector.h \
   /usr/include/c++/13/bits/string_view.tcc \
   /usr/include/c++/13/bits/stringfwd.h \
   /usr/include/c++/13/bits/uses_allocator.h \
   /usr/include/c++/13/bits/uses_allocator_args.h \
   /usr/include/c++/13/bits/utility.h \
-  /usr/include/c++/13/bits/vector.tcc \
   /usr/include/c++/13/cctype \
   /usr/include/c++/13/cerrno \
   /usr/include/c++/13/clocale \
@@ -1447,7 +1444,6 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o: /home/light/work/Video_P
   /usr/include/c++/13/tuple \
   /usr/include/c++/13/type_traits \
   /usr/include/c++/13/variant \
-  /usr/include/c++/13/vector \
   /usr/include/ctype.h \
   /usr/include/endian.h \
   /usr/include/errno.h \
@@ -1522,6 +1518,7 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o: /home/light/work/Video_P
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h
 
 CMakeFiles/login_server.dir/session/SessionManager.cpp.o: /home/light/work/Video_Prj/Server/session/SessionManager.cpp \
+  /home/light/work/Video_Prj/Server/domain/User.h \
   /home/light/work/Video_Prj/Server/session/SessionManager.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/errno-base.h \
@@ -1962,8 +1959,6 @@ CMakeFiles/login_server.dir/server_main.cpp.o:
 
 /usr/include/x86_64-linux-gnu/sys/types.h:
 
-/usr/include/x86_64-linux-gnu/sys/single_threaded.h:
-
 /usr/include/x86_64-linux-gnu/sys/cdefs.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
@@ -2038,13 +2033,15 @@ CMakeFiles/login_server.dir/session/SessionManager.cpp.o:
 
 /usr/include/c++/13/bits/stl_function.h:
 
+/usr/include/x86_64-linux-gnu/sys/single_threaded.h:
+
+/home/light/work/Video_Prj/Server/domain/User.h:
+
 /usr/include/c++/13/bits/uses_allocator_args.h:
 
 /usr/include/arpa/inet.h:
 
 /usr/include/c++/13/bits/atomic_base.h:
-
-/usr/include/c++/13/cstring:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
@@ -2100,10 +2097,6 @@ CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
-/usr/include/c++/13/bits/refwrap.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
 /usr/include/c++/13/bits/stl_heap.h:
 
 /usr/include/c++/13/bits/std_abs.h:
@@ -2123,14 +2116,6 @@ CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o:
 /usr/include/c++/13/bits/locale_facets.tcc:
 
 /usr/include/c++/13/bits/locale_facets.h:
-
-/usr/include/x86_64-linux-gnu/bits/long-double.h:
-
-/usr/include/c++/13/bits/algorithmfwd.h:
-
-/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
-
-/usr/include/c++/13/bits/node_handle.h:
 
 /usr/include/c++/13/backward/binders.h:
 
@@ -2182,12 +2167,6 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o:
 
 /usr/include/stdc-predef.h:
 
-/home/light/work/Video_Prj/Server/protocol/protocol_types.h:
-
-/usr/include/alloca.h:
-
-/home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.h:
-
 /usr/include/wchar.h:
 
 /usr/include/c++/13/bits/shared_ptr_base.h:
@@ -2196,9 +2175,9 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
-/usr/include/c++/13/bits/alloc_traits.h:
+/usr/include/alloca.h:
 
-/usr/include/c++/13/bits/concept_check.h:
+/home/light/work/Video_Prj/Server/dispatcher/ServerEventDispatcher.h:
 
 /home/light/work/Video_Prj/Server/protocol/protocol_common.h:
 
@@ -2248,6 +2227,10 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o:
 
 /usr/include/linux/stddef.h:
 
+/usr/include/c++/13/bits/refwrap.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
 /home/light/work/Video_Prj/Server/core/LoginServer.h:
 
 /usr/include/c++/13/mutex:
@@ -2255,6 +2238,20 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o:
 /home/light/work/Video_Prj/Server/net/PacketCodec.h:
 
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
+
+/home/light/work/Video_Prj/Server/protocol/protocol_types.h:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/usr/include/c++/13/bits/algorithmfwd.h:
+
+/usr/include/c++/13/bits/alloc_traits.h:
+
+/usr/include/c++/13/bits/concept_check.h:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
+/usr/include/c++/13/bits/node_handle.h:
 
 /usr/include/c++/13/atomic:
 
@@ -2359,6 +2356,8 @@ CMakeFiles/login_server.dir/dispatcher/ServerEventDispatcher.cpp.o:
 /usr/include/c++/13/bits/hash_bytes.h:
 
 /usr/include/c++/13/bits/ios_base.h:
+
+/usr/include/c++/13/cstring:
 
 /usr/include/c++/13/ctime:
 

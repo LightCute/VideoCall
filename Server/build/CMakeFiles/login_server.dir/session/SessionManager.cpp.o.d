@@ -148,4 +148,5 @@ CMakeFiles/login_server.dir/session/SessionManager.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/c++/13/bits/charconv.h \
- /usr/include/c++/13/bits/basic_string.tcc
+ /usr/include/c++/13/bits/basic_string.tcc \
+ /home/light/work/Video_Prj/Server/./domain/User.h
