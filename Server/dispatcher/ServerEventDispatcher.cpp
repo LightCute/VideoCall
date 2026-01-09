@@ -10,26 +10,60 @@ ServerEventDispatcher::ServerEventDispatcher(
       sessionMgr_(sessionMgr)
 {}
 
-ServerAction ServerEventDispatcher::dispatch(int fd,
-                                             const ServerEvent& event) {
-    ServerAction action;
 
-    switch (event.type) {
-    case ServerEventType::LoginRequest: {
-        LoginResult result = loginService_.handleLogin(event.loginReq);
+std::vector<ServerAction>
+ServerEventDispatcher::dispatch(int fd, const ServerEvent& event)
+{
+    return std::visit([&](auto&& ev) {
+        return handle(fd, ev);
+    }, event);
+}
 
-        action.type = ServerActionType::SendLoginResult;
-        action.targetFd = fd;
-        action.loginResult = result;
 
-        if (result.success) {
-            //sessionMgr_.onLoginSuccess(fd, result.username, result.privilege);
+// 登录
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::LoginRequest& ev)
+{
+    std::vector<ServerAction> actions;
 
-        }
-        return action;
+    LoginResult r = loginService_.handleLogin(ev.req);
+
+    if (r.success) {
+        sessionMgr_.login(fd, {
+            r.username,
+            r.privilege,
+            true
+        });
+
+        actions.emplace_back(SendLoginOk{
+            .fd = fd,
+            .username = r.username,
+            .privilege = r.privilege
+        });
+
+        actions.emplace_back(BroadcastOnlineUsers{
+            .snapshot = sessionMgr_.snapshot()
+        });
+    } else {
+        actions.emplace_back(SendLoginFail{
+            .fd = fd,
+            .reason = r.reason
+        });
     }
 
-    default:
-        return {};
-    }
+    return actions;
+}
+
+
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::ErrorEvent& ev)
+{
+    std::vector<ServerAction> actions;
+    
+    actions.emplace_back(SendError{
+        .fd = fd,
+        .reason = ev.reason +ev.rawMsg
+    });
+    
+    return actions;
 }

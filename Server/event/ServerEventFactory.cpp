@@ -1,20 +1,20 @@
-//ServerEventFactory.cpp
-#include "./event/ServerEventFactory.h"
+// ServerEventFactory.cpp
+#include "ServerEventFactory.h"
 #include "protocol/protocol_text.h"
+#include <stdexcept>
+
 
 ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 {
-    ServerEvent e;
-
-    if (proto::parseLoginRequest(
-            msg,
-            e.loginReq.username,
-            e.loginReq.password))
-    {
-        e.type = ServerEventType::LoginRequest;
-        return e;
+    proto::LoginRequest req;
+    if (proto::parseLoginRequest(msg, req.username, req.password)) {
+        return event::LoginRequest{ req };
     }
 
-    e.type = ServerEventType::Unknown;
-    return e;
+    // ❗ 如果你愿意，可以抛异常 / optional
+    // fallback -> 返回 ErrorEvent
+    return event::ErrorEvent{
+        .rawMsg = msg,
+        .reason = "Unknown or malformed command"
+    };
 }

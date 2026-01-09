@@ -54,8 +54,8 @@ add_executable(login_server
 )
 
 # Linux 下链接必要的系统库
-if(UNIX)
-    target_link_libraries(login_server
-        pthread   # 多线程
-    )
-endif()
+# if(UNIX)
+#     target_link_libraries(login_server
+#         pthread   # 多线程
+#     )
+# endif()

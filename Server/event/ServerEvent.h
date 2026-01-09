@@ -1,22 +1,18 @@
 //ServerEvent.h
 #pragma once
-#include <string>
+#include <variant>
+#include "ServerEvents.h"
 
-namespace proto {
-    struct LoginRequest {
-        std::string username;
-        std::string password;
-    };
-}
 
-enum class ServerEventType {
-    LoginRequest,
-    Unknown
-};
 
-struct ServerEvent {
-    ServerEventType type = ServerEventType::Unknown;
 
-    // payload（只用一个）
-    proto::LoginRequest loginReq;
-};
+using ServerEvent = std::variant<
+    event::ErrorEvent,
+    event::LoginRequest
+    // event::Logout,
+    // event::Chat,
+    // 以后只需要往这里加
+>;
+
+
+

@@ -2,7 +2,6 @@
 #include "./core/LoginServer.h"
 
 
-using namespace proto;
 
 // 实现 LoginServer 构造函数
 LoginServer::LoginServer() 
@@ -10,6 +9,11 @@ LoginServer::LoginServer()
 {
     // 构造函数体可留空（如需其他初始化逻辑可补充）
 }
+LoginServer::~LoginServer() {
+    listener_.stop();      // 停止 accept 线程
+    // ThreadPool 析构会自动 join
+}
+
 
 bool LoginServer::start(int port) {
     listener_.setAcceptCallback(
@@ -52,119 +56,63 @@ void LoginServer::clientThread(int clientfd) {
     std::cout << "[Server] client disconnected fd=" << clientfd << std::endl;
 }
 
-void LoginServer::onMessage(int clientfd, const std::string& msg) {
-    std::cout << "[Server] recv from " << clientfd << ": " << msg << std::endl;
-
+void LoginServer::onMessage(int fd, const std::string& msg)
+{
     ServerEvent event = ServerEventFactory::makeEvent(msg);
 
-    ServerAction action = dispatcher_.dispatch(clientfd, event);
-    
-    handleAction(action);
+    auto actions = dispatcher_.dispatch(fd, event);
 
-    
-}
-
-void LoginServer::handleAction(const ServerAction& action) {
-    switch (action.type) {
-    case ServerActionType::SendLoginResult: {
-        const auto& r = action.loginResult;
-
-        std::string payload;
-
-        if (r.success) {
-            proto::UserInfo u;
-            u.username = r.username;
-            u.privilege = r.privilege;
-
-            payload = proto::makeLoginOk(u, "welcome");
-        } else {
-            payload = proto::makeLoginFail(r.reason);
-        }
-
-        listener_.sendPacket(action.targetFd, payload);
-        break;
-    }
-
-    default:
-        break;
+    for (auto& act : actions) {
+        std::visit([this](auto&& a) {
+            handle(a);
+        }, act);
     }
 }
 
 
+// LoginServer.cpp
 
-// void LoginServer::handleLogin(int fd, ServerEvent& event)
-// {
-//     if (event.type != ServerEventType::LoginRequest)
-//         return;
+void LoginServer::handle(const SendLoginOk& a)
+{
+    proto::UserInfo u;
+    u.username = a.username;
+    u.privilege = a.privilege;
 
-//    switch (event.type) {
-//     case ServerEventType::LoginRequest:
+    auto payload = proto::makeLoginOk(u, "welcome");
+    listener_.sendPacket(a.fd, payload);
+}
 
-//         break;
+void LoginServer::handle(const SendLoginFail& a)
+{
+    auto payload = proto::makeLoginFail(a.reason);
+    listener_.sendPacket(a.fd, payload);
+}
 
-//     default:
+void LoginServer::handle(const BroadcastOnlineUsers&)
+{
+    auto snapshot = sessionMgr_.snapshot();
 
-//         break;
-//     }
+    proto::OnlineUsers users;
+    for (auto& [fd, info] : snapshot) {
+        users.users.push_back(proto::UserInfo{
+            info.username,
+            info.privilege
+        });
+    }
 
+    auto payload = proto::makeOnlineUsers(users);
 
-//     //auto result = loginService_.handleLogin(event.loginReq);
+    std::cout << "Broadcast: " << payload << std::endl;
+    for (auto& [fd, _] : snapshot) {
+        listener_.sendPacket(fd, payload);
+    }
+}
 
-//     // if (result.success) {
-//     //     sessionMgr_.login(fd, result.user);
-//     //     sendPacket(fd, proto::makeLoginOk(...));
-//     // } else {
-//     //     sendPacket(fd, proto::makeLoginFail("fail"));
-//     // }
-// }
+void LoginServer::handle(const SendError& a)
+{
+    auto payload = (a.reason);
+    std::cout << "Error: " << payload << std::endl;
 
-
-
-// void LoginServer::handleLogin(int fd, ServerEvent& event)
-// {
-//    switch (event.type) {
-//     case ServerEventType::LoginRequest:
-        
-//     // std::string user, pwd;
-//     // if (proto::parseLoginRequest(msg, user, pwd) == true) {
-//     //     proto::UserInfo user_temp;
-
-//     //     if(user == "admin" && pwd == "123")
-//     //     {
-//     //         std::cout << "Login suceess admin 123" << std::endl;
-//     //         user_temp.username = "admin";
-//     //         user_temp.privilege = 10;
-
-//     //         {
-//     //             std::lock_guard<std::mutex> lock(mutex_);
-//     //             clients_[clientfd] = {
-//     //                 user,
-//     //                 user_temp.privilege,
-//     //                 "unknown",
-//     //                 0,
-//     //                 true
-//     //             };
-//     //         }
-
-//     //         sendPacket(clientfd, proto::makeLoginOk(user_temp, "welcome"));
-
-//     //         broadcastOnlineUsers();
-//     //     }
-//     //     else {
-//     //         sendPacket(clientfd, proto::makeLoginFail("Login fail !!"));
-//     //     }
-
-
-//     // }    
-
-
-
-
-//         break;
-
-//     default:
-
-//         break;
-//     }
-// }
+    listener_.sendPacket(a.fd, payload);
+}
 

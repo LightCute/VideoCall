@@ -19,8 +19,9 @@ LoginWidget::LoginWidget(QWidget *parent)
     cmdSocket_->setMessageCallback([this](const std::string& msg){
 
         ClientEvent event = ClientEventFactory::makeEvent(msg);
-
+        qDebug() << "recv: " << QString::fromStdString(msg);
         QMetaObject::invokeMethod(this, [this, event]() {
+
             handleEvent(event);
         }, Qt::QueuedConnection);
     });
@@ -82,7 +83,7 @@ void LoginWidget::handleEvent(const ClientEvent& e) {
 
     case ClientEventType::OnlineUsers:
         //updateOnlineList(e.onlineUsers);
-        ui->TextEdit_tcp_test_recv->setPlainText("Broadcast");
+        ui->TextEdit_tcp_test_recv->setPlainText("Broadcast" );
         break;
 
     default:

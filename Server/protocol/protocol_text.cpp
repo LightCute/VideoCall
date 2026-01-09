@@ -46,7 +46,6 @@ std::string makeOnlineUsers(const OnlineUsers& users)
     for (const auto& u : users.users) {
         oss << " " << u.username << ":" << u.privilege;
     }
-    oss ;
     return oss.str();
 }
 

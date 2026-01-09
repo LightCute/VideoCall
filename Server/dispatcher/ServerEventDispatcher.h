@@ -5,17 +5,20 @@
 #include "./service/LoginService.h"
 #include "./session/SessionManager.h"
 #include "./service/ServerAction.h"
+#include "./service/ServerActions.h"
 
-using namespace proto;
 
 class ServerEventDispatcher {
 public:
     ServerEventDispatcher(LoginService& loginService,
                           SessionManager& sessionMgr);
 
-    ServerAction dispatch(int fd, const ServerEvent& event);
+    std::vector<ServerAction> dispatch(int fd, const ServerEvent& event);
 
 private:
+    std::vector<ServerAction> handle(int fd, const event::LoginRequest& ev);
+    std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
+
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
 };

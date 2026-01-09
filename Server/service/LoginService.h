@@ -16,6 +16,7 @@ struct LoginResult {
     std::string username;
     int privilege = 0;
     std::string reason;   // 失败原因
+    //UserInfo user;
 };
 
 class LoginService {

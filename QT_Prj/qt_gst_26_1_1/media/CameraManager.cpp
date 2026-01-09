@@ -45,7 +45,7 @@ bool CameraManager::start(const std::string& device) {
     gst_app_sink_set_emit_signals(GST_APP_SINK(appsink_), true);
     gst_app_sink_set_drop(GST_APP_SINK(appsink_), true);
     gst_app_sink_set_max_buffers(GST_APP_SINK(appsink_), 1);
-
+    
     g_signal_connect(appsink_, "new-sample",
                      G_CALLBACK(onNewSample), this);
 

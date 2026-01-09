@@ -1,28 +1,11 @@
-// ServerAction.h
+// Service/ServerAction.h
 #pragma once
-#include <string>
-#include <vector>
+#include <variant>
+#include "ServerActions.h"
 
-
-enum class ServerActionType {
-    None,
-    SendLoginResult,
+using ServerAction = std::variant<
+    SendError,
+    SendLoginOk,
+    SendLoginFail,
     BroadcastOnlineUsers
-};
-
-
-struct ServerAction {
-    ServerActionType type = ServerActionType::None;
-    int targetFd = -1;
-
-    // 动作数据（不是协议字符串！）
-    LoginResult loginResult;
-};
-
-// struct ServerAction {
-//     ServerActionType type = ServerActionType::None;
-
-//     int targetFd = -1;              // 单播
-//     std::vector<int> targets;       // 广播
-//     std::string payload;            // 已编码好的协议数据
-// };
+>;

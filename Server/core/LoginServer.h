@@ -25,6 +25,7 @@
 class LoginServer {
 public:
     LoginServer();
+    ~LoginServer();
     bool start(int port);
 
 private:
@@ -32,7 +33,12 @@ private:
     void clientThread(int clientfd);
     void onMessage(int clientfd, const std::string& msg);
     void handleLogin(int fd, ServerEvent& event);
-    void handleAction(const ServerAction& action);
+
+    void handle(const SendLoginOk&);
+    void handle(const SendLoginFail&);
+    void handle(const BroadcastOnlineUsers&);
+    void handle(const SendError&);
+
 
     CommandSocket listener_;
     ThreadPool pool_{8};

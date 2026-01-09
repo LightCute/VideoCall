@@ -11,7 +11,6 @@ login_server: \
   CMakeFiles/login_server.dir/service/LoginService.cpp.o \
   CMakeFiles/login_server.dir/session/SessionManager.cpp.o \
   CMakeFiles/login_server.dir/util/ThreadPool.cpp.o \
-  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libpthread.a \
   /usr/lib/gcc/x86_64-linux-gnu/13/libstdc++.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
@@ -64,8 +63,6 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.o:
 CMakeFiles/login_server.dir/session/SessionManager.cpp.o:
 
 CMakeFiles/login_server.dir/util/ThreadPool.cpp.o:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libpthread.a:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/libstdc++.so:
 

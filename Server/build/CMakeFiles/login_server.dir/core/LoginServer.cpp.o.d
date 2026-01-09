@@ -224,11 +224,14 @@ CMakeFiles/login_server.dir/core/LoginServer.cpp.o: \
  /usr/include/c++/13/atomic /usr/include/c++/13/bits/atomic_base.h \
  /usr/include/c++/13/bits/atomic_lockfree_defines.h \
  /home/light/work/Video_Prj/Server/./event/ServerEvent.h \
+ /usr/include/c++/13/variant \
+ /home/light/work/Video_Prj/Server/./event/ServerEvents.h \
+ /home/light/work/Video_Prj/Server/protocol/protocol_types.h \
  /home/light/work/Video_Prj/Server/./event/ServerEventFactory.h \
  /home/light/work/Video_Prj/Server/./session/SessionManager.h \
  /home/light/work/Video_Prj/Server/./dispatcher/ServerEventDispatcher.h \
  /home/light/work/Video_Prj/Server/./service/LoginService.h \
  /home/light/work/Video_Prj/Server/./service/ServerAction.h \
+ /home/light/work/Video_Prj/Server/./service/ServerActions.h \
  /home/light/work/Video_Prj/Server/./protocol/protocol_text.h \
- /home/light/work/Video_Prj/Server/./protocol/protocol_types.h \
  /home/light/work/Video_Prj/Server/./protocol/protocol_common.h

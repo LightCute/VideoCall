@@ -54,6 +54,7 @@ void CameraManager::stop() {
     if (!running) return;
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline);
+    
     pipeline = nullptr;
     running = false;
 }
