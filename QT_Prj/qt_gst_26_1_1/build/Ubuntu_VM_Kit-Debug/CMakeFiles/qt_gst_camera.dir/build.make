@@ -107,10 +107,24 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/qt_gst_camera.dir/main.cpp.s"
 	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/main.cpp -o CMakeFiles/qt_gst_camera.dir/main.cpp.s
 
+CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o: CMakeFiles/qt_gst_camera.dir/flags.make
+CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.cpp
+CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o: CMakeFiles/qt_gst_camera.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o"
+	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o -MF CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o.d -o CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o -c /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.cpp
+
+CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.i"
+	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.cpp > CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.i
+
+CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.s"
+	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.cpp -o CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.s
+
 CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o: CMakeFiles/qt_gst_camera.dir/flags.make
 CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.cpp
 CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o: CMakeFiles/qt_gst_camera.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o"
 	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o -MF CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o.d -o CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o -c /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.cpp
 
 CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.i: cmake_force
@@ -120,20 +134,6 @@ CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.i: cmake_force
 CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.s"
 	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.cpp -o CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.s
-
-CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o: CMakeFiles/qt_gst_camera.dir/flags.make
-CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.cpp
-CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o: CMakeFiles/qt_gst_camera.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o"
-	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o -MF CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o.d -o CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o -c /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.cpp
-
-CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.i"
-	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.cpp > CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.i
-
-CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.s"
-	/usr/bin/x86_64-linux-gnu-g++-13 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.cpp -o CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.s
 
 CMakeFiles/qt_gst_camera.dir/media/CameraManager.cpp.o: CMakeFiles/qt_gst_camera.dir/flags.make
 CMakeFiles/qt_gst_camera.dir/media/CameraManager.cpp.o: /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.cpp
@@ -251,8 +251,8 @@ CMakeFiles/qt_gst_camera.dir/ui/widget.cpp.s: cmake_force
 qt_gst_camera_OBJECTS = \
 "CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/qt_gst_camera.dir/main.cpp.o" \
+"CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o" \
 "CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o" \
-"CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o" \
 "CMakeFiles/qt_gst_camera.dir/media/CameraManager.cpp.o" \
 "CMakeFiles/qt_gst_camera.dir/net/CommandSocket.cpp.o" \
 "CMakeFiles/qt_gst_camera.dir/protocol/protocol_text.cpp.o" \
@@ -267,8 +267,8 @@ qt_gst_camera_EXTERNAL_OBJECTS =
 
 qt_gst_camera: CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o
 qt_gst_camera: CMakeFiles/qt_gst_camera.dir/main.cpp.o
+qt_gst_camera: CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o
 qt_gst_camera: CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o
-qt_gst_camera: CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o
 qt_gst_camera: CMakeFiles/qt_gst_camera.dir/media/CameraManager.cpp.o
 qt_gst_camera: CMakeFiles/qt_gst_camera.dir/net/CommandSocket.cpp.o
 qt_gst_camera: CMakeFiles/qt_gst_camera.dir/protocol/protocol_text.cpp.o

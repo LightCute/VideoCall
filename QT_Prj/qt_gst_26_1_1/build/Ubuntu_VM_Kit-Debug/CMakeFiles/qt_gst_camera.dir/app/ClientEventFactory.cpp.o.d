@@ -122,4 +122,8 @@ CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o: \
  /usr/include/c++/13/bits/stl_bvector.h \
  /usr/include/c++/13/bits/vector.tcc \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEvent.h \
+ /usr/include/c++/13/variant \
+ /usr/include/c++/13/bits/enable_special_members.h \
+ /usr/include/c++/13/bits/parse_numbers.h \
+ /usr/include/c++/13/ext/aligned_buffer.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_text.h

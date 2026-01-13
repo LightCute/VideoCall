@@ -1,11 +1,12 @@
+//LoginWidget.cpp
 #include "LoginWidget.h"
 #include "./ui_LoginWidget.h"
 #include <QMessageBox>
 #include <QMetaObject>
 #include <QDebug>
-#include "ClientLoginProtocol.h"
+
 #include <QThread>
-using namespace proto;
+#include <QTimer>
 
 LoginWidget::LoginWidget(QWidget *parent)
     : QWidget(parent)
@@ -13,23 +14,43 @@ LoginWidget::LoginWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    cmdSocket_ = new CommandSocket();
+    core_ = new ClientCore;
 
-    // 设置回调函数，线程安全调用 Qt UI
-    cmdSocket_->setMessageCallback([this](const std::string& msg){
-
-        ClientEvent event = ClientEventFactory::makeEvent(msg);
-        qDebug() << "recv: " << QString::fromStdString(msg);
-        QMetaObject::invokeMethod(this, [this, event]() {
-
-            handleEvent(event);
-        }, Qt::QueuedConnection);
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this](){
+        ClientEvent ev;
+        while(core_->pollEvent(ev)) {
+            std::visit([this](auto&& e){ handle(e); }, ev);
+        }
     });
-    // 作为客户端连接服务器
-    //cmdSocket_->connectToServer("127.0.0.1", 6000);
-    // 或者作为服务器：
-    //cmdSocket_->startServer(6000);
+    timer->start(10); // 每 10ms 拉取一次事件
 
+
+    // core_->onEvent = [this](ClientEvent ev){
+    //     auto evCopy = std::move(ev); // 移动一次
+    //     QTimer::singleShot(0, this, [this, ev=std::move(evCopy)]() mutable {
+    //         std::visit([this](auto&& e){
+    //             handle(e);
+    //         }, ev);
+    //     });
+    // };
+
+
+
+
+    core_->onStateChanged = [this](State s){
+        QString stateStr;
+        switch(s){
+        case State::Disconnected: stateStr = "Disconnected"; break;
+        case State::Connecting:   stateStr = "Connecting"; break;
+        case State::Connected:    stateStr = "Connected"; break;
+        case State::LoggingIn:    stateStr = "LoggingIn"; break;
+        case State::LoggedIn:     stateStr = "LoggedIn"; break;
+        }
+
+        // 显示在 UI 上
+        ui->TextEdit_FSM_State->setPlainText("State: " + stateStr);
+    };
 
 }
 
@@ -52,14 +73,18 @@ void LoginWidget::on_Bt_ConnectToServer_clicked()
     qDebug() << "current thread:" << QThread::currentThread();
     qDebug() << "ui thread:" << qApp->thread();
 
-    if(cmdSocket_->connectToServer("127.0.0.1", 6001) == true)
-    {
-        ui->TextEdit_tcp_test_recv->setPlainText("Connect sucess\n");
-    }
-    else
-    {
-        ui->TextEdit_tcp_test_recv->setPlainText("Connect fail\n");
-    }
+    // if(core_->doconnect("127.0.0.1", 6001) == true)
+    // {
+    //     ui->TextEdit_tcp_test_recv->setPlainText("Connect sucess\n");
+    // }
+    // else
+    // {
+    //     ui->TextEdit_tcp_test_recv->setPlainText("Connect fail\n");
+    // }
+    ui->TextEdit_tcp_test_recv->setPlainText("Connecting\n");
+    core_->postEvent(EvCmdConnect{"127.0.0.1", 6001});
+
+
 }
 
 
@@ -67,26 +92,60 @@ void LoginWidget::on_Bt_tcp_test_send_clicked()
 {
     QString qmsg = ui->LE_tcp_send_test->text();
     std::string msg = qmsg.toStdString();
-    cmdSocket_->sendMessage( msg);
+    core_->sendRaw(msg);
 }
 
-void LoginWidget::handleEvent(const ClientEvent& e) {
-    switch (e.type) {
-    case ClientEventType::LoginOk:
-        ui->TextEdit_tcp_test_recv->setPlainText("Login success");
-        break;
 
-    case ClientEventType::LoginFail:
-        ui->TextEdit_tcp_test_recv->setPlainText(
-            "Login failed: " + QString::fromStdString(e.loginResp.message));
-        break;
-
-    case ClientEventType::OnlineUsers:
-        //updateOnlineList(e.onlineUsers);
-        ui->TextEdit_tcp_test_recv->setPlainText("Broadcast" );
-        break;
-
-    default:
-        qDebug() << "Unknown event";
-    }
+void LoginWidget::handle(const EvUnknow& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText(QString::fromStdString(e.error_msg.message));
 }
+
+void LoginWidget::handle(const EvLoginOk& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("Login success");
+}
+
+void LoginWidget::handle(const EvLoginFail& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText(
+        "Login failed: " + QString::fromStdString(e.resp.message));
+}
+
+void LoginWidget::handle(const EvOnlineUsers& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("Broadcast");
+}
+
+void LoginWidget::handle(const EvCmdConnect& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvCmdConnect");
+}
+
+void LoginWidget::handle(const EvCmdDisconnect& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvCmdDisconnect");
+
+}
+
+void LoginWidget::handle(const EvCmdLogin& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvCmdLogin");
+}
+
+
+void LoginWidget::handle(const EvTcpConnected& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvTcpConnected");
+}
+
+void LoginWidget::handle(const EvTcpDisconnected& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvTcpDisconnected");
+}
+
+
+
+
+void LoginWidget::on_Bt_Login_clicked()
+{
+    QString qstr_user_name = ui->LE_UserName->text();
+    std::string msg_user_name = qstr_user_name.toStdString();
+
+    QString qstr_user_pass = ui->LE_UserPass->text();
+    std::string msg_user_pass = qstr_user_pass.toStdString();
+
+    core_->postEvent(EvCmdLogin{msg_user_name, msg_user_pass});
+}
+

@@ -1,10 +1,11 @@
+//widget.h
 #ifndef WIDGET_H
 #define WIDGET_H
 
 #include <QWidget>
 #include "QtCameraAdapter.h"
 #include "CameraManager.h"
-#include "CommandSocket.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -34,6 +35,5 @@ private:
     VideoWidget *video_;
     CameraManager camera_;
     QtCameraAdapter* adapter_;
-    CommandSocket *cmdSocket_ ;
 };
 #endif // WIDGET_H

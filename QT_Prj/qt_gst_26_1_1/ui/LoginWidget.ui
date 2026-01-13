@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>589</width>
-    <height>437</height>
+    <width>810</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="Bt_Jump_Test">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>390</y>
+     <x>630</x>
+     <y>510</y>
      <width>88</width>
      <height>26</height>
     </rect>
@@ -42,8 +42,8 @@
   <widget class="QPushButton" name="Bt_Login">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>200</y>
+     <x>240</x>
+     <y>150</y>
      <width>88</width>
      <height>26</height>
     </rect>
@@ -68,9 +68,9 @@
   <widget class="QPlainTextEdit" name="TextEdit_tcp_test_recv">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>300</y>
-     <width>104</width>
+     <x>70</x>
+     <y>460</y>
+     <width>201</width>
      <height>70</height>
     </rect>
    </property>
@@ -90,16 +90,16 @@
     <rect>
      <x>160</x>
      <y>300</y>
-     <width>113</width>
-     <height>26</height>
+     <width>291</width>
+     <height>41</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label_send">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>270</y>
+     <x>260</x>
+     <y>260</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -111,8 +111,8 @@
   <widget class="QLabel" name="label_recv">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>270</y>
+     <x>140</x>
+     <y>430</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -124,8 +124,8 @@
   <widget class="QPushButton" name="Bt_tcp_test_send">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>340</y>
+     <x>210</x>
+     <y>370</y>
      <width>88</width>
      <height>26</height>
     </rect>
@@ -137,24 +137,44 @@
   <widget class="QPlainTextEdit" name="TextEdit_raw_recv">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>300</y>
-     <width>104</width>
-     <height>70</height>
+     <x>310</x>
+     <y>450</y>
+     <width>221</width>
+     <height>81</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label_recv_2">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>270</y>
+     <x>390</x>
+     <y>430</y>
      <width>81</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
     <string>recv_raw</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="LE_UserPass">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>110</y>
+     <width>113</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="TextEdit_FSM_State">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>180</y>
+     <width>201</width>
+     <height>70</height>
+    </rect>
    </property>
   </widget>
  </widget>

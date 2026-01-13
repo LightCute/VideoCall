@@ -1,3 +1,4 @@
+//CameraManager.h
 #pragma once
 
 #include <string>

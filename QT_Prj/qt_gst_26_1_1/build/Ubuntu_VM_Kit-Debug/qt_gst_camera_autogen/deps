@@ -1,14 +1,16 @@
 qt_gst_camera_autogen/timestamp: \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/CMakeLists.txt \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEvent.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventEnum.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.h \
-	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.cpp \
-	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientLoginProtocol.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/.qtc/package-manager/auto-setup.cmake \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/CMakeFiles/4.2.0-rc4/CMakeSystem.cmake \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/moc_predefs.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.cpp \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientState.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/main.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.h \
@@ -64,6 +66,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/bits/cpp_type_traits.h \
 	/usr/include/c++/13/bits/cxxabi_forced.h \
 	/usr/include/c++/13/bits/cxxabi_init_exception.h \
+	/usr/include/c++/13/bits/deque.tcc \
 	/usr/include/c++/13/bits/enable_special_members.h \
 	/usr/include/c++/13/bits/erase_if.h \
 	/usr/include/c++/13/bits/exception.h \
@@ -92,6 +95,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/bits/node_handle.h \
 	/usr/include/c++/13/bits/ostream.tcc \
 	/usr/include/c++/13/bits/ostream_insert.h \
+	/usr/include/c++/13/bits/parse_numbers.h \
 	/usr/include/c++/13/bits/postypes.h \
 	/usr/include/c++/13/bits/predefined_ops.h \
 	/usr/include/c++/13/bits/ptr_traits.h \
@@ -114,6 +118,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/bits/stl_algobase.h \
 	/usr/include/c++/13/bits/stl_bvector.h \
 	/usr/include/c++/13/bits/stl_construct.h \
+	/usr/include/c++/13/bits/stl_deque.h \
 	/usr/include/c++/13/bits/stl_function.h \
 	/usr/include/c++/13/bits/stl_heap.h \
 	/usr/include/c++/13/bits/stl_iterator.h \
@@ -124,6 +129,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/bits/stl_multimap.h \
 	/usr/include/c++/13/bits/stl_numeric.h \
 	/usr/include/c++/13/bits/stl_pair.h \
+	/usr/include/c++/13/bits/stl_queue.h \
 	/usr/include/c++/13/bits/stl_raw_storage_iter.h \
 	/usr/include/c++/13/bits/stl_relops.h \
 	/usr/include/c++/13/bits/stl_tempbuf.h \
@@ -147,6 +153,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/clocale \
 	/usr/include/c++/13/compare \
 	/usr/include/c++/13/concepts \
+	/usr/include/c++/13/condition_variable \
 	/usr/include/c++/13/cstddef \
 	/usr/include/c++/13/cstdint \
 	/usr/include/c++/13/cstdlib \
@@ -155,6 +162,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/cwctype \
 	/usr/include/c++/13/debug/assertions.h \
 	/usr/include/c++/13/debug/debug.h \
+	/usr/include/c++/13/deque \
 	/usr/include/c++/13/exception \
 	/usr/include/c++/13/ext/aligned_buffer.h \
 	/usr/include/c++/13/ext/alloc_traits.h \
@@ -172,6 +180,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/list \
 	/usr/include/c++/13/map \
 	/usr/include/c++/13/memory \
+	/usr/include/c++/13/mutex \
 	/usr/include/c++/13/new \
 	/usr/include/c++/13/numbers \
 	/usr/include/c++/13/numeric \
@@ -181,6 +190,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/pstl/glue_algorithm_defs.h \
 	/usr/include/c++/13/pstl/glue_memory_defs.h \
 	/usr/include/c++/13/pstl/glue_numeric_defs.h \
+	/usr/include/c++/13/queue \
 	/usr/include/c++/13/stdexcept \
 	/usr/include/c++/13/streambuf \
 	/usr/include/c++/13/string \
@@ -191,6 +201,7 @@ qt_gst_camera_autogen/timestamp: \
 	/usr/include/c++/13/typeinfo \
 	/usr/include/c++/13/unordered_map \
 	/usr/include/c++/13/utility \
+	/usr/include/c++/13/variant \
 	/usr/include/c++/13/vector \
 	/usr/include/ctype.h \
 	/usr/include/dirent.h \

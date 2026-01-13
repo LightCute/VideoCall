@@ -1,3 +1,4 @@
+//CommandSocket.h
 #pragma once
 #include <string>
 #include <thread>
@@ -9,10 +10,14 @@
 class CommandSocket {
 public:
     using MessageCallback = std::function<void(const std::string&)>;
+    using ConnectCallback = std::function<void()>;
+    using DisconnectCallback = std::function<void()>;
 
     CommandSocket();
     ~CommandSocket();
 
+    void setConnectCallback(ConnectCallback cb);
+    void setDisconnectCallback(DisconnectCallback cb);
     // TCP 客户端
     bool connectToServer(const std::string& host, int port);
 
@@ -36,4 +41,8 @@ private:
     std::thread workerThread_;
     std::atomic<bool> running_{false};
     MessageCallback callback_;
+
+    ConnectCallback onConnect_;
+    DisconnectCallback onDisconnect_;
+
 };

@@ -1,3 +1,4 @@
+//QtCameraAdapter.h
 #pragma once
 #include <QObject>
 #include "Frame.h"

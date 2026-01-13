@@ -1,3 +1,4 @@
+//VideoWidget.h
 #pragma once
 #include <QWidget>
 #include <QImage>

@@ -1,0 +1,1502 @@
+
+========== ./main.cpp ==========
+Lines: 16
+
+//main.cpp
+#include "widget.h"
+#include "LoginWidget.h"
+#include <QApplication>
+#include "AppWindow.h"
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    qRegisterMetaType<Frame>("Frame");
+    AppWindow w;
+    //LoginWidget login_W;
+    //login_W.show();
+    w.show();
+    return a.exec();
+}
+
+========== ./core/ClientCore.cpp ==========
+Lines: 189
+
+//ClientCore.cpp
+#include "ClientCore.h"
+
+#include "ClientEventFactory.h"
+#include "protocol_text.h"   // makeLoginRequest
+#include <QDebug>
+
+ClientCore::ClientCore() {
+    // 让 CommandSocket 只认识 ClientCore，不认识 UI
+    socket_.setMessageCallback([this](const std::string& msg) {
+        handleMessage(msg);
+    });
+
+    socket_.setConnectCallback([this]{
+        dispatchEvent(EvTcpConnected{});
+    });
+
+    socket_.setDisconnectCallback([this]{
+        dispatchEvent(EvTcpDisconnected{});
+    });
+
+}
+
+ClientCore::~ClientCore() {
+    socket_.stop();
+}
+
+
+EventTableEntry ClientCore::eventTable_[] = {
+
+    // ===== 断开态 =====
+    { State::Disconnected, EventType::CmdConnect,
+        [](ClientCore& c, const ClientEvent& ev){
+            if (auto e = std::get_if<EvCmdConnect>(&ev)) {
+             c.state_ = State::Connecting;
+                c.doconnect(e->host, e->port);
+            }
+        },
+        State::Connecting
+    },
+
+    // ===== 正在连接 =====
+    { State::Connecting, EventType::TcpConnected,
+        [](ClientCore& c, const ClientEvent& ev){
+            if (auto e = std::get_if<EvTcpConnected>(&ev)) {
+                if (c.onEvent) c.onEvent(std::move(*e)); // 移动给 UI
+
+            }
+        },
+        State::Connected
+    },
+
+    { State::Connecting, EventType::TcpDisconnected,
+        nullptr,
+        State::Disconnected
+    },
+
+    // ===== 已连接 =====
+    { State::Connected, EventType::CmdLogin,
+        [](ClientCore& c, const ClientEvent& ev){
+            if (auto e = std::get_if<EvCmdLogin>(&ev)) {
+                c.sendLogin(e->user, e->pass);
+            }
+        },
+        State::LoggingIn
+    },
+
+    // ===== 正在登录 =====
+    { State::LoggingIn, EventType::LoginOk,
+        [](ClientCore& c, const ClientEvent& ev){
+            if (auto e = std::get_if<EvLoginOk>(&ev)) {
+                if (c.onEvent) c.onEvent(std::move(*e)); // 移动给 UI
+            }
+        },
+        State::LoggedIn
+    },
+
+    { State::LoggingIn, EventType::LoginFail,
+        [](ClientCore& c, const ClientEvent& ev){
+            if (auto e = std::get_if<EvLoginFail>(&ev)) {
+                if (c.onEvent) c.onEvent(std::move(*e)); // 移动给 UI
+            }
+        },
+        State::Connected
+    },
+
+    // ===== 任何在线状态断线 =====
+    { State::Connected,  EventType::TcpDisconnected, nullptr, State::Disconnected },
+    { State::LoggingIn,  EventType::TcpDisconnected, nullptr, State::Disconnected },
+    { State::LoggedIn,   EventType::TcpDisconnected, nullptr, State::Disconnected },
+
+};
+
+
+
+void ClientCore::dispatchEvent(const ClientEvent ev)
+{
+    qDebug() << "dispatchEvent called, state=" << (int)state_;
+    std::visit([](auto&& e){
+        qDebug() << "Event type:" << typeid(e).name();
+    }, ev);
+
+    EventType evType;
+
+    // 根据 ClientEvent 类型确定 EventType
+    std::visit([&evType](auto&& e){
+        using T = std::decay_t<decltype(e)>;
+
+        // ===== UI =====
+        if constexpr (std::is_same_v<T, EvCmdConnect>)      evType = EventType::CmdConnect;
+        else if constexpr (std::is_same_v<T, EvCmdDisconnect>) evType = EventType::CmdDisconnect;
+        else if constexpr (std::is_same_v<T, EvCmdLogin>)   evType = EventType::CmdLogin;
+
+        // ===== TCP =====
+        else if constexpr (std::is_same_v<T, EvTcpConnected>)    evType = EventType::TcpConnected;
+        else if constexpr (std::is_same_v<T, EvTcpDisconnected>) evType = EventType::TcpDisconnected;
+
+        // ===== 协议 =====
+        else if constexpr (std::is_same_v<T, EvLoginOk>)   evType = EventType::LoginOk;
+        else if constexpr (std::is_same_v<T, EvLoginFail>) evType = EventType::LoginFail;
+        else if constexpr (std::is_same_v<T, EvOnlineUsers>)     evType = EventType::OnlineUsers;
+
+        else evType = EventType::Unknow;
+    }, ev);
+
+
+    bool matched = false;
+    // 遍历事件表匹配
+    for (const auto& entry : eventTable_) {
+        qDebug() << "FSM entry: state=" << (int)entry.current_state
+                 << " event_type=" << (int)entry.event_type
+                 << " current state_=" << (int)state_
+                 << " evType=" << (int)evType;
+        if (entry.current_state == state_ && entry.event_type == evType) {
+            qDebug() << "Matched, executing action";
+            // ① 先变状态
+            state_ = entry.next_state;
+
+            // ② 先通知 UI
+            if (onStateChanged)
+                onStateChanged(state_);
+
+            // ③ 再执行 action（里面可能会触发新事件）
+            if (entry.action)
+                entry.action(*this, std::move(ev));
+            matched = true;
+            break;
+        }
+    }
+    if(!matched) {
+        qDebug() << "No matching event table entry for state" << (int)state_ << "event" << (int)evType;
+    }
+}
+
+
+
+bool ClientCore::doconnect(const std::string& host, int port) {
+    return socket_.connectToServer(host, port);
+}
+
+void ClientCore::sendLogin(const std::string& username,
+                           const std::string& password)
+{
+    std::string msg = proto::makeLoginRequest(username, password);
+    socket_.sendMessage(msg);
+}
+
+
+void ClientCore::postEvent(const ClientEvent ev)
+{
+    dispatchEvent(std::move(ev));
+}
+
+
+
+void ClientCore::sendRaw(const std::string& msg) {
+    socket_.sendMessage(msg);
+}
+
+// ========================
+// 这是客户端的大脑
+// ========================
+void ClientCore::handleMessage(const std::string& msg) {
+    // 1️⃣ 协议解析
+    ClientEvent ev = ClientEventFactory::makeEvent(msg);
+
+    // 2️⃣ 投递给 UI（或者上层）
+    dispatchEvent(std::move(ev));
+}
+
+========== ./core/ClientCore.h ==========
+Lines: 58
+
+//ClientCore.h
+#pragma once
+
+#include <functional>
+#include <string>
+
+#include "CommandSocket.h"
+#include "ClientEvent.h"
+
+#include <variant>
+#include <functional>
+#include "ClientEventEnum.h"
+#include "ClientState.h"
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+
+struct EventTableEntry {
+    State current_state;
+    EventType event_type;
+    std::function<void(class ClientCore&, const ClientEvent)> action;
+    State next_state;
+};
+
+class ClientCore {
+public:
+    ClientCore();
+    ~ClientCore();
+
+    // 连接服务器
+    bool doconnect(const std::string& host, int port);
+
+    // 业务 API（UI 只调用这些）
+    void sendLogin(const std::string& username, const std::string& password);
+    void sendRaw(const std::string& msg); // 你现在测试用的
+
+    // UI 注册这个回调
+    std::function<void(const ClientEvent)> onEvent;
+    std::function<void(State)> onStateChanged;
+
+
+
+    void dispatchEvent(const ClientEvent ev);
+    void postEvent(const ClientEvent ev);
+
+
+private:
+    State state_ = State::Disconnected;
+    CommandSocket socket_;
+
+    // 内部：socket → protocol → event
+    void handleMessage(const std::string& msg);
+
+    // 事件表
+    static EventTableEntry eventTable_[];
+
+
+};
+
+========== ./core/ClientState.h ==========
+Lines: 13
+
+// ClientState.h
+#pragma once
+
+#include <string>
+
+enum class State {
+    Disconnected,
+    Connecting,
+    Connected,
+    LoggingIn,
+    LoggedIn
+};
+
+
+========== ./net/PacketCodec.h ==========
+Lines: 39
+
+//PacketCodec.h
+#pragma once
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <arpa/inet.h>
+
+class PacketCodec {
+public:
+    // 打包：payload → 带长度头的二进制数据
+    static std::vector<char> encode(const std::string& payload) {
+        uint32_t len = payload.size();
+        uint32_t netLen = htonl(len);
+
+        std::vector<char> buf(sizeof(netLen) + len);
+        std::memcpy(buf.data(), &netLen, sizeof(netLen));
+        std::memcpy(buf.data() + sizeof(netLen), payload.data(), len);
+        return buf;
+    }
+
+    // 尝试解包：从 buffer 中提取一个完整 payload
+    // 成功返回 true，并填充 outPayload
+    static bool tryDecode(std::vector<char>& buffer, std::string& outPayload) {
+        if (buffer.size() < 4)
+            return false;
+
+        uint32_t netLen;
+        std::memcpy(&netLen, buffer.data(), 4);
+        uint32_t len = ntohl(netLen);
+
+        if (buffer.size() < 4 + len)
+            return false;
+
+        outPayload.assign(buffer.data() + 4, len);
+        buffer.erase(buffer.begin(), buffer.begin() + 4 + len);
+        return true;
+    }
+};
+
+========== ./net/CommandSocket.h ==========
+Lines: 48
+
+//CommandSocket.h
+#pragma once
+#include <string>
+#include <thread>
+#include <atomic>
+#include <functional>
+#include <vector>
+#include "PacketCodec.h"
+
+class CommandSocket {
+public:
+    using MessageCallback = std::function<void(const std::string&)>;
+    using ConnectCallback = std::function<void()>;
+    using DisconnectCallback = std::function<void()>;
+
+    CommandSocket();
+    ~CommandSocket();
+
+    void setConnectCallback(ConnectCallback cb);
+    void setDisconnectCallback(DisconnectCallback cb);
+    // TCP 客户端
+    bool connectToServer(const std::string& host, int port);
+
+    // TCP 服务器
+    bool startServer(int port);
+
+    void setMessageCallback(MessageCallback cb);
+
+    // 发送数据
+    void sendMessage(const std::string& msg);
+
+    // 停止
+    void stop();
+
+private:
+    void clientThreadFunc();
+    void serverThreadFunc();
+    void sendPacket(int fd, const std::string& payload);
+    int sockfd_ = -1;
+    int clientfd_ = -1;  // 对于服务器端保存客户端连接
+    std::thread workerThread_;
+    std::atomic<bool> running_{false};
+    MessageCallback callback_;
+
+    ConnectCallback onConnect_;
+    DisconnectCallback onDisconnect_;
+
+};
+
+========== ./net/CommandSocket.cpp ==========
+Lines: 139
+
+//CommandSocket.cpp
+#include "CommandSocket.h"
+#include <iostream>
+#include <cstring>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+CommandSocket::CommandSocket() {}
+
+CommandSocket::~CommandSocket() {
+    stop();
+}
+
+void CommandSocket::setMessageCallback(MessageCallback cb) {
+    callback_ = std::move(cb);
+}
+
+void CommandSocket::setConnectCallback(ConnectCallback cb) {
+    onConnect_ = std::move(cb);
+}
+
+void CommandSocket::setDisconnectCallback(DisconnectCallback cb) {
+    onDisconnect_ = std::move(cb);
+}
+
+
+void CommandSocket::sendPacket(int fd, const std::string& payload) {
+    auto data = PacketCodec::encode(payload);
+    send(fd, data.data(), data.size(), 0);
+}
+
+
+bool CommandSocket::connectToServer(const std::string& host, int port) {
+    sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd_ < 0) return false;
+
+    sockaddr_in serv_addr{};
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+    inet_pton(AF_INET, host.c_str(), &serv_addr.sin_addr);
+
+    if (connect(sockfd_, (sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+        close(sockfd_);
+        sockfd_ = -1;
+        return false;
+    }
+
+    if (onConnect_) onConnect_();   // ⭐ TCP真正建立
+    // std::thread([this]{
+    //     if (onConnect_) onConnect_();
+    // }).detach();
+
+    running_ = true;
+    workerThread_ = std::thread(&CommandSocket::clientThreadFunc, this);
+    return true;
+}
+
+bool CommandSocket::startServer(int port) {
+    sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd_ < 0) return false;
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = INADDR_ANY;
+
+    int opt = 1;
+    setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+    if (bind(sockfd_, (sockaddr*)&addr, sizeof(addr)) < 0) return false;
+    if (listen(sockfd_, 1) < 0) return false;
+
+    running_ = true;
+    workerThread_ = std::thread(&CommandSocket::serverThreadFunc, this);
+    return true;
+}
+
+void CommandSocket::sendMessage(const std::string& msg) {
+    int fd = (clientfd_ >= 0) ? clientfd_ : sockfd_;
+    sendPacket(fd,msg);
+}
+
+void CommandSocket::stop() {
+    running_ = false;
+    if (workerThread_.joinable())
+        workerThread_.join();
+    if (sockfd_ >= 0) close(sockfd_);
+    if (clientfd_ >= 0) close(clientfd_);
+    sockfd_ = -1;
+    clientfd_ = -1;
+}
+
+void CommandSocket::clientThreadFunc() {
+    std::vector<char> recvBuffer;
+    char temp[1024];
+
+    while (running_) {
+        int n = recv(sockfd_, temp, sizeof(temp), 0);
+        if (n > 0) {
+
+            // 1️⃣ 把收到的字节塞进缓存
+            recvBuffer.insert(recvBuffer.end(), temp, temp + n);
+
+            // 2️⃣ 尝试从缓存中拆完整包
+            std::string payload;
+            while (PacketCodec::tryDecode(recvBuffer, payload)) {
+
+                // 3️⃣ 每一个 payload = 一条完整“应用层消息”
+                if (callback_) {
+                    callback_(payload);
+                }
+            }
+
+        } else if (n <= 0) {
+            if (onDisconnect_) onDisconnect_();  // ⭐ TCP断线
+            break; // 服务器正常断开
+        }
+    }
+}
+
+void CommandSocket::serverThreadFunc() {
+    sockaddr_in client_addr{};
+    socklen_t client_len = sizeof(client_addr);
+    clientfd_ = accept(sockfd_, (sockaddr*)&client_addr, &client_len);
+    if (clientfd_ < 0) return;
+
+    char buffer[1024];
+    while (running_) {
+        int n = recv(clientfd_, buffer, sizeof(buffer) - 1, 0);
+        if (n > 0) {
+            buffer[n] = '\0';
+            if (callback_) callback_(std::string(buffer));
+        } else if (n == 0) {
+            break; // 客户端断开
+        }
+    }
+}
+
+========== ./ui/VideoWidget.cpp ==========
+Lines: 35
+
+//VideoWidget.cpp
+#include "VideoWidget.h"
+#include <QPainter>
+#include <QDebug>
+VideoWidget::VideoWidget(QWidget *parent)
+    : QWidget(parent) {
+    setMinimumSize(640, 480);
+}
+
+void VideoWidget::setFrame(const QImage &img) {
+    frame_ = img;
+    update();
+}
+
+void VideoWidget::paintEvent(QPaintEvent *) {
+    QPainter p(this);
+    p.fillRect(rect(), Qt::black);
+
+    if (frame_.isNull())
+        return;
+
+    QSize imgSize = frame_.size();
+    imgSize.scale(size(), Qt::KeepAspectRatio);
+
+    QRect targetRect(
+        (width()  - imgSize.width())  / 2,
+        (height() - imgSize.height()) / 2,
+        imgSize.width(),
+        imgSize.height()
+        );
+    //qDebug() << "widget size:" << size();
+
+    p.drawImage(targetRect, frame_);
+}
+
+
+========== ./ui/widget.cpp ==========
+Lines: 46
+
+//widget.cpp
+#include "widget.h"
+#include "./ui_widget.h"
+#include <QDebug>
+
+Widget::Widget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+    video_ = new VideoWidget(ui->videoContainer);
+    // video_->setSizePolicy(QSizePolicy::Expanding,
+    //                       QSizePolicy::Expanding);
+    adapter_ = new QtCameraAdapter(video_, this);
+
+
+}
+
+Widget::~Widget()
+{
+    delete ui;
+}
+
+void Widget::on_Bt_video_on_off_clicked()
+{
+    qDebug("Button clicked!");
+    camera_.start("/dev/video0");
+}
+
+
+void Widget::on_Bt_video_off_clicked()
+{
+    qDebug("Button clicked!");
+    camera_.stop();
+}
+
+
+void Widget::on_Bt_tcp_send_clicked()
+{
+}
+
+
+void Widget::on_Bt_tcp_connect_clicked()
+{
+}
+
+
+========== ./ui/QtCameraAdapter.cpp ==========
+Lines: 18
+
+//QtCameraAdapter.cpp
+#include "QtCameraAdapter.h"
+#include <QImage>
+
+QtCameraAdapter::QtCameraAdapter(VideoWidget* view, QObject* parent)
+    : QObject(parent), view_(view) {}
+
+void QtCameraAdapter::onFrame(Frame f) {
+    QImage img(
+        f.data.data(),
+        f.width,
+        f.height,
+        f.stride,
+        QImage::Format_RGB888
+        );
+
+    view_->setFrame(img.copy());
+}
+
+========== ./ui/LoginWidget.h ==========
+Lines: 62
+
+//LoginWidget.h
+#ifndef LOGINWIDGET_H
+#define LOGINWIDGET_H
+
+#include <QWidget>
+
+#include "widget.h"
+
+#include "ClientCore.h"
+
+namespace Ui {
+class LoginWidget;
+}
+
+class LoginWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit LoginWidget(QWidget *parent = nullptr);
+    ~LoginWidget();
+
+signals:
+    void loginSuccess();
+
+private slots:
+
+    void on_Bt_Jump_Test_clicked();
+
+    void on_Bt_ConnectToServer_clicked();
+
+    void on_Bt_tcp_test_send_clicked();
+
+    void on_Bt_Login_clicked();
+
+private:
+    Ui::LoginWidget *ui;
+    ClientCore* core_;
+
+    void handle(const EvUnknow& e) ;
+
+    void handle(const EvLoginOk& e) ;
+
+    void handle(const EvLoginFail& e);
+
+    void handle(const EvOnlineUsers& e);
+
+    void handle(const EvCmdConnect& e) ;
+
+    void handle(const EvCmdDisconnect& e) ;
+
+    void handle(const EvCmdLogin& e) ;
+
+    void handle(const EvTcpConnected& e) ;
+
+    void handle(const EvTcpDisconnected& e);
+
+
+
+};
+
+#endif // LOGINWIDGET_H
+
+========== ./ui/AppWindow.cpp ==========
+Lines: 30
+
+//AppWindow.cpp
+#include "AppWindow.h"
+#include "LoginWidget.h"
+#include "widget.h"
+#include <QVBoxLayout>
+
+AppWindow::AppWindow(QWidget *parent)
+    : QWidget(parent)
+{
+    resize(900, 600);
+    stack = new QStackedWidget(this);
+
+    loginPage = new LoginWidget;
+    mainPage  = new Widget;
+
+    stack->addWidget(loginPage); // index 0
+    stack->addWidget(mainPage);  // index 1
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(stack);
+    setLayout(layout);
+
+    // 登录成功 → 切换页面
+    connect(loginPage, &LoginWidget::loginSuccess, this, [=](){
+        stack->setCurrentIndex(PAGE_MAIN);
+    });
+
+    // 初始页面
+    stack->setCurrentIndex(PAGE_LOGIN);
+}
+
+========== ./ui/VideoWidget.h ==========
+Lines: 17
+
+//VideoWidget.h
+#pragma once
+#include <QWidget>
+#include <QImage>
+
+class VideoWidget : public QWidget {
+    Q_OBJECT
+public:
+    explicit VideoWidget(QWidget *parent = nullptr);
+    void setFrame(const QImage &img);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    QImage frame_;
+};
+
+========== ./ui/QtCameraAdapter.h ==========
+Lines: 17
+
+//QtCameraAdapter.h
+#pragma once
+#include <QObject>
+#include "Frame.h"
+#include "VideoWidget.h"
+
+class QtCameraAdapter : public QObject {
+    Q_OBJECT
+public:
+    explicit QtCameraAdapter(VideoWidget* view, QObject* parent = nullptr);
+
+public slots:
+    void onFrame(Frame frame);
+
+private:
+    VideoWidget* view_;
+};
+
+========== ./ui/LoginWidget.cpp ==========
+Lines: 152
+
+//LoginWidget.cpp
+#include "LoginWidget.h"
+#include "./ui_LoginWidget.h"
+#include <QMessageBox>
+#include <QMetaObject>
+#include <QDebug>
+
+#include <QThread>
+#include <QTime>
+
+LoginWidget::LoginWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::LoginWidget)
+{
+    ui->setupUi(this);
+
+    core_ = new ClientCore;
+
+    core_->onEvent = [this](ClientEvent ev){
+        QMetaObject::invokeMethod(this,
+              [this, ev=std::move(ev)]() mutable {
+                  std::visit([this](auto&& e){
+                      handle(e);
+                  }, ev);
+              },
+              Qt::QueuedConnection
+          );
+    };
+
+    // core_->onEvent = [this](ClientEvent ev){
+    //     auto evCopy = std::move(ev); // 移动一次
+    //     QTimer::singleShot(0, this, [this, ev=std::move(evCopy)]() mutable {
+    //         std::visit([this](auto&& e){
+    //             handle(e);
+    //         }, ev);
+    //     });
+    // };
+
+
+
+
+    core_->onStateChanged = [this](State s){
+        QString stateStr;
+        switch(s){
+        case State::Disconnected: stateStr = "Disconnected"; break;
+        case State::Connecting:   stateStr = "Connecting"; break;
+        case State::Connected:    stateStr = "Connected"; break;
+        case State::LoggingIn:    stateStr = "LoggingIn"; break;
+        case State::LoggedIn:     stateStr = "LoggedIn"; break;
+        }
+
+        // 显示在 UI 上
+        ui->TextEdit_FSM_State->setPlainText("State: " + stateStr);
+    };
+
+}
+
+LoginWidget::~LoginWidget()
+{
+    delete ui;
+}
+
+
+
+
+void LoginWidget::on_Bt_Jump_Test_clicked()
+{
+    emit loginSuccess();
+}
+
+
+void LoginWidget::on_Bt_ConnectToServer_clicked()
+{
+    qDebug() << "current thread:" << QThread::currentThread();
+    qDebug() << "ui thread:" << qApp->thread();
+
+    // if(core_->doconnect("127.0.0.1", 6001) == true)
+    // {
+    //     ui->TextEdit_tcp_test_recv->setPlainText("Connect sucess\n");
+    // }
+    // else
+    // {
+    //     ui->TextEdit_tcp_test_recv->setPlainText("Connect fail\n");
+    // }
+    ui->TextEdit_tcp_test_recv->setPlainText("Connecting\n");
+    core_->postEvent(EvCmdConnect{"127.0.0.1", 6001});
+
+
+}
+
+
+void LoginWidget::on_Bt_tcp_test_send_clicked()
+{
+    QString qmsg = ui->LE_tcp_send_test->text();
+    std::string msg = qmsg.toStdString();
+    core_->sendRaw(msg);
+}
+
+
+void LoginWidget::handle(const EvUnknow& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText(QString::fromStdString(e.error_msg.message));
+}
+
+void LoginWidget::handle(const EvLoginOk& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("Login success");
+}
+
+void LoginWidget::handle(const EvLoginFail& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText(
+        "Login failed: " + QString::fromStdString(e.resp.message));
+}
+
+void LoginWidget::handle(const EvOnlineUsers& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("Broadcast");
+}
+
+void LoginWidget::handle(const EvCmdConnect& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvCmdConnect");
+}
+
+void LoginWidget::handle(const EvCmdDisconnect& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvCmdDisconnect");
+
+}
+
+void LoginWidget::handle(const EvCmdLogin& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvCmdLogin");
+}
+
+
+void LoginWidget::handle(const EvTcpConnected& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvTcpConnected");
+}
+
+void LoginWidget::handle(const EvTcpDisconnected& e) {
+    ui->TextEdit_tcp_test_recv->setPlainText("EvTcpDisconnected");
+}
+
+
+
+
+void LoginWidget::on_Bt_Login_clicked()
+{
+    QString qstr_user_name = ui->LE_UserName->text();
+    std::string msg_user_name = qstr_user_name.toStdString();
+
+    QString qstr_user_pass = ui->LE_UserPass->text();
+    std::string msg_user_pass = qstr_user_pass.toStdString();
+
+    core_->postEvent(EvCmdLogin{msg_user_name, msg_user_pass});
+}
+
+
+========== ./ui/AppWindow.h ==========
+Lines: 23
+
+//AppWindow.h
+#pragma once
+#include <QWidget>
+#include <QStackedWidget>
+#include "LoginWidget.h"
+#include "widget.h"
+
+class AppWindow : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit AppWindow(QWidget *parent = nullptr);
+
+private:
+    QStackedWidget *stack;
+    LoginWidget *loginPage;
+    Widget *mainPage;
+
+    enum PageIndex {
+        PAGE_LOGIN = 0,
+        PAGE_MAIN
+    };
+};
+
+========== ./ui/widget.h ==========
+Lines: 39
+
+//widget.h
+#ifndef WIDGET_H
+#define WIDGET_H
+
+#include <QWidget>
+#include "QtCameraAdapter.h"
+#include "CameraManager.h"
+
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class Widget;
+}
+QT_END_NAMESPACE
+
+class Widget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    Widget(QWidget *parent = nullptr);
+    ~Widget();
+
+private slots:
+    void on_Bt_video_on_off_clicked();
+
+    void on_Bt_video_off_clicked();
+
+    void on_Bt_tcp_send_clicked();
+
+    void on_Bt_tcp_connect_clicked();
+
+private:
+    Ui::Widget *ui;
+    VideoWidget *video_;
+    CameraManager camera_;
+    QtCameraAdapter* adapter_;
+};
+#endif // WIDGET_H
+
+========== ./protocol/protocol_types.h ==========
+Lines: 27
+
+//protocol_types.h
+#pragma once
+#include <string>
+#include <vector>
+
+namespace proto {
+
+struct UserInfo {
+    std::string username;
+    int privilege = 0;
+};
+
+struct Unknown {
+    std::string message;
+};
+
+struct LoginResponse {
+    bool success = false;
+    UserInfo user;
+    std::string message;
+};
+
+struct OnlineUsers {
+    std::vector<UserInfo> users;
+};
+
+}
+
+========== ./protocol/protocol_text.h ==========
+Lines: 19
+
+//protocol_text.h
+#pragma once
+#include <string>
+#include "protocol_types.h"
+
+namespace proto {
+
+// build
+std::string makeLoginRequest(const std::string& user, const std::string& pwd);
+std::string makeLoginOk(const UserInfo& user, const std::string& msg);
+std::string makeLoginFail(const std::string& msg);
+std::string makeOnlineUsers(const OnlineUsers& users);
+
+// parse
+bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
+bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
+bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
+
+}
+
+========== ./protocol/protocol_text.cpp ==========
+Lines: 126
+
+//protocol_text.cpp
+#include "protocol_text.h"
+#include "protocol_common.h"
+
+#include <sstream>
+
+namespace proto {
+
+/* ================= build ================= */
+
+// Client 使用
+std::string makeLoginRequest(const std::string& user,
+                             const std::string& pwd)
+{
+    std::ostringstream oss;
+    oss << CMD_LOGIN << " " << user << " " << pwd ;
+    return oss.str();
+}
+
+// Server 使用
+std::string makeLoginOk(const UserInfo& user,
+                        const std::string& msg)
+{
+    std::ostringstream oss;
+    oss << CMD_LOGIN_OK << " "
+        << user.privilege << " "
+        << msg ;
+    return oss.str();
+}
+
+// Server 使用
+std::string makeLoginFail(const std::string& msg)
+{
+    std::ostringstream oss;
+    oss << CMD_LOGIN_FAIL << " " << msg ;
+    return oss.str();
+}
+
+// Server 使用
+std::string makeOnlineUsers(const OnlineUsers& users)
+{
+    std::ostringstream oss;
+    oss << CMD_ONLINE_USERS << " "
+        << users.users.size();
+
+    for (const auto& u : users.users) {
+        oss << " " << u.username << ":" << u.privilege;
+    }
+    oss ;
+    return oss.str();
+}
+
+/* ================= parse ================= */
+
+// Server 使用
+bool parseLoginRequest(const std::string& msg,
+                       std::string& user,
+                       std::string& pwd)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_LOGIN) return false;
+    iss >> user >> pwd;
+    return !user.empty() && !pwd.empty();
+}
+
+// Client 使用
+bool parseLoginResponse(const std::string& msg,
+                        LoginResponse& resp)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd == CMD_LOGIN_OK) {
+        resp.success = true;
+        iss >> resp.user.privilege;
+        std::getline(iss, resp.message);
+        if (!resp.message.empty() && resp.message[0] == ' ')
+            resp.message.erase(0, 1);
+        return true;
+    }
+
+    if (cmd == CMD_LOGIN_FAIL) {
+        resp.success = false;
+        std::getline(iss, resp.message);
+        if (!resp.message.empty() && resp.message[0] == ' ')
+            resp.message.erase(0, 1);
+        return true;
+    }
+
+    return false;
+}
+
+// Client 使用
+bool parseOnlineUsers(const std::string& msg,
+                      OnlineUsers& users)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_ONLINE_USERS) return false;
+
+    int count = 0;
+    iss >> count;
+
+    users.users.clear();
+
+    for (int i = 0; i < count; ++i) {
+        std::string token;
+        iss >> token;           // user:priv
+        auto pos = token.find(':');
+        if (pos == std::string::npos) continue;
+
+        UserInfo u;
+        u.username = token.substr(0, pos);
+        u.privilege = std::stoi(token.substr(pos + 1));
+        users.users.push_back(u);
+    }
+    return true;
+}
+
+} // namespace proto
+
+========== ./protocol/protocol_common.h ==========
+Lines: 20
+
+//protocol_common.h
+#pragma once
+
+namespace proto {
+
+// commands
+constexpr const char* CMD_LOGIN        = "LOGIN";
+constexpr const char* CMD_LOGIN_OK     = "LOGIN_OK";
+constexpr const char* CMD_LOGIN_FAIL   = "LOGIN_FAIL";
+constexpr const char* CMD_ONLINE_USERS = "ONLINE_USERS";
+
+// keys
+constexpr const char* KEY_USERNAME  = "username";
+constexpr const char* KEY_PASSWORD  = "password";
+constexpr const char* KEY_PRIVILEGE = "privilege";
+constexpr const char* KEY_MESSAGE   = "message";
+constexpr const char* KEY_USERS     = "users";
+constexpr const char* KEY_COUNT     = "count";
+
+}
+
+========== ./app/ClientEvent.h ==========
+Lines: 40
+
+//ClientEvent.h
+#pragma once
+
+#include <string>
+#include "protocol_types.h"
+#include <variant>
+
+struct EvTcpConnected {};
+struct EvTcpDisconnected {};
+struct EvLoginOk    { proto::LoginResponse resp; };
+struct EvLoginFail { proto::LoginResponse resp; };
+struct EvOnlineUsers { proto::OnlineUsers users; };
+struct EvUnknow { proto::Unknown error_msg; };
+struct EvCmdConnect {
+    std::string host;
+    int port;
+};
+struct EvCmdDisconnect {};
+struct EvCmdLogin {
+    std::string user;
+    std::string pass;
+};
+
+using ClientEvent = std::variant<
+    // UI
+    EvCmdConnect,
+    EvCmdDisconnect,
+    EvCmdLogin,
+
+    // TCP
+    EvTcpConnected,
+    EvTcpDisconnected,
+
+    // 协议
+    EvLoginOk,
+    EvLoginFail,
+    EvOnlineUsers,
+    EvUnknow
+>;
+
+
+========== ./app/ClientEventFactory.h ==========
+Lines: 18
+
+//ClientEventFactory.h
+#ifndef CLIENTEVENTFACTORY_H
+#define CLIENTEVENTFACTORY_H
+
+#include "protocol_types.h"
+#include "ClientEvent.h"
+class ClientEventFactory
+{
+public:
+    ClientEventFactory();
+    static ClientEvent makeEvent(const std::string& msg);
+
+private:
+
+
+};
+
+#endif // CLIENTEVENTFACTORY_H
+
+========== ./app/ClientEventFactory.cpp ==========
+Lines: 28
+
+//ClientEventFactory.cpp
+#include "ClientEventFactory.h"
+
+// 只在 cpp 中 include 解析函数
+#include "protocol_text.h"
+// 例如：
+// bool parseLoginResponse(const std::string&, LoginResponse&)
+// bool parseOnlineUsers(const std::string&, OnlineUsers&)
+
+ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
+{
+    proto::LoginResponse login;
+    if (proto::parseLoginResponse(msg, login)) {
+        if (login.success)
+            return EvLoginOk{login};
+        else
+            return EvLoginFail{login};
+    }
+
+    proto::OnlineUsers users;
+    if (proto::parseOnlineUsers(msg, users)) {
+        return EvOnlineUsers{users};
+    }
+
+    proto::Unknown req_error;
+    req_error.message = msg;
+    return EvUnknow{req_error};
+}
+
+========== ./app/ClientEventEnum.h ==========
+Lines: 20
+
+//ClientEventEnum.h
+#pragma once
+
+
+enum class EventType {
+    // ===== UI 命令 =====
+    CmdConnect,
+    CmdDisconnect,
+    CmdLogin,
+
+    // ===== TCP =====
+    TcpConnected,
+    TcpDisconnected,
+
+    // ===== 协议 =====
+    LoginOk,
+    LoginFail,
+    OnlineUsers,
+    Unknow
+};
+
+========== ./media/CameraManager.cpp ==========
+Lines: 98
+
+//CameraManager.cpp
+#include "CameraManager.h"
+#include <iostream>
+#include <cstring>
+
+CameraManager::CameraManager() {
+    gst_init(nullptr, nullptr);
+}
+
+CameraManager::~CameraManager() {
+    stop();
+}
+
+void CameraManager::setFrameCallback(FrameCallback cb) {
+    callback_ = std::move(cb);
+}
+
+bool CameraManager::start(const std::string& device) {
+    if (pipeline_) return true;
+
+    std::string pipelineStr =
+        "v4l2src device=" + device +
+        " ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 "
+        " ! videoconvert "
+        " ! openh264enc bitrate=2000000 "
+        " ! h264parse "
+        " ! tee name=t "
+        " t. ! queue "
+        "     ! avdec_h264 "
+        "     ! videoconvert "
+        "     ! video/x-raw,format=RGB "
+        "     ! appsink name=sink "
+        " t. ! queue "
+        "     ! rtph264pay pt=96 config-interval=1 "
+        "     ! udpsink host=192.168.6.15 port=5000 sync=false async=false";
+
+    pipeline_ = gst_parse_launch(pipelineStr.c_str(), nullptr);
+    if (!pipeline_) {
+        std::cerr << "Failed to create pipeline\n";
+        return false;
+    }
+
+    /* appsink 用于 Qt 显示 */
+    appsink_ = gst_bin_get_by_name(GST_BIN(pipeline_), "sink");
+
+    gst_app_sink_set_emit_signals(GST_APP_SINK(appsink_), true);
+    gst_app_sink_set_drop(GST_APP_SINK(appsink_), true);
+    gst_app_sink_set_max_buffers(GST_APP_SINK(appsink_), 1);
+    
+    g_signal_connect(appsink_, "new-sample",
+                     G_CALLBACK(onNewSample), this);
+
+    gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    return true;
+}
+
+void CameraManager::stop() {
+    if (!pipeline_) return;
+
+    gst_element_set_state(pipeline_, GST_STATE_NULL);
+    gst_object_unref(pipeline_);
+    pipeline_ = nullptr;
+    appsink_ = nullptr;
+}
+
+GstFlowReturn CameraManager::onNewSample(GstAppSink* sink, gpointer user_data) {
+    auto* self = static_cast<CameraManager*>(user_data);
+    if (!self->callback_) return GST_FLOW_OK;
+
+    GstSample* sample = gst_app_sink_pull_sample(sink);
+    GstBuffer* buffer = gst_sample_get_buffer(sample);
+    GstCaps* caps = gst_sample_get_caps(sample);
+
+    GstStructure* s = gst_caps_get_structure(caps, 0);
+    int width = 0, height = 0;
+    gst_structure_get_int(s, "width", &width);
+    gst_structure_get_int(s, "height", &height);
+
+    GstMapInfo map;
+    gst_buffer_map(buffer, &map, GST_MAP_READ);
+
+    Frame frame;
+    frame.width = width;
+    frame.height = height;
+    frame.stride = width * 3;
+    frame.format = PixelFormat::RGB888;
+    frame.timestamp = GST_BUFFER_PTS(buffer);
+
+    frame.data.resize(map.size);
+    std::memcpy(frame.data.data(), map.data, map.size);
+
+    self->callback_(frame);
+
+    gst_buffer_unmap(buffer, &map);
+    gst_sample_unref(sample);
+
+    return GST_FLOW_OK;
+}
+
+========== ./media/CameraManager.h ==========
+Lines: 29
+
+//CameraManager.h
+#pragma once
+
+#include <string>
+#include <functional>
+#include <gst/gst.h>
+#include <gst/app/gstappsink.h>
+#include "Frame.h"
+
+class CameraManager {
+public:
+    using FrameCallback = std::function<void(const Frame&)>;
+
+    CameraManager();
+    ~CameraManager();
+
+    bool start(const std::string& device);
+    void stop();
+
+    void setFrameCallback(FrameCallback cb);
+
+private:
+    GstElement* pipeline_ = nullptr;
+    GstElement* appsink_  = nullptr;
+
+    FrameCallback callback_;
+
+    static GstFlowReturn onNewSample(GstAppSink* sink, gpointer user_data);
+};
+
+========== ./media/Frame.h ==========
+Lines: 19
+
+//Frame.h
+#pragma once
+#include <vector>
+#include <cstdint>
+#include <QMetaType>   // ⚠️ 必须加这一行
+enum class PixelFormat {
+    RGB888
+};
+
+struct Frame {
+    std::vector<uint8_t> data; // 连续内存
+    int width = 0;
+    int height = 0;
+    int stride = 0;
+    PixelFormat format;
+    uint64_t timestamp = 0;
+};
+
+Q_DECLARE_METATYPE(Frame)
+
+
+=====================================
+Total files: 28
+Total lines: 1385

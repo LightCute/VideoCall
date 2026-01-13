@@ -507,6 +507,7 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: \
  /usr/include/gstreamer-1.0/gst/base/gstbasesink.h \
  /usr/include/gstreamer-1.0/gst/base/base-prelude.h \
  /usr/include/gstreamer-1.0/gst/app/app-prelude.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/CommandSocket.h \
  /usr/include/c++/13/thread /usr/include/c++/13/bits/std_thread.h \
  /usr/include/c++/13/bits/this_thread_sleep.h \
@@ -529,9 +530,17 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o: \
  /usr/include/asm-generic/sockios.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
  /usr/include/x86_64-linux-gnu/bits/in.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_types.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEvent.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_types.h \
+ /usr/include/c++/13/variant \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventEnum.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientState.h \
+ /usr/include/c++/13/queue /usr/include/c++/13/deque \
+ /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \
+ /usr/include/c++/13/bits/stl_queue.h /usr/include/c++/13/mutex \
+ /usr/include/c++/13/bits/std_mutex.h \
+ /usr/include/c++/13/bits/unique_lock.h \
+ /usr/include/c++/13/condition_variable \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/moc_LoginWidget.cpp \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/../../../../ui/LoginWidget.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/UYX5XTB5RZ/moc_QtCameraAdapter.cpp \

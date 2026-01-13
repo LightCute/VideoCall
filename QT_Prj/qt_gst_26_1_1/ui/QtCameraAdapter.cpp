@@ -1,3 +1,4 @@
+//QtCameraAdapter.cpp
 #include "QtCameraAdapter.h"
 #include <QImage>
 

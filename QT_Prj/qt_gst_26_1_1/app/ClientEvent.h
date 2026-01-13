@@ -1,18 +1,40 @@
+//ClientEvent.h
 #pragma once
 
 #include <string>
 #include "protocol_types.h"
+#include <variant>
 
-enum class ClientEventType {
-    Unknown,
-    LoginOk,
-    LoginFail,
-    OnlineUsers
+struct EvTcpConnected {};
+struct EvTcpDisconnected {};
+struct EvLoginOk    { proto::LoginResponse resp; };
+struct EvLoginFail { proto::LoginResponse resp; };
+struct EvOnlineUsers { proto::OnlineUsers users; };
+struct EvUnknow { proto::Unknown error_msg; };
+struct EvCmdConnect {
+    std::string host;
+    int port;
+};
+struct EvCmdDisconnect {};
+struct EvCmdLogin {
+    std::string user;
+    std::string pass;
 };
 
-struct ClientEvent {
-    ClientEventType type = ClientEventType::Unknown;
+using ClientEvent = std::variant<
+    // UI
+    EvCmdConnect,
+    EvCmdDisconnect,
+    EvCmdLogin,
 
-    proto::LoginResponse loginResp;
-    proto::OnlineUsers   onlineUsers;
-};
+    // TCP
+    EvTcpConnected,
+    EvTcpDisconnected,
+
+    // 协议
+    EvLoginOk,
+    EvLoginFail,
+    EvOnlineUsers,
+    EvUnknow
+>;
+

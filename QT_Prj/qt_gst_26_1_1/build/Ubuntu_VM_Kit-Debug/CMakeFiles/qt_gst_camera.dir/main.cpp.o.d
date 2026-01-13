@@ -500,6 +500,9 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: \
  /usr/include/gstreamer-1.0/gst/base/gstbasesink.h \
  /usr/include/gstreamer-1.0/gst/base/base-prelude.h \
  /usr/include/gstreamer-1.0/gst/app/app-prelude.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/LoginWidget.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/widget.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/CommandSocket.h \
  /usr/include/c++/13/thread /usr/include/c++/13/bits/std_thread.h \
  /usr/include/c++/13/bits/this_thread_sleep.h \
@@ -522,11 +525,17 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: \
  /usr/include/asm-generic/sockios.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
  /usr/include/x86_64-linux-gnu/bits/in.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/LoginWidget.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/widget.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.h \
- /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_types.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEvent.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_types.h \
+ /usr/include/c++/13/variant \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventEnum.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientState.h \
+ /usr/include/c++/13/queue /usr/include/c++/13/deque \
+ /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \
+ /usr/include/c++/13/bits/stl_queue.h /usr/include/c++/13/mutex \
+ /usr/include/c++/13/bits/std_mutex.h \
+ /usr/include/c++/13/bits/unique_lock.h \
+ /usr/include/c++/13/condition_variable \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
@@ -537,7 +546,6 @@ CMakeFiles/qt_gst_camera.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qlocale.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvariant.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qmap.h \
- /usr/include/c++/13/variant \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/ui/AppWindow.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStackedWidget \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstackedwidget.h \

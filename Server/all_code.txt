@@ -1,0 +1,994 @@
+
+========== ./server_main.cpp ==========
+Lines: 15
+
+//server_main.cpp
+#include "./core/LoginServer.h"
+#include <iostream>
+#include <unistd.h>
+
+int main() {
+    LoginServer server;
+    if (!server.start(6001)) {
+        std::cerr << "Server start failed\n";
+        return -1;
+    }
+
+    std::cout << "Login server running on port 6001\n";
+    while (true) sleep(1);
+}
+
+========== ./util/ThreadPool.cpp ==========
+Lines: 52
+
+// ThreadPool.cpp
+#include "./util/ThreadPool.h"
+
+ThreadPool::~ThreadPool() {
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        stop_ = true;
+    }
+
+    cv_.notify_all();
+
+    for (auto& t : workers_) {
+        if (t.joinable())
+            t.join();
+    }
+}
+
+
+ThreadPool::ThreadPool(size_t workerCount) {
+    for (size_t i = 0; i < workerCount; ++i) {
+        workers_.emplace_back(&ThreadPool::workerLoop, this);
+    }
+}
+
+void ThreadPool::post(std::function<void()> task) {
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        tasks_.push(std::move(task));
+    }
+    cv_.notify_one();
+}
+
+void ThreadPool::workerLoop() {
+    while (true) {
+        std::function<void()> task;
+
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            cv_.wait(lock, [&] {
+                return stop_ || !tasks_.empty();
+            });
+
+            if (stop_ && tasks_.empty())
+                return;
+
+            task = std::move(tasks_.front());
+            tasks_.pop();
+        }
+
+        task();  // ⭐ 真正执行任务
+    }
+}
+
+========== ./util/ThreadPool.h ==========
+Lines: 29
+
+// ThreadPool.h
+#pragma once
+#include <vector>
+#include <queue>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
+
+class ThreadPool {
+public:
+    explicit ThreadPool(size_t workerCount);
+    ~ThreadPool();
+
+    // 向线程池投递任务
+    void post(std::function<void()> task);
+
+private:
+    // 每个 worker 线程执行的函数
+    void workerLoop();
+
+private:
+    std::vector<std::thread> workers_;          // 固定数量线程
+    std::queue<std::function<void()>> tasks_;   // 任务队列
+
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    bool stop_ = false;
+};
+
+========== ./core/LoginServer.cpp ==========
+Lines: 123
+
+//LoginServer.cpp
+// LoginServer: protocol ↔ domain 的边界层
+
+#include "./core/LoginServer.h"
+
+
+
+// 实现 LoginServer 构造函数
+LoginServer::LoginServer() 
+    : dispatcher_(loginService_, sessionMgr_)  // 手动初始化 dispatcher_，传入所需两个参数
+{
+    // 构造函数体可留空（如需其他初始化逻辑可补充）
+}
+LoginServer::~LoginServer() {
+    listener_.stop();      // 停止 accept 线程
+    // ThreadPool 析构会自动 join
+}
+
+
+bool LoginServer::start(int port) {
+    listener_.setAcceptCallback(
+        [this](int clientfd) {
+            onAccept(clientfd);
+        }
+    );
+    return listener_.startListen(port);
+}
+
+
+
+void LoginServer::onAccept(int clientfd) {
+    std::cout << "[Server] new client fd=" << clientfd << std::endl;
+
+    pool_.post([this, clientfd] {
+        clientThread(clientfd);
+    });
+}
+
+void LoginServer::clientThread(int clientfd) {
+    std::vector<char> recvBuffer;
+    char buf[1024];
+
+    while (true) {
+        int n = recv(clientfd, buf, sizeof(buf), 0);
+        if (n <= 0) break;
+
+        recvBuffer.insert(recvBuffer.end(), buf, buf + n);
+
+        std::string payload;
+        while (PacketCodec::tryDecode(recvBuffer, payload)) {
+            onMessage(clientfd, payload);
+        }
+    }
+
+
+
+    close(clientfd);
+    std::cout << "[Server] client disconnected fd=" << clientfd << std::endl;
+}
+
+void LoginServer::onMessage(int fd, const std::string& msg)
+{
+    ServerEvent event = ServerEventFactory::makeEvent(msg);
+
+    auto actions = dispatcher_.dispatch(fd, event);
+
+    for (auto& act : actions) {
+        std::visit([this](auto&& a) {
+            handle(a);
+        }, act);
+    }
+}
+
+
+// LoginServer.cpp
+
+void LoginServer::handle(const SendLoginOk& a)
+{
+    proto::UserInfo u;
+    u.username = a.username;
+    u.privilege = a.privilege;
+
+    auto payload = proto::makeLoginOk(u, "welcome");
+    listener_.sendPacket(a.fd, payload);
+}
+
+void LoginServer::handle(const SendLoginFail& a)
+{
+    auto payload = proto::makeLoginFail(a.reason);
+    listener_.sendPacket(a.fd, payload);
+}
+
+void LoginServer::handle(const BroadcastOnlineUsers&)
+{
+    auto snapshot = sessionMgr_.snapshot();
+
+    proto::OnlineUsers users;
+    for (auto& [fd, info] : snapshot) {
+        const domain::User& u = info.user;
+
+        users.users.push_back(proto::UserInfo{
+            u.username,
+            u.privilege
+        });
+    }
+
+
+    auto payload = proto::makeOnlineUsers(users);
+
+    std::cout << "Broadcast: " << payload << std::endl;
+    for (auto& [fd, _] : snapshot) {
+        listener_.sendPacket(fd, payload);
+    }
+}
+
+void LoginServer::handle(const SendError& a)
+{
+    auto payload = (a.reason);
+    std::cout << "Error: " << payload << std::endl;
+
+    listener_.sendPacket(a.fd, payload);
+}
+
+
+========== ./core/LoginServer.h ==========
+Lines: 48
+
+//LoginServer.h
+#pragma once
+#include <thread>
+#include <mutex>
+#include <map>
+#include <iostream>
+#include <sstream>
+
+
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+#include "./util/ThreadPool.h"
+#include "./net/PacketCodec.h"
+#include "./net/CommandSocket.h"
+#include "./event/ServerEvent.h"
+#include "./event/ServerEventFactory.h"
+#include "./session/SessionManager.h"
+#include "./dispatcher/ServerEventDispatcher.h"
+#include "./service/ServerAction.h"
+#include "./protocol/protocol_text.h"
+#include "./protocol/protocol_common.h"
+
+class LoginServer {
+public:
+    LoginServer();
+    ~LoginServer();
+    bool start(int port);
+
+private:
+    void onAccept(int clientfd);
+    void clientThread(int clientfd);
+    void onMessage(int clientfd, const std::string& msg);
+    void handleLogin(int fd, ServerEvent& event);
+
+    void handle(const SendLoginOk&);
+    void handle(const SendLoginFail&);
+    void handle(const BroadcastOnlineUsers&);
+    void handle(const SendError&);
+
+
+    CommandSocket listener_;
+    ThreadPool pool_{8};
+    SessionManager sessionMgr_;
+    ServerEventDispatcher dispatcher_;
+    LoginService loginService_;
+};
+
+========== ./service/ServerActions.h ==========
+Lines: 33
+
+// Service/ServerActions.h
+#pragma once
+#include <string>
+#include <vector>
+#include <map>
+//#include "SessionManager.h"
+
+// 单播：登录成功
+struct SendLoginOk {
+    int fd;
+    std::string username;
+    int privilege;
+};
+
+// 单播：登录失败
+struct SendLoginFail {
+    int fd;
+    std::string reason;
+};
+
+struct SendError {
+    int fd;
+    std::string reason;
+};
+
+// 广播：在线用户列表
+struct BroadcastOnlineUsers {
+};
+
+// 未来可无限加
+// struct KickUser { int fd; };
+// struct ForceLogout { int fd; };
+// struct SendChat { int from; std::string msg; };
+
+========== ./service/LoginService.h ==========
+Lines: 22
+
+//LoginService.h
+#pragma once
+#include <string>
+
+#include "./event/ServerEvent.h" // for proto::LoginRequest
+
+
+
+
+
+struct LoginResult {
+    bool success = false;
+    std::string username;
+    int privilege = 0;
+    std::string reason;   // 失败原因
+    //UserInfo user;
+};
+
+class LoginService {
+public:
+    LoginResult handleLogin(const event::LoginRequest& req);
+};
+
+========== ./service/LoginService.cpp ==========
+Lines: 17
+
+//LoginService
+#include "LoginService.h"
+
+LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
+    LoginResult r;
+
+    if (req.username == "admin" && req.password == "123") {
+        r.success = true;
+        r.username = "admin";
+        r.privilege = 10;
+    } else {
+        r.success = false;
+        r.reason = "invalid username or password";
+    }
+
+    return r;
+}
+
+========== ./service/ServerAction.h ==========
+Lines: 11
+
+// Service/ServerAction.h
+#pragma once
+#include <variant>
+#include "ServerActions.h"
+
+using ServerAction = std::variant<
+    SendError,
+    SendLoginOk,
+    SendLoginFail,
+    BroadcastOnlineUsers
+>;
+
+========== ./dispatcher/ServerEventDispatcher.cpp ==========
+Lines: 68
+
+//ServerEventDispatcher.cpp
+#include "./dispatcher/ServerEventDispatcher.h"
+
+
+
+ServerEventDispatcher::ServerEventDispatcher(
+    LoginService& loginService,
+    SessionManager& sessionMgr)
+    : loginService_(loginService),
+      sessionMgr_(sessionMgr)
+{}
+
+
+std::vector<ServerAction>
+ServerEventDispatcher::dispatch(int fd, const ServerEvent& event)
+{
+    return std::visit([&](auto&& ev) {
+        return handle(fd, ev);
+    }, event);
+}
+
+
+// 登录
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::LoginRequest& ev)
+{
+    std::vector<ServerAction> actions;
+
+    LoginResult r = loginService_.handleLogin(ev);
+
+    if (r.success) {
+        sessionMgr_.login(fd, {
+            domain::User{ r.username, r.privilege },
+            true
+        });
+
+        actions.emplace_back(SendLoginOk{
+            .fd = fd,
+            .username = r.username,
+            .privilege = r.privilege
+        });
+
+        actions.emplace_back(BroadcastOnlineUsers{
+            
+        });
+    } else {
+        actions.emplace_back(SendLoginFail{
+            .fd = fd,
+            .reason = r.reason
+        });
+    }
+
+    return actions;
+}
+
+
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::ErrorEvent& ev)
+{
+    std::vector<ServerAction> actions;
+    
+    actions.emplace_back(SendError{
+        .fd = fd,
+        .reason = ev.reason +ev.rawMsg
+    });
+
+    return actions;
+}
+
+========== ./dispatcher/ServerEventDispatcher.h ==========
+Lines: 24
+
+//ServerEventDispatcher.h
+#pragma once
+#include "./event/ServerEvent.h"
+
+#include "./service/LoginService.h"
+#include "./session/SessionManager.h"
+#include "./service/ServerAction.h"
+#include "./service/ServerActions.h"
+
+
+class ServerEventDispatcher {
+public:
+    ServerEventDispatcher(LoginService& loginService,
+                          SessionManager& sessionMgr);
+
+    std::vector<ServerAction> dispatch(int fd, const ServerEvent& event);
+
+private:
+    std::vector<ServerAction> handle(int fd, const event::LoginRequest& ev);
+    std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
+
+    LoginService&  loginService_;
+    SessionManager& sessionMgr_;
+};
+
+========== ./domain/User.h ==========
+Lines: 13
+
+//User.h
+#pragma once
+#include <string>
+
+
+namespace domain {
+
+struct User {
+    std::string username;
+    int privilege = 0;
+};
+
+} // namespace domain
+
+========== ./session/SessionManager.cpp ==========
+Lines: 17
+
+//SessionManager.cpp
+#include "./session/SessionManager.h"
+
+void SessionManager::login(int fd, const ClientInfo& info) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    sessions_[fd] = info;
+}
+
+void SessionManager::logout(int fd) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    sessions_.erase(fd);
+}
+
+std::map<int, ClientInfo> SessionManager::snapshot() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return sessions_;
+}
+
+========== ./session/SessionManager.h ==========
+Lines: 22
+
+//SessionManager.h
+#pragma once
+#include <map>
+#include <mutex>
+#include <string>
+#include "./domain/User.h"
+
+struct ClientInfo {
+    domain::User user;
+    bool online = false;
+};
+
+class SessionManager {
+public:
+    void login(int fd, const ClientInfo& info);
+    void logout(int fd);
+    std::map<int, ClientInfo> snapshot() const;
+
+private:
+    mutable std::mutex mutex_;
+    std::map<int, ClientInfo> sessions_;
+};
+
+========== ./event/ServerEventFactory.h ==========
+Lines: 9
+
+//ServerEventFactory.h
+#pragma once
+#include <string>
+#include "./event/ServerEvent.h"
+
+class ServerEventFactory {
+public:
+    static ServerEvent makeEvent(const std::string& msg);
+};
+
+========== ./event/ServerEventFactory.cpp ==========
+Lines: 23
+
+// ServerEventFactory.cpp
+#include "ServerEventFactory.h"
+#include "protocol/protocol_text.h"
+#include <stdexcept>
+
+
+ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
+{
+    std::string user, pwd;
+    if (proto::parseLoginRequest(msg, user, pwd)) {
+        return event::LoginRequest{
+            .username = user,
+            .password = pwd
+        };
+    }
+
+    // ❗ 如果你愿意，可以抛异常 / optional
+    // fallback -> 返回 ErrorEvent
+    return event::ErrorEvent{
+        .rawMsg = msg,
+        .reason = "Unknown or malformed command"
+    };
+}
+
+========== ./event/ServerEvents.h ==========
+Lines: 29
+
+//ServerEvents.h
+#pragma once
+#include <string>
+
+
+
+
+namespace event {
+
+struct ErrorEvent {
+    std::string rawMsg;  // 收到的原始消息
+    std::string reason;  // 解析失败原因
+};
+
+// 登录请求
+struct LoginRequest {
+    std::string username;
+    std::string password;
+};
+
+// 以后可以非常自然地加
+struct Logout {
+};
+
+struct Chat {
+    std::string message;
+};
+
+} // namespace event
+
+========== ./event/ServerEvent.h ==========
+Lines: 18
+
+//ServerEvent.h
+#pragma once
+#include <variant>
+#include "ServerEvents.h"
+
+
+
+
+using ServerEvent = std::variant<
+    event::ErrorEvent,
+    event::LoginRequest
+    // event::Logout,
+    // event::Chat,
+    // 以后只需要往这里加
+>;
+
+
+
+
+========== ./net/PacketCodec.h ==========
+Lines: 38
+
+#pragma once
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <arpa/inet.h>
+
+class PacketCodec {
+public:
+    // 打包：payload → 带长度头的二进制数据
+    static std::vector<char> encode(const std::string& payload) {
+        uint32_t len = payload.size();
+        uint32_t netLen = htonl(len);
+
+        std::vector<char> buf(sizeof(netLen) + len);
+        std::memcpy(buf.data(), &netLen, sizeof(netLen));
+        std::memcpy(buf.data() + sizeof(netLen), payload.data(), len);
+        return buf;
+    }
+
+    // 尝试解包：从 buffer 中提取一个完整 payload
+    // 成功返回 true，并填充 outPayload
+    static bool tryDecode(std::vector<char>& buffer, std::string& outPayload) {
+        if (buffer.size() < 4)
+            return false;
+
+        uint32_t netLen;
+        std::memcpy(&netLen, buffer.data(), 4);
+        uint32_t len = ntohl(netLen);
+
+        if (buffer.size() < 4 + len)
+            return false;
+
+        outPayload.assign(buffer.data() + 4, len);
+        buffer.erase(buffer.begin(), buffer.begin() + 4 + len);
+        return true;
+    }
+};
+
+========== ./net/CommandSocket.h ==========
+Lines: 24
+
+//CommandSocket.h
+#pragma once
+#include <functional>
+#include <thread>
+#include <atomic>
+#include "./net/PacketCodec.h"
+
+class CommandSocket {
+public:
+    using AcceptCallback = std::function<void(int)>;
+
+    bool startListen(int port);
+    void setAcceptCallback(AcceptCallback cb);
+    void stop();
+    void sendPacket(int fd, const std::string& payload);
+    void sendMessage(const std::string& msg);
+    
+private:
+    void acceptThreadFunc();
+    int listenfd_ = -1;
+    std::thread acceptThread_;
+    std::atomic<bool> running_{false};
+    AcceptCallback acceptCb_;
+};
+
+========== ./net/CommandSocket.cpp ==========
+Lines: 58
+
+//CommandSocket.cpp
+#include "./net/CommandSocket.h"
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+
+bool CommandSocket::startListen(int port) {
+    listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (listenfd_ < 0) return false;
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = INADDR_ANY;
+
+    int opt = 1;
+    setsockopt(listenfd_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+    if (bind(listenfd_, (sockaddr*)&addr, sizeof(addr)) < 0) return false;
+    if (listen(listenfd_, 16) < 0) return false;
+
+    running_ = true;
+    acceptThread_ = std::thread(&CommandSocket::acceptThreadFunc, this);
+    return true;
+}
+
+void CommandSocket::setAcceptCallback(AcceptCallback cb) {
+    acceptCb_ = std::move(cb);
+}
+
+void CommandSocket::acceptThreadFunc() {
+    while (running_) {
+        int clientfd = accept(listenfd_, nullptr, nullptr);
+        if (clientfd >= 0 && acceptCb_) {
+            acceptCb_(clientfd);   // ⭐ 抛给 LoginServer
+        }
+    }
+}
+
+void CommandSocket::stop() {
+    running_ = false;
+    if (acceptThread_.joinable())
+        acceptThread_.join();
+    if (listenfd_ >= 0)
+        close(listenfd_);
+}
+
+void CommandSocket::sendPacket(int fd, const std::string& payload) {
+    auto data = PacketCodec::encode(payload);
+    send(fd, data.data(), data.size(), 0);
+}
+
+
+void CommandSocket::sendMessage(const std::string& msg) {
+    sendPacket(listenfd_,msg);
+}
+
+
+
+========== ./protocol/protocol_types.h ==========
+Lines: 25
+
+//protocol_types.h
+#pragma once
+
+
+#include <string>
+#include <vector>
+
+namespace proto {
+
+struct UserInfo {
+    std::string username;
+    int privilege = 0;
+};
+
+struct LoginResponse {
+    bool success = false;
+    UserInfo user;
+    std::string message;
+};
+
+struct OnlineUsers {
+    std::vector<UserInfo> users;
+};
+
+}
+
+========== ./protocol/protocol_text.h ==========
+Lines: 20
+
+//protocol_text.h
+
+#pragma once
+#include <string>
+#include "protocol_types.h"
+
+namespace proto {
+
+// build
+std::string makeLoginRequest(const std::string& user, const std::string& pwd);
+std::string makeLoginOk(const UserInfo& user, const std::string& msg);
+std::string makeLoginFail(const std::string& msg);
+std::string makeOnlineUsers(const OnlineUsers& users);
+
+// parse
+bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
+bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
+bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
+
+}
+
+========== ./protocol/protocol_text.cpp ==========
+Lines: 125
+
+//protocol_text.cpp
+#include "protocol_text.h"
+#include "protocol_common.h"
+
+#include <sstream>
+
+namespace proto {
+
+/* ================= build ================= */
+
+// Client 使用
+std::string makeLoginRequest(const std::string& user,
+                             const std::string& pwd)
+{
+    std::ostringstream oss;
+    oss << CMD_LOGIN << " " << user << " " << pwd ;
+    return oss.str();
+}
+
+// Server 使用
+std::string makeLoginOk(const UserInfo& user,
+                        const std::string& msg)
+{
+    std::ostringstream oss;
+    oss << CMD_LOGIN_OK << " "
+        << user.privilege << " "
+        << msg ;
+    return oss.str();
+}
+
+// Server 使用
+std::string makeLoginFail(const std::string& msg)
+{
+    std::ostringstream oss;
+    oss << CMD_LOGIN_FAIL << " " << msg ;
+    return oss.str();
+}
+
+// Server 使用
+std::string makeOnlineUsers(const OnlineUsers& users)
+{
+    std::ostringstream oss;
+    oss << CMD_ONLINE_USERS << " "
+        << users.users.size();
+
+    for (const auto& u : users.users) {
+        oss << " " << u.username << ":" << u.privilege;
+    }
+    return oss.str();
+}
+
+/* ================= parse ================= */
+
+// Server 使用
+bool parseLoginRequest(const std::string& msg,
+                       std::string& user,
+                       std::string& pwd)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_LOGIN) return false;
+    iss >> user >> pwd;
+    return !user.empty() && !pwd.empty();
+}
+
+// Client 使用
+bool parseLoginResponse(const std::string& msg,
+                        LoginResponse& resp)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd == CMD_LOGIN_OK) {
+        resp.success = true;
+        iss >> resp.user.privilege;
+        std::getline(iss, resp.message);
+        if (!resp.message.empty() && resp.message[0] == ' ')
+            resp.message.erase(0, 1);
+        return true;
+    }
+
+    if (cmd == CMD_LOGIN_FAIL) {
+        resp.success = false;
+        std::getline(iss, resp.message);
+        if (!resp.message.empty() && resp.message[0] == ' ')
+            resp.message.erase(0, 1);
+        return true;
+    }
+
+    return false;
+}
+
+// Client 使用
+bool parseOnlineUsers(const std::string& msg,
+                      OnlineUsers& users)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_ONLINE_USERS) return false;
+
+    int count = 0;
+    iss >> count;
+
+    users.users.clear();
+
+    for (int i = 0; i < count; ++i) {
+        std::string token;
+        iss >> token;           // user:priv
+        auto pos = token.find(':');
+        if (pos == std::string::npos) continue;
+
+        UserInfo u;
+        u.username = token.substr(0, pos);
+        u.privilege = std::stoi(token.substr(pos + 1));
+        users.users.push_back(u);
+    }
+    return true;
+}
+
+} // namespace proto
+
+========== ./protocol/protocol_common.h ==========
+Lines: 26
+
+// proto::*
+// ⚠️ PROTOCOL DTO — do NOT use as domain model
+// ⚠️ 仅用于协议序列化 / 反序列化
+// ⚠️ 禁止在业务层、事件层、服务层中作为业务模型使用
+
+//protocol_common.h
+
+#pragma once
+
+namespace proto {
+
+// commands
+constexpr const char* CMD_LOGIN        = "LOGIN";
+constexpr const char* CMD_LOGIN_OK     = "LOGIN_OK";
+constexpr const char* CMD_LOGIN_FAIL   = "LOGIN_FAIL";
+constexpr const char* CMD_ONLINE_USERS = "ONLINE_USERS";
+
+// keys
+constexpr const char* KEY_USERNAME  = "username";
+constexpr const char* KEY_PASSWORD  = "password";
+constexpr const char* KEY_PRIVILEGE = "privilege";
+constexpr const char* KEY_MESSAGE   = "message";
+constexpr const char* KEY_USERS     = "users";
+constexpr const char* KEY_COUNT     = "count";
+
+}
+
+
+=====================================
+Total files: 25
+Total lines: 889

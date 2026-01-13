@@ -4,8 +4,8 @@ qt_gst_camera: \
   /usr/lib/gcc/x86_64-linux-gnu/13/crtbeginS.o \
   CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o \
   CMakeFiles/qt_gst_camera.dir/main.cpp.o \
+  CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o \
   CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o \
-  CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o \
   CMakeFiles/qt_gst_camera.dir/media/CameraManager.cpp.o \
   CMakeFiles/qt_gst_camera.dir/net/CommandSocket.cpp.o \
   CMakeFiles/qt_gst_camera.dir/protocol/protocol_text.cpp.o \
@@ -94,9 +94,9 @@ CMakeFiles/qt_gst_camera.dir/qt_gst_camera_autogen/mocs_compilation.cpp.o:
 
 CMakeFiles/qt_gst_camera.dir/main.cpp.o:
 
-CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o:
+CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o:
 
-CMakeFiles/qt_gst_camera.dir/app/ClientLoginProtocol.cpp.o:
+CMakeFiles/qt_gst_camera.dir/app/ClientEventFactory.cpp.o:
 
 CMakeFiles/qt_gst_camera.dir/media/CameraManager.cpp.o:
 

@@ -1,14 +1,12 @@
+//LoginWidget.h
 #ifndef LOGINWIDGET_H
 #define LOGINWIDGET_H
 
 #include <QWidget>
 
 #include "widget.h"
-#include "CommandSocket.h"
 
-#include "ClientEventFactory.h"
-#include "ClientEvent.h"
-
+#include "ClientCore.h"
 
 namespace Ui {
 class LoginWidget;
@@ -33,10 +31,32 @@ private slots:
 
     void on_Bt_tcp_test_send_clicked();
 
+    void on_Bt_Login_clicked();
+
 private:
     Ui::LoginWidget *ui;
-    CommandSocket *cmdSocket_ ;
-    void handleEvent(const ClientEvent& e);
+    ClientCore* core_;
+
+    void handle(const EvUnknow& e) ;
+
+    void handle(const EvLoginOk& e) ;
+
+    void handle(const EvLoginFail& e);
+
+    void handle(const EvOnlineUsers& e);
+
+    void handle(const EvCmdConnect& e) ;
+
+    void handle(const EvCmdDisconnect& e) ;
+
+    void handle(const EvCmdLogin& e) ;
+
+    void handle(const EvTcpConnected& e) ;
+
+    void handle(const EvTcpDisconnected& e);
+
+
+
 };
 
 #endif // LOGINWIDGET_H

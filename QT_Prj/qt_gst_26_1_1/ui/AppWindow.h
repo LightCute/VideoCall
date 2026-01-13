@@ -1,3 +1,4 @@
+//AppWindow.h
 #pragma once
 #include <QWidget>
 #include <QStackedWidget>

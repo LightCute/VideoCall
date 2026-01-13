@@ -37,12 +37,18 @@ pkg_check_modules(GST REQUIRED
 set(PROJECT_SOURCES
     main.cpp
 
+    #core
+    core/ClientCore.cpp
+    core/ClientCore.h
+    core/ClientState.h
+
+
     # app
     app/ClientEvent.h
     app/ClientEventFactory.cpp
     app/ClientEventFactory.h
-    app/ClientLoginProtocol.cpp
-    app/ClientLoginProtocol.h
+    app/ClientEventEnum.h
+
 
     # media
     media/CameraManager.cpp
@@ -107,6 +113,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/net
         ${CMAKE_CURRENT_SOURCE_DIR}/protocol
         ${CMAKE_CURRENT_SOURCE_DIR}/ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/core
 )
 
 # =========================

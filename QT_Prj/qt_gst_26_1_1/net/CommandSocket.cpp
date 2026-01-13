@@ -1,3 +1,4 @@
+//CommandSocket.cpp
 #include "CommandSocket.h"
 #include <iostream>
 #include <cstring>
@@ -15,6 +16,15 @@ CommandSocket::~CommandSocket() {
 void CommandSocket::setMessageCallback(MessageCallback cb) {
     callback_ = std::move(cb);
 }
+
+void CommandSocket::setConnectCallback(ConnectCallback cb) {
+    onConnect_ = std::move(cb);
+}
+
+void CommandSocket::setDisconnectCallback(DisconnectCallback cb) {
+    onDisconnect_ = std::move(cb);
+}
+
 
 void CommandSocket::sendPacket(int fd, const std::string& payload) {
     auto data = PacketCodec::encode(payload);
@@ -36,6 +46,11 @@ bool CommandSocket::connectToServer(const std::string& host, int port) {
         sockfd_ = -1;
         return false;
     }
+
+    if (onConnect_) onConnect_();   // ⭐ TCP真正建立
+    // std::thread([this]{
+    //     if (onConnect_) onConnect_();
+    // }).detach();
 
     running_ = true;
     workerThread_ = std::thread(&CommandSocket::clientThreadFunc, this);
@@ -98,10 +113,9 @@ void CommandSocket::clientThreadFunc() {
                 }
             }
 
-        } else if (n == 0) {
+        } else if (n <= 0) {
+            if (onDisconnect_) onDisconnect_();  // ⭐ TCP断线
             break; // 服务器正常断开
-        } else {
-            break; // 错误
         }
     }
 }
