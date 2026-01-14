@@ -1,19 +1,28 @@
 // core/CoreInput.h
 #pragma once
-#include "ClientEvent.h"
+#include <variant>
+#include <string>
+namespace core {
+
+struct EvCmdConnect { std::string host; int port; };
+struct EvCmdDisconnect {};
+struct EvCmdLogin { std::string user; std::string pass; };
+struct EvTcpConnected {};
+struct EvTcpDisconnected {};
+struct EvLoginOk {};
+struct EvLoginFail { std::string msg; };
+struct EvOnlineUsers { std::string list; };
+struct EvUnknow {};
+
 using CoreInput = std::variant<
-    // UI 命令
     EvCmdConnect,
     EvCmdDisconnect,
     EvCmdLogin,
-
-    // TCP
     EvTcpConnected,
     EvTcpDisconnected,
-
-    // 协议（来自网络）
     EvLoginOk,
     EvLoginFail,
     EvOnlineUsers,
     EvUnknow
     >;
+}

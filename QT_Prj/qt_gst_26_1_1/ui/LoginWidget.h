@@ -37,25 +37,16 @@ private:
     Ui::LoginWidget *ui;
     ClientCore* core_;
 
-    void handle(const EvUnknow& e) ;
+    void handle(const OutLoginFail&);
 
-    void handle(const EvLoginOk& e) ;
+    void handle(const OutDisconnected&) ;
 
-    void handle(const EvLoginFail& e);
+    void handle(const OutLoginOk&) ;
 
-    void handle(const EvOnlineUsers& e);
+    void handle(const OutStateChanged& e) ;
 
-    void handle(const EvCmdConnect& e) ;
-
-    void handle(const EvCmdDisconnect& e) ;
-
-    void handle(const EvCmdLogin& e) ;
-
-    void handle(const EvTcpConnected& e) ;
-
-    void handle(const EvTcpDisconnected& e);
-
-
+    void handle(const OutConnect&);       // 新增
+    void handle(const OutSendLogin&);
 
 };
 

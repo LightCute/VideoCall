@@ -43,6 +43,8 @@ set(PROJECT_SOURCES
     core/ClientState.h
     core/CoreInput.h
     core/CoreOutput.h
+    core/FSM.h
+    core/FSM.cpp
 
     # app
     app/ClientEvent.h

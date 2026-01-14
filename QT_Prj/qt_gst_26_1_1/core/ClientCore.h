@@ -1,67 +1,37 @@
-//ClientCore.h
+// core/ClientCore.h
 #pragma once
-
-#include <functional>
-#include <string>
-
+#include "CoreInput.h"
+#include "CoreOutput.h"
+#include "FSM.h"
 #include "CommandSocket.h"
-#include "ClientEvent.h"
-
-#include <variant>
-#include <functional>
-#include "ClientEventEnum.h"
-#include "ClientState.h"
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-#include "CoreOutput.h"
-struct EventTableEntry {
-    State current_state;
-    EventType event_type;
-    std::function<void(class ClientCore&, const ClientEvent)> action;
-    State next_state;
-};
-using ActionResult = std::vector<CoreOutput>;
-
+#include <thread>
+#include "protocol_text.h"
+#include <iostream>
 
 class ClientCore {
 public:
     ClientCore();
     ~ClientCore();
 
-    // 连接服务器
-    bool doconnect(const std::string& host, int port);
+    // 线程安全接口
+    void postInput(core::CoreInput ev);
+    bool pollOutput(CoreOutput& out);
 
-    // 业务 API（UI 只调用这些）
-    void sendLogin(const std::string& username, const std::string& password);
-    void sendRaw(const std::string& msg); // 你现在测试用的
-
-    // UI 注册这个回调
-    std::function<void(const ClientEvent)> onEvent;
-    std::function<void(State)> onStateChanged;
-
-
-
-    void dispatchEvent(const ClientEvent ev);
-    void postEvent(const ClientEvent ev);
-
-    // UI 层可以定期或轮询调用
-    bool pollEvent(ClientEvent &outEv);
+    // 可选接口
+    bool connectToServer(const std::string& host, int port);
+    void sendLogin(const std::string& user, const std::string& pass);
 
 private:
-    State state_ = State::Disconnected;
+    FSM fsm_;
     CommandSocket socket_;
 
-    // 内部：socket → protocol → event
-    void handleMessage(const std::string& msg);
+    std::queue<core::CoreInput>  inputQueue_;
+    std::queue<CoreOutput> outputQueue_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
 
-    // 事件表
-    static EventTableEntry eventTable_[];
-
-    std::queue<ClientEvent> eventQueue_;
-    std::mutex queueMutex_;
-    std::condition_variable queueCv_;
-
-    // 新增一个处理队列事件的函数
-    void processEvents();
+    void processEvents(); // 后台线程
 };

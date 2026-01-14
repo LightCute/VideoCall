@@ -72,3 +72,23 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
+# CMake build目录（核心：忽略整个build文件夹）
+build/
+# Qt用户配置文件
+*.user
+*.user.debug
+*.user.release
+# 编译产物
+*.o
+*.so
+*.d
+*.a
+# Qt自动生成的文件
+*_autogen/
+# 可执行文件
+qt_gst_camera
+# CMake临时文件
+CMakeCache.txt
+CMakeFiles/
+Testing/
+
