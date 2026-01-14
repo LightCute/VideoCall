@@ -535,6 +535,7 @@ CMakeFiles/qt_gst_camera.dir/ui/LoginWidget.cpp.o: \
  /usr/include/c++/13/bits/std_mutex.h \
  /usr/include/c++/13/bits/unique_lock.h \
  /usr/include/c++/13/condition_variable \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/CoreOutput.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/build/Ubuntu_VM_Kit-Debug/qt_gst_camera_autogen/include/./ui_LoginWidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvariant.h \

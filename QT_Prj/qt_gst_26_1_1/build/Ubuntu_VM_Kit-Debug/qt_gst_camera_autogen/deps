@@ -11,6 +11,8 @@ qt_gst_camera_autogen/timestamp: \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientState.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/CoreInput.h \
+	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/CoreOutput.h \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/main.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.cpp \
 	/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.h \

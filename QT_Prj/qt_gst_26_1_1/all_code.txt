@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 189
+Lines: 226
 
 //ClientCore.cpp
 #include "ClientCore.h"
@@ -36,13 +36,15 @@ ClientCore::ClientCore() {
     });
 
     socket_.setConnectCallback([this]{
-        dispatchEvent(EvTcpConnected{});
+        postEvent(EvTcpConnected{});
     });
 
     socket_.setDisconnectCallback([this]{
-        dispatchEvent(EvTcpDisconnected{});
+        postEvent(EvTcpDisconnected{});
     });
 
+
+    std::thread([this] { processEvents(); }).detach();
 }
 
 ClientCore::~ClientCore() {
@@ -190,11 +192,35 @@ void ClientCore::sendLogin(const std::string& username,
 }
 
 
-void ClientCore::postEvent(const ClientEvent ev)
+// void ClientCore::postEvent(const ClientEvent ev)
+// {
+//     dispatchEvent(std::move(ev));
+// }
+void ClientCore::postEvent(ClientEvent ev)  // 注意按值 + 移动
 {
-    dispatchEvent(std::move(ev));
+    {
+        std::lock_guard<std::mutex> lock(queueMutex_);
+        eventQueue_.push(std::move(ev));
+    }
+    queueCv_.notify_one(); // 通知可能在等待的线程
 }
 
+void ClientCore::processEvents()
+{
+    while (true) {
+        ClientEvent ev;
+
+        {
+            std::unique_lock<std::mutex> lock(queueMutex_);
+            queueCv_.wait(lock, [this]{ return !eventQueue_.empty(); });
+
+            ev = std::move(eventQueue_.front());
+            eventQueue_.pop();
+        }
+
+        dispatchEvent(std::move(ev));
+    }
+}
 
 
 void ClientCore::sendRaw(const std::string& msg) {
@@ -209,11 +235,22 @@ void ClientCore::handleMessage(const std::string& msg) {
     ClientEvent ev = ClientEventFactory::makeEvent(msg);
 
     // 2️⃣ 投递给 UI（或者上层）
-    dispatchEvent(std::move(ev));
+    postEvent(std::move(ev));
 }
 
+
+bool ClientCore::pollEvent(ClientEvent &outEv) {
+    std::lock_guard<std::mutex> lock(queueMutex_);
+    if(eventQueue_.empty()) return false;
+    outEv = std::move(eventQueue_.front());
+    eventQueue_.pop();
+    return true;
+}
+
+
+
 ========== ./core/ClientCore.h ==========
-Lines: 58
+Lines: 65
 
 //ClientCore.h
 #pragma once
@@ -260,6 +297,8 @@ public:
     void dispatchEvent(const ClientEvent ev);
     void postEvent(const ClientEvent ev);
 
+    // UI 层可以定期或轮询调用
+    bool pollEvent(ClientEvent &outEv);
 
 private:
     State state_ = State::Disconnected;
@@ -271,7 +310,12 @@ private:
     // 事件表
     static EventTableEntry eventTable_[];
 
+    std::queue<ClientEvent> eventQueue_;
+    std::mutex queueMutex_;
+    std::condition_variable queueCv_;
 
+    // 新增一个处理队列事件的函数
+    void processEvents();
 };
 
 ========== ./core/ClientState.h ==========
@@ -783,7 +827,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 152
+Lines: 153
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -793,7 +837,7 @@ Lines: 152
 #include <QDebug>
 
 #include <QThread>
-#include <QTime>
+#include <QTimer>
 
 LoginWidget::LoginWidget(QWidget *parent)
     : QWidget(parent)
@@ -803,42 +847,43 @@ LoginWidget::LoginWidget(QWidget *parent)
 
     core_ = new ClientCore;
 
-    core_->onEvent = [this](ClientEvent ev){
-        QMetaObject::invokeMethod(this,
-              [this, ev=std::move(ev)]() mutable {
-                  std::visit([this](auto&& e){
-                      handle(e);
-                  }, ev);
-              },
-              Qt::QueuedConnection
-          );
-    };
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this](){
+        ClientEvent ev;
+        while(core_->pollEvent(ev)) {
+            std::visit([this](auto&& e){ handle(e); }, ev);
+        }
+    });
+    timer->start(10); // 每 10ms 拉取一次事件
+
 
     // core_->onEvent = [this](ClientEvent ev){
-    //     auto evCopy = std::move(ev); // 移动一次
-    //     QTimer::singleShot(0, this, [this, ev=std::move(evCopy)]() mutable {
+    //     auto evCopy = std::move(ev);
+    //     QMetaObject::invokeMethod(this, [this, ev = std::move(evCopy)]() mutable {
     //         std::visit([this](auto&& e){
     //             handle(e);
     //         }, ev);
-    //     });
+    //     }, Qt::QueuedConnection);
     // };
 
 
 
 
-    core_->onStateChanged = [this](State s){
-        QString stateStr;
-        switch(s){
-        case State::Disconnected: stateStr = "Disconnected"; break;
-        case State::Connecting:   stateStr = "Connecting"; break;
-        case State::Connected:    stateStr = "Connected"; break;
-        case State::LoggingIn:    stateStr = "LoggingIn"; break;
-        case State::LoggedIn:     stateStr = "LoggedIn"; break;
-        }
 
-        // 显示在 UI 上
-        ui->TextEdit_FSM_State->setPlainText("State: " + stateStr);
+    core_->onStateChanged = [this](State s){
+        QMetaObject::invokeMethod(this, [this, s](){
+            QString stateStr;
+            switch(s){
+            case State::Disconnected: stateStr = "Disconnected"; break;
+            case State::Connecting:   stateStr = "Connecting"; break;
+            case State::Connected:    stateStr = "Connected"; break;
+            case State::LoggingIn:    stateStr = "LoggingIn"; break;
+            case State::LoggedIn:     stateStr = "LoggedIn"; break;
+            }
+            ui->TextEdit_FSM_State->setPlainText("State: " + stateStr);
+        }, Qt::QueuedConnection);
     };
+
 
 }
 
@@ -1499,4 +1544,4 @@ Q_DECLARE_METATYPE(Frame)
 
 =====================================
 Total files: 28
-Total lines: 1385
+Total lines: 1430

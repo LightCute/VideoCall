@@ -27,30 +27,32 @@ LoginWidget::LoginWidget(QWidget *parent)
 
 
     // core_->onEvent = [this](ClientEvent ev){
-    //     auto evCopy = std::move(ev); // 移动一次
-    //     QTimer::singleShot(0, this, [this, ev=std::move(evCopy)]() mutable {
+    //     auto evCopy = std::move(ev);
+    //     QMetaObject::invokeMethod(this, [this, ev = std::move(evCopy)]() mutable {
     //         std::visit([this](auto&& e){
     //             handle(e);
     //         }, ev);
-    //     });
+    //     }, Qt::QueuedConnection);
     // };
 
 
 
 
-    core_->onStateChanged = [this](State s){
-        QString stateStr;
-        switch(s){
-        case State::Disconnected: stateStr = "Disconnected"; break;
-        case State::Connecting:   stateStr = "Connecting"; break;
-        case State::Connected:    stateStr = "Connected"; break;
-        case State::LoggingIn:    stateStr = "LoggingIn"; break;
-        case State::LoggedIn:     stateStr = "LoggedIn"; break;
-        }
 
-        // 显示在 UI 上
-        ui->TextEdit_FSM_State->setPlainText("State: " + stateStr);
+    core_->onStateChanged = [this](State s){
+        QMetaObject::invokeMethod(this, [this, s](){
+            QString stateStr;
+            switch(s){
+            case State::Disconnected: stateStr = "Disconnected"; break;
+            case State::Connecting:   stateStr = "Connecting"; break;
+            case State::Connected:    stateStr = "Connected"; break;
+            case State::LoggingIn:    stateStr = "LoggingIn"; break;
+            case State::LoggedIn:     stateStr = "LoggedIn"; break;
+            }
+            ui->TextEdit_FSM_State->setPlainText("State: " + stateStr);
+        }, Qt::QueuedConnection);
     };
+
 
 }
 

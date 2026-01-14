@@ -116,6 +116,18 @@
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/CoreInput.h",
+			"MU",
+			"TAC5DWH4SE/moc_CoreInput.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/CoreOutput.h",
+			"MU",
+			"TAC5DWH4SE/moc_CoreOutput.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.h",
 			"MU",
 			"HTGEZKIBRU/moc_CameraManager.cpp",

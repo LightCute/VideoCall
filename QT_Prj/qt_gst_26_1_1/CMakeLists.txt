@@ -41,7 +41,8 @@ set(PROJECT_SOURCES
     core/ClientCore.cpp
     core/ClientCore.h
     core/ClientState.h
-
+    core/CoreInput.h
+    core/CoreOutput.h
 
     # app
     app/ClientEvent.h

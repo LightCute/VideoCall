@@ -4,6 +4,7 @@
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventEnum.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientCore.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/ClientState.h \
+  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/CoreOutput.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/CameraManager.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/media/Frame.h \
   /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/net/CommandSocket.h \

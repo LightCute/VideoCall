@@ -14,13 +14,15 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-
+#include "CoreOutput.h"
 struct EventTableEntry {
     State current_state;
     EventType event_type;
     std::function<void(class ClientCore&, const ClientEvent)> action;
     State next_state;
 };
+using ActionResult = std::vector<CoreOutput>;
+
 
 class ClientCore {
 public:

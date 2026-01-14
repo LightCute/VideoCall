@@ -202,6 +202,7 @@ CMakeFiles/qt_gst_camera.dir/core/ClientCore.cpp.o: \
  /usr/include/c++/13/bits/shared_ptr_base.h \
  /usr/include/c++/13/bits/allocated_ptr.h \
  /usr/include/c++/13/ext/concurrence.h \
+ /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/core/CoreOutput.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/app/ClientEventFactory.h \
  /home/light/work/Video_Prj/QT_Prj/qt_gst_26_1_1/protocol/protocol_text.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug \

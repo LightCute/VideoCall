@@ -12,12 +12,13 @@ ClientCore::ClientCore() {
     });
 
     socket_.setConnectCallback([this]{
-        dispatchEvent(EvTcpConnected{});
+        postEvent(EvTcpConnected{});
     });
 
     socket_.setDisconnectCallback([this]{
-        dispatchEvent(EvTcpDisconnected{});
+        postEvent(EvTcpDisconnected{});
     });
+
 
     std::thread([this] { processEvents(); }).detach();
 }
@@ -210,7 +211,7 @@ void ClientCore::handleMessage(const std::string& msg) {
     ClientEvent ev = ClientEventFactory::makeEvent(msg);
 
     // 2️⃣ 投递给 UI（或者上层）
-    dispatchEvent(std::move(ev));
+    postEvent(std::move(ev));
 }
 
 
