@@ -3,7 +3,13 @@
 #include <variant>
 #include "ClientState.h"
 
-struct OutStateChanged { State state; };
+// 输出层事件全部纳入 core 命名空间
+namespace core {
+
+struct OutStateChanged {
+    State from;
+    State to;
+};
 struct OutLoginOk {};
 struct OutLoginFail { std::string msg; };
 struct OutDisconnected {};
@@ -18,3 +24,5 @@ using CoreOutput = std::variant<
     OutConnect,
     OutSendLogin
     >;
+
+} // namespace core

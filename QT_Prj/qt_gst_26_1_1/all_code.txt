@@ -40,33 +40,31 @@ int main(int argc, char *argv[])
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 90
+Lines: 105
 
-// core/ClientCore.cpp
 #include "ClientCore.h"
 
+// 构造函数：初始化 Executor，设置回调
+ClientCore::ClientCore() : fsm_() {
+    // 初始化 Executor：回调函数用于接收 Executor 推送的 CoreInput
+    executor_ = std::make_unique<CoreExecutor>(
+        [this](core::CoreInput ev) {
+            this->postInput(std::move(ev)); // 将 Executor 的事件推入输入队列
+        }
+        );
 
-ClientCore::ClientCore() : fsm_(State::Disconnected) {
-    socket_.setMessageCallback([this](const std::string& msg){
-        // 转成 CoreInput
-        postInput(core::EvLoginOk{}); // 示例
-    });
-
-    socket_.setConnectCallback([this]{
-        postInput(core::EvTcpConnected{});
-    });
-
-    socket_.setDisconnectCallback([this]{
-        postInput(core::EvTcpDisconnected{});
-    });
-
+    // 启动事件处理线程（仅调度，无 IO）
     std::thread([this]{ processEvents(); }).detach();
 }
 
 ClientCore::~ClientCore() {
-    socket_.stop();
+    // 释放 Executor 资源
+    if (executor_) {
+        executor_->stop();
+    }
 }
 
+// 原 postInput/pollOutput 逻辑不变（补充 core:: 前缀）
 void ClientCore::postInput(core::CoreInput ev) {
     {
         std::lock_guard<std::mutex> lock(mtx_);
@@ -75,7 +73,7 @@ void ClientCore::postInput(core::CoreInput ev) {
     cv_.notify_one();
 }
 
-bool ClientCore::pollOutput(CoreOutput& out) {
+bool ClientCore::pollOutput(core::CoreOutput& out) { // 补充 core:: 前缀
     std::lock_guard<std::mutex> lock(mtx_);
     if (outputQueue_.empty()) return false;
     out = std::move(outputQueue_.front());
@@ -83,6 +81,7 @@ bool ClientCore::pollOutput(CoreOutput& out) {
     return true;
 }
 
+// 原 processEvents 逻辑不变（补充 core:: 前缀）
 void ClientCore::processEvents() {
     while (true) {
         core::CoreInput ev;
@@ -93,48 +92,64 @@ void ClientCore::processEvents() {
             inputQueue_.pop();
         }
 
-        auto outputs = fsm_.handle(std::move(ev));
+        auto outputs = fsm_.handle(state_, ev);
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
-                // ===== 修正后的 OutConnect 处理逻辑 =====
-                if (auto connectEv = std::get_if<OutConnect>(&o)) {
-                    // 临时变量拷贝（兼容C++11）
-                    std::string host = connectEv->host;
-                    int port = connectEv->port;
-
-                    // 异步执行连接
-                    std::thread connectThread([this, host, port]() {
-                        bool connectResult = this->socket_.connectToServer(host, port);
-                        if (!connectResult) {
-                            this->postInput(core::EvTcpDisconnected{});
-                        }
-                    });
-                    connectThread.detach();
-                }
-                // ===== OutSendLogin 处理逻辑（原有）=====
-                if (auto loginEv = std::get_if<OutSendLogin>(&o)) {
-                    std::string loginMsg = proto::makeLoginRequest(loginEv->user, loginEv->pass);
-                    socket_.sendMessage(loginMsg);
-                }
-
-                // 🔴 关键：先把 OutStateChanged 写入队列，再处理其他逻辑
-                std::cout << "[ClientCore] write outputQueue_, type index: " << o.index() << std::endl;
-                outputQueue_.push(std::move(o));
+                handleOutput(std::move(o));
             }
         }
     }
 }
-bool ClientCore::connectToServer(const std::string& host, int port) {
-    return socket_.connectToServer(host, port);
+
+// 原 handleOutput/applyStateChange 逻辑不变（补充 core:: 前缀）
+void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
+    std::visit([this](auto&& e){
+        using T = std::decay_t<decltype(e)>;
+
+        if constexpr (std::is_same_v<T, core::OutStateChanged>) { // 补充 core:: 前缀
+            applyStateChange(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutConnect>) { // 补充 core:: 前缀
+            execute(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutSendLogin>) { // 补充 core:: 前缀
+            execute(e);
+        }
+        else {
+            outputQueue_.push(std::move(e));
+        }
+    }, std::move(o));
 }
 
-void ClientCore::sendLogin(const std::string& user, const std::string& pass) {
-    socket_.sendMessage("login"); // 伪示例
+void ClientCore::applyStateChange(const core::OutStateChanged& e) { // 补充 core:: 前缀
+    std::cout << "[Core] State: "
+              << stateToString(e.from)
+              << " -> "
+              << stateToString(e.to)
+              << std::endl;
+
+    state_ = e.to;
+    outputQueue_.push(e);
 }
+
+// 关键修改：execute 仅调用 Executor 接口，无 IO 逻辑（补充 core:: 前缀）
+void ClientCore::execute(const core::OutConnect& e) { // 补充 core:: 前缀
+    // 调度 Executor 执行连接（Core 仅发命令，不做具体操作）
+    executor_->connectToServer(e.host, e.port);
+}
+
+void ClientCore::execute(const core::OutSendLogin& e) { // 补充 core:: 前缀
+    // 调度 Executor 发送登录请求
+    executor_->sendLoginRequest(e.user, e.pass);
+}
+
+// 废弃原 socket 操作接口（可直接删除）
+// bool ClientCore::connectToServer(const std::string& host, int port) { ... }
+// void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }
 
 ========== ./core/FSM.h ==========
-Lines: 34
+Lines: 35
 
 // core/FSM.h
 #pragma once
@@ -149,30 +164,31 @@ Lines: 34
 
 struct FSMEntry {
     State current_state;
-    EventType event_type; // 用 int 或枚举
-    std::function<std::vector<CoreOutput>(const core::CoreInput&)> action;
+    EventType event_type;
+    // 补充 core:: 前缀
+    std::function<std::vector<core::CoreOutput>(
+        State current,
+        const core::CoreInput&
+        )> action;
     State next_state;
 };
 
 class FSM {
 public:
-    FSM(State init);
+    FSM();
 
-    std::vector<CoreOutput> handle(core::CoreInput ev);
-
-    State getState() const { return state_; }
+    // 补充 core:: 前缀
+    std::vector<core::CoreOutput>
+    handle(State current, const core::CoreInput& ev);
 
 private:
-
     EventType eventTypeFromInput(const core::CoreInput& ev);
-
-    State state_;
     std::vector<FSMEntry> table_;
     void initTable();
 };
 
 ========== ./core/CoreInput.h ==========
-Lines: 28
+Lines: 29
 
 // core/CoreInput.h
 #pragma once
@@ -180,54 +196,54 @@ Lines: 28
 #include <string>
 namespace core {
 
-struct EvCmdConnect { std::string host; int port; };
-struct EvCmdDisconnect {};
-struct EvCmdLogin { std::string user; std::string pass; };
-struct EvTcpConnected {};
-struct EvTcpDisconnected {};
-struct EvLoginOk {};
-struct EvLoginFail { std::string msg; };
-struct EvOnlineUsers { std::string list; };
-struct EvUnknow {};
+// 所有 Core 输入事件前缀改为 In
+struct InCmdConnect { std::string host; int port; };
+struct InCmdDisconnect {};
+struct InCmdLogin { std::string user; std::string pass; };
+struct InTcpConnected {};
+struct InTcpDisconnected {};
+struct InLoginOk {};
+struct InLoginFail { std::string msg; };
+struct InOnlineUsers { std::string list; };
+struct InUnknow {};
 
 using CoreInput = std::variant<
-    EvCmdConnect,
-    EvCmdDisconnect,
-    EvCmdLogin,
-    EvTcpConnected,
-    EvTcpDisconnected,
-    EvLoginOk,
-    EvLoginFail,
-    EvOnlineUsers,
-    EvUnknow
+    InCmdConnect,
+    InCmdDisconnect,
+    InCmdLogin,
+    InTcpConnected,
+    InTcpDisconnected,
+    InLoginOk,
+    InLoginFail,
+    InOnlineUsers,
+    InUnknow
     >;
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 138
+Lines: 159
 
 // core/FSM.cpp
 #include "FSM.h"
 
-FSM::FSM(State init) : state_(init) {
-    // 新增：构造函数中初始化状态表
+FSM::FSM() {
     initTable();
 }
 
-std::vector<CoreOutput> FSM::handle(core::CoreInput ev) {
+// 补充 core:: 前缀
+std::vector<core::CoreOutput>
+FSM::handle(State current, const core::CoreInput& ev)
+{
     EventType evType = eventTypeFromInput(ev);
-    std::cout << "[FSM] event type: " << static_cast<int>(evType) << " current state: " << static_cast<int>(state_) << std::endl;
+
     for (auto& entry : table_) {
-        if (entry.current_state == state_ && entry.event_type == evType) {
-            // 事件类型匹配（简化示例，用 type_index 或自定义 EventType）
-            // 如果匹配：
-            auto outputs = entry.action(ev);
-            std::cout << "[FSM] matched，output num: " << outputs.size() << std::endl;
-            state_ = entry.next_state;
+        if (entry.current_state == current &&
+            entry.event_type == evType) {
+
+            auto outputs = entry.action(current, ev);
             return outputs;
         }
     }
-    std::cout << "[FSM] no matched" << std::endl;
     return {};
 }
 
@@ -235,156 +251,261 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
     EventType evType = EventType::Unknow;
     std::visit([&evType](auto&& e){
         using T = std::decay_t<decltype(e)>;
-        if constexpr (std::is_same_v<T, core::EvCmdConnect>)      evType = EventType::CmdConnect;
-        else if constexpr (std::is_same_v<T, core::EvCmdDisconnect>) evType = EventType::CmdDisconnect;
-        else if constexpr (std::is_same_v<T, core::EvCmdLogin>)   evType = EventType::CmdLogin;
+        // 全部替换为 InXXX 前缀
+        if constexpr (std::is_same_v<T, core::InCmdConnect>)      evType = EventType::CmdConnect;
+        else if constexpr (std::is_same_v<T, core::InCmdDisconnect>) evType = EventType::CmdDisconnect;
+        else if constexpr (std::is_same_v<T, core::InCmdLogin>)   evType = EventType::CmdLogin;
 
-        else if constexpr (std::is_same_v<T, core::EvTcpConnected>)    evType = EventType::TcpConnected;
-        else if constexpr (std::is_same_v<T, core::EvTcpDisconnected>) evType = EventType::TcpDisconnected;
+        else if constexpr (std::is_same_v<T, core::InTcpConnected>)    evType = EventType::TcpConnected;
+        else if constexpr (std::is_same_v<T, core::InTcpDisconnected>) evType = EventType::TcpDisconnected;
 
-        else if constexpr (std::is_same_v<T, core::EvLoginOk>)   evType = EventType::LoginOk;
-        else if constexpr (std::is_same_v<T, core::EvLoginFail>) evType = EventType::LoginFail;
-        else if constexpr (std::is_same_v<T, core::EvOnlineUsers>) evType = EventType::OnlineUsers;
+        else if constexpr (std::is_same_v<T, core::InLoginOk>)   evType = EventType::LoginOk;
+        else if constexpr (std::is_same_v<T, core::InLoginFail>) evType = EventType::LoginFail;
+        else if constexpr (std::is_same_v<T, core::InOnlineUsers>) evType = EventType::OnlineUsers;
 
         else evType = EventType::Unknow;
     }, ev);
     return evType;
 }
 
-
 void FSM::initTable() {
     table_ = {
-      // ===== 断开态 =====
-        { State::Disconnected, EventType::CmdConnect,
-          [](const core::CoreInput& ev) -> std::vector<CoreOutput> {
-              std::vector<CoreOutput> out;
-              if (auto e = std::get_if<core::EvCmdConnect>(&ev)) {
-                  // 在 FSM 里只能返回输出，不直接操作 Core
-                  // 可以用输出通知 Core 做连接
-                  out.push_back(OutStateChanged{State::Connecting});
-                  out.push_back(OutConnect{e->host,e->port});
-                  // 可用特殊输出通知 Core 去 connect
-                  // 也可以让 ClientCore 在 postInput 后立即 connect
-              }
-              return out;
-          },
-          State::Connecting
-      },
+              // ===== 断开态 =====
+              { State::Disconnected, EventType::CmdConnect,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                      std::vector<core::CoreOutput> out;
+                      // 替换为 InCmdConnect
+                      if (auto e = std::get_if<core::InCmdConnect>(&ev)) {
+                          out.push_back(core::OutStateChanged{cur, State::Connecting}); // 补充 core::
+                          out.push_back(core::OutConnect{e->host, e->port}); // 补充 core::
+                      }
+                      return out;
+                  },
+                  State::Connecting
+              },
 
-      // ===== 正在连接 =====
-        { State::Connecting, EventType::TcpConnected,
-          [](const core::CoreInput& ev) -> std::vector<CoreOutput> {
-              std::vector<CoreOutput> out;
-             if (auto e = std::get_if<core::EvTcpConnected>(&ev)) {
-                  out.push_back(OutStateChanged{State::Connected});
-              }
-              return out;
-          },
-          State::Connected
-      },
+              // ===== 正在连接 =====
+              { State::Connecting, EventType::TcpConnected,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                      std::vector<core::CoreOutput> out;
+                      // 替换为 InTcpConnected
+                      if (auto e = std::get_if<core::InTcpConnected>(&ev)) {
+                          out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
+                      }
+                      return out;
+                  },
+                  State::Connected
+              },
 
-        { State::Connecting, EventType::TcpDisconnected,
-          [](const core::CoreInput&){ return std::vector<CoreOutput>{}; },
-          State::Disconnected
-      },
+              { State::Connecting, EventType::TcpDisconnected,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput&){ return std::vector<core::CoreOutput>{}; },
+                  State::Disconnected
+              },
 
-      // ===== 已连接 =====
-        { State::Connected, EventType::CmdLogin,
-          [](const core::CoreInput& ev) -> std::vector<CoreOutput> {
-              std::vector<CoreOutput> out;
-              if (auto e = std::get_if<core::EvCmdLogin>(&ev)) {
-                  // Core 会在 ClientCore 层处理 sendLogin
-                  out.push_back(OutStateChanged{State::LoggingIn});
-                  out.push_back(OutSendLogin{e->user, e->pass});
-              }
-              return out;
-          },
-          State::LoggingIn
-      },
+              // ===== 已连接 =====
+              { State::Connected, EventType::CmdLogin,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                      std::vector<core::CoreOutput> out;
+                      // 替换为 InCmdLogin
+                      if (auto e = std::get_if<core::InCmdLogin>(&ev)) {
+                          out.push_back(core::OutStateChanged{cur, State::LoggingIn}); // 补充 core::
+                          out.push_back(core::OutSendLogin{e->user, e->pass}); // 补充 core::
+                      }
+                      return out;
+                  },
+                  State::LoggingIn
+              },
 
-      // ===== 正在登录 =====
-        { State::LoggingIn, EventType::LoginOk ,
-         [](const core::CoreInput& ev) -> std::vector<CoreOutput> {
-              std::vector<CoreOutput> out;
-             if (auto e = std::get_if<core::EvLoginOk>(&ev)) {
-                  out.push_back(OutLoginOk{});
-                  out.push_back(OutStateChanged{State::LoggedIn});
-              }
-              return out;
-          },
-          State::LoggedIn
-      },
+              // ===== 正在登录 =====
+              { State::LoggingIn, EventType::LoginOk ,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                      std::vector<core::CoreOutput> out;
+                      // 替换为 InLoginOk
+                      if (auto e = std::get_if<core::InLoginOk>(&ev)) {
+                          out.push_back(core::OutLoginOk{}); // 补充 core::
+                          out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 补充 core::
+                      }
+                      return out;
+                  },
+                  State::LoggedIn
+              },
 
-        { State::LoggingIn, EventType::LoginFail ,
-          [](const core::CoreInput& ev) -> std::vector<CoreOutput> {
-              std::vector<CoreOutput> out;
-              if (auto e = std::get_if<core::EvLoginFail>(&ev)) {
-                  out.push_back(OutLoginFail{e->msg});
-                  out.push_back(OutStateChanged{State::Connected});
-              }
-              return out;
-          },
-          State::Connected
-      },
+              { State::LoggingIn, EventType::LoginFail ,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                      std::vector<core::CoreOutput> out;
+                      // 替换为 InLoginFail
+                      if (auto e = std::get_if<core::InLoginFail>(&ev)) {
+                          out.push_back(core::OutLoginFail{e->msg}); // 补充 core::
+                          out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
+                      }
+                      return out;
+                  },
+                  State::Connected
+              },
 
-      // ===== 任何在线状态断线 =====
-      { State::Connected,  EventType::TcpDisconnected,
-          [](const core::CoreInput&){ return std::vector<CoreOutput>{OutStateChanged{State::Disconnected}, OutDisconnected{}}; },
-          State::Disconnected
-      },
-      { State::LoggingIn,  EventType::TcpDisconnected,
-          [](const core::CoreInput&){ return std::vector<CoreOutput>{OutStateChanged{State::Disconnected}, OutDisconnected{}}; },
-          State::Disconnected
-      },
-      { State::LoggedIn,   EventType::TcpDisconnected,
-          [](const core::CoreInput&){ return std::vector<CoreOutput>{OutStateChanged{State::Disconnected}, OutDisconnected{}}; },
-          State::Disconnected
-      },
-  };
+              // ===== 任何在线状态断线 =====
+              { State::Connected,  EventType::TcpDisconnected,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput&){
+                      return std::vector<core::CoreOutput>{
+                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                          core::OutDisconnected{} // 补充 core::
+                      };
+                  },
+                  State::Disconnected
+              },
+              { State::LoggingIn,  EventType::TcpDisconnected,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput&){
+                      return std::vector<core::CoreOutput>{
+                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                          core::OutDisconnected{} // 补充 core::
+                      };
+                  },
+                  State::Disconnected
+              },
+              { State::LoggedIn,   EventType::TcpDisconnected,
+                  // 补充 core:: 前缀
+                  [](State cur, const core::CoreInput&){
+                      return std::vector<core::CoreOutput>{
+                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                          core::OutDisconnected{} // 补充 core::
+                      };
+                  },
+                  State::Disconnected
+              },
+              };
 }
 
-
-
 ========== ./core/ClientCore.h ==========
-Lines: 37
+Lines: 43
 
-// core/ClientCore.h
 #pragma once
 #include "CoreInput.h"
 #include "CoreOutput.h"
 #include "FSM.h"
-#include "CommandSocket.h"
+#include "ClientState.h"
+#include "CoreExecutor.h"
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-#include "protocol_text.h"
-#include <iostream>
+#include <memory>
 
 class ClientCore {
 public:
     ClientCore();
     ~ClientCore();
 
-    // 线程安全接口
+    // 线程安全接口（对外暴露）
     void postInput(core::CoreInput ev);
-    bool pollOutput(CoreOutput& out);
+    bool pollOutput(core::CoreOutput& out); // 补充 core:: 前缀
 
-    // 可选接口
-    bool connectToServer(const std::string& host, int port);
-    void sendLogin(const std::string& user, const std::string& pass);
+    // 废弃：原直接操作 socket 的接口
+    // bool connectToServer(const std::string& host, int port);
+    // void sendLogin(const std::string& user, const std::string& pass);
 
 private:
     FSM fsm_;
-    CommandSocket socket_;
+    State state_ = State::Disconnected;
+    std::unique_ptr<CoreExecutor> executor_;
 
+    // 线程安全队列（补充 core:: 前缀）
     std::queue<core::CoreInput>  inputQueue_;
-    std::queue<CoreOutput> outputQueue_;
+    std::queue<core::CoreOutput> outputQueue_; // 补充 core:: 前缀
     std::mutex mtx_;
     std::condition_variable cv_;
 
-    void processEvents(); // 后台线程
+    // 核心方法（参数补充 core:: 前缀）
+    void processEvents();
+    void applyStateChange(const core::OutStateChanged& e); // 补充 core:: 前缀
+    void handleOutput(core::CoreOutput&& o); // 补充 core:: 前缀
+    void execute(const core::OutConnect& e) ; // 补充 core:: 前缀
+    void execute(const core::OutSendLogin& e) ; // 补充 core:: 前缀
 };
+
+========== ./core/CoreExecutor.cpp ==========
+Lines: 73
+
+//CoreExecutor.cpp
+#include "CoreExecutor.h"
+#include "ClientEventFactory.h"
+#include <thread>
+#include <iostream>
+
+CoreExecutor::CoreExecutor(InputCallback cb)
+    : postInput_(std::move(cb)) {
+    initSocketCallbacks();
+}
+
+CoreExecutor::~CoreExecutor() {
+    stop();
+}
+
+void CoreExecutor::initSocketCallbacks() {
+    // 1. 连接成功回调：推送 InTcpConnected 到 Core
+    socket_.setConnectCallback([this]() {
+        if (isRunning_) {
+            postInput_(core::InTcpConnected{}); // 替换为 InTcpConnected
+            std::cout << "[Executor] Socket connected, push InTcpConnected to Core" << std::endl;
+        }
+    });
+
+    // 2. 断开连接回调：推送 InTcpDisconnected 到 Core
+    socket_.setDisconnectCallback([this]() {
+        if (isRunning_) {
+            postInput_(core::InTcpDisconnected{}); // 替换为 InTcpDisconnected
+            std::cout << "[Executor] Socket disconnected, push InTcpDisconnected to Core" << std::endl;
+        }
+    });
+
+    // 3. 消息接收回调：解析消息并推送对应 CoreInput 到 Core
+    socket_.setMessageCallback([this](const std::string& msg) {
+        if (!isRunning_) return;
+
+        ClientEvent event = ClientEventFactory::makeEvent(msg);
+        std::visit([this](auto&& e) {
+            using T = std::decay_t<decltype(e)>;
+            if constexpr (std::is_same_v<T, ProtoEvtLoginOk>) {
+                postInput_(core::InLoginOk{}); // 替换为 InLoginOk
+            } else if constexpr (std::is_same_v<T, ProtoEvtLoginFail>) {
+                postInput_(core::InLoginFail{e.resp.message}); // 替换为 InLoginFail
+            } else if constexpr (std::is_same_v<T, ProtoEvtOnlineUsers>) {
+                postInput_(core::InOnlineUsers{""}); // 替换为 InOnlineUsers
+            } else {
+                postInput_(core::InUnknow{}); // 替换为 InUnknow
+            }
+        }, event);
+    });
+}
+
+void CoreExecutor::connectToServer(const std::string& host, int port) {
+    // 异步执行连接
+    std::thread([this, host, port]() {
+        if (!socket_.connectToServer(host, port)) {
+            // 连接失败：推送 InTcpDisconnected
+            postInput_(core::InTcpDisconnected{}); // 替换为 InTcpDisconnected
+            std::cout << "[Executor] Connect to " << host << ":" << port << " failed" << std::endl;
+        }
+    }).detach();
+}
+
+void CoreExecutor::sendLoginRequest(const std::string& user, const std::string& pass) {
+    std::string loginMsg = proto::makeLoginRequest(user, pass);
+    socket_.sendMessage(loginMsg);
+    std::cout << "[Executor] Send login request for user: " << user << std::endl;
+}
+
+void CoreExecutor::stop() {
+    isRunning_ = false;
+    socket_.stop();
+}
 
 ========== ./core/ClientState.h ==========
 Lines: 24
@@ -414,15 +535,59 @@ inline std::string stateToString(State s) {
     }
 }
 
+========== ./core/CoreExecutor.h ==========
+Lines: 34
+
+//CoreExecutor.h
+#pragma once
+#include "CoreInput.h"
+#include "CommandSocket.h"
+#include "protocol_text.h"
+#include "ClientEventFactory.h"
+#include <functional>
+#include <memory>
+
+// 定义回调类型：Executor 执行 IO 后，通过该回调向 ClientCore 推送 CoreInput
+using InputCallback = std::function<void(core::CoreInput)>;
+
+class CoreExecutor {
+public:
+    // 构造函数：接收回调函数（用于向 Core 推送输入事件）
+    explicit CoreExecutor(InputCallback cb);
+    ~CoreExecutor();
+
+    // 对外暴露的 IO 操作接口（语义化命名）
+    void connectToServer(const std::string& host, int port);
+    void sendLoginRequest(const std::string& user, const std::string& pass);
+    void stop(); // 资源释放接口
+
+private:
+    // 封装的 socket 实例（Executor 唯一持有）
+    CommandSocket socket_;
+    // 向 Core 推送事件的回调
+    InputCallback postInput_;
+    // 线程安全标记
+    std::atomic<bool> isRunning_{true};
+
+    // 初始化 socket 回调（内部私有）
+    void initSocketCallbacks();
+};
+
 ========== ./core/CoreOutput.h ==========
-Lines: 20
+Lines: 28
 
 // core/CoreOutput.h
 #pragma once
 #include <variant>
 #include "ClientState.h"
 
-struct OutStateChanged { State state; };
+// 输出层事件全部纳入 core 命名空间
+namespace core {
+
+struct OutStateChanged {
+    State from;
+    State to;
+};
 struct OutLoginOk {};
 struct OutLoginFail { std::string msg; };
 struct OutDisconnected {};
@@ -437,6 +602,8 @@ using CoreOutput = std::variant<
     OutConnect,
     OutSendLogin
     >;
+
+} // namespace core
 
 ========== ./net/PacketCodec.h ==========
 Lines: 39
@@ -788,7 +955,7 @@ void QtCameraAdapter::onFrame(Frame f) {
 }
 
 ========== ./ui/LoginWidget.h ==========
-Lines: 53
+Lines: 44
 
 //LoginWidget.h
 #ifndef LOGINWIDGET_H
@@ -797,7 +964,6 @@ Lines: 53
 #include <QWidget>
 
 #include "widget.h"
-
 #include "ClientCore.h"
 
 namespace Ui {
@@ -816,30 +982,22 @@ signals:
     void loginSuccess();
 
 private slots:
-
     void on_Bt_Jump_Test_clicked();
-
     void on_Bt_ConnectToServer_clicked();
-
     void on_Bt_tcp_test_send_clicked();
-
     void on_Bt_Login_clicked();
 
 private:
     Ui::LoginWidget *ui;
     ClientCore* core_;
 
-    void handle(const OutLoginFail&);
-
-    void handle(const OutDisconnected&) ;
-
-    void handle(const OutLoginOk&) ;
-
-    void handle(const OutStateChanged& e) ;
-
-    void handle(const OutConnect&);       // 新增
-    void handle(const OutSendLogin&);
-
+    // 所有参数补充 core:: 前缀
+    void handle(const core::OutLoginFail&);
+    void handle(const core::OutDisconnected&) ;
+    void handle(const core::OutLoginOk&) ;
+    void handle(const core::OutStateChanged& e) ;
+    void handle(const core::OutConnect&);       // 新增
+    void handle(const core::OutSendLogin&);     // 新增
 };
 
 #endif // LOGINWIDGET_H
@@ -921,7 +1079,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 110
+Lines: 97
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -943,7 +1101,7 @@ LoginWidget::LoginWidget(QWidget *parent)
 
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this]{
-        CoreOutput out;
+        core::CoreOutput out; // 补充 core:: 前缀
         while (core_->pollOutput(out)) {
             std::cout << "[UI] get output, type index: " << out.index() << std::endl;
             std::visit([this](const auto& e){
@@ -952,8 +1110,6 @@ LoginWidget::LoginWidget(QWidget *parent)
         }
     });
     timer->start(10);
-
-
 }
 
 LoginWidget::~LoginWidget()
@@ -961,14 +1117,10 @@ LoginWidget::~LoginWidget()
     delete ui;
 }
 
-
-
-
 void LoginWidget::on_Bt_Jump_Test_clicked()
 {
     emit loginSuccess();
 }
-
 
 void LoginWidget::on_Bt_ConnectToServer_clicked()
 {
@@ -976,51 +1128,44 @@ void LoginWidget::on_Bt_ConnectToServer_clicked()
     qDebug() << "ui thread:" << qApp->thread();
 
     ui->TextEdit_tcp_test_recv->setPlainText("Connecting\n");
-    //core_->postEvent(EvCmdConnect{"127.0.0.1", 6001});
-    core_->postInput(core::EvCmdConnect{"127.0.0.1",6001});
-
+    // 替换为 InCmdConnect
+    core_->postInput(core::InCmdConnect{"127.0.0.1",6001});
 }
-
 
 void LoginWidget::on_Bt_tcp_test_send_clicked()
 {
     QString qmsg = ui->LE_tcp_send_test->text();
     std::string msg = qmsg.toStdString();
-    //core_->sendRaw(msg);
 }
 
-void LoginWidget::handle(const OutLoginFail&) {
+// 所有 handle 函数参数补充 core:: 前缀
+void LoginWidget::handle(const core::OutLoginFail&) {
     std::cout << "[UI] handle OutLoginFail: " << std::endl;
     ui->TextEdit_tcp_test_recv->setPlainText("Login failed");
 }
 
-void LoginWidget::handle(const OutDisconnected&) {
+void LoginWidget::handle(const core::OutDisconnected&) {
     std::cout << "[UI] handle OutDisconnected: " << std::endl;
     ui->TextEdit_tcp_test_recv->setPlainText("OutDisconnected");
 }
 
-void LoginWidget::handle(const OutLoginOk&) {
+void LoginWidget::handle(const core::OutLoginOk&) {
     std::cout << "[UI] handle OutLoginOk: " << std::endl;
     ui->TextEdit_tcp_test_recv->setPlainText("Login success");
 }
 
-void LoginWidget::handle(const OutStateChanged& e) {
-    std::cout << "[UI] handle OutStateChanged: " << stateToString(e.state) << std::endl;
-    ui->TextEdit_FSM_State->setPlainText(QString::fromStdString(stateToString(e.state)));
+void LoginWidget::handle(const core::OutStateChanged& e) {
+    std::cout << "[UI] handle OutStateChanged: " << stateToString(e.from) << " to " << stateToString(e.to) << std::endl;
+    ui->TextEdit_FSM_State->setPlainText(QString::fromStdString(stateToString(e.to)));
 }
 
-// ui/LoginWidget.cpp 中补充以下 handle 重载
-void LoginWidget::handle(const OutConnect& e) {
-    std::cout << "[UI] handle OutConnect: " << e.host << ":" << e.port << std::endl;
-    ui->TextEdit_tcp_test_recv->setPlainText("OutConnect");
-
+void LoginWidget::handle(const core::OutConnect&) {
+    std::cout << "[UI] Ignore OutConnect (CoreExecutor handles it)" << std::endl;
 }
 
-void LoginWidget::handle(const OutSendLogin& e) {
-    std::cout << "[UI] handle OutSendLogin: " <<  e.user << ":"  << e.pass << std::endl;
-    ui->TextEdit_tcp_test_recv->setPlainText("OutSendLogin");
+void LoginWidget::handle(const core::OutSendLogin&) {
+    std::cout << "[UI] Ignore OutSendLogin (CoreExecutor handles it)" << std::endl;
 }
-
 
 void LoginWidget::on_Bt_Login_clicked()
 {
@@ -1030,9 +1175,9 @@ void LoginWidget::on_Bt_Login_clicked()
     QString qstr_user_pass = ui->LE_UserPass->text();
     std::string msg_user_pass = qstr_user_pass.toStdString();
 
-    core_->postInput(core::EvCmdLogin{msg_user_name, msg_user_pass});
+    // 替换为 InCmdLogin
+    core_->postInput(core::InCmdLogin{msg_user_name, msg_user_pass});
 }
-
 
 ========== ./ui/AppWindow.h ==========
 Lines: 23
@@ -1322,39 +1467,39 @@ Lines: 40
 #include "protocol_types.h"
 #include <variant>
 
-struct EvTcpConnected {};
-struct EvTcpDisconnected {};
-struct EvLoginOk    { proto::LoginResponse resp; };
-struct EvLoginFail { proto::LoginResponse resp; };
-struct EvOnlineUsers { proto::OnlineUsers users; };
-struct EvUnknow { proto::Unknown error_msg; };
-struct EvCmdConnect {
+// 协议层事件统一前缀：ProtoEvt
+struct ProtoEvtTcpConnected {};
+struct ProtoEvtTcpDisconnected {};
+struct ProtoEvtLoginOk    { proto::LoginResponse resp; };
+struct ProtoEvtLoginFail { proto::LoginResponse resp; };
+struct ProtoEvtOnlineUsers { proto::OnlineUsers users; };
+struct ProtoEvtUnknow { proto::Unknown error_msg; };
+struct ProtoEvtCmdConnect {
     std::string host;
     int port;
 };
-struct EvCmdDisconnect {};
-struct EvCmdLogin {
+struct ProtoEvtCmdDisconnect {};
+struct ProtoEvtCmdLogin {
     std::string user;
     std::string pass;
 };
 
 using ClientEvent = std::variant<
-    // UI
-    EvCmdConnect,
-    EvCmdDisconnect,
-    EvCmdLogin,
+    // UI 触发的协议命令
+    ProtoEvtCmdConnect,
+    ProtoEvtCmdDisconnect,
+    ProtoEvtCmdLogin,
 
-    // TCP
-    EvTcpConnected,
-    EvTcpDisconnected,
+    // TCP 底层事件
+    ProtoEvtTcpConnected,
+    ProtoEvtTcpDisconnected,
 
-    // 协议
-    EvLoginOk,
-    EvLoginFail,
-    EvOnlineUsers,
-    EvUnknow
->;
-
+    // 协议解析后的业务事件
+    ProtoEvtLoginOk,
+    ProtoEvtLoginFail,
+    ProtoEvtOnlineUsers,
+    ProtoEvtUnknow
+    >;
 
 ========== ./app/ClientEventFactory.h ==========
 Lines: 18
@@ -1379,35 +1524,34 @@ private:
 #endif // CLIENTEVENTFACTORY_H
 
 ========== ./app/ClientEventFactory.cpp ==========
-Lines: 28
+Lines: 27
 
 //ClientEventFactory.cpp
 #include "ClientEventFactory.h"
 
 // 只在 cpp 中 include 解析函数
 #include "protocol_text.h"
-// 例如：
-// bool parseLoginResponse(const std::string&, LoginResponse&)
-// bool parseOnlineUsers(const std::string&, OnlineUsers&)
+
+ClientEventFactory::ClientEventFactory() {}
 
 ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
 {
     proto::LoginResponse login;
     if (proto::parseLoginResponse(msg, login)) {
         if (login.success)
-            return EvLoginOk{login};
+            return ProtoEvtLoginOk{login}; // 改为 ProtoEvt 前缀
         else
-            return EvLoginFail{login};
+            return ProtoEvtLoginFail{login}; // 改为 ProtoEvt 前缀
     }
 
     proto::OnlineUsers users;
     if (proto::parseOnlineUsers(msg, users)) {
-        return EvOnlineUsers{users};
+        return ProtoEvtOnlineUsers{users}; // 改为 ProtoEvt 前缀
     }
 
     proto::Unknown req_error;
     req_error.message = msg;
-    return EvUnknow{req_error};
+    return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀
 }
 
 ========== ./app/ClientEventEnum.h ==========
@@ -1594,5 +1738,5 @@ Q_DECLARE_METATYPE(Frame)
 
 
 =====================================
-Total files: 32
-Total lines: 1465
+Total files: 34
+Total lines: 1601

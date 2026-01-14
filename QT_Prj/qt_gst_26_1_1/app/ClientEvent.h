@@ -5,36 +5,36 @@
 #include "protocol_types.h"
 #include <variant>
 
-struct EvTcpConnected {};
-struct EvTcpDisconnected {};
-struct EvLoginOk    { proto::LoginResponse resp; };
-struct EvLoginFail { proto::LoginResponse resp; };
-struct EvOnlineUsers { proto::OnlineUsers users; };
-struct EvUnknow { proto::Unknown error_msg; };
-struct EvCmdConnect {
+// 协议层事件统一前缀：ProtoEvt
+struct ProtoEvtTcpConnected {};
+struct ProtoEvtTcpDisconnected {};
+struct ProtoEvtLoginOk    { proto::LoginResponse resp; };
+struct ProtoEvtLoginFail { proto::LoginResponse resp; };
+struct ProtoEvtOnlineUsers { proto::OnlineUsers users; };
+struct ProtoEvtUnknow { proto::Unknown error_msg; };
+struct ProtoEvtCmdConnect {
     std::string host;
     int port;
 };
-struct EvCmdDisconnect {};
-struct EvCmdLogin {
+struct ProtoEvtCmdDisconnect {};
+struct ProtoEvtCmdLogin {
     std::string user;
     std::string pass;
 };
 
 using ClientEvent = std::variant<
-    // UI
-    EvCmdConnect,
-    EvCmdDisconnect,
-    EvCmdLogin,
+    // UI 触发的协议命令
+    ProtoEvtCmdConnect,
+    ProtoEvtCmdDisconnect,
+    ProtoEvtCmdLogin,
 
-    // TCP
-    EvTcpConnected,
-    EvTcpDisconnected,
+    // TCP 底层事件
+    ProtoEvtTcpConnected,
+    ProtoEvtTcpDisconnected,
 
-    // 协议
-    EvLoginOk,
-    EvLoginFail,
-    EvOnlineUsers,
-    EvUnknow
->;
-
+    // 协议解析后的业务事件
+    ProtoEvtLoginOk,
+    ProtoEvtLoginFail,
+    ProtoEvtOnlineUsers,
+    ProtoEvtUnknow
+    >;

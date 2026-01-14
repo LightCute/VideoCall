@@ -4,25 +4,26 @@
 #include <string>
 namespace core {
 
-struct EvCmdConnect { std::string host; int port; };
-struct EvCmdDisconnect {};
-struct EvCmdLogin { std::string user; std::string pass; };
-struct EvTcpConnected {};
-struct EvTcpDisconnected {};
-struct EvLoginOk {};
-struct EvLoginFail { std::string msg; };
-struct EvOnlineUsers { std::string list; };
-struct EvUnknow {};
+// 所有 Core 输入事件前缀改为 In
+struct InCmdConnect { std::string host; int port; };
+struct InCmdDisconnect {};
+struct InCmdLogin { std::string user; std::string pass; };
+struct InTcpConnected {};
+struct InTcpDisconnected {};
+struct InLoginOk {};
+struct InLoginFail { std::string msg; };
+struct InOnlineUsers { std::string list; };
+struct InUnknow {};
 
 using CoreInput = std::variant<
-    EvCmdConnect,
-    EvCmdDisconnect,
-    EvCmdLogin,
-    EvTcpConnected,
-    EvTcpDisconnected,
-    EvLoginOk,
-    EvLoginFail,
-    EvOnlineUsers,
-    EvUnknow
+    InCmdConnect,
+    InCmdDisconnect,
+    InCmdLogin,
+    InTcpConnected,
+    InTcpDisconnected,
+    InLoginOk,
+    InLoginFail,
+    InOnlineUsers,
+    InUnknow
     >;
 }

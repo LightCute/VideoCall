@@ -3,26 +3,25 @@
 
 // 只在 cpp 中 include 解析函数
 #include "protocol_text.h"
-// 例如：
-// bool parseLoginResponse(const std::string&, LoginResponse&)
-// bool parseOnlineUsers(const std::string&, OnlineUsers&)
+
+ClientEventFactory::ClientEventFactory() {}
 
 ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
 {
     proto::LoginResponse login;
     if (proto::parseLoginResponse(msg, login)) {
         if (login.success)
-            return EvLoginOk{login};
+            return ProtoEvtLoginOk{login}; // 改为 ProtoEvt 前缀
         else
-            return EvLoginFail{login};
+            return ProtoEvtLoginFail{login}; // 改为 ProtoEvt 前缀
     }
 
     proto::OnlineUsers users;
     if (proto::parseOnlineUsers(msg, users)) {
-        return EvOnlineUsers{users};
+        return ProtoEvtOnlineUsers{users}; // 改为 ProtoEvt 前缀
     }
 
     proto::Unknown req_error;
     req_error.message = msg;
-    return EvUnknow{req_error};
+    return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀
 }

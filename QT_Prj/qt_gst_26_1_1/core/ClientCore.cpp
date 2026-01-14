@@ -1,28 +1,26 @@
-// core/ClientCore.cpp
 #include "ClientCore.h"
 
+// 构造函数：初始化 Executor，设置回调
+ClientCore::ClientCore() : fsm_() {
+    // 初始化 Executor：回调函数用于接收 Executor 推送的 CoreInput
+    executor_ = std::make_unique<CoreExecutor>(
+        [this](core::CoreInput ev) {
+            this->postInput(std::move(ev)); // 将 Executor 的事件推入输入队列
+        }
+        );
 
-ClientCore::ClientCore() : fsm_(State::Disconnected) {
-    socket_.setMessageCallback([this](const std::string& msg){
-        // 转成 CoreInput
-        postInput(core::EvLoginOk{}); // 示例
-    });
-
-    socket_.setConnectCallback([this]{
-        postInput(core::EvTcpConnected{});
-    });
-
-    socket_.setDisconnectCallback([this]{
-        postInput(core::EvTcpDisconnected{});
-    });
-
+    // 启动事件处理线程（仅调度，无 IO）
     std::thread([this]{ processEvents(); }).detach();
 }
 
 ClientCore::~ClientCore() {
-    socket_.stop();
+    // 释放 Executor 资源
+    if (executor_) {
+        executor_->stop();
+    }
 }
 
+// 原 postInput/pollOutput 逻辑不变（补充 core:: 前缀）
 void ClientCore::postInput(core::CoreInput ev) {
     {
         std::lock_guard<std::mutex> lock(mtx_);
@@ -31,7 +29,7 @@ void ClientCore::postInput(core::CoreInput ev) {
     cv_.notify_one();
 }
 
-bool ClientCore::pollOutput(CoreOutput& out) {
+bool ClientCore::pollOutput(core::CoreOutput& out) { // 补充 core:: 前缀
     std::lock_guard<std::mutex> lock(mtx_);
     if (outputQueue_.empty()) return false;
     out = std::move(outputQueue_.front());
@@ -39,6 +37,7 @@ bool ClientCore::pollOutput(CoreOutput& out) {
     return true;
 }
 
+// 原 processEvents 逻辑不变（补充 core:: 前缀）
 void ClientCore::processEvents() {
     while (true) {
         core::CoreInput ev;
@@ -49,42 +48,58 @@ void ClientCore::processEvents() {
             inputQueue_.pop();
         }
 
-        auto outputs = fsm_.handle(std::move(ev));
+        auto outputs = fsm_.handle(state_, ev);
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
-                // ===== 修正后的 OutConnect 处理逻辑 =====
-                if (auto connectEv = std::get_if<OutConnect>(&o)) {
-                    // 临时变量拷贝（兼容C++11）
-                    std::string host = connectEv->host;
-                    int port = connectEv->port;
-
-                    // 异步执行连接
-                    std::thread connectThread([this, host, port]() {
-                        bool connectResult = this->socket_.connectToServer(host, port);
-                        if (!connectResult) {
-                            this->postInput(core::EvTcpDisconnected{});
-                        }
-                    });
-                    connectThread.detach();
-                }
-                // ===== OutSendLogin 处理逻辑（原有）=====
-                if (auto loginEv = std::get_if<OutSendLogin>(&o)) {
-                    std::string loginMsg = proto::makeLoginRequest(loginEv->user, loginEv->pass);
-                    socket_.sendMessage(loginMsg);
-                }
-
-                // 🔴 关键：先把 OutStateChanged 写入队列，再处理其他逻辑
-                std::cout << "[ClientCore] write outputQueue_, type index: " << o.index() << std::endl;
-                outputQueue_.push(std::move(o));
+                handleOutput(std::move(o));
             }
         }
     }
 }
-bool ClientCore::connectToServer(const std::string& host, int port) {
-    return socket_.connectToServer(host, port);
+
+// 原 handleOutput/applyStateChange 逻辑不变（补充 core:: 前缀）
+void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
+    std::visit([this](auto&& e){
+        using T = std::decay_t<decltype(e)>;
+
+        if constexpr (std::is_same_v<T, core::OutStateChanged>) { // 补充 core:: 前缀
+            applyStateChange(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutConnect>) { // 补充 core:: 前缀
+            execute(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutSendLogin>) { // 补充 core:: 前缀
+            execute(e);
+        }
+        else {
+            outputQueue_.push(std::move(e));
+        }
+    }, std::move(o));
 }
 
-void ClientCore::sendLogin(const std::string& user, const std::string& pass) {
-    socket_.sendMessage("login"); // 伪示例
+void ClientCore::applyStateChange(const core::OutStateChanged& e) { // 补充 core:: 前缀
+    std::cout << "[Core] State: "
+              << stateToString(e.from)
+              << " -> "
+              << stateToString(e.to)
+              << std::endl;
+
+    state_ = e.to;
+    outputQueue_.push(e);
 }
+
+// 关键修改：execute 仅调用 Executor 接口，无 IO 逻辑（补充 core:: 前缀）
+void ClientCore::execute(const core::OutConnect& e) { // 补充 core:: 前缀
+    // 调度 Executor 执行连接（Core 仅发命令，不做具体操作）
+    executor_->connectToServer(e.host, e.port);
+}
+
+void ClientCore::execute(const core::OutSendLogin& e) { // 补充 core:: 前缀
+    // 调度 Executor 发送登录请求
+    executor_->sendLoginRequest(e.user, e.pass);
+}
+
+// 废弃原 socket 操作接口（可直接删除）
+// bool ClientCore::connectToServer(const std::string& host, int port) { ... }
+// void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }

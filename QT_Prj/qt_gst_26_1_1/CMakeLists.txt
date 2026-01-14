@@ -45,6 +45,9 @@ set(PROJECT_SOURCES
     core/CoreOutput.h
     core/FSM.h
     core/FSM.cpp
+    core/CoreExecutor.h
+    core/CoreExecutor.cpp
+
 
     # app
     app/ClientEvent.h
