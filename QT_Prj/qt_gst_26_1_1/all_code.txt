@@ -1,6 +1,6 @@
 
 ========== ./main.cpp ==========
-Lines: 36
+Lines: 37
 
 //main.cpp
 #include <iostream>
@@ -22,7 +22,7 @@ Lines: 36
 #include "widget.h"
 #include "LoginWidget.h"
 #include "AppWindow.h"
-
+#include "core/CoreOutput.h"
 // #include "widget.h"
 // #include "LoginWidget.h"
 // #include <QApplication>
@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     qRegisterMetaType<Frame>("Frame");
+    qRegisterMetaType<core::CoreOutput>("core::CoreOutput");  // 新增
     AppWindow w;
     //LoginWidget login_W;
     //login_W.show();
@@ -40,9 +41,10 @@ int main(int argc, char *argv[])
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 105
+Lines: 137
 
 #include "ClientCore.h"
+#include <algorithm>
 
 // 构造函数：初始化 Executor，设置回调
 ClientCore::ClientCore() : fsm_() {
@@ -59,11 +61,16 @@ ClientCore::ClientCore() : fsm_() {
 
 ClientCore::~ClientCore() {
     // 释放 Executor 资源
+    stop();
     if (executor_) {
         executor_->stop();
     }
 }
 
+void ClientCore::stop() {
+    is_running_ = false;
+    cv_.notify_one(); // 唤醒等待的线程，使其退出循环
+}
 // 原 postInput/pollOutput 逻辑不变（补充 core:: 前缀）
 void ClientCore::postInput(core::CoreInput ev) {
     {
@@ -73,17 +80,41 @@ void ClientCore::postInput(core::CoreInput ev) {
     cv_.notify_one();
 }
 
-bool ClientCore::pollOutput(core::CoreOutput& out) { // 补充 core:: 前缀
-    std::lock_guard<std::mutex> lock(mtx_);
-    if (outputQueue_.empty()) return false;
-    out = std::move(outputQueue_.front());
-    outputQueue_.pop();
-    return true;
+// 新增：添加监听者（线程安全）
+void ClientCore::addListener(core::ICoreListener* listener) {
+    std::lock_guard<std::mutex> lock(listener_mtx_);
+    listeners_.push_back(listener);
 }
+
+// 新增：移除监听者（线程安全）
+void ClientCore::removeListener(core::ICoreListener* listener) {
+    std::lock_guard<std::mutex> lock(listener_mtx_);
+    listeners_.erase(
+        std::remove(listeners_.begin(), listeners_.end(), listener),
+        listeners_.end()
+        );
+}
+
+// 新增：广播输出事件给所有监听者（Core 线程调用）
+void ClientCore::broadcastOutput(const core::CoreOutput& out) {
+    std::lock_guard<std::mutex> lock(listener_mtx_);
+    for (auto* listener : listeners_) {
+        listener->onCoreOutput(out); // 调用监听者的回调（Core 线程）
+    }
+}
+
+
+// bool ClientCore::pollOutput(core::CoreOutput& out) { // 补充 core:: 前缀
+//     std::lock_guard<std::mutex> lock(mtx_);
+//     if (outputQueue_.empty()) return false;
+//     out = std::move(outputQueue_.front());
+//     outputQueue_.pop();
+//     return true;
+// }
 
 // 原 processEvents 逻辑不变（补充 core:: 前缀）
 void ClientCore::processEvents() {
-    while (true) {
+    while (is_running_) {
         core::CoreInput ev;
         {
             std::unique_lock<std::mutex> lock(mtx_);
@@ -109,6 +140,7 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
 
         if constexpr (std::is_same_v<T, core::OutStateChanged>) { // 补充 core:: 前缀
             applyStateChange(e);
+            broadcastOutput(e); // Broadcast state change
         }
         else if constexpr (std::is_same_v<T, core::OutConnect>) { // 补充 core:: 前缀
             execute(e);
@@ -117,7 +149,8 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
             execute(e);
         }
         else {
-            outputQueue_.push(std::move(e));
+            // outputQueue_.push(std::move(e));
+            broadcastOutput(e); // 广播其他事件
         }
     }, std::move(o));
 }
@@ -130,7 +163,7 @@ void ClientCore::applyStateChange(const core::OutStateChanged& e) { // 补充 co
               << std::endl;
 
     state_ = e.to;
-    outputQueue_.push(e);
+    //outputQueue_.push(e);
 }
 
 // 关键修改：execute 仅调用 Executor 接口，无 IO 逻辑（补充 core:: 前缀）
@@ -384,7 +417,7 @@ void FSM::initTable() {
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 43
+Lines: 52
 
 #pragma once
 #include "CoreInput.h"
@@ -397,6 +430,8 @@ Lines: 43
 #include <condition_variable>
 #include <thread>
 #include <memory>
+#include "ICoreListener.h"
+#include <vector>
 
 class ClientCore {
 public:
@@ -405,11 +440,11 @@ public:
 
     // 线程安全接口（对外暴露）
     void postInput(core::CoreInput ev);
-    bool pollOutput(core::CoreOutput& out); // 补充 core:: 前缀
-
-    // 废弃：原直接操作 socket 的接口
-    // bool connectToServer(const std::string& host, int port);
-    // void sendLogin(const std::string& user, const std::string& pass);
+    // bool pollOutput(core::CoreOutput& out); // 补充 core:: 前缀
+    void stop();
+    // 监听者管理（线程安全）
+    void addListener(core::ICoreListener* listener);   // 新增
+    void removeListener(core::ICoreListener* listener);// 新增
 
 private:
     FSM fsm_;
@@ -422,12 +457,19 @@ private:
     std::mutex mtx_;
     std::condition_variable cv_;
 
+    // 监听者管理（新增）
+    std::vector<core::ICoreListener*> listeners_;
+    std::mutex listener_mtx_;  // 监听者操作的线程安全锁
+
     // 核心方法（参数补充 core:: 前缀）
     void processEvents();
     void applyStateChange(const core::OutStateChanged& e); // 补充 core:: 前缀
     void handleOutput(core::CoreOutput&& o); // 补充 core:: 前缀
     void execute(const core::OutConnect& e) ; // 补充 core:: 前缀
     void execute(const core::OutSendLogin& e) ; // 补充 core:: 前缀
+    // 新增：广播输出事件给所有监听者
+    void broadcastOutput(const core::CoreOutput& out);
+    std::atomic<bool> is_running_{true};
 };
 
 ========== ./core/CoreExecutor.cpp ==========
@@ -572,6 +614,25 @@ private:
     // 初始化 socket 回调（内部私有）
     void initSocketCallbacks();
 };
+
+========== ./core/ICoreListener.h ==========
+Lines: 15
+
+// core/ICoreListener.h
+#pragma once
+#include "CoreOutput.h"
+
+namespace core {
+
+class ICoreListener {
+public:
+    virtual ~ICoreListener() = default;
+
+    // Core 输出事件的统一回调（Core 线程调用）
+    virtual void onCoreOutput(const CoreOutput& out) = 0;
+};
+
+} // namespace core
 
 ========== ./core/CoreOutput.h ==========
 Lines: 28
@@ -883,29 +944,64 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 46
+Lines: 72
 
-//widget.cpp
+// ui/widget.cpp（完整修复版）
 #include "widget.h"
 #include "./ui_widget.h"
 #include <QDebug>
+#include "ClientCore.h" // 包含Core头文件
+#include "ClientState.h" // 包含状态转换函数
 
-Widget::Widget(QWidget *parent)
+Widget::Widget(ClientCore* core, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
+    , core_(core)  // 初始化Core指针
 {
     ui->setupUi(this);
     video_ = new VideoWidget(ui->videoContainer);
-    // video_->setSizePolicy(QSizePolicy::Expanding,
-    //                       QSizePolicy::Expanding);
     adapter_ = new QtCameraAdapter(video_, this);
 
+    // 关键修复：绑定摄像头回调到Qt界面
+    camera_.setFrameCallback([this](const Frame& f) {
+        // 跨线程安全调用（CameraManager在子线程，UI在主线程）
+        QMetaObject::invokeMethod(adapter_, "onFrame", Qt::QueuedConnection, Q_ARG(Frame, f));
+    });
 
+    // 关键修复：绑定Core事件的跨线程处理
+    connect(this, &Widget::coreOutputReceived,
+            this, &Widget::handleCoreOutput,
+            Qt::QueuedConnection);
 }
 
 Widget::~Widget()
 {
+    // 修复：使用正确的移除监听者方法
+    if (core_) {
+        core_->removeListener(this);
+    }
     delete ui;
+}
+
+// 实现ICoreListener接口：接收Core输出事件
+void Widget::onCoreOutput(const core::CoreOutput& out)
+{
+    qDebug() << "Main UI received core output, type index:" << out.index();
+    // 转发为Qt信号（确保UI线程处理）
+    emit coreOutputReceived(out);
+}
+
+// 实现槽函数：处理Core输出事件（UI线程）
+void Widget::handleCoreOutput(const core::CoreOutput& out)
+{
+    // 可根据需要扩展处理逻辑，目前打印日志
+    std::visit([](auto&& e) {
+        using T = std::decay_t<decltype(e)>;
+        if constexpr (std::is_same_v<T, core::OutStateChanged>) {
+            qDebug() << "Main UI state change:" << QString::fromStdString(stateToString(e.from))
+                     << "→" << QString::fromStdString(stateToString(e.to));
+        }
+    }, out);
 }
 
 void Widget::on_Bt_video_on_off_clicked()
@@ -914,23 +1010,14 @@ void Widget::on_Bt_video_on_off_clicked()
     camera_.start("/dev/video0");
 }
 
-
 void Widget::on_Bt_video_off_clicked()
 {
     qDebug("Button clicked!");
     camera_.stop();
 }
 
-
-void Widget::on_Bt_tcp_send_clicked()
-{
-}
-
-
-void Widget::on_Bt_tcp_connect_clicked()
-{
-}
-
+void Widget::on_Bt_tcp_send_clicked() {}
+void Widget::on_Bt_tcp_connect_clicked() {}
 
 ========== ./ui/QtCameraAdapter.cpp ==========
 Lines: 18
@@ -955,7 +1042,7 @@ void QtCameraAdapter::onFrame(Frame f) {
 }
 
 ========== ./ui/LoginWidget.h ==========
-Lines: 44
+Lines: 50
 
 //LoginWidget.h
 #ifndef LOGINWIDGET_H
@@ -963,34 +1050,40 @@ Lines: 44
 
 #include <QWidget>
 
-#include "widget.h"
-#include "ClientCore.h"
+#include "core/ICoreListener.h"  // 实现抽象接口
+#include "core/CoreOutput.h"     // Core 输出事件
+
+class ClientCore;
 
 namespace Ui {
 class LoginWidget;
 }
 
-class LoginWidget : public QWidget
+class LoginWidget : public QWidget, public core::ICoreListener
 {
     Q_OBJECT
 
 public:
-    explicit LoginWidget(QWidget *parent = nullptr);
-    ~LoginWidget();
+    explicit LoginWidget(ClientCore* core, QWidget* parent = nullptr);
+    ~LoginWidget() override;
+
+    void onCoreOutput(const core::CoreOutput& out) override;
 
 signals:
     void loginSuccess();
+    void coreOutputReceived(const core::CoreOutput& out);
 
 private slots:
     void on_Bt_Jump_Test_clicked();
     void on_Bt_ConnectToServer_clicked();
     void on_Bt_tcp_test_send_clicked();
     void on_Bt_Login_clicked();
+    void handleCoreOutput(const core::CoreOutput& out);
 
 private:
     Ui::LoginWidget *ui;
     ClientCore* core_;
-
+    // 新增：UI 线程处理 Core 事件
     // 所有参数补充 core:: 前缀
     void handle(const core::OutLoginFail&);
     void handle(const core::OutDisconnected&) ;
@@ -1003,12 +1096,13 @@ private:
 #endif // LOGINWIDGET_H
 
 ========== ./ui/AppWindow.cpp ==========
-Lines: 30
+Lines: 38
 
-//AppWindow.cpp
+// ui/AppWindow.cpp
 #include "AppWindow.h"
 #include "LoginWidget.h"
 #include "widget.h"
+#include "core/ClientCore.h"  // 包含 Core 头文件
 #include <QVBoxLayout>
 
 AppWindow::AppWindow(QWidget *parent)
@@ -1017,8 +1111,12 @@ AppWindow::AppWindow(QWidget *parent)
     resize(900, 600);
     stack = new QStackedWidget(this);
 
-    loginPage = new LoginWidget;
-    mainPage  = new Widget;
+    // 核心：创建唯一的 ClientCore 实例（纯 C++，无 Qt 依赖）
+    core_ = std::make_unique<ClientCore>();
+
+    // 传递 Core 指针给子窗口
+    loginPage = new LoginWidget(core_.get(), this);
+    mainPage  = new Widget(core_.get(), this);
 
     stack->addWidget(loginPage); // index 0
     stack->addWidget(mainPage);  // index 1
@@ -1035,6 +1133,9 @@ AppWindow::AppWindow(QWidget *parent)
     // 初始页面
     stack->setCurrentIndex(PAGE_LOGIN);
 }
+
+// 析构：智能指针自动释放 Core
+AppWindow::~AppWindow() = default;
 
 ========== ./ui/VideoWidget.h ==========
 Lines: 17
@@ -1079,7 +1180,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 97
+Lines: 114
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -1087,34 +1188,51 @@ Lines: 97
 #include <QMessageBox>
 #include <QMetaObject>
 #include <QDebug>
+#include "ClientCore.h"
 
-#include <QThread>
-#include <QTimer>
 
-LoginWidget::LoginWidget(QWidget *parent)
+
+LoginWidget::LoginWidget(ClientCore* core, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::LoginWidget)
+    , core_(core)  // 接收 AppWindow 传入的 Core 实例
 {
     ui->setupUi(this);
 
-    core_ = new ClientCore;
+    // 注册为 Core 的监听者
+    core_->addListener(this);
 
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this]{
-        core::CoreOutput out; // 补充 core:: 前缀
-        while (core_->pollOutput(out)) {
-            std::cout << "[UI] get output, type index: " << out.index() << std::endl;
-            std::visit([this](const auto& e){
-                handle(e);
-            }, out);
-        }
-    });
-    timer->start(10);
+    // 关键：跨线程信号槽（强制 QueuedConnection，确保 UI 线程执行）
+    connect(this, &LoginWidget::coreOutputReceived,
+            this, &LoginWidget::handleCoreOutput,
+            Qt::QueuedConnection);
+
+    // 移除：删除 QTimer 轮询逻辑
+    // QTimer* timer = new QTimer(this);
+    // connect(timer, &QTimer::timeout, this, [this]{ ... });
+    // timer->start(10);
 }
 
-LoginWidget::~LoginWidget()
-{
+LoginWidget::~LoginWidget() {
+    // 析构时移除监听者（避免野指针）
+    if (core_) {
+        core_->removeListener(this);
+    }
     delete ui;
+}
+
+
+// 实现 ICoreListener 接口（Core 线程调用，绝不操作 UI）
+void LoginWidget::onCoreOutput(const core::CoreOutput& out) {
+    // 仅转发为 Qt 信号，交给 UI 线程处理
+    emit coreOutputReceived(out);
+}
+
+// UI 线程处理 Core 事件（安全操作 UI）
+void LoginWidget::handleCoreOutput(const core::CoreOutput& out) {
+    std::visit([this](auto&& e) {
+        handle(e);
+    }, out);
 }
 
 void LoginWidget::on_Bt_Jump_Test_clicked()
@@ -1124,8 +1242,8 @@ void LoginWidget::on_Bt_Jump_Test_clicked()
 
 void LoginWidget::on_Bt_ConnectToServer_clicked()
 {
-    qDebug() << "current thread:" << QThread::currentThread();
-    qDebug() << "ui thread:" << qApp->thread();
+    //qDebug() << "current thread:" << QThread::currentThread();
+    //qDebug() << "ui thread:" << qApp->thread();
 
     ui->TextEdit_tcp_test_recv->setPlainText("Connecting\n");
     // 替换为 InCmdConnect
@@ -1180,25 +1298,32 @@ void LoginWidget::on_Bt_Login_clicked()
 }
 
 ========== ./ui/AppWindow.h ==========
-Lines: 23
+Lines: 30
 
 //AppWindow.h
 #pragma once
 #include <QWidget>
 #include <QStackedWidget>
+#include "memory"
 #include "LoginWidget.h"
 #include "widget.h"
+#include "memory"
+
+class ClientCore;
 
 class AppWindow : public QWidget
 {
     Q_OBJECT
 public:
     explicit AppWindow(QWidget *parent = nullptr);
-
+    ~AppWindow() override;
 private:
     QStackedWidget *stack;
     LoginWidget *loginPage;
     Widget *mainPage;
+
+    // 核心：AppWindow 唯一持有 ClientCore 实例
+    std::unique_ptr<ClientCore> core_;
 
     enum PageIndex {
         PAGE_LOGIN = 0,
@@ -1207,16 +1332,20 @@ private:
 };
 
 ========== ./ui/widget.h ==========
-Lines: 39
+Lines: 48
 
-//widget.h
+// ui/widget.h（完整修复版）
 #ifndef WIDGET_H
 #define WIDGET_H
 
 #include <QWidget>
 #include "QtCameraAdapter.h"
 #include "CameraManager.h"
+#include "core/ICoreListener.h"
+#include "core/CoreOutput.h"
 
+// 前置声明（减少耦合）
+class ClientCore;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -1224,25 +1353,30 @@ class Widget;
 }
 QT_END_NAMESPACE
 
-class Widget : public QWidget
+class Widget : public QWidget, public core::ICoreListener
 {
     Q_OBJECT
 
 public:
-    Widget(QWidget *parent = nullptr);
-    ~Widget();
+    explicit Widget(ClientCore* core, QWidget *parent = nullptr);
+    ~Widget() override;
+
+    // 仅实现ICoreListener要求的纯虚函数
+    void onCoreOutput(const core::CoreOutput& out) override;
+
+signals:
+    void coreOutputReceived(const core::CoreOutput& out);
 
 private slots:
     void on_Bt_video_on_off_clicked();
-
     void on_Bt_video_off_clicked();
-
     void on_Bt_tcp_send_clicked();
-
     void on_Bt_tcp_connect_clicked();
+    void handleCoreOutput(const core::CoreOutput& out); // 槽函数声明
 
 private:
     Ui::Widget *ui;
+    ClientCore* core_; // 新增：Core指针成员
     VideoWidget *video_;
     CameraManager camera_;
     QtCameraAdapter* adapter_;
@@ -1738,5 +1872,5 @@ Q_DECLARE_METATYPE(Frame)
 
 
 =====================================
-Total files: 34
-Total lines: 1601
+Total files: 35
+Total lines: 1731

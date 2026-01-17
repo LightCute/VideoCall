@@ -1,4 +1,5 @@
 #include "ClientCore.h"
+#include <algorithm>
 
 // 构造函数：初始化 Executor，设置回调
 ClientCore::ClientCore() : fsm_() {
@@ -15,11 +16,16 @@ ClientCore::ClientCore() : fsm_() {
 
 ClientCore::~ClientCore() {
     // 释放 Executor 资源
+    stop();
     if (executor_) {
         executor_->stop();
     }
 }
 
+void ClientCore::stop() {
+    is_running_ = false;
+    cv_.notify_one(); // 唤醒等待的线程，使其退出循环
+}
 // 原 postInput/pollOutput 逻辑不变（补充 core:: 前缀）
 void ClientCore::postInput(core::CoreInput ev) {
     {
@@ -29,17 +35,41 @@ void ClientCore::postInput(core::CoreInput ev) {
     cv_.notify_one();
 }
 
-bool ClientCore::pollOutput(core::CoreOutput& out) { // 补充 core:: 前缀
-    std::lock_guard<std::mutex> lock(mtx_);
-    if (outputQueue_.empty()) return false;
-    out = std::move(outputQueue_.front());
-    outputQueue_.pop();
-    return true;
+// 新增：添加监听者（线程安全）
+void ClientCore::addListener(core::ICoreListener* listener) {
+    std::lock_guard<std::mutex> lock(listener_mtx_);
+    listeners_.push_back(listener);
 }
+
+// 新增：移除监听者（线程安全）
+void ClientCore::removeListener(core::ICoreListener* listener) {
+    std::lock_guard<std::mutex> lock(listener_mtx_);
+    listeners_.erase(
+        std::remove(listeners_.begin(), listeners_.end(), listener),
+        listeners_.end()
+        );
+}
+
+// 新增：广播输出事件给所有监听者（Core 线程调用）
+void ClientCore::broadcastOutput(const core::CoreOutput& out) {
+    std::lock_guard<std::mutex> lock(listener_mtx_);
+    for (auto* listener : listeners_) {
+        listener->onCoreOutput(out); // 调用监听者的回调（Core 线程）
+    }
+}
+
+
+// bool ClientCore::pollOutput(core::CoreOutput& out) { // 补充 core:: 前缀
+//     std::lock_guard<std::mutex> lock(mtx_);
+//     if (outputQueue_.empty()) return false;
+//     out = std::move(outputQueue_.front());
+//     outputQueue_.pop();
+//     return true;
+// }
 
 // 原 processEvents 逻辑不变（补充 core:: 前缀）
 void ClientCore::processEvents() {
-    while (true) {
+    while (is_running_) {
         core::CoreInput ev;
         {
             std::unique_lock<std::mutex> lock(mtx_);
@@ -65,6 +95,7 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
 
         if constexpr (std::is_same_v<T, core::OutStateChanged>) { // 补充 core:: 前缀
             applyStateChange(e);
+            broadcastOutput(e); // Broadcast state change
         }
         else if constexpr (std::is_same_v<T, core::OutConnect>) { // 补充 core:: 前缀
             execute(e);
@@ -73,7 +104,8 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
             execute(e);
         }
         else {
-            outputQueue_.push(std::move(e));
+            // outputQueue_.push(std::move(e));
+            broadcastOutput(e); // 广播其他事件
         }
     }, std::move(o));
 }
@@ -86,7 +118,7 @@ void ClientCore::applyStateChange(const core::OutStateChanged& e) { // 补充 co
               << std::endl;
 
     state_ = e.to;
-    outputQueue_.push(e);
+    //outputQueue_.push(e);
 }
 
 // 关键修改：execute 仅调用 Executor 接口，无 IO 逻辑（补充 core:: 前缀）

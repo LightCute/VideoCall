@@ -1,7 +1,8 @@
-//AppWindow.cpp
+// ui/AppWindow.cpp
 #include "AppWindow.h"
 #include "LoginWidget.h"
 #include "widget.h"
+#include "core/ClientCore.h"  // 包含 Core 头文件
 #include <QVBoxLayout>
 
 AppWindow::AppWindow(QWidget *parent)
@@ -10,8 +11,12 @@ AppWindow::AppWindow(QWidget *parent)
     resize(900, 600);
     stack = new QStackedWidget(this);
 
-    loginPage = new LoginWidget;
-    mainPage  = new Widget;
+    // 核心：创建唯一的 ClientCore 实例（纯 C++，无 Qt 依赖）
+    core_ = std::make_unique<ClientCore>();
+
+    // 传递 Core 指针给子窗口
+    loginPage = new LoginWidget(core_.get(), this);
+    mainPage  = new Widget(core_.get(), this);
 
     stack->addWidget(loginPage); // index 0
     stack->addWidget(mainPage);  // index 1
@@ -28,3 +33,6 @@ AppWindow::AppWindow(QWidget *parent)
     // 初始页面
     stack->setCurrentIndex(PAGE_LOGIN);
 }
+
+// 析构：智能指针自动释放 Core
+AppWindow::~AppWindow() = default;

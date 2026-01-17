@@ -18,7 +18,7 @@
 #include "widget.h"
 #include "LoginWidget.h"
 #include "AppWindow.h"
-
+#include "core/CoreOutput.h"
 // #include "widget.h"
 // #include "LoginWidget.h"
 // #include <QApplication>
@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     qRegisterMetaType<Frame>("Frame");
+    qRegisterMetaType<core::CoreOutput>("core::CoreOutput");  // 新增
     AppWindow w;
     //LoginWidget login_W;
     //login_W.show();

@@ -1,11 +1,15 @@
-//widget.h
+// ui/widget.h（完整修复版）
 #ifndef WIDGET_H
 #define WIDGET_H
 
 #include <QWidget>
 #include "QtCameraAdapter.h"
 #include "CameraManager.h"
+#include "core/ICoreListener.h"
+#include "core/CoreOutput.h"
 
+// 前置声明（减少耦合）
+class ClientCore;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -13,25 +17,30 @@ class Widget;
 }
 QT_END_NAMESPACE
 
-class Widget : public QWidget
+class Widget : public QWidget, public core::ICoreListener
 {
     Q_OBJECT
 
 public:
-    Widget(QWidget *parent = nullptr);
-    ~Widget();
+    explicit Widget(ClientCore* core, QWidget *parent = nullptr);
+    ~Widget() override;
+
+    // 仅实现ICoreListener要求的纯虚函数
+    void onCoreOutput(const core::CoreOutput& out) override;
+
+signals:
+    void coreOutputReceived(const core::CoreOutput& out);
 
 private slots:
     void on_Bt_video_on_off_clicked();
-
     void on_Bt_video_off_clicked();
-
     void on_Bt_tcp_send_clicked();
-
     void on_Bt_tcp_connect_clicked();
+    void handleCoreOutput(const core::CoreOutput& out); // 槽函数声明
 
 private:
     Ui::Widget *ui;
+    ClientCore* core_; // 新增：Core指针成员
     VideoWidget *video_;
     CameraManager camera_;
     QtCameraAdapter* adapter_;

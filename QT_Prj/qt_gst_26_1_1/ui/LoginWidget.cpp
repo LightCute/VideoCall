@@ -4,34 +4,51 @@
 #include <QMessageBox>
 #include <QMetaObject>
 #include <QDebug>
+#include "ClientCore.h"
 
-#include <QThread>
-#include <QTimer>
 
-LoginWidget::LoginWidget(QWidget *parent)
+
+LoginWidget::LoginWidget(ClientCore* core, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::LoginWidget)
+    , core_(core)  // 接收 AppWindow 传入的 Core 实例
 {
     ui->setupUi(this);
 
-    core_ = new ClientCore;
+    // 注册为 Core 的监听者
+    core_->addListener(this);
 
-    QTimer* timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this]{
-        core::CoreOutput out; // 补充 core:: 前缀
-        while (core_->pollOutput(out)) {
-            std::cout << "[UI] get output, type index: " << out.index() << std::endl;
-            std::visit([this](const auto& e){
-                handle(e);
-            }, out);
-        }
-    });
-    timer->start(10);
+    // 关键：跨线程信号槽（强制 QueuedConnection，确保 UI 线程执行）
+    connect(this, &LoginWidget::coreOutputReceived,
+            this, &LoginWidget::handleCoreOutput,
+            Qt::QueuedConnection);
+
+    // 移除：删除 QTimer 轮询逻辑
+    // QTimer* timer = new QTimer(this);
+    // connect(timer, &QTimer::timeout, this, [this]{ ... });
+    // timer->start(10);
 }
 
-LoginWidget::~LoginWidget()
-{
+LoginWidget::~LoginWidget() {
+    // 析构时移除监听者（避免野指针）
+    if (core_) {
+        core_->removeListener(this);
+    }
     delete ui;
+}
+
+
+// 实现 ICoreListener 接口（Core 线程调用，绝不操作 UI）
+void LoginWidget::onCoreOutput(const core::CoreOutput& out) {
+    // 仅转发为 Qt 信号，交给 UI 线程处理
+    emit coreOutputReceived(out);
+}
+
+// UI 线程处理 Core 事件（安全操作 UI）
+void LoginWidget::handleCoreOutput(const core::CoreOutput& out) {
+    std::visit([this](auto&& e) {
+        handle(e);
+    }, out);
 }
 
 void LoginWidget::on_Bt_Jump_Test_clicked()
@@ -41,8 +58,8 @@ void LoginWidget::on_Bt_Jump_Test_clicked()
 
 void LoginWidget::on_Bt_ConnectToServer_clicked()
 {
-    qDebug() << "current thread:" << QThread::currentThread();
-    qDebug() << "ui thread:" << qApp->thread();
+    //qDebug() << "current thread:" << QThread::currentThread();
+    //qDebug() << "ui thread:" << qApp->thread();
 
     ui->TextEdit_tcp_test_recv->setPlainText("Connecting\n");
     // 替换为 InCmdConnect

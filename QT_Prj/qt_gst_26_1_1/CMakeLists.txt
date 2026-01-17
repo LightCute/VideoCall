@@ -47,7 +47,7 @@ set(PROJECT_SOURCES
     core/FSM.cpp
     core/CoreExecutor.h
     core/CoreExecutor.cpp
-
+    core/ICoreListener.h
 
     # app
     app/ClientEvent.h

@@ -9,6 +9,8 @@
 #include <condition_variable>
 #include <thread>
 #include <memory>
+#include "ICoreListener.h"
+#include <vector>
 
 class ClientCore {
 public:
@@ -17,11 +19,11 @@ public:
 
     // 线程安全接口（对外暴露）
     void postInput(core::CoreInput ev);
-    bool pollOutput(core::CoreOutput& out); // 补充 core:: 前缀
-
-    // 废弃：原直接操作 socket 的接口
-    // bool connectToServer(const std::string& host, int port);
-    // void sendLogin(const std::string& user, const std::string& pass);
+    // bool pollOutput(core::CoreOutput& out); // 补充 core:: 前缀
+    void stop();
+    // 监听者管理（线程安全）
+    void addListener(core::ICoreListener* listener);   // 新增
+    void removeListener(core::ICoreListener* listener);// 新增
 
 private:
     FSM fsm_;
@@ -34,10 +36,17 @@ private:
     std::mutex mtx_;
     std::condition_variable cv_;
 
+    // 监听者管理（新增）
+    std::vector<core::ICoreListener*> listeners_;
+    std::mutex listener_mtx_;  // 监听者操作的线程安全锁
+
     // 核心方法（参数补充 core:: 前缀）
     void processEvents();
     void applyStateChange(const core::OutStateChanged& e); // 补充 core:: 前缀
     void handleOutput(core::CoreOutput&& o); // 补充 core:: 前缀
     void execute(const core::OutConnect& e) ; // 补充 core:: 前缀
     void execute(const core::OutSendLogin& e) ; // 补充 core:: 前缀
+    // 新增：广播输出事件给所有监听者
+    void broadcastOutput(const core::CoreOutput& out);
+    std::atomic<bool> is_running_{true};
 };
