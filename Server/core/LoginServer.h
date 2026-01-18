@@ -33,11 +33,12 @@ private:
     void clientThread(int clientfd);
     void onMessage(int clientfd, const std::string& msg);
     void handleLogin(int fd, ServerEvent& event);
-
+    void startHeartbeatMonitor();
     void handle(const SendLoginOk&);
     void handle(const SendLoginFail&);
     void handle(const BroadcastOnlineUsers&);
     void handle(const SendError&);
+    void handle(const BroadcastLogout&);
 
 
     CommandSocket listener_;

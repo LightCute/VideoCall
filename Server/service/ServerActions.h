@@ -27,6 +27,9 @@ struct SendError {
 struct BroadcastOnlineUsers {
 };
 
+struct BroadcastLogout {
+};
+
 // 未来可无限加
 // struct KickUser { int fd; };
 // struct ForceLogout { int fd; };

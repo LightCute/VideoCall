@@ -14,6 +14,8 @@ public:
     void stop();
     void sendPacket(int fd, const std::string& payload);
     void sendMessage(const std::string& msg);
+    void configureClientSocket(int clientfd);
+
     
 private:
     void acceptThreadFunc();

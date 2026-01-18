@@ -1,3 +1,53 @@
+========== 工程目录结构（仅含.h/.cpp）==========
+
+📂 .:
+  └─ server_main.cpp
+
+📂 ./util:
+  └─ ThreadPool.cpp
+  └─ ThreadPool.h
+
+📂 ./core:
+  └─ LoginServer.cpp
+  └─ LoginServer.h
+
+📂 ./service:
+  └─ LoginService.cpp
+  └─ LoginService.h
+  └─ ServerAction.h
+  └─ ServerActions.h
+
+📂 ./dispatcher:
+  └─ ServerEventDispatcher.cpp
+  └─ ServerEventDispatcher.h
+
+📂 ./domain:
+  └─ User.h
+
+📂 ./session:
+  └─ SessionManager.cpp
+  └─ SessionManager.h
+
+📂 ./event:
+  └─ ServerEvent.h
+  └─ ServerEventFactory.cpp
+  └─ ServerEventFactory.h
+  └─ ServerEvents.h
+
+📂 ./net:
+  └─ CommandSocket.cpp
+  └─ CommandSocket.h
+  └─ PacketCodec.h
+
+📂 ./protocol:
+  └─ protocol_common.h
+  └─ protocol_text.cpp
+  └─ protocol_text.h
+  └─ protocol_types.h
+
+==================================================
+========== 所有.h/.cpp文件内容 ==========
+
 
 ========== ./server_main.cpp ==========
 Lines: 15
@@ -108,7 +158,7 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 123
+Lines: 196
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
@@ -135,9 +185,48 @@ bool LoginServer::start(int port) {
             onAccept(clientfd);
         }
     );
-    return listener_.startListen(port);
+    bool ok = listener_.startListen(port);
+
+    if (ok) {
+        startHeartbeatMonitor(); // ⚡ 启动心跳监测
+    }
+
+    return ok;
 }
 
+void LoginServer::startHeartbeatMonitor() {
+    std::thread([this] {
+        while (true) {
+            auto snapshot = sessionMgr_.snapshot();
+            auto now = std::chrono::steady_clock::now();
+
+            for (auto& [fd, info] : snapshot) {
+                auto dur = std::chrono::duration_cast<std::chrono::seconds>(
+                    now - info.lastHeartbeat
+                ).count();
+
+                if (dur > 15) { // 超过 15 秒没心跳就下线
+                    std::cout << "[Server] heartbeat timeout fd=" << fd << std::endl;
+                    sessionMgr_.logout(fd);
+                    close(fd);
+
+                    // 广播新的在线用户列表
+                    auto onlineSnapshot = sessionMgr_.snapshot();
+                    proto::OnlineUsers users;
+                    for (auto& [fd2, info2] : onlineSnapshot) {
+                        users.users.push_back({info2.user.username, info2.user.privilege});
+                    }
+                    auto payload = proto::makeOnlineUsers(users);
+                    for (auto& [fd2, _] : onlineSnapshot) {
+                        listener_.sendPacket(fd2, payload);
+                    }
+                }
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    }).detach();
+}
 
 
 void LoginServer::onAccept(int clientfd) {
@@ -152,9 +241,12 @@ void LoginServer::clientThread(int clientfd) {
     std::vector<char> recvBuffer;
     char buf[1024];
 
+
+    
     while (true) {
         int n = recv(clientfd, buf, sizeof(buf), 0);
-        if (n <= 0) break;
+        if (n <= 0) {
+            break;}
 
         recvBuffer.insert(recvBuffer.end(), buf, buf + n);
 
@@ -164,7 +256,20 @@ void LoginServer::clientThread(int clientfd) {
         }
     }
 
+    
 
+    // 客户端断开处理
+    sessionMgr_.logout(clientfd);
+
+    auto snapshot = sessionMgr_.snapshot();
+    proto::OnlineUsers users;
+    for (auto& [fd, info] : snapshot) {
+        users.users.push_back({info.user.username, info.user.privilege});
+    }
+    auto payload = proto::makeOnlineUsers(users);
+    for (auto& [fd, _] : snapshot) {
+        listener_.sendPacket(fd, payload);
+    }
 
     close(clientfd);
     std::cout << "[Server] client disconnected fd=" << clientfd << std::endl;
@@ -233,9 +338,27 @@ void LoginServer::handle(const SendError& a)
     listener_.sendPacket(a.fd, payload);
 }
 
+void LoginServer::handle(const BroadcastLogout&)
+{
+    auto snapshot = sessionMgr_.snapshot();
+
+    proto::OnlineUsers users;
+    for (auto& [fd, info] : snapshot) {
+        const domain::User& u = info.user;
+        users.users.push_back({u.username, u.privilege});
+    }
+
+    auto payload = proto::makeOnlineUsers(users);
+
+    for (auto& [fd, _] : snapshot) {
+        listener_.sendPacket(fd, payload);
+    }
+}
+
+
 
 ========== ./core/LoginServer.h ==========
-Lines: 48
+Lines: 49
 
 //LoginServer.h
 #pragma once
@@ -272,11 +395,12 @@ private:
     void clientThread(int clientfd);
     void onMessage(int clientfd, const std::string& msg);
     void handleLogin(int fd, ServerEvent& event);
-
+    void startHeartbeatMonitor();
     void handle(const SendLoginOk&);
     void handle(const SendLoginFail&);
     void handle(const BroadcastOnlineUsers&);
     void handle(const SendError&);
+    void handle(const BroadcastLogout&);
 
 
     CommandSocket listener_;
@@ -287,7 +411,7 @@ private:
 };
 
 ========== ./service/ServerActions.h ==========
-Lines: 33
+Lines: 36
 
 // Service/ServerActions.h
 #pragma once
@@ -316,6 +440,9 @@ struct SendError {
 
 // 广播：在线用户列表
 struct BroadcastOnlineUsers {
+};
+
+struct BroadcastLogout {
 };
 
 // 未来可无限加
@@ -350,7 +477,7 @@ public:
 };
 
 ========== ./service/LoginService.cpp ==========
-Lines: 17
+Lines: 35
 
 //LoginService
 #include "LoginService.h"
@@ -362,7 +489,25 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
         r.success = true;
         r.username = "admin";
         r.privilege = 10;
-    } else {
+    } 
+    else if (req.username == "user_a" && req.password == "123") {
+        r.success = true;
+        r.username = "user_a";
+        r.privilege = 10;
+    } 
+    else if (req.username == "user_b" && req.password == "123") {
+        r.success = true;
+        r.username = "user_b";
+        r.privilege = 10;
+    }     
+    else if (req.username == "user_c" && req.password == "123") {
+        r.success = true;
+        r.username = "user_c";
+        r.privilege = 10;
+    }     
+
+
+    else {
         r.success = false;
         r.reason = "invalid username or password";
     }
@@ -371,7 +516,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/ServerAction.h ==========
-Lines: 11
+Lines: 12
 
 // Service/ServerAction.h
 #pragma once
@@ -382,11 +527,12 @@ using ServerAction = std::variant<
     SendError,
     SendLoginOk,
     SendLoginFail,
-    BroadcastOnlineUsers
+    BroadcastOnlineUsers,
+    BroadcastLogout
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 68
+Lines: 87
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -457,8 +603,27 @@ ServerEventDispatcher::handle(int fd, const event::ErrorEvent& ev)
     return actions;
 }
 
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::Logout& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 关键：先从 SessionManager 里移除
+    sessionMgr_.logout(fd);
+
+    // 然后广播新的在线列表
+    actions.emplace_back(BroadcastOnlineUsers{});
+
+    return actions;
+}
+
+std::vector<ServerAction> ServerEventDispatcher::handle(int fd, const event::Heartbeat&) {
+    sessionMgr_.updateHeartbeat(fd);  // 更新时间戳
+    return {}; // 心跳不触发其他动作
+}
+
 ========== ./dispatcher/ServerEventDispatcher.h ==========
-Lines: 24
+Lines: 27
 
 //ServerEventDispatcher.h
 #pragma once
@@ -480,6 +645,9 @@ public:
 private:
     std::vector<ServerAction> handle(int fd, const event::LoginRequest& ev);
     std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
+    std::vector<ServerAction> handle(int fd, const event::Logout& ev);
+    std::vector<ServerAction> handle(int fd, const event::Heartbeat& ev);
+    //std::vector<ServerAction> handle(int fd, const event::Logout&)
 
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
@@ -503,7 +671,7 @@ struct User {
 } // namespace domain
 
 ========== ./session/SessionManager.cpp ==========
-Lines: 17
+Lines: 25
 
 //SessionManager.cpp
 #include "./session/SessionManager.h"
@@ -523,8 +691,16 @@ std::map<int, ClientInfo> SessionManager::snapshot() const {
     return sessions_;
 }
 
+void SessionManager::updateHeartbeat(int fd) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto it = sessions_.find(fd);
+    if (it != sessions_.end()) {
+        it->second.lastHeartbeat = std::chrono::steady_clock::now();
+    }
+}
+
 ========== ./session/SessionManager.h ==========
-Lines: 22
+Lines: 24
 
 //SessionManager.h
 #pragma once
@@ -536,6 +712,7 @@ Lines: 22
 struct ClientInfo {
     domain::User user;
     bool online = false;
+    std::chrono::steady_clock::time_point lastHeartbeat = std::chrono::steady_clock::now();
 };
 
 class SessionManager {
@@ -544,6 +721,7 @@ public:
     void logout(int fd);
     std::map<int, ClientInfo> snapshot() const;
 
+    void updateHeartbeat(int fd);
 private:
     mutable std::mutex mutex_;
     std::map<int, ClientInfo> sessions_;
@@ -563,7 +741,7 @@ public:
 };
 
 ========== ./event/ServerEventFactory.cpp ==========
-Lines: 23
+Lines: 31
 
 // ServerEventFactory.cpp
 #include "ServerEventFactory.h"
@@ -581,6 +759,14 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         };
     }
 
+    else if (proto::parseLogout(msg)) {
+        return event::Logout{};
+    }    
+
+    else if (proto::parseHeartbeat(msg)) {
+        return event::Heartbeat{};
+    }
+
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{
@@ -590,7 +776,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./event/ServerEvents.h ==========
-Lines: 29
+Lines: 32
 
 //ServerEvents.h
 #pragma once
@@ -616,6 +802,9 @@ struct LoginRequest {
 struct Logout {
 };
 
+struct Heartbeat {};  // 客户端心跳
+
+
 struct Chat {
     std::string message;
 };
@@ -623,7 +812,7 @@ struct Chat {
 } // namespace event
 
 ========== ./event/ServerEvent.h ==========
-Lines: 18
+Lines: 19
 
 //ServerEvent.h
 #pragma once
@@ -635,8 +824,9 @@ Lines: 18
 
 using ServerEvent = std::variant<
     event::ErrorEvent,
-    event::LoginRequest
-    // event::Logout,
+    event::LoginRequest,
+    event::Logout,
+    event::Heartbeat
     // event::Chat,
     // 以后只需要往这里加
 >;
@@ -687,7 +877,7 @@ public:
 };
 
 ========== ./net/CommandSocket.h ==========
-Lines: 24
+Lines: 26
 
 //CommandSocket.h
 #pragma once
@@ -705,6 +895,8 @@ public:
     void stop();
     void sendPacket(int fd, const std::string& payload);
     void sendMessage(const std::string& msg);
+    void configureClientSocket(int clientfd);
+
     
 private:
     void acceptThreadFunc();
@@ -715,13 +907,14 @@ private:
 };
 
 ========== ./net/CommandSocket.cpp ==========
-Lines: 58
+Lines: 77
 
 //CommandSocket.cpp
 #include "./net/CommandSocket.h"
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 
 bool CommandSocket::startListen(int port) {
     listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
@@ -751,6 +944,7 @@ void CommandSocket::acceptThreadFunc() {
     while (running_) {
         int clientfd = accept(listenfd_, nullptr, nullptr);
         if (clientfd >= 0 && acceptCb_) {
+            configureClientSocket(clientfd);
             acceptCb_(clientfd);   // ⭐ 抛给 LoginServer
         }
     }
@@ -775,6 +969,23 @@ void CommandSocket::sendMessage(const std::string& msg) {
 }
 
 
+void CommandSocket::configureClientSocket(int clientfd) {
+    // 1. 设置接收超时
+    struct timeval timeout{5, 0}; // 5秒
+    setsockopt(clientfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
+    // 2. 启用 TCP KeepAlive
+    int opt = 1;
+    setsockopt(clientfd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof(opt));
+
+    // 3. KeepAlive 参数
+    int keepidle = 10;   // 10 秒没数据开始探测
+    int keepintvl = 3;   // 每 3 秒探测一次
+    int keepcnt = 3;     // 探测失败 3 次就判定连接死
+    setsockopt(clientfd, IPPROTO_TCP, TCP_KEEPIDLE, &keepidle, sizeof(keepidle));
+    setsockopt(clientfd, IPPROTO_TCP, TCP_KEEPINTVL, &keepintvl, sizeof(keepintvl));
+    setsockopt(clientfd, IPPROTO_TCP, TCP_KEEPCNT, &keepcnt, sizeof(keepcnt));
+}
 
 ========== ./protocol/protocol_types.h ==========
 Lines: 25
@@ -806,7 +1017,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 20
+Lines: 24
 
 //protocol_text.h
 
@@ -821,16 +1032,20 @@ std::string makeLoginRequest(const std::string& user, const std::string& pwd);
 std::string makeLoginOk(const UserInfo& user, const std::string& msg);
 std::string makeLoginFail(const std::string& msg);
 std::string makeOnlineUsers(const OnlineUsers& users);
+std::string makeLogout();
+std::string makeHeartbeat();
 
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
 bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
 bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
+bool parseLogout(const std::string& msg);
+bool parseHeartbeat(const std::string& msg);
 
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 125
+Lines: 149
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -881,6 +1096,14 @@ std::string makeOnlineUsers(const OnlineUsers& users)
         oss << " " << u.username << ":" << u.privilege;
     }
     return oss.str();
+}
+
+std::string makeLogout() {
+    return CMD_LOGOUT;
+}
+
+std::string makeHeartbeat() {
+    return CMD_HEARTBEAT;
 }
 
 /* ================= parse ================= */
@@ -956,10 +1179,26 @@ bool parseOnlineUsers(const std::string& msg,
     return true;
 }
 
+
+bool parseLogout(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_LOGOUT;
+}
+
+bool parseHeartbeat(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_HEARTBEAT;
+}
+
+
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 26
+Lines: 29
 
 // proto::*
 // ⚠️ PROTOCOL DTO — do NOT use as domain model
@@ -977,6 +1216,9 @@ constexpr const char* CMD_LOGIN        = "LOGIN";
 constexpr const char* CMD_LOGIN_OK     = "LOGIN_OK";
 constexpr const char* CMD_LOGIN_FAIL   = "LOGIN_FAIL";
 constexpr const char* CMD_ONLINE_USERS = "ONLINE_USERS";
+constexpr const char* CMD_LOGOUT       = "LOGOUT";
+constexpr const char* CMD_HEARTBEAT = "PING";
+constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 
 // keys
 constexpr const char* KEY_USERNAME  = "username";
@@ -991,4 +1233,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 25
-Total lines: 889
+Total lines: 1081

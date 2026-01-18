@@ -14,6 +14,9 @@ constexpr const char* CMD_LOGIN        = "LOGIN";
 constexpr const char* CMD_LOGIN_OK     = "LOGIN_OK";
 constexpr const char* CMD_LOGIN_FAIL   = "LOGIN_FAIL";
 constexpr const char* CMD_ONLINE_USERS = "ONLINE_USERS";
+constexpr const char* CMD_LOGOUT       = "LOGOUT";
+constexpr const char* CMD_HEARTBEAT = "PING";
+constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 
 // keys
 constexpr const char* KEY_USERNAME  = "username";

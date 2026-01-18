@@ -1,3 +1,57 @@
+========== 工程目录结构（仅含.h/.cpp）==========
+
+📂 .:
+  └─ main.cpp
+
+📂 ./core:
+  └─ ClientCore.cpp
+  └─ ClientCore.h
+  └─ ClientState.h
+  └─ CoreExecutor.cpp
+  └─ CoreExecutor.h
+  └─ CoreInput.h
+  └─ CoreOutput.h
+  └─ FSM.cpp
+  └─ FSM.h
+  └─ ICoreListener.h
+
+📂 ./net:
+  └─ CommandSocket.cpp
+  └─ CommandSocket.h
+  └─ PacketCodec.h
+
+📂 ./ui:
+  └─ AppWindow.cpp
+  └─ AppWindow.h
+  └─ LoginWidget.cpp
+  └─ LoginWidget.h
+  └─ QtCameraAdapter.cpp
+  └─ QtCameraAdapter.h
+  └─ VideoWidget.cpp
+  └─ VideoWidget.h
+  └─ widget.cpp
+  └─ widget.h
+
+📂 ./protocol:
+  └─ protocol_common.h
+  └─ protocol_text.cpp
+  └─ protocol_text.h
+  └─ protocol_types.h
+
+📂 ./app:
+  └─ ClientEvent.h
+  └─ ClientEventEnum.h
+  └─ ClientEventFactory.cpp
+  └─ ClientEventFactory.h
+
+📂 ./media:
+  └─ CameraManager.cpp
+  └─ CameraManager.h
+  └─ Frame.h
+
+==================================================
+========== 所有.h/.cpp文件内容 ==========
+
 
 ========== ./main.cpp ==========
 Lines: 37

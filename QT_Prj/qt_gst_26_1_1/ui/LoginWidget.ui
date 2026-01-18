@@ -29,8 +29,8 @@
   <widget class="QLabel" name="Lb_UserName">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>110</y>
+     <x>80</x>
+     <y>30</y>
      <width>101</width>
      <height>18</height>
     </rect>
@@ -43,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>150</y>
+     <y>130</y>
      <width>88</width>
      <height>26</height>
     </rect>
@@ -78,9 +78,9 @@
   <widget class="QLineEdit" name="LE_UserName">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>110</y>
-     <width>113</width>
+     <x>190</x>
+     <y>30</y>
+     <width>221</width>
      <height>26</height>
     </rect>
    </property>
@@ -160,9 +160,9 @@
   <widget class="QLineEdit" name="LE_UserPass">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>110</y>
-     <width>113</width>
+     <x>190</x>
+     <y>80</y>
+     <width>221</width>
      <height>26</height>
     </rect>
    </property>
@@ -175,6 +175,19 @@
      <width>201</width>
      <height>70</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="Lb_Password">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>80</y>
+     <width>101</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Password</string>
    </property>
   </widget>
  </widget>

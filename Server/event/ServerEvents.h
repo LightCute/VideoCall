@@ -22,6 +22,9 @@ struct LoginRequest {
 struct Logout {
 };
 
+struct Heartbeat {};  // 客户端心跳
+
+
 struct Chat {
     std::string message;
 };

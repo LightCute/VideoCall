@@ -14,6 +14,14 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         };
     }
 
+    else if (proto::parseLogout(msg)) {
+        return event::Logout{};
+    }    
+
+    else if (proto::parseHeartbeat(msg)) {
+        return event::Heartbeat{};
+    }
+
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{

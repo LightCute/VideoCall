@@ -49,6 +49,14 @@ std::string makeOnlineUsers(const OnlineUsers& users)
     return oss.str();
 }
 
+std::string makeLogout() {
+    return CMD_LOGOUT;
+}
+
+std::string makeHeartbeat() {
+    return CMD_HEARTBEAT;
+}
+
 /* ================= parse ================= */
 
 // Server 使用
@@ -121,5 +129,21 @@ bool parseOnlineUsers(const std::string& msg,
     }
     return true;
 }
+
+
+bool parseLogout(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_LOGOUT;
+}
+
+bool parseHeartbeat(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_HEARTBEAT;
+}
+
 
 } // namespace proto

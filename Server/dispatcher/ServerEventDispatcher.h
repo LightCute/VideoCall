@@ -18,6 +18,9 @@ public:
 private:
     std::vector<ServerAction> handle(int fd, const event::LoginRequest& ev);
     std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
+    std::vector<ServerAction> handle(int fd, const event::Logout& ev);
+    std::vector<ServerAction> handle(int fd, const event::Heartbeat& ev);
+    //std::vector<ServerAction> handle(int fd, const event::Logout&)
 
     LoginService&  loginService_;
     SessionManager& sessionMgr_;

@@ -66,3 +66,22 @@ ServerEventDispatcher::handle(int fd, const event::ErrorEvent& ev)
 
     return actions;
 }
+
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::Logout& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 关键：先从 SessionManager 里移除
+    sessionMgr_.logout(fd);
+
+    // 然后广播新的在线列表
+    actions.emplace_back(BroadcastOnlineUsers{});
+
+    return actions;
+}
+
+std::vector<ServerAction> ServerEventDispatcher::handle(int fd, const event::Heartbeat&) {
+    sessionMgr_.updateHeartbeat(fd);  // 更新时间戳
+    return {}; // 心跳不触发其他动作
+}

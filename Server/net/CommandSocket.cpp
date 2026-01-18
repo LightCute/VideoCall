@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 
 bool CommandSocket::startListen(int port) {
     listenfd_ = socket(AF_INET, SOCK_STREAM, 0);
@@ -32,6 +33,7 @@ void CommandSocket::acceptThreadFunc() {
     while (running_) {
         int clientfd = accept(listenfd_, nullptr, nullptr);
         if (clientfd >= 0 && acceptCb_) {
+            configureClientSocket(clientfd);
             acceptCb_(clientfd);   // ⭐ 抛给 LoginServer
         }
     }
@@ -56,3 +58,20 @@ void CommandSocket::sendMessage(const std::string& msg) {
 }
 
 
+void CommandSocket::configureClientSocket(int clientfd) {
+    // 1. 设置接收超时
+    struct timeval timeout{5, 0}; // 5秒
+    setsockopt(clientfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
+    // 2. 启用 TCP KeepAlive
+    int opt = 1;
+    setsockopt(clientfd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof(opt));
+
+    // 3. KeepAlive 参数
+    int keepidle = 10;   // 10 秒没数据开始探测
+    int keepintvl = 3;   // 每 3 秒探测一次
+    int keepcnt = 3;     // 探测失败 3 次就判定连接死
+    setsockopt(clientfd, IPPROTO_TCP, TCP_KEEPIDLE, &keepidle, sizeof(keepidle));
+    setsockopt(clientfd, IPPROTO_TCP, TCP_KEEPINTVL, &keepintvl, sizeof(keepintvl));
+    setsockopt(clientfd, IPPROTO_TCP, TCP_KEEPCNT, &keepcnt, sizeof(keepcnt));
+}

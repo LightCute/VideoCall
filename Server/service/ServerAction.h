@@ -7,5 +7,6 @@ using ServerAction = std::variant<
     SendError,
     SendLoginOk,
     SendLoginFail,
-    BroadcastOnlineUsers
+    BroadcastOnlineUsers,
+    BroadcastLogout
 >;
