@@ -20,6 +20,10 @@ Widget::Widget(ClientCore* core, QWidget *parent)
         QMetaObject::invokeMethod(adapter_, "onFrame", Qt::QueuedConnection, Q_ARG(Frame, f));
     });
 
+    if (core_) {
+        core_->addListener(this);
+    }
+
     // 关键修复：绑定Core事件的跨线程处理
     connect(this, &Widget::coreOutputReceived,
             this, &Widget::handleCoreOutput,
@@ -43,18 +47,37 @@ void Widget::onCoreOutput(const core::CoreOutput& out)
     emit coreOutputReceived(out);
 }
 
-// 实现槽函数：处理Core输出事件（UI线程）
 void Widget::handleCoreOutput(const core::CoreOutput& out)
 {
-    // 可根据需要扩展处理逻辑，目前打印日志
-    std::visit([](auto&& e) {
-        using T = std::decay_t<decltype(e)>;
-        if constexpr (std::is_same_v<T, core::OutStateChanged>) {
-            qDebug() << "Main UI state change:" << QString::fromStdString(stateToString(e.from))
-                     << "→" << QString::fromStdString(stateToString(e.to));
-        }
+    std::visit([this](auto&& e) {
+        handle(e);   // 🔥 和 LoginWidget 一模一样的分发风格
     }, out);
 }
+
+void Widget::handle(const core::OutOnlineUsers& e) {
+    std::cout << "[UI] OutOnlineUsers" << std::endl;
+    QString text;
+
+    for (const auto& u : e.list) {
+        text += QString("%1 (priv=%2)\n")
+                    .arg(QString::fromStdString(u.name))
+                    .arg(u.privilege);
+    }
+
+    ui->text_onlineUsers->setPlainText(text);
+}
+// // 实现槽函数：处理Core输出事件（UI线程）
+// void Widget::handleCoreOutput(const core::CoreOutput& out)
+// {
+//     // 可根据需要扩展处理逻辑，目前打印日志
+//     std::visit([](auto&& e) {
+//         using T = std::decay_t<decltype(e)>;
+//         if constexpr (std::is_same_v<T, core::OutStateChanged>) {
+//             qDebug() << "Main UI state change:" << QString::fromStdString(stateToString(e.from))
+//                      << "→" << QString::fromStdString(stateToString(e.to));
+//         }
+//     }, out);
+// }
 
 void Widget::on_Bt_video_on_off_clicked()
 {
@@ -70,3 +93,41 @@ void Widget::on_Bt_video_off_clicked()
 
 void Widget::on_Bt_tcp_send_clicked() {}
 void Widget::on_Bt_tcp_connect_clicked() {}
+
+
+void Widget::handle(const core::OutStateChanged& e) {
+    qDebug() << "[Widget] FSM:"
+             << QString::fromStdString(stateToString(e.from))
+             << "→"
+             << QString::fromStdString(stateToString(e.to));
+
+
+}
+
+void Widget::handle(const core::OutDisconnected&) {
+    qDebug() << "[Widget] OutDisconnected";
+}
+
+void Widget::handle(const core::OutConnect&) {
+    qDebug() << "[Widget] Ignore OutConnect (CoreExecutor handles it)";
+}
+
+void Widget::handle(const core::OutSendLogin&) {
+    qDebug() << "[Widget] Ignore OutSendLogin";
+}
+
+void Widget::handle(const core::OutSendPing&) {
+    qDebug() << "[Widget] Ignore OutSendPing";
+}
+
+void Widget::handle(const core::OutUpdateAlive&) {
+    qDebug() << "[Widget] OutUpdateAlive";
+}
+
+void Widget::handle(const core::OutLoginOk&) {
+    qDebug() << "[Widget] OutLoginOk (optional handling)";
+}
+
+void Widget::handle(const core::OutLoginFail&) {
+    qDebug() << "[Widget] OutLoginFail (optional handling)";
+}

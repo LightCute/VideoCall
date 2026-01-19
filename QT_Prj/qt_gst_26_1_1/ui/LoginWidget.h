@@ -49,6 +49,7 @@ private:
     void handle(const core::OutSendPing&);
 
     void handle(const core::OutUpdateAlive&);
+    void handle(const core::OutOnlineUsers&);
 };
 
 #endif // LOGINWIDGET_H

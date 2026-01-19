@@ -44,5 +44,26 @@ private:
     VideoWidget *video_;
     CameraManager camera_;
     QtCameraAdapter* adapter_;
+
+
+
+    void handle(const core::OutDisconnected&);
+
+    void handle(const core::OutConnect&);
+
+    void handle(const core::OutSendLogin&);
+
+    void handle(const core::OutSendPing&);
+
+    void handle(const core::OutUpdateAlive&);
+
+    void handle(const core::OutLoginOk&);
+
+    void handle(const core::OutLoginFail&);
+
+    void handle(const core::OutOnlineUsers&);
+
+    void handle(const core::OutStateChanged&);
+
 };
 #endif // WIDGET_H

@@ -180,5 +180,18 @@ void FSM::initTable() {
               },
               State::Disconnected
           },
+
+        { State::LoggedIn, EventType::OnlineUsers,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+
+                if (auto e = std::get_if<core::InOnlineUsers>(&ev)) {
+                    out.push_back(core::OutOnlineUsers{e->users});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
+
     };
 }

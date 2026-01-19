@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 153
+Lines: 155
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -175,6 +175,8 @@ void ClientCore::processEvents() {
             cv_.wait(lock, [this]{ return !inputQueue_.empty(); });
             ev = std::move(inputQueue_.front());
             inputQueue_.pop();
+            std::cout << "[ClientCore] Processing Input event, remaining queue size: " << inputQueue_.size()
+                      << ", Event type index: " << ev.index() << std::endl;
         }
 
         auto outputs = fsm_.handle(state_, ev);
@@ -292,13 +294,21 @@ private:
 };
 
 ========== ./core/CoreInput.h ==========
-Lines: 35
+Lines: 43
 
 // core/CoreInput.h
 #pragma once
 #include <variant>
 #include <string>
+#include <vector>
 namespace core {
+
+struct OnlineUser {
+    std::string name;
+    int privilege;
+};
+
+
 
 // 所有 Core 输入事件前缀改为 In
 struct InCmdConnect { std::string host; int port; };
@@ -308,7 +318,7 @@ struct InTcpConnected {};
 struct InTcpDisconnected {};
 struct InLoginOk {};
 struct InLoginFail { std::string msg; };
-struct InOnlineUsers { std::string list; };
+struct InOnlineUsers { std::vector<OnlineUser> users; };
 struct InUnknow {};
 struct InHeartbeatOk {};      // 收到 PONG
 struct InHeartbeatTimeout {}; // 心跳超时
@@ -331,7 +341,7 @@ using CoreInput = std::variant<
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 182
+Lines: 184
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -349,9 +359,11 @@ std::vector<core::CoreOutput>
 FSM::handle(State current, const core::CoreInput& ev)
 {
     EventType evType = eventTypeFromInput(ev);
-
+    std::cout << "[FSM] Current state: " << stateToString(current)
+              << ", Received event type: " << static_cast<int>(evType) << std::endl;
     if (isOnlineState(current) && evType == EventType::HeartbeatTick) {
         // 直接返回，不走 FSM 表
+        std::cout << "[FSM] Online state, directly handle HeartbeatTick event" << std::endl;
         return { core::OutSendPing{} };
     }
 
@@ -574,7 +586,7 @@ private:
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 98
+Lines: 110
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
@@ -621,7 +633,16 @@ void CoreExecutor::initSocketCallbacks() {
             } else if constexpr (std::is_same_v<T, ProtoEvtLoginFail>) {
                 postInput_(core::InLoginFail{e.resp.message});
             } else if constexpr (std::is_same_v<T, ProtoEvtOnlineUsers>) {
-                postInput_(core::InOnlineUsers{""});
+                core::InOnlineUsers in;
+
+                for (const auto& u : e.users) {
+                    in.users.push_back(core::OnlineUser{
+                        .name = u.username,
+                        .privilege = u.privilege
+                    });
+                }
+
+                postInput_(std::move(in));
             }
             else if constexpr (std::is_same_v<T, ProtoEvHeartbeatAck>) {
                 postInput_(core::InHeartbeatOk{});
@@ -640,6 +661,9 @@ void CoreExecutor::connectToServer(const std::string& host, int port) {
             // 连接失败：推送 InTcpDisconnected
             postInput_(core::InTcpDisconnected{}); // 替换为 InTcpDisconnected
             std::cout << "[Executor] Connect to " << host << ":" << port << " failed" << std::endl;
+        }
+        else {
+            std::cout << "[Executor] Successfully connected to server: " << host << ":" << port << std::endl;
         }
     }).detach();
 }
@@ -897,7 +921,7 @@ private:
 };
 
 ========== ./net/CommandSocket.cpp ==========
-Lines: 139
+Lines: 141
 
 //CommandSocket.cpp
 #include "CommandSocket.h"
@@ -1002,6 +1026,7 @@ void CommandSocket::clientThreadFunc() {
         if (n > 0) {
 
             // 1️⃣ 把收到的字节塞进缓存
+            std::cout << "[CommandSocket] Received data, length: " << n << " bytes" << std::endl;
             recvBuffer.insert(recvBuffer.end(), temp, temp + n);
 
             // 2️⃣ 尝试从缓存中拆完整包
@@ -1015,6 +1040,7 @@ void CommandSocket::clientThreadFunc() {
             }
 
         } else if (n <= 0) {
+            std::cout << "[CommandSocket] Server disconnected (recv return <=0)" << std::endl;
             if (onDisconnect_) onDisconnect_();  // ⭐ TCP断线
             break; // 服务器正常断开
         }
@@ -1319,7 +1345,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 122
+Lines: 123
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -1409,6 +1435,7 @@ void LoginWidget::handle(const core::OutDisconnected&) {
 void LoginWidget::handle(const core::OutLoginOk&) {
     std::cout << "[UI] handle OutLoginOk: " << std::endl;
     ui->TextEdit_tcp_test_recv->setPlainText("Login success");
+    emit loginSuccess();
 }
 
 void LoginWidget::handle(const core::OutStateChanged& e) {
@@ -1886,7 +1913,7 @@ enum class EventType {
 };
 
 ========== ./media/CameraManager.cpp ==========
-Lines: 98
+Lines: 99
 
 //CameraManager.cpp
 #include "CameraManager.h"
@@ -1907,7 +1934,7 @@ void CameraManager::setFrameCallback(FrameCallback cb) {
 
 bool CameraManager::start(const std::string& device) {
     if (pipeline_) return true;
-
+    std::cout << "[CameraManager] Attempting to start camera: " << device << std::endl;
     std::string pipelineStr =
         "v4l2src device=" + device +
         " ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 "
@@ -1941,6 +1968,7 @@ bool CameraManager::start(const std::string& device) {
                      G_CALLBACK(onNewSample), this);
 
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    std::cout << "[CameraManager] Camera started successfully: " << device << std::endl;
     return true;
 }
 
@@ -2046,4 +2074,4 @@ Q_DECLARE_METATYPE(Frame)
 
 =====================================
 Total files: 35
-Total lines: 1850
+Total lines: 1878

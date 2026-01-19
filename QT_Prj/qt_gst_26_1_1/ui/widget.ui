@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1200</width>
+    <height>611</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,6 +93,16 @@
    </property>
    <property name="text">
     <string>Connect</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="text_onlineUsers">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>100</y>
+     <width>301</width>
+     <height>161</height>
+    </rect>
    </property>
   </widget>
  </widget>

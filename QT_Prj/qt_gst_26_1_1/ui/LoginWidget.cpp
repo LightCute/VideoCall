@@ -86,6 +86,7 @@ void LoginWidget::handle(const core::OutDisconnected&) {
 void LoginWidget::handle(const core::OutLoginOk&) {
     std::cout << "[UI] handle OutLoginOk: " << std::endl;
     ui->TextEdit_tcp_test_recv->setPlainText("Login success");
+    emit loginSuccess();
 }
 
 void LoginWidget::handle(const core::OutStateChanged& e) {
@@ -107,6 +108,10 @@ void LoginWidget::handle(const core::OutSendPing&) {
 
 void LoginWidget::handle(const core::OutUpdateAlive&) {
     std::cout << "[UI] Ignore OutUpdateAlive" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutOnlineUsers&) {
+    std::cout << "[UI] OutOnlineUsers" << std::endl;
 }
 
 void LoginWidget::on_Bt_Login_clicked()

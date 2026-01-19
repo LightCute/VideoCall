@@ -2,7 +2,15 @@
 #pragma once
 #include <variant>
 #include <string>
+#include <vector>
 namespace core {
+
+struct OnlineUser {
+    std::string name;
+    int privilege;
+};
+
+
 
 // 所有 Core 输入事件前缀改为 In
 struct InCmdConnect { std::string host; int port; };
@@ -12,7 +20,7 @@ struct InTcpConnected {};
 struct InTcpDisconnected {};
 struct InLoginOk {};
 struct InLoginFail { std::string msg; };
-struct InOnlineUsers { std::string list; };
+struct InOnlineUsers { std::vector<OnlineUser> users; };
 struct InUnknow {};
 struct InHeartbeatOk {};      // 收到 PONG
 struct InHeartbeatTimeout {}; // 心跳超时

@@ -43,7 +43,16 @@ void CoreExecutor::initSocketCallbacks() {
             } else if constexpr (std::is_same_v<T, ProtoEvtLoginFail>) {
                 postInput_(core::InLoginFail{e.resp.message});
             } else if constexpr (std::is_same_v<T, ProtoEvtOnlineUsers>) {
-                postInput_(core::InOnlineUsers{""});
+                core::InOnlineUsers in;
+
+                for (const auto& u : (e.users.users)) {
+                    in.users.push_back(core::OnlineUser{
+                        .name = u.username,
+                        .privilege = u.privilege
+                    });
+                }
+
+                postInput_(std::move(in));
             }
             else if constexpr (std::is_same_v<T, ProtoEvHeartbeatAck>) {
                 postInput_(core::InHeartbeatOk{});
