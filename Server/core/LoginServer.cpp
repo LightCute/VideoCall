@@ -69,7 +69,7 @@ void LoginServer::startHeartbeatMonitor() {
 
 void LoginServer::onAccept(int clientfd) {
     std::cout << "[Server] new client fd=" << clientfd << std::endl;
-
+    
     pool_.post([this, clientfd] {
         clientThread(clientfd);
     });
@@ -194,3 +194,10 @@ void LoginServer::handle(const BroadcastLogout&)
 }
 
 
+void LoginServer::handle(const SendHeartbeatAck& a)
+{
+    std::cout << "[Server] Send PONG to fd= " << a.fd << std::endl;
+    std::string payload = proto::makeHeartbeatAck(); // ⭐ PONG
+
+    listener_.sendPacket(a.fd, payload);
+}

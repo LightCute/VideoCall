@@ -46,7 +46,8 @@ private:
     void handleOutput(core::CoreOutput&& o); // 补充 core:: 前缀
     void execute(const core::OutConnect& e) ; // 补充 core:: 前缀
     void execute(const core::OutSendLogin& e) ; // 补充 core:: 前缀
-    // 新增：广播输出事件给所有监听者
+    void execute(const core::OutSendPing& e);
+    void execute(const core::OutUpdateAlive&);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };

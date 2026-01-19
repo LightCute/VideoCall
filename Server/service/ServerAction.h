@@ -8,5 +8,6 @@ using ServerAction = std::variant<
     SendLoginOk,
     SendLoginFail,
     BroadcastOnlineUsers,
-    BroadcastLogout
+    BroadcastLogout,
+    SendHeartbeatAck
 >;

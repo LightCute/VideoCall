@@ -21,6 +21,10 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         return ProtoEvtOnlineUsers{users}; // 改为 ProtoEvt 前缀
     }
 
+    if (proto::parseHeartbeatAck(msg)) {
+        return ProtoEvHeartbeatAck{}; // 改为 ProtoEvt 前缀
+    }
+
     proto::Unknown req_error;
     req_error.message = msg;
     return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀

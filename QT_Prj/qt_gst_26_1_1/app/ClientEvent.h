@@ -21,6 +21,7 @@ struct ProtoEvtCmdLogin {
     std::string user;
     std::string pass;
 };
+struct ProtoEvHeartbeatAck{};
 
 using ClientEvent = std::variant<
     // UI 触发的协议命令
@@ -36,5 +37,6 @@ using ClientEvent = std::variant<
     ProtoEvtLoginOk,
     ProtoEvtLoginFail,
     ProtoEvtOnlineUsers,
-    ProtoEvtUnknow
+    ProtoEvtUnknow,
+    ProtoEvHeartbeatAck
     >;

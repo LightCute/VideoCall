@@ -1,6 +1,6 @@
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
-
+#include "iostream"
 
 
 ServerEventDispatcher::ServerEventDispatcher(
@@ -82,6 +82,7 @@ ServerEventDispatcher::handle(int fd, const event::Logout& ev)
 }
 
 std::vector<ServerAction> ServerEventDispatcher::handle(int fd, const event::Heartbeat&) {
+    std::cout << "[Server] Received PING from fd= " << fd << std::endl;
     sessionMgr_.updateHeartbeat(fd);  // 更新时间戳
-    return {}; // 心跳不触发其他动作
+    return {SendHeartbeatAck{ .fd = fd }}; // 心跳不触发Ack
 }

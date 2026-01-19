@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 137
+Lines: 153
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -202,6 +202,13 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
         else if constexpr (std::is_same_v<T, core::OutSendLogin>) { // 补充 core:: 前缀
             execute(e);
         }
+        else if constexpr (std::is_same_v<T, core::OutSendPing>) {
+            execute(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutUpdateAlive>) {
+            execute(e);
+            broadcastOutput(e);
+        }
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -231,12 +238,21 @@ void ClientCore::execute(const core::OutSendLogin& e) { // 补充 core:: 前缀
     executor_->sendLoginRequest(e.user, e.pass);
 }
 
+void ClientCore::execute(const core::OutSendPing&) {
+    executor_->sendPing();
+}
+
+void ClientCore::execute(const core::OutUpdateAlive&) {
+    std::cout << "[Executor] Received PONG from server" << std::endl;
+}
+
+
 // 废弃原 socket 操作接口（可直接删除）
 // bool ClientCore::connectToServer(const std::string& host, int port) { ... }
 // void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }
 
 ========== ./core/FSM.h ==========
-Lines: 35
+Lines: 36
 
 // core/FSM.h
 #pragma once
@@ -270,12 +286,13 @@ public:
 
 private:
     EventType eventTypeFromInput(const core::CoreInput& ev);
+    bool isOnlineState(State s);
     std::vector<FSMEntry> table_;
     void initTable();
 };
 
 ========== ./core/CoreInput.h ==========
-Lines: 29
+Lines: 35
 
 // core/CoreInput.h
 #pragma once
@@ -293,6 +310,9 @@ struct InLoginOk {};
 struct InLoginFail { std::string msg; };
 struct InOnlineUsers { std::string list; };
 struct InUnknow {};
+struct InHeartbeatOk {};      // 收到 PONG
+struct InHeartbeatTimeout {}; // 心跳超时
+struct InHeartbeatTick {};    // Send PING
 
 using CoreInput = std::variant<
     InCmdConnect,
@@ -303,12 +323,15 @@ using CoreInput = std::variant<
     InLoginOk,
     InLoginFail,
     InOnlineUsers,
-    InUnknow
+    InUnknow,
+    InHeartbeatOk,
+    InHeartbeatTimeout,
+    InHeartbeatTick
     >;
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 159
+Lines: 182
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -317,11 +340,25 @@ FSM::FSM() {
     initTable();
 }
 
+bool FSM::isOnlineState(State s) {
+    return s != State::Disconnected;
+}
+
 // 补充 core:: 前缀
 std::vector<core::CoreOutput>
 FSM::handle(State current, const core::CoreInput& ev)
 {
     EventType evType = eventTypeFromInput(ev);
+
+    if (isOnlineState(current) && evType == EventType::HeartbeatTick) {
+        // 直接返回，不走 FSM 表
+        return { core::OutSendPing{} };
+    }
+
+    else if (isOnlineState(current) && evType == EventType::HeartbeatOk) {
+        // 直接返回，不走 FSM 表
+        return { core::OutUpdateAlive{} };
+    }
 
     for (auto& entry : table_) {
         if (entry.current_state == current &&
@@ -350,6 +387,15 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
         else if constexpr (std::is_same_v<T, core::InLoginFail>) evType = EventType::LoginFail;
         else if constexpr (std::is_same_v<T, core::InOnlineUsers>) evType = EventType::OnlineUsers;
 
+        else if constexpr (std::is_same_v<T, core::InHeartbeatOk>)
+            evType = EventType::HeartbeatOk;
+
+        else if constexpr (std::is_same_v<T, core::InHeartbeatTimeout>)
+            evType = EventType::HeartbeatTimeout;
+
+        else if constexpr (std::is_same_v<T, core::InHeartbeatTick>)
+            evType = EventType::HeartbeatTick;
+
         else evType = EventType::Unknow;
     }, ev);
     return evType;
@@ -357,121 +403,121 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
 
 void FSM::initTable() {
     table_ = {
-              // ===== 断开态 =====
-              { State::Disconnected, EventType::CmdConnect,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InCmdConnect
-                      if (auto e = std::get_if<core::InCmdConnect>(&ev)) {
-                          out.push_back(core::OutStateChanged{cur, State::Connecting}); // 补充 core::
-                          out.push_back(core::OutConnect{e->host, e->port}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::Connecting
+          // ===== 断开态 =====
+          { State::Disconnected, EventType::CmdConnect,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InCmdConnect
+                  if (auto e = std::get_if<core::InCmdConnect>(&ev)) {
+                      out.push_back(core::OutStateChanged{cur, State::Connecting}); // 补充 core::
+                      out.push_back(core::OutConnect{e->host, e->port}); // 补充 core::
+                  }
+                  return out;
               },
+              State::Connecting
+          },
 
-              // ===== 正在连接 =====
-              { State::Connecting, EventType::TcpConnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InTcpConnected
-                      if (auto e = std::get_if<core::InTcpConnected>(&ev)) {
-                          out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::Connected
+          // ===== 正在连接 =====
+          { State::Connecting, EventType::TcpConnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InTcpConnected
+                  if (auto e = std::get_if<core::InTcpConnected>(&ev)) {
+                      out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
+                  }
+                  return out;
               },
+              State::Connected
+          },
 
-              { State::Connecting, EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){ return std::vector<core::CoreOutput>{}; },
-                  State::Disconnected
-              },
+          { State::Connecting, EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){ return std::vector<core::CoreOutput>{}; },
+              State::Disconnected
+          },
 
-              // ===== 已连接 =====
-              { State::Connected, EventType::CmdLogin,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InCmdLogin
-                      if (auto e = std::get_if<core::InCmdLogin>(&ev)) {
-                          out.push_back(core::OutStateChanged{cur, State::LoggingIn}); // 补充 core::
-                          out.push_back(core::OutSendLogin{e->user, e->pass}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::LoggingIn
+          // ===== 已连接 =====
+          { State::Connected, EventType::CmdLogin,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InCmdLogin
+                  if (auto e = std::get_if<core::InCmdLogin>(&ev)) {
+                      out.push_back(core::OutStateChanged{cur, State::LoggingIn}); // 补充 core::
+                      out.push_back(core::OutSendLogin{e->user, e->pass}); // 补充 core::
+                  }
+                  return out;
               },
+              State::LoggingIn
+          },
 
-              // ===== 正在登录 =====
-              { State::LoggingIn, EventType::LoginOk ,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InLoginOk
-                      if (auto e = std::get_if<core::InLoginOk>(&ev)) {
-                          out.push_back(core::OutLoginOk{}); // 补充 core::
-                          out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::LoggedIn
+          // ===== 正在登录 =====
+          { State::LoggingIn, EventType::LoginOk ,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InLoginOk
+                  if (auto e = std::get_if<core::InLoginOk>(&ev)) {
+                      out.push_back(core::OutLoginOk{}); // 补充 core::
+                      out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 补充 core::
+                  }
+                  return out;
               },
+              State::LoggedIn
+          },
 
-              { State::LoggingIn, EventType::LoginFail ,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InLoginFail
-                      if (auto e = std::get_if<core::InLoginFail>(&ev)) {
-                          out.push_back(core::OutLoginFail{e->msg}); // 补充 core::
-                          out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::Connected
+          { State::LoggingIn, EventType::LoginFail ,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InLoginFail
+                  if (auto e = std::get_if<core::InLoginFail>(&ev)) {
+                      out.push_back(core::OutLoginFail{e->msg}); // 补充 core::
+                      out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
+                  }
+                  return out;
               },
+              State::Connected
+          },
 
-              // ===== 任何在线状态断线 =====
-              { State::Connected,  EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){
-                      return std::vector<core::CoreOutput>{
-                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                          core::OutDisconnected{} // 补充 core::
-                      };
-                  },
-                  State::Disconnected
+          // ===== 任何在线状态断线 =====
+          { State::Connected,  EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){
+                  return std::vector<core::CoreOutput>{
+                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                      core::OutDisconnected{} // 补充 core::
+                  };
               },
-              { State::LoggingIn,  EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){
-                      return std::vector<core::CoreOutput>{
-                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                          core::OutDisconnected{} // 补充 core::
-                      };
-                  },
-                  State::Disconnected
+              State::Disconnected
+          },
+          { State::LoggingIn,  EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){
+                  return std::vector<core::CoreOutput>{
+                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                      core::OutDisconnected{} // 补充 core::
+                  };
               },
-              { State::LoggedIn,   EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){
-                      return std::vector<core::CoreOutput>{
-                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                          core::OutDisconnected{} // 补充 core::
-                      };
-                  },
-                  State::Disconnected
+              State::Disconnected
+          },
+          { State::LoggedIn,   EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){
+                  return std::vector<core::CoreOutput>{
+                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                      core::OutDisconnected{} // 补充 core::
+                  };
               },
-              };
+              State::Disconnected
+          },
+    };
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 52
+Lines: 53
 
 #pragma once
 #include "CoreInput.h"
@@ -521,13 +567,14 @@ private:
     void handleOutput(core::CoreOutput&& o); // 补充 core:: 前缀
     void execute(const core::OutConnect& e) ; // 补充 core:: 前缀
     void execute(const core::OutSendLogin& e) ; // 补充 core:: 前缀
-    // 新增：广播输出事件给所有监听者
+    void execute(const core::OutSendPing& e);
+    void execute(const core::OutUpdateAlive&);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 73
+Lines: 98
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
@@ -538,6 +585,7 @@ Lines: 73
 CoreExecutor::CoreExecutor(InputCallback cb)
     : postInput_(std::move(cb)) {
     initSocketCallbacks();
+    heartbeatThread_ = std::thread(&CoreExecutor::heartbeatLoop, this);
 }
 
 CoreExecutor::~CoreExecutor() {
@@ -569,13 +617,17 @@ void CoreExecutor::initSocketCallbacks() {
         std::visit([this](auto&& e) {
             using T = std::decay_t<decltype(e)>;
             if constexpr (std::is_same_v<T, ProtoEvtLoginOk>) {
-                postInput_(core::InLoginOk{}); // 替换为 InLoginOk
+                postInput_(core::InLoginOk{});
             } else if constexpr (std::is_same_v<T, ProtoEvtLoginFail>) {
-                postInput_(core::InLoginFail{e.resp.message}); // 替换为 InLoginFail
+                postInput_(core::InLoginFail{e.resp.message});
             } else if constexpr (std::is_same_v<T, ProtoEvtOnlineUsers>) {
-                postInput_(core::InOnlineUsers{""}); // 替换为 InOnlineUsers
-            } else {
-                postInput_(core::InUnknow{}); // 替换为 InUnknow
+                postInput_(core::InOnlineUsers{""});
+            }
+            else if constexpr (std::is_same_v<T, ProtoEvHeartbeatAck>) {
+                postInput_(core::InHeartbeatOk{});
+            }
+            else {
+                postInput_(core::InUnknow{});
             }
         }, event);
     });
@@ -597,6 +649,26 @@ void CoreExecutor::sendLoginRequest(const std::string& user, const std::string& 
     socket_.sendMessage(loginMsg);
     std::cout << "[Executor] Send login request for user: " << user << std::endl;
 }
+
+void CoreExecutor::heartbeatLoop() {
+    while (isRunning_) {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        if (!isRunning_) break;
+
+        // 推送 HeartbeatTick 给 Core
+        postInput_(core::InHeartbeatTick{});
+        std::cout << "[Executor] push InHeartbeatTick" << std::endl;
+    }
+}
+
+
+void CoreExecutor::sendPing() {
+    std::string ping = proto::makeHeartbeat();
+    socket_.sendMessage(ping);
+    std::cout << "[Executor] Send PING" << std::endl;
+}
+
 
 void CoreExecutor::stop() {
     isRunning_ = false;
@@ -632,7 +704,7 @@ inline std::string stateToString(State s) {
 }
 
 ========== ./core/CoreExecutor.h ==========
-Lines: 34
+Lines: 39
 
 //CoreExecutor.h
 #pragma once
@@ -655,6 +727,7 @@ public:
     // 对外暴露的 IO 操作接口（语义化命名）
     void connectToServer(const std::string& host, int port);
     void sendLoginRequest(const std::string& user, const std::string& pass);
+    void sendPing();
     void stop(); // 资源释放接口
 
 private:
@@ -667,6 +740,10 @@ private:
 
     // 初始化 socket 回调（内部私有）
     void initSocketCallbacks();
+
+    std::thread heartbeatThread_;
+    void heartbeatLoop();   // 新增
+
 };
 
 ========== ./core/ICoreListener.h ==========
@@ -689,7 +766,7 @@ public:
 } // namespace core
 
 ========== ./core/CoreOutput.h ==========
-Lines: 28
+Lines: 32
 
 // core/CoreOutput.h
 #pragma once
@@ -708,6 +785,8 @@ struct OutLoginFail { std::string msg; };
 struct OutDisconnected {};
 struct OutConnect { std::string host; int port; };
 struct OutSendLogin { std::string user; std::string pass; };
+struct OutSendPing {};   // Core -> Executor：发送心跳
+struct OutUpdateAlive {};
 
 using CoreOutput = std::variant<
     OutStateChanged,
@@ -715,7 +794,9 @@ using CoreOutput = std::variant<
     OutLoginFail,
     OutDisconnected,
     OutConnect,
-    OutSendLogin
+    OutSendLogin,
+    OutSendPing,
+    OutUpdateAlive
     >;
 
 } // namespace core
@@ -1096,7 +1177,7 @@ void QtCameraAdapter::onFrame(Frame f) {
 }
 
 ========== ./ui/LoginWidget.h ==========
-Lines: 50
+Lines: 54
 
 //LoginWidget.h
 #ifndef LOGINWIDGET_H
@@ -1145,6 +1226,10 @@ private:
     void handle(const core::OutStateChanged& e) ;
     void handle(const core::OutConnect&);       // 新增
     void handle(const core::OutSendLogin&);     // 新增
+
+    void handle(const core::OutSendPing&);
+
+    void handle(const core::OutUpdateAlive&);
 };
 
 #endif // LOGINWIDGET_H
@@ -1234,7 +1319,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 114
+Lines: 122
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -1337,6 +1422,14 @@ void LoginWidget::handle(const core::OutConnect&) {
 
 void LoginWidget::handle(const core::OutSendLogin&) {
     std::cout << "[UI] Ignore OutSendLogin (CoreExecutor handles it)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendPing&) {
+    std::cout << "[UI] Ignore OutSendPing (CoreExecutor handles it)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutUpdateAlive&) {
+    std::cout << "[UI] Ignore OutUpdateAlive" << std::endl;
 }
 
 void LoginWidget::on_Bt_Login_clicked()
@@ -1469,7 +1562,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 19
+Lines: 20
 
 //protocol_text.h
 #pragma once
@@ -1483,16 +1576,17 @@ std::string makeLoginRequest(const std::string& user, const std::string& pwd);
 std::string makeLoginOk(const UserInfo& user, const std::string& msg);
 std::string makeLoginFail(const std::string& msg);
 std::string makeOnlineUsers(const OnlineUsers& users);
-
+std::string makeHeartbeat();
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
 bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
 bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
+bool parseHeartbeatAck(const std::string& msg);
 
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 126
+Lines: 139
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1544,6 +1638,10 @@ std::string makeOnlineUsers(const OnlineUsers& users)
     }
     oss ;
     return oss.str();
+}
+
+std::string makeHeartbeat() {
+    return CMD_HEARTBEAT;
 }
 
 /* ================= parse ================= */
@@ -1619,10 +1717,19 @@ bool parseOnlineUsers(const std::string& msg,
     return true;
 }
 
+
+bool parseHeartbeatAck(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_HEARTBEAT_ACK;   // "PONG"
+}
+
+
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 20
+Lines: 22
 
 //protocol_common.h
 #pragma once
@@ -1630,10 +1737,12 @@ Lines: 20
 namespace proto {
 
 // commands
-constexpr const char* CMD_LOGIN        = "LOGIN";
-constexpr const char* CMD_LOGIN_OK     = "LOGIN_OK";
-constexpr const char* CMD_LOGIN_FAIL   = "LOGIN_FAIL";
-constexpr const char* CMD_ONLINE_USERS = "ONLINE_USERS";
+constexpr const char* CMD_LOGIN         = "LOGIN";
+constexpr const char* CMD_LOGIN_OK      = "LOGIN_OK";
+constexpr const char* CMD_LOGIN_FAIL    = "LOGIN_FAIL";
+constexpr const char* CMD_ONLINE_USERS  = "ONLINE_USERS";
+constexpr const char* CMD_HEARTBEAT     = "PING";
+constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 
 // keys
 constexpr const char* KEY_USERNAME  = "username";
@@ -1646,7 +1755,7 @@ constexpr const char* KEY_COUNT     = "count";
 }
 
 ========== ./app/ClientEvent.h ==========
-Lines: 40
+Lines: 42
 
 //ClientEvent.h
 #pragma once
@@ -1671,6 +1780,7 @@ struct ProtoEvtCmdLogin {
     std::string user;
     std::string pass;
 };
+struct ProtoEvHeartbeatAck{};
 
 using ClientEvent = std::variant<
     // UI 触发的协议命令
@@ -1686,7 +1796,8 @@ using ClientEvent = std::variant<
     ProtoEvtLoginOk,
     ProtoEvtLoginFail,
     ProtoEvtOnlineUsers,
-    ProtoEvtUnknow
+    ProtoEvtUnknow,
+    ProtoEvHeartbeatAck
     >;
 
 ========== ./app/ClientEventFactory.h ==========
@@ -1712,7 +1823,7 @@ private:
 #endif // CLIENTEVENTFACTORY_H
 
 ========== ./app/ClientEventFactory.cpp ==========
-Lines: 27
+Lines: 31
 
 //ClientEventFactory.cpp
 #include "ClientEventFactory.h"
@@ -1737,13 +1848,17 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         return ProtoEvtOnlineUsers{users}; // 改为 ProtoEvt 前缀
     }
 
+    if (proto::parseHeartbeatAck(msg)) {
+        return ProtoEvHeartbeatAck{}; // 改为 ProtoEvt 前缀
+    }
+
     proto::Unknown req_error;
     req_error.message = msg;
     return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀
 }
 
 ========== ./app/ClientEventEnum.h ==========
-Lines: 20
+Lines: 24
 
 //ClientEventEnum.h
 #pragma once
@@ -1763,7 +1878,11 @@ enum class EventType {
     LoginOk,
     LoginFail,
     OnlineUsers,
-    Unknow
+    Unknow,
+
+    HeartbeatOk,
+    HeartbeatTimeout,
+    HeartbeatTick
 };
 
 ========== ./media/CameraManager.cpp ==========
@@ -1927,4 +2046,4 @@ Q_DECLARE_METATYPE(Frame)
 
 =====================================
 Total files: 35
-Total lines: 1731
+Total lines: 1850

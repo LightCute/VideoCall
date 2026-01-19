@@ -17,7 +17,7 @@ void CameraManager::setFrameCallback(FrameCallback cb) {
 
 bool CameraManager::start(const std::string& device) {
     if (pipeline_) return true;
-
+    std::cout << "[CameraManager] Attempting to start camera: " << device << std::endl;
     std::string pipelineStr =
         "v4l2src device=" + device +
         " ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 "
@@ -51,6 +51,7 @@ bool CameraManager::start(const std::string& device) {
                      G_CALLBACK(onNewSample), this);
 
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    std::cout << "[CameraManager] Camera started successfully: " << device << std::endl;
     return true;
 }
 

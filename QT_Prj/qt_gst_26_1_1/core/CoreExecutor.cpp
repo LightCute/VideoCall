@@ -7,6 +7,7 @@
 CoreExecutor::CoreExecutor(InputCallback cb)
     : postInput_(std::move(cb)) {
     initSocketCallbacks();
+    heartbeatThread_ = std::thread(&CoreExecutor::heartbeatLoop, this);
 }
 
 CoreExecutor::~CoreExecutor() {
@@ -38,13 +39,17 @@ void CoreExecutor::initSocketCallbacks() {
         std::visit([this](auto&& e) {
             using T = std::decay_t<decltype(e)>;
             if constexpr (std::is_same_v<T, ProtoEvtLoginOk>) {
-                postInput_(core::InLoginOk{}); // 替换为 InLoginOk
+                postInput_(core::InLoginOk{});
             } else if constexpr (std::is_same_v<T, ProtoEvtLoginFail>) {
-                postInput_(core::InLoginFail{e.resp.message}); // 替换为 InLoginFail
+                postInput_(core::InLoginFail{e.resp.message});
             } else if constexpr (std::is_same_v<T, ProtoEvtOnlineUsers>) {
-                postInput_(core::InOnlineUsers{""}); // 替换为 InOnlineUsers
-            } else {
-                postInput_(core::InUnknow{}); // 替换为 InUnknow
+                postInput_(core::InOnlineUsers{""});
+            }
+            else if constexpr (std::is_same_v<T, ProtoEvHeartbeatAck>) {
+                postInput_(core::InHeartbeatOk{});
+            }
+            else {
+                postInput_(core::InUnknow{});
             }
         }, event);
     });
@@ -58,6 +63,9 @@ void CoreExecutor::connectToServer(const std::string& host, int port) {
             postInput_(core::InTcpDisconnected{}); // 替换为 InTcpDisconnected
             std::cout << "[Executor] Connect to " << host << ":" << port << " failed" << std::endl;
         }
+        else {
+            std::cout << "[Executor] Successfully connected to server: " << host << ":" << port << std::endl;
+        }
     }).detach();
 }
 
@@ -66,6 +74,26 @@ void CoreExecutor::sendLoginRequest(const std::string& user, const std::string& 
     socket_.sendMessage(loginMsg);
     std::cout << "[Executor] Send login request for user: " << user << std::endl;
 }
+
+void CoreExecutor::heartbeatLoop() {
+    while (isRunning_) {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        if (!isRunning_) break;
+
+        // 推送 HeartbeatTick 给 Core
+        postInput_(core::InHeartbeatTick{});
+        std::cout << "[Executor] push InHeartbeatTick" << std::endl;
+    }
+}
+
+
+void CoreExecutor::sendPing() {
+    std::string ping = proto::makeHeartbeat();
+    socket_.sendMessage(ping);
+    std::cout << "[Executor] Send PING" << std::endl;
+}
+
 
 void CoreExecutor::stop() {
     isRunning_ = false;

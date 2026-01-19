@@ -101,6 +101,14 @@ void LoginWidget::handle(const core::OutSendLogin&) {
     std::cout << "[UI] Ignore OutSendLogin (CoreExecutor handles it)" << std::endl;
 }
 
+void LoginWidget::handle(const core::OutSendPing&) {
+    std::cout << "[UI] Ignore OutSendPing (CoreExecutor handles it)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutUpdateAlive&) {
+    std::cout << "[UI] Ignore OutUpdateAlive" << std::endl;
+}
+
 void LoginWidget::on_Bt_Login_clicked()
 {
     QString qstr_user_name = ui->LE_UserName->text();

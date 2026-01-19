@@ -19,6 +19,7 @@ public:
     // 对外暴露的 IO 操作接口（语义化命名）
     void connectToServer(const std::string& host, int port);
     void sendLoginRequest(const std::string& user, const std::string& pass);
+    void sendPing();
     void stop(); // 资源释放接口
 
 private:
@@ -31,4 +32,8 @@ private:
 
     // 初始化 socket 回调（内部私有）
     void initSocketCallbacks();
+
+    std::thread heartbeatThread_;
+    void heartbeatLoop();   // 新增
+
 };

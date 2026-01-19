@@ -14,6 +14,9 @@ struct InLoginOk {};
 struct InLoginFail { std::string msg; };
 struct InOnlineUsers { std::string list; };
 struct InUnknow {};
+struct InHeartbeatOk {};      // 收到 PONG
+struct InHeartbeatTimeout {}; // 心跳超时
+struct InHeartbeatTick {};    // Send PING
 
 using CoreInput = std::variant<
     InCmdConnect,
@@ -24,6 +27,9 @@ using CoreInput = std::variant<
     InLoginOk,
     InLoginFail,
     InOnlineUsers,
-    InUnknow
+    InUnknow,
+    InHeartbeatOk,
+    InHeartbeatTimeout,
+    InHeartbeatTick
     >;
 }

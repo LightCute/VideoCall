@@ -39,6 +39,7 @@ private:
     void handle(const BroadcastOnlineUsers&);
     void handle(const SendError&);
     void handle(const BroadcastLogout&);
+    void handle(const SendHeartbeatAck& a);
 
 
     CommandSocket listener_;

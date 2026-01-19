@@ -76,6 +76,8 @@ void ClientCore::processEvents() {
             cv_.wait(lock, [this]{ return !inputQueue_.empty(); });
             ev = std::move(inputQueue_.front());
             inputQueue_.pop();
+            std::cout << "[ClientCore] Processing Input event, remaining queue size: " << inputQueue_.size()
+                      << ", Event type index: " << ev.index() << std::endl;
         }
 
         auto outputs = fsm_.handle(state_, ev);
@@ -102,6 +104,13 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
         }
         else if constexpr (std::is_same_v<T, core::OutSendLogin>) { // 补充 core:: 前缀
             execute(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutSendPing>) {
+            execute(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutUpdateAlive>) {
+            execute(e);
+            broadcastOutput(e);
         }
         else {
             // outputQueue_.push(std::move(e));
@@ -131,6 +140,15 @@ void ClientCore::execute(const core::OutSendLogin& e) { // 补充 core:: 前缀
     // 调度 Executor 发送登录请求
     executor_->sendLoginRequest(e.user, e.pass);
 }
+
+void ClientCore::execute(const core::OutSendPing&) {
+    executor_->sendPing();
+}
+
+void ClientCore::execute(const core::OutUpdateAlive&) {
+    std::cout << "[Executor] Received PONG from server" << std::endl;
+}
+
 
 // 废弃原 socket 操作接口（可直接删除）
 // bool ClientCore::connectToServer(const std::string& host, int port) { ... }

@@ -101,6 +101,7 @@ void CommandSocket::clientThreadFunc() {
         if (n > 0) {
 
             // 1️⃣ 把收到的字节塞进缓存
+            std::cout << "[CommandSocket] Received data, length: " << n << " bytes" << std::endl;
             recvBuffer.insert(recvBuffer.end(), temp, temp + n);
 
             // 2️⃣ 尝试从缓存中拆完整包
@@ -114,6 +115,7 @@ void CommandSocket::clientThreadFunc() {
             }
 
         } else if (n <= 0) {
+            std::cout << "[CommandSocket] Server disconnected (recv return <=0)" << std::endl;
             if (onDisconnect_) onDisconnect_();  // ⭐ TCP断线
             break; // 服务器正常断开
         }

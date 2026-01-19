@@ -30,6 +30,7 @@ public:
 
 private:
     EventType eventTypeFromInput(const core::CoreInput& ev);
+    bool isOnlineState(State s);
     std::vector<FSMEntry> table_;
     void initTable();
 };

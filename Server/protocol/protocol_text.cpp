@@ -57,6 +57,11 @@ std::string makeHeartbeat() {
     return CMD_HEARTBEAT;
 }
 
+std::string makeHeartbeatAck() {
+    return CMD_HEARTBEAT_ACK;  // "PONG"
+}
+
+
 /* ================= parse ================= */
 
 // Server 使用

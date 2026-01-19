@@ -50,6 +50,10 @@ std::string makeOnlineUsers(const OnlineUsers& users)
     return oss.str();
 }
 
+std::string makeHeartbeat() {
+    return CMD_HEARTBEAT;
+}
+
 /* ================= parse ================= */
 
 // Server 使用
@@ -122,5 +126,14 @@ bool parseOnlineUsers(const std::string& msg,
     }
     return true;
 }
+
+
+bool parseHeartbeatAck(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_HEARTBEAT_ACK;   // "PONG"
+}
+
 
 } // namespace proto

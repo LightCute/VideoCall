@@ -158,7 +158,7 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 196
+Lines: 203
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
@@ -356,9 +356,16 @@ void LoginServer::handle(const BroadcastLogout&)
 }
 
 
+void LoginServer::handle(const SendHeartbeatAck& a)
+{
+    std::cout << "[Server] Send PONG to fd= " << a.fd << std::endl;
+    std::string payload = proto::makeHeartbeatAck(); // ⭐ PONG
+
+    listener_.sendPacket(a.fd, payload);
+}
 
 ========== ./core/LoginServer.h ==========
-Lines: 49
+Lines: 50
 
 //LoginServer.h
 #pragma once
@@ -401,6 +408,7 @@ private:
     void handle(const BroadcastOnlineUsers&);
     void handle(const SendError&);
     void handle(const BroadcastLogout&);
+    void handle(const SendHeartbeatAck& a);
 
 
     CommandSocket listener_;
@@ -411,7 +419,7 @@ private:
 };
 
 ========== ./service/ServerActions.h ==========
-Lines: 36
+Lines: 41
 
 // Service/ServerActions.h
 #pragma once
@@ -443,6 +451,11 @@ struct BroadcastOnlineUsers {
 };
 
 struct BroadcastLogout {
+};
+
+// 新增：服务器回应心跳
+struct SendHeartbeatAck {
+    int fd;
 };
 
 // 未来可无限加
@@ -516,7 +529,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/ServerAction.h ==========
-Lines: 12
+Lines: 13
 
 // Service/ServerAction.h
 #pragma once
@@ -528,15 +541,16 @@ using ServerAction = std::variant<
     SendLoginOk,
     SendLoginFail,
     BroadcastOnlineUsers,
-    BroadcastLogout
+    BroadcastLogout,
+    SendHeartbeatAck
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 87
+Lines: 88
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
-
+#include "iostream"
 
 
 ServerEventDispatcher::ServerEventDispatcher(
@@ -618,8 +632,9 @@ ServerEventDispatcher::handle(int fd, const event::Logout& ev)
 }
 
 std::vector<ServerAction> ServerEventDispatcher::handle(int fd, const event::Heartbeat&) {
+    std::cout << "[Server] Received PING from fd= " << fd << std::endl;
     sessionMgr_.updateHeartbeat(fd);  // 更新时间戳
-    return {}; // 心跳不触发其他动作
+    return {SendHeartbeatAck{ .fd = fd }}; // 心跳不触发Ack
 }
 
 ========== ./dispatcher/ServerEventDispatcher.h ==========
@@ -1017,7 +1032,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 24
+Lines: 25
 
 //protocol_text.h
 
@@ -1034,6 +1049,7 @@ std::string makeLoginFail(const std::string& msg);
 std::string makeOnlineUsers(const OnlineUsers& users);
 std::string makeLogout();
 std::string makeHeartbeat();
+std::string makeHeartbeatAck();   // ⭐ 新增
 
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
@@ -1045,7 +1061,7 @@ bool parseHeartbeat(const std::string& msg);
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 149
+Lines: 154
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1105,6 +1121,11 @@ std::string makeLogout() {
 std::string makeHeartbeat() {
     return CMD_HEARTBEAT;
 }
+
+std::string makeHeartbeatAck() {
+    return CMD_HEARTBEAT_ACK;  // "PONG"
+}
+
 
 /* ================= parse ================= */
 
@@ -1233,4 +1254,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 25
-Total lines: 1081
+Total lines: 1102

@@ -16,5 +16,9 @@ enum class EventType {
     LoginOk,
     LoginFail,
     OnlineUsers,
-    Unknow
+    Unknow,
+
+    HeartbeatOk,
+    HeartbeatTimeout,
+    HeartbeatTick
 };

@@ -5,11 +5,27 @@ FSM::FSM() {
     initTable();
 }
 
+bool FSM::isOnlineState(State s) {
+    return s != State::Disconnected;
+}
+
 // 补充 core:: 前缀
 std::vector<core::CoreOutput>
 FSM::handle(State current, const core::CoreInput& ev)
 {
     EventType evType = eventTypeFromInput(ev);
+    std::cout << "[FSM] Current state: " << stateToString(current)
+              << ", Received event type: " << static_cast<int>(evType) << std::endl;
+    if (isOnlineState(current) && evType == EventType::HeartbeatTick) {
+        // 直接返回，不走 FSM 表
+        std::cout << "[FSM] Online state, directly handle HeartbeatTick event" << std::endl;
+        return { core::OutSendPing{} };
+    }
+
+    else if (isOnlineState(current) && evType == EventType::HeartbeatOk) {
+        // 直接返回，不走 FSM 表
+        return { core::OutUpdateAlive{} };
+    }
 
     for (auto& entry : table_) {
         if (entry.current_state == current &&
@@ -38,6 +54,15 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
         else if constexpr (std::is_same_v<T, core::InLoginFail>) evType = EventType::LoginFail;
         else if constexpr (std::is_same_v<T, core::InOnlineUsers>) evType = EventType::OnlineUsers;
 
+        else if constexpr (std::is_same_v<T, core::InHeartbeatOk>)
+            evType = EventType::HeartbeatOk;
+
+        else if constexpr (std::is_same_v<T, core::InHeartbeatTimeout>)
+            evType = EventType::HeartbeatTimeout;
+
+        else if constexpr (std::is_same_v<T, core::InHeartbeatTick>)
+            evType = EventType::HeartbeatTick;
+
         else evType = EventType::Unknow;
     }, ev);
     return evType;
@@ -45,115 +70,115 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
 
 void FSM::initTable() {
     table_ = {
-              // ===== 断开态 =====
-              { State::Disconnected, EventType::CmdConnect,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InCmdConnect
-                      if (auto e = std::get_if<core::InCmdConnect>(&ev)) {
-                          out.push_back(core::OutStateChanged{cur, State::Connecting}); // 补充 core::
-                          out.push_back(core::OutConnect{e->host, e->port}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::Connecting
+          // ===== 断开态 =====
+          { State::Disconnected, EventType::CmdConnect,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InCmdConnect
+                  if (auto e = std::get_if<core::InCmdConnect>(&ev)) {
+                      out.push_back(core::OutStateChanged{cur, State::Connecting}); // 补充 core::
+                      out.push_back(core::OutConnect{e->host, e->port}); // 补充 core::
+                  }
+                  return out;
               },
+              State::Connecting
+          },
 
-              // ===== 正在连接 =====
-              { State::Connecting, EventType::TcpConnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InTcpConnected
-                      if (auto e = std::get_if<core::InTcpConnected>(&ev)) {
-                          out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::Connected
+          // ===== 正在连接 =====
+          { State::Connecting, EventType::TcpConnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InTcpConnected
+                  if (auto e = std::get_if<core::InTcpConnected>(&ev)) {
+                      out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
+                  }
+                  return out;
               },
+              State::Connected
+          },
 
-              { State::Connecting, EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){ return std::vector<core::CoreOutput>{}; },
-                  State::Disconnected
-              },
+          { State::Connecting, EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){ return std::vector<core::CoreOutput>{}; },
+              State::Disconnected
+          },
 
-              // ===== 已连接 =====
-              { State::Connected, EventType::CmdLogin,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InCmdLogin
-                      if (auto e = std::get_if<core::InCmdLogin>(&ev)) {
-                          out.push_back(core::OutStateChanged{cur, State::LoggingIn}); // 补充 core::
-                          out.push_back(core::OutSendLogin{e->user, e->pass}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::LoggingIn
+          // ===== 已连接 =====
+          { State::Connected, EventType::CmdLogin,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InCmdLogin
+                  if (auto e = std::get_if<core::InCmdLogin>(&ev)) {
+                      out.push_back(core::OutStateChanged{cur, State::LoggingIn}); // 补充 core::
+                      out.push_back(core::OutSendLogin{e->user, e->pass}); // 补充 core::
+                  }
+                  return out;
               },
+              State::LoggingIn
+          },
 
-              // ===== 正在登录 =====
-              { State::LoggingIn, EventType::LoginOk ,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InLoginOk
-                      if (auto e = std::get_if<core::InLoginOk>(&ev)) {
-                          out.push_back(core::OutLoginOk{}); // 补充 core::
-                          out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::LoggedIn
+          // ===== 正在登录 =====
+          { State::LoggingIn, EventType::LoginOk ,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InLoginOk
+                  if (auto e = std::get_if<core::InLoginOk>(&ev)) {
+                      out.push_back(core::OutLoginOk{}); // 补充 core::
+                      out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 补充 core::
+                  }
+                  return out;
               },
+              State::LoggedIn
+          },
 
-              { State::LoggingIn, EventType::LoginFail ,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                      std::vector<core::CoreOutput> out;
-                      // 替换为 InLoginFail
-                      if (auto e = std::get_if<core::InLoginFail>(&ev)) {
-                          out.push_back(core::OutLoginFail{e->msg}); // 补充 core::
-                          out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
-                      }
-                      return out;
-                  },
-                  State::Connected
+          { State::LoggingIn, EventType::LoginFail ,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                  std::vector<core::CoreOutput> out;
+                  // 替换为 InLoginFail
+                  if (auto e = std::get_if<core::InLoginFail>(&ev)) {
+                      out.push_back(core::OutLoginFail{e->msg}); // 补充 core::
+                      out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
+                  }
+                  return out;
               },
+              State::Connected
+          },
 
-              // ===== 任何在线状态断线 =====
-              { State::Connected,  EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){
-                      return std::vector<core::CoreOutput>{
-                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                          core::OutDisconnected{} // 补充 core::
-                      };
-                  },
-                  State::Disconnected
+          // ===== 任何在线状态断线 =====
+          { State::Connected,  EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){
+                  return std::vector<core::CoreOutput>{
+                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                      core::OutDisconnected{} // 补充 core::
+                  };
               },
-              { State::LoggingIn,  EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){
-                      return std::vector<core::CoreOutput>{
-                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                          core::OutDisconnected{} // 补充 core::
-                      };
-                  },
-                  State::Disconnected
+              State::Disconnected
+          },
+          { State::LoggingIn,  EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){
+                  return std::vector<core::CoreOutput>{
+                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                      core::OutDisconnected{} // 补充 core::
+                  };
               },
-              { State::LoggedIn,   EventType::TcpDisconnected,
-                  // 补充 core:: 前缀
-                  [](State cur, const core::CoreInput&){
-                      return std::vector<core::CoreOutput>{
-                          core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                          core::OutDisconnected{} // 补充 core::
-                      };
-                  },
-                  State::Disconnected
+              State::Disconnected
+          },
+          { State::LoggedIn,   EventType::TcpDisconnected,
+              // 补充 core:: 前缀
+              [](State cur, const core::CoreInput&){
+                  return std::vector<core::CoreOutput>{
+                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
+                      core::OutDisconnected{} // 补充 core::
+                  };
               },
-              };
+              State::Disconnected
+          },
+    };
 }

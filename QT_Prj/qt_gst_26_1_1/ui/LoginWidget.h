@@ -45,6 +45,10 @@ private:
     void handle(const core::OutStateChanged& e) ;
     void handle(const core::OutConnect&);       // 新增
     void handle(const core::OutSendLogin&);     // 新增
+
+    void handle(const core::OutSendPing&);
+
+    void handle(const core::OutUpdateAlive&);
 };
 
 #endif // LOGINWIDGET_H

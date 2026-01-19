@@ -13,6 +13,7 @@ std::string makeLoginFail(const std::string& msg);
 std::string makeOnlineUsers(const OnlineUsers& users);
 std::string makeLogout();
 std::string makeHeartbeat();
+std::string makeHeartbeatAck();   // ⭐ 新增
 
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);

@@ -15,6 +15,8 @@ struct OutLoginFail { std::string msg; };
 struct OutDisconnected {};
 struct OutConnect { std::string host; int port; };
 struct OutSendLogin { std::string user; std::string pass; };
+struct OutSendPing {};   // Core -> Executor：发送心跳
+struct OutUpdateAlive {};
 
 using CoreOutput = std::variant<
     OutStateChanged,
@@ -22,7 +24,9 @@ using CoreOutput = std::variant<
     OutLoginFail,
     OutDisconnected,
     OutConnect,
-    OutSendLogin
+    OutSendLogin,
+    OutSendPing,
+    OutUpdateAlive
     >;
 
 } // namespace core

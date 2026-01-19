@@ -30,6 +30,11 @@ struct BroadcastOnlineUsers {
 struct BroadcastLogout {
 };
 
+// 新增：服务器回应心跳
+struct SendHeartbeatAck {
+    int fd;
+};
+
 // 未来可无限加
 // struct KickUser { int fd; };
 // struct ForceLogout { int fd; };
