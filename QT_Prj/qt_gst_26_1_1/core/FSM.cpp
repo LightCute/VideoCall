@@ -69,6 +69,12 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
         else if constexpr (std::is_same_v<T, core::InSelectVpn>)
             evType = EventType::SelectVpn;
 
+        else if constexpr (std::is_same_v<T, core::InCmdSendText>)
+            evType = EventType::CmdSendText;
+
+        else if constexpr (std::is_same_v<T, core::InForwardText>)
+            evType = EventType::ForwardText;
+
         else evType = EventType::Unknow;
     }, ev);
     return evType;
@@ -223,6 +229,27 @@ void FSM::initTable() {
             State::LoggedIn
         },
 
+        { State::LoggedIn, EventType::CmdSendText,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCmdSendText>(&ev)) {
+                    out.push_back(core::OutSendText{e->target_user, e->content});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        { State::LoggedIn, EventType::ForwardText,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InForwardText>(&ev)) {
+                    out.push_back(core::OutForwardText{e->from_user, e->content});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
 
     };
 }

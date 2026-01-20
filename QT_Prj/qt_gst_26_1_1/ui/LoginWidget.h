@@ -53,6 +53,9 @@ private:
     void handle(const core::OutSelectLan&) ;
 
     void handle(const core::OutSelectVpn&) ;
+    void handle(const core::OutSendText& e) ;
+
+    void handle(const core::OutForwardText& e) ;
 
 };
 

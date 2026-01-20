@@ -18,6 +18,8 @@ constexpr const char* CMD_LOGOUT       = "LOGOUT";
 constexpr const char* CMD_HEARTBEAT = "PING";
 constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
+constexpr const char* CMD_SEND_TEXT     = "SEND_TEXT";       // 客户端→服务端：发送文本
+constexpr const char* CMD_FORWARD_TEXT  = "FORWARD_TEXT"; // 服务端→客户端：转发文本
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";

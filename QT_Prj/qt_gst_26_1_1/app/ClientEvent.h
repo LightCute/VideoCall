@@ -23,6 +23,12 @@ struct ProtoEvtCmdLogin {
 };
 struct ProtoEvHeartbeatAck{};
 
+// 转发文本消息事件（服务器→客户端）
+struct ProtoEvtForwardText {
+    std::string from_user;  // 发送者用户名
+    std::string content;    // 消息内容
+};
+
 using ClientEvent = std::variant<
     // UI 触发的协议命令
     ProtoEvtCmdConnect,
@@ -38,5 +44,6 @@ using ClientEvent = std::variant<
     ProtoEvtLoginFail,
     ProtoEvtOnlineUsers,
     ProtoEvtUnknow,
-    ProtoEvHeartbeatAck
+    ProtoEvHeartbeatAck,
+    ProtoEvtForwardText
     >;

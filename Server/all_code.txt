@@ -568,7 +568,7 @@ using ServerAction = std::variant<
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 107
+Lines: 111
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -654,9 +654,13 @@ ServerEventDispatcher::handle(int fd, const event::Logout& ev)
 }
 
 std::vector<ServerAction> ServerEventDispatcher::handle(int fd, const event::Heartbeat&) {
-    std::cout << "[Server] Received PING from fd= " << fd << std::endl;
-    sessionMgr_.updateHeartbeat(fd);  // 更新时间戳
-    return {SendHeartbeatAck{ .fd = fd }}; // 心跳不触发Ack
+    if (!sessionMgr_.exists(fd)) {
+        std::cout << "[Server] Ignore heartbeat before login, fd=" << fd << std::endl;
+        return {};   // ❗ 不回 PONG
+    }
+
+    sessionMgr_.updateHeartbeat(fd);
+    return {SendHeartbeatAck{ .fd = fd }};
 }
 
 std::vector<ServerAction>
@@ -729,7 +733,7 @@ struct User {
 } // namespace domain
 
 ========== ./session/SessionManager.cpp ==========
-Lines: 44
+Lines: 49
 
 //SessionManager.cpp
 #include "./session/SessionManager.h"
@@ -775,9 +779,14 @@ void SessionManager::updateNetInfo(int fd, const ClientNetInfo& net) {
     }
 }
 
+bool SessionManager::exists(int fd) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return sessions_.count(fd) > 0;
+}
+
 
 ========== ./session/SessionManager.h ==========
-Lines: 32
+Lines: 33
 
 //SessionManager.h
 #pragma once
@@ -807,6 +816,7 @@ public:
 
     void updateHeartbeat(int fd);
     void updateNetInfo(int fd, const ClientNetInfo& net);
+    bool exists(int fd);
 private:
     mutable std::mutex mutex_;
     std::map<int, ClientInfo> sessions_;
@@ -1359,4 +1369,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 25
-Total lines: 1207
+Total lines: 1217

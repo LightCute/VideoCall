@@ -10,5 +10,7 @@ using ServerAction = std::variant<
     BroadcastOnlineUsers,
     BroadcastLogout,
     SendHeartbeatAck,
-    UpdatePeerInfo
+    UpdatePeerInfo,
+    ForwardText,
+    SendUserNotFound
 >;

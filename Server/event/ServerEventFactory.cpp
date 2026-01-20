@@ -31,7 +31,17 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
             .udpPort = port
         };
     }
-    
+
+    // 替换原 parseSendText 逻辑：解析客户端的 SEND_TEXT 消息（target_user + content）
+    std::string target_user, content;
+    if (proto::parseSendTextMsg(msg, target_user, content)) {
+        return event::SendTextToUser{
+            .target_user = target_user,
+            .content = content,
+            .from_user = "" // 发送者用户名由 Dispatcher 补全
+        };
+    }
+        
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{

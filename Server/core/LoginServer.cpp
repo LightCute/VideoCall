@@ -212,3 +212,27 @@ void LoginServer::handle(const UpdatePeerInfo& a)
     std::cout << "[Server] Registered peer info for fd=" << a.fd << std::endl;
 }
 
+
+void LoginServer::handle(const SendUserNotFound& a)
+{
+    std::string reason = "User not found: " + a.target_user;
+    auto payload = proto::makeLoginFail(reason); // 复用 LoginFail 格式返回错误
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send user not found to fd=" << a.fd << ": " << a.target_user << std::endl;
+}
+
+// 调整：定向转发文本消息给目标用户
+void LoginServer::handle(const ForwardText& a)
+{
+    // 目标用户不存在则跳过
+    if (a.target_fd == -1) return;
+
+    // 构建转发文本的 payload
+    auto payload = proto::makeForwardTextMsg(a.from_user, a.content);
+
+    // 仅发送给目标 FD
+    listener_.sendPacket(a.target_fd, payload);
+    std::cout << "[Server] Forward text to fd=" << a.target_fd 
+              << " from=" << a.from_user 
+              << " content=" << a.content << std::endl;
+}

@@ -27,6 +27,7 @@ public:
     void updateHeartbeat(int fd);
     void updateNetInfo(int fd, const ClientNetInfo& net);
     bool exists(int fd);
+    int getFdByUsername(const std::string& username) const;
 private:
     mutable std::mutex mutex_;
     std::map<int, ClientInfo> sessions_;

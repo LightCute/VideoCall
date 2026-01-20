@@ -11,6 +11,9 @@ constexpr const char* CMD_ONLINE_USERS  = "ONLINE_USERS";
 constexpr const char* CMD_HEARTBEAT     = "PING";
 constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
+constexpr const char* CMD_SEND_TEXT     = "SEND_TEXT";
+constexpr const char* CMD_FORWARD_TEXT  = "FORWARD_TEXT";
+
 
 // keys
 constexpr const char* KEY_USERNAME  = "username";

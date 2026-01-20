@@ -47,3 +47,13 @@ bool SessionManager::exists(int fd) {
     return sessions_.count(fd) > 0;
 }
 
+int SessionManager::getFdByUsername(const std::string& username) const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& [fd, info] : sessions_) {
+        if (info.user.username == username) {
+            return fd;
+        }
+    }
+    return -1; // 目标用户不存在
+}
+

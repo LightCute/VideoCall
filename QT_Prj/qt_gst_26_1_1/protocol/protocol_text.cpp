@@ -67,7 +67,20 @@ std::string makeRegisterPeerMsg(
     return oss.str();
 }
 
+// （客户端→服务器）
+std::string makeSendTextMsg(const std::string& target_user, const std::string& content) {
+    std::ostringstream oss;
+    // 格式：SEND_TEXT 目标用户名 消息内容（内容含空格需保留，用引号或直接拼接，这里用空格分隔后拼接）
+    oss << CMD_SEND_TEXT << " " << target_user << " " << content;
+    return oss.str();
+}
 
+// （服务器→客户端）
+std::string makeForwardTextMsg(const std::string& from_user, const std::string& content) {
+    std::ostringstream oss;
+    oss << CMD_FORWARD_TEXT << " " << from_user << " " << content;
+    return oss.str();
+}
 
 
 /* ================= parse ================= */
@@ -149,6 +162,34 @@ bool parseHeartbeatAck(const std::string& msg) {
     std::string cmd;
     iss >> cmd;
     return cmd == CMD_HEARTBEAT_ACK;   // "PONG"
+}
+
+// 解析发送文本消息（服务器用）
+bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::string& content) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_SEND_TEXT) return false;
+
+    // 读取目标用户名
+    iss >> target_user;
+    // 读取剩余所有内容作为消息（处理含空格的情况）
+    std::getline(iss >> std::ws, content);
+    return !target_user.empty() && !content.empty();
+}
+
+// 解析转发文本消息（客户端用）
+bool parseForwardTextMsg(const std::string& msg, std::string& from_user, std::string& content) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_FORWARD_TEXT) return false;
+
+    // 读取发送者用户名
+    iss >> from_user;
+    // 读取剩余所有内容作为消息
+    std::getline(iss >> std::ws, content);
+    return !from_user.empty() && !content.empty();
 }
 
 

@@ -23,5 +23,7 @@ enum class EventType {
     HeartbeatTick,
 
     SelectLan,
-    SelectVpn
+    SelectVpn,
+    CmdSendText,
+    ForwardText
 };

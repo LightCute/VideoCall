@@ -61,6 +61,21 @@ std::string makeHeartbeatAck() {
     return CMD_HEARTBEAT_ACK;  // "PONG"
 }
 
+// 构建客户端发送的文本消息（CMD_SEND_TEXT）
+std::string makeSendText(const std::string& from_user, const std::string& content) {
+    std::ostringstream oss;
+    oss << CMD_SEND_TEXT << " " << from_user << " " << content;
+    return oss.str();
+}
+
+// 构建服务端转发的文本消息（CMD_FORWARD_TEXT）
+std::string makeForwardTextMsg(const std::string& from_user, const std::string& content) {
+    std::ostringstream oss;
+    oss << CMD_FORWARD_TEXT << " " << from_user << " " << content;
+    return oss.str();
+}
+
+
 
 /* ================= parse ================= */
 
@@ -165,5 +180,35 @@ bool parseRegisterPeer(
     iss >> lan >> vpn >> port;
     return !lan.empty() && port > 0;
 }
+
+// 解析客户端发送的文本消息
+bool parseSendText(const std::string& msg, std::string& from_user, std::string& content) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_SEND_TEXT) return false;
+    
+    iss >> from_user;
+    // 读取剩余所有内容作为消息体（支持空格）
+    std::getline(iss >> std::ws, content);
+    return !from_user.empty() && !content.empty();
+}
+
+// 解析客户端发送的定向文本消息（格式：SEND_TEXT target_user content）
+    bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::string& content) {
+        std::istringstream iss(msg);
+        std::string cmd;
+        iss >> cmd;
+
+        if (cmd != CMD_SEND_TEXT) return false;
+
+        // 读取目标用户名
+        iss >> target_user;
+        // 读取剩余所有内容作为消息（支持含空格的消息）
+        std::getline(iss >> std::ws, content);
+        return !target_user.empty() && !content.empty();
+    }
+
 
 } // namespace proto

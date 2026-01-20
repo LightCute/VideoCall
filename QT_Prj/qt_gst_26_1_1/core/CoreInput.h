@@ -15,6 +15,9 @@ struct OnlineUser {
 };
 
 
+struct InCmdSendText { std::string target_user; std::string content; };
+
+struct InForwardText { std::string from_user; std::string content; };
 
 // 所有 Core 输入事件前缀改为 In
 struct InCmdConnect { std::string host; int port; };
@@ -49,6 +52,8 @@ using CoreInput = std::variant<
     InHeartbeatTimeout,
     InHeartbeatTick,
     InSelectLan,
-    InSelectVpn
+    InSelectVpn,
+    InCmdSendText,
+    InForwardText
     >;
 }

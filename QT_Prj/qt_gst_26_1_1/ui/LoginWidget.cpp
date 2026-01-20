@@ -122,6 +122,16 @@ void LoginWidget::handle(const core::OutSelectVpn&) {
     std::cout << "[UI] OutSelectVpn" << std::endl;
 }
 
+void LoginWidget::handle(const core::OutSendText& e) {
+    std::cout << "[UI] OutSendText  "  << std::endl;
+}
+
+// 新增：处理接收转发文本消息（显示到UI）
+void LoginWidget::handle(const core::OutForwardText& e) {
+    std::cout << "[UI] OutForwardText " << std::endl;
+
+}
+
 void LoginWidget::on_Bt_Login_clicked()
 {
     QString qstr_user_name = ui->LE_UserName->text();

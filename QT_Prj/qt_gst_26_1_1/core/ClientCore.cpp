@@ -121,6 +121,14 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
             execute(e);
             broadcastOutput(e);
         }
+        // 新增：处理发送文本消息
+        else if constexpr (std::is_same_v<T, core::OutSendText>) {
+            execute(e);
+        }
+        // 新增：广播转发文本消息给UI
+        else if constexpr (std::is_same_v<T, core::OutForwardText>) {
+            broadcastOutput(e);
+        }
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -173,7 +181,13 @@ void ClientCore::execute(const core::OutLoginOk&) {
     executor_->sendLocalIP();
 }
 
+void ClientCore::execute(const core::OutSendText& e) {
+    executor_->sendTextMsg(e.target_user, e.content);
+}
 
+void ClientCore::execute(const core::OutForwardText&) {
+    std::cout << "[Executor] OutForwardText" << std::endl;
+}
 // 废弃原 socket 操作接口（可直接删除）
 // bool ClientCore::connectToServer(const std::string& host, int port) { ... }
 // void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }

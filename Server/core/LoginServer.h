@@ -41,8 +41,8 @@ private:
     void handle(const BroadcastLogout&);
     void handle(const SendHeartbeatAck& a);
     void handle(const UpdatePeerInfo&);
-
-
+    void handle(const ForwardText&);          
+    void handle(const SendUserNotFound&);     
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;

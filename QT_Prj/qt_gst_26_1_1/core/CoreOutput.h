@@ -21,7 +21,8 @@ struct OutUpdateAlive {};
 struct OutOnlineUsers { std::vector<OnlineUser> list; };
 struct OutSelectLan {};
 struct OutSelectVpn {};
-
+struct OutSendText { std::string target_user; std::string content; };
+struct OutForwardText { std::string from_user; std::string content; };
 
 
 using CoreOutput = std::variant<
@@ -35,7 +36,9 @@ using CoreOutput = std::variant<
     OutUpdateAlive,
     OutOnlineUsers,
     OutSelectLan,
-    OutSelectVpn
+    OutSelectVpn,
+    OutSendText,
+    OutForwardText
     >;
 
 } // namespace core

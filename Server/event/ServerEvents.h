@@ -7,6 +7,12 @@
 
 namespace event {
 
+struct SendTextToUser {
+    std::string target_user;  // 客户端指定的目标用户名
+    std::string content;      // 消息内容
+    std::string from_user;    // 发送者用户名（服务端从 Session 中补全）
+};
+
 struct ErrorEvent {
     std::string rawMsg;  // 收到的原始消息
     std::string reason;  // 解析失败原因

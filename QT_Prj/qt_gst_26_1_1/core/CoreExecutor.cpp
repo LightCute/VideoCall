@@ -58,6 +58,9 @@ void CoreExecutor::initSocketCallbacks() {
             else if constexpr (std::is_same_v<T, ProtoEvHeartbeatAck>) {
                 postInput_(core::InHeartbeatOk{});
             }
+            else if constexpr (std::is_same_v<T, ProtoEvtForwardText>) {
+                postInput_(core::InForwardText{e.from_user, e.content});
+            }
             else {
                 postInput_(core::InUnknow{});
             }
@@ -133,4 +136,10 @@ void CoreExecutor::sendLocalIP() {
     std::string msg = proto::makeRegisterPeerMsg(lanIp, vpnIp, port);
     socket_.sendMessage(msg);
     std::cout << "[Executor] Send Local IP" << std::endl;
+}
+
+void CoreExecutor::sendTextMsg(const std::string& target_user, const std::string& content) {
+    std::string textMsg = proto::makeSendTextMsg(target_user, content);
+    socket_.sendMessage(textMsg);
+    std::cout << "[Executor] Send text msg to " << target_user << ": " << content << std::endl;
 }

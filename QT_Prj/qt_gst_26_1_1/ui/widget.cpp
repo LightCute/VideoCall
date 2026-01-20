@@ -92,11 +92,35 @@ void Widget::on_Bt_video_off_clicked()
 }
 
 void Widget::on_Bt_tcp_send_clicked() {
-
-
+    // 获取目标用户名和消息内容
+    QString target_user = ui->lineEdit_target_user->text();
+    QString content = ui->lineEdit_msg->text();
+    if (target_user.isEmpty() || content.isEmpty()) {
+        std::cout << "can not be empty" << std::endl;
+        return;
+    }
+    // 发送到Core层
+    core_->postInput(core::InCmdSendText{
+        target_user.toStdString(),
+        content.toStdString()
+    });
+    // 清空输入框
+    ui->lineEdit_msg->clear();
 }
 
+// 新增：处理发送文本消息（仅日志）
+void Widget::handle(const core::OutSendText& e) {
+    std::cout << "[Widget] Send text to  " << e.target_user << ": " << e.content << std::endl;
+}
 
+// 新增：处理接收转发文本消息（显示到UI）
+void Widget::handle(const core::OutForwardText& e) {
+    std::cout << "[Widget] recev from " << e.from_user << " msg: " << e.content << std::endl;
+    // 追加到文本框
+    QString text = ui->PTE_recv->toPlainText();
+    text += QString("[%1]: %2\n").arg(QString::fromStdString(e.from_user)).arg(QString::fromStdString(e.content));
+    ui->PTE_recv->setPlainText(text);
+}
 
 void Widget::handle(const core::OutStateChanged& e) {
     std::cout << "[Widget] FSM:"

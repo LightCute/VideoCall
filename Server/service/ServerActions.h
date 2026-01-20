@@ -42,6 +42,17 @@ struct UpdatePeerInfo {
     int udpPort;
 };
 
+struct ForwardText {
+    int target_fd;               // 目标用户 FD（-1 表示用户不存在）
+    std::string from_user;       // 发送者用户名
+    std::string content;         // 消息内容
+    int sender_fd;               // 发送者 FD（用于返回错误）
+};
+
+struct SendUserNotFound {
+    int fd;                      // 发送者 FD
+    std::string target_user;     // 不存在的用户名
+};
 
 
 // 未来可无限加

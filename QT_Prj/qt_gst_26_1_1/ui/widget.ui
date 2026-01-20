@@ -62,7 +62,7 @@
     <string>Send</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_to_cli">
+  <widget class="QLineEdit" name="lineEdit_target_user">
    <property name="geometry">
     <rect>
      <x>820</x>
@@ -115,6 +115,16 @@
      <y>420</y>
      <width>231</width>
      <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="PTE_recv">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>280</y>
+     <width>301</width>
+     <height>70</height>
     </rect>
    </property>
   </widget>

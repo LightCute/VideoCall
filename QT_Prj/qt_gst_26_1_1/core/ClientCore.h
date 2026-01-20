@@ -51,7 +51,8 @@ private:
     void execute(const core::OutSelectLan&);
     void execute(const core::OutSelectVpn&) ;
     void execute(const core::OutLoginOk&);
-
+    void execute(const core::OutSendText& e);
+    void execute(const core::OutForwardText&);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };

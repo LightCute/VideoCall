@@ -25,6 +25,12 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         return ProtoEvHeartbeatAck{}; // 改为 ProtoEvt 前缀
     }
 
+    // 解析转发文本消息（CMD_FORWARD_TEXT）
+    std::string from_user, content;
+    if (proto::parseForwardTextMsg(msg, from_user, content)) {
+        return ProtoEvtForwardText{from_user, content};
+    }
+
     proto::Unknown req_error;
     req_error.message = msg;
     return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀

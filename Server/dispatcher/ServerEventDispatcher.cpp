@@ -109,3 +109,48 @@ ServerEventDispatcher::handle(int fd, const event::RegisterPeer& ev)
     };
 }
 
+
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::SendTextToUser& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否在线
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot send message"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名（从 Session 中读取）
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 根据目标用户名查找 FD
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+
+    if (target_fd == -1) {
+        // 目标用户不存在：返回错误
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+    } else {
+        // 目标用户存在：生成定向转发 Action
+        actions.emplace_back(ForwardText{
+            .target_fd = target_fd,
+            .from_user = from_user,
+            .content = ev.content,
+            .sender_fd = fd
+        });
+    }
+
+    std::cout << "[Dispatcher] SendTextToUser from fd=" << fd 
+              << " user=" << from_user 
+              << " target=" << ev.target_user 
+              << " content=" << ev.content << std::endl;
+
+    return actions;
+}

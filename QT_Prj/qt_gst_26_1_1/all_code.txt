@@ -153,7 +153,7 @@ std::string getVpnIp()
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 179
+Lines: 193
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -278,6 +278,14 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
             execute(e);
             broadcastOutput(e);
         }
+        // 新增：处理发送文本消息
+        else if constexpr (std::is_same_v<T, core::OutSendText>) {
+            execute(e);
+        }
+        // 新增：广播转发文本消息给UI
+        else if constexpr (std::is_same_v<T, core::OutForwardText>) {
+            broadcastOutput(e);
+        }
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -330,7 +338,13 @@ void ClientCore::execute(const core::OutLoginOk&) {
     executor_->sendLocalIP();
 }
 
+void ClientCore::execute(const core::OutSendText& e) {
+    executor_->sendTextMsg(e.target_user, e.content);
+}
 
+void ClientCore::execute(const core::OutForwardText&) {
+    std::cout << "[Executor] OutForwardText" << std::endl;
+}
 // 废弃原 socket 操作接口（可直接删除）
 // bool ClientCore::connectToServer(const std::string& host, int port) { ... }
 // void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }
@@ -376,7 +390,7 @@ private:
 };
 
 ========== ./core/CoreInput.h ==========
-Lines: 54
+Lines: 59
 
 // core/CoreInput.h
 #pragma once
@@ -395,6 +409,9 @@ struct OnlineUser {
 };
 
 
+struct InCmdSendText { std::string target_user; std::string content; };
+
+struct InForwardText { std::string from_user; std::string content; };
 
 // 所有 Core 输入事件前缀改为 In
 struct InCmdConnect { std::string host; int port; };
@@ -429,12 +446,14 @@ using CoreInput = std::variant<
     InHeartbeatTimeout,
     InHeartbeatTick,
     InSelectLan,
-    InSelectVpn
+    InSelectVpn,
+    InCmdSendText,
+    InForwardText
     >;
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 228
+Lines: 255
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -506,6 +525,12 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
 
         else if constexpr (std::is_same_v<T, core::InSelectVpn>)
             evType = EventType::SelectVpn;
+
+        else if constexpr (std::is_same_v<T, core::InCmdSendText>)
+            evType = EventType::CmdSendText;
+
+        else if constexpr (std::is_same_v<T, core::InForwardText>)
+            evType = EventType::ForwardText;
 
         else evType = EventType::Unknow;
     }, ev);
@@ -661,12 +686,33 @@ void FSM::initTable() {
             State::LoggedIn
         },
 
+        { State::LoggedIn, EventType::CmdSendText,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCmdSendText>(&ev)) {
+                    out.push_back(core::OutSendText{e->target_user, e->content});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        { State::LoggedIn, EventType::ForwardText,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InForwardText>(&ev)) {
+                    out.push_back(core::OutForwardText{e->from_user, e->content});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
 
     };
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 57
+Lines: 58
 
 #pragma once
 #include "CoreInput.h"
@@ -721,13 +767,14 @@ private:
     void execute(const core::OutSelectLan&);
     void execute(const core::OutSelectVpn&) ;
     void execute(const core::OutLoginOk&);
-
+    void execute(const core::OutSendText& e);
+    void execute(const core::OutForwardText&);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 136
+Lines: 145
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
@@ -788,6 +835,9 @@ void CoreExecutor::initSocketCallbacks() {
             }
             else if constexpr (std::is_same_v<T, ProtoEvHeartbeatAck>) {
                 postInput_(core::InHeartbeatOk{});
+            }
+            else if constexpr (std::is_same_v<T, ProtoEvtForwardText>) {
+                postInput_(core::InForwardText{e.from_user, e.content});
             }
             else {
                 postInput_(core::InUnknow{});
@@ -866,6 +916,12 @@ void CoreExecutor::sendLocalIP() {
     std::cout << "[Executor] Send Local IP" << std::endl;
 }
 
+void CoreExecutor::sendTextMsg(const std::string& target_user, const std::string& content) {
+    std::string textMsg = proto::makeSendTextMsg(target_user, content);
+    socket_.sendMessage(textMsg);
+    std::cout << "[Executor] Send text msg to " << target_user << ": " << content << std::endl;
+}
+
 ========== ./core/ClientState.h ==========
 Lines: 24
 
@@ -895,7 +951,7 @@ inline std::string stateToString(State s) {
 }
 
 ========== ./core/CoreExecutor.h ==========
-Lines: 45
+Lines: 46
 
 //CoreExecutor.h
 #pragma once
@@ -924,6 +980,7 @@ public:
     void setLanMode() ;
     void setVpnMode() ;
     void sendLocalIP();
+    void sendTextMsg(const std::string& target_user, const std::string& content);
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
@@ -963,7 +1020,7 @@ public:
 } // namespace core
 
 ========== ./core/CoreOutput.h ==========
-Lines: 41
+Lines: 44
 
 // core/CoreOutput.h
 #pragma once
@@ -988,7 +1045,8 @@ struct OutUpdateAlive {};
 struct OutOnlineUsers { std::vector<OnlineUser> list; };
 struct OutSelectLan {};
 struct OutSelectVpn {};
-
+struct OutSendText { std::string target_user; std::string content; };
+struct OutForwardText { std::string from_user; std::string content; };
 
 
 using CoreOutput = std::variant<
@@ -1002,7 +1060,9 @@ using CoreOutput = std::variant<
     OutUpdateAlive,
     OutOnlineUsers,
     OutSelectLan,
-    OutSelectVpn
+    OutSelectVpn,
+    OutSendText,
+    OutForwardText
     >;
 
 } // namespace core
@@ -1287,7 +1347,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 144
+Lines: 168
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -1383,11 +1443,35 @@ void Widget::on_Bt_video_off_clicked()
 }
 
 void Widget::on_Bt_tcp_send_clicked() {
-
-
+    // 获取目标用户名和消息内容
+    QString target_user = ui->lineEdit_target_user->text();
+    QString content = ui->lineEdit_msg->text();
+    if (target_user.isEmpty() || content.isEmpty()) {
+        std::cout << "can not be empty" << std::endl;
+        return;
+    }
+    // 发送到Core层
+    core_->postInput(core::InCmdSendText{
+        target_user.toStdString(),
+        content.toStdString()
+    });
+    // 清空输入框
+    ui->lineEdit_msg->clear();
 }
 
+// 新增：处理发送文本消息（仅日志）
+void Widget::handle(const core::OutSendText& e) {
+    std::cout << "[Widget] Send text to  " << e.target_user << ": " << e.content << std::endl;
+}
 
+// 新增：处理接收转发文本消息（显示到UI）
+void Widget::handle(const core::OutForwardText& e) {
+    std::cout << "[Widget] recev from " << e.from_user << " msg: " << e.content << std::endl;
+    // 追加到文本框
+    QString text = ui->PTE_recv->toPlainText();
+    text += QString("[%1]: %2\n").arg(QString::fromStdString(e.from_user)).arg(QString::fromStdString(e.content));
+    ui->PTE_recv->setPlainText(text);
+}
 
 void Widget::handle(const core::OutStateChanged& e) {
     std::cout << "[Widget] FSM:"
@@ -1457,7 +1541,7 @@ void QtCameraAdapter::onFrame(Frame f) {
 }
 
 ========== ./ui/LoginWidget.h ==========
-Lines: 59
+Lines: 62
 
 //LoginWidget.h
 #ifndef LOGINWIDGET_H
@@ -1514,6 +1598,9 @@ private:
     void handle(const core::OutSelectLan&) ;
 
     void handle(const core::OutSelectVpn&) ;
+    void handle(const core::OutSendText& e) ;
+
+    void handle(const core::OutForwardText& e) ;
 
 };
 
@@ -1604,7 +1691,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 135
+Lines: 145
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -1730,6 +1817,16 @@ void LoginWidget::handle(const core::OutSelectVpn&) {
     std::cout << "[UI] OutSelectVpn" << std::endl;
 }
 
+void LoginWidget::handle(const core::OutSendText& e) {
+    std::cout << "[UI] OutSendText  "  << std::endl;
+}
+
+// 新增：处理接收转发文本消息（显示到UI）
+void LoginWidget::handle(const core::OutForwardText& e) {
+    std::cout << "[UI] OutForwardText " << std::endl;
+
+}
+
 void LoginWidget::on_Bt_Login_clicked()
 {
     QString qstr_user_name = ui->LE_UserName->text();
@@ -1777,7 +1874,7 @@ private:
 };
 
 ========== ./ui/widget.h ==========
-Lines: 73
+Lines: 75
 
 // ui/widget.h（完整修复版）
 #ifndef WIDGET_H
@@ -1848,13 +1945,15 @@ private:
     void handle(const core::OutSelectLan&) ;
 
     void handle(const core::OutSelectVpn&) ;
+    void handle(const core::OutSendText& e) ;
 
+    void handle(const core::OutForwardText& e) ;
 
 };
 #endif // WIDGET_H
 
 ========== ./protocol/protocol_types.h ==========
-Lines: 27
+Lines: 40
 
 //protocol_types.h
 #pragma once
@@ -1882,10 +1981,23 @@ struct OnlineUsers {
     std::vector<UserInfo> users;
 };
 
+// 新增：文本消息结构体（客户端→服务器）
+struct SendTextMsg {
+    std::string target_user;  // 目标用户名
+    std::string content;      // 消息内容
+    std::string from_user;    // 发送者用户名（服务器填充）
+};
+
+// 新增：转发文本消息结构体（服务器→客户端）
+struct ForwardTextMsg {
+    std::string from_user;    // 发送者用户名
+    std::string content;      // 消息内容
+};
+
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 21
+Lines: 27
 
 //protocol_text.h
 #pragma once
@@ -1901,16 +2013,22 @@ std::string makeLoginFail(const std::string& msg);
 std::string makeOnlineUsers(const OnlineUsers& users);
 std::string makeHeartbeat();
 std::string makeRegisterPeerMsg(const std::string& lan,const std::string& vpn,int port);
+std::string makeSendTextMsg(const std::string& target_user, const std::string& content);
+std::string makeForwardTextMsg(const std::string& from_user, const std::string& content);
+
+
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
 bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
 bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
 bool parseHeartbeatAck(const std::string& msg);
+bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::string& content);
+bool parseForwardTextMsg(const std::string& msg, std::string& from_user, std::string& content);
 
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 155
+Lines: 196
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1981,7 +2099,20 @@ std::string makeRegisterPeerMsg(
     return oss.str();
 }
 
+// （客户端→服务器）
+std::string makeSendTextMsg(const std::string& target_user, const std::string& content) {
+    std::ostringstream oss;
+    // 格式：SEND_TEXT 目标用户名 消息内容（内容含空格需保留，用引号或直接拼接，这里用空格分隔后拼接）
+    oss << CMD_SEND_TEXT << " " << target_user << " " << content;
+    return oss.str();
+}
 
+// （服务器→客户端）
+std::string makeForwardTextMsg(const std::string& from_user, const std::string& content) {
+    std::ostringstream oss;
+    oss << CMD_FORWARD_TEXT << " " << from_user << " " << content;
+    return oss.str();
+}
 
 
 /* ================= parse ================= */
@@ -2065,11 +2196,39 @@ bool parseHeartbeatAck(const std::string& msg) {
     return cmd == CMD_HEARTBEAT_ACK;   // "PONG"
 }
 
+// 解析发送文本消息（服务器用）
+bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::string& content) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_SEND_TEXT) return false;
+
+    // 读取目标用户名
+    iss >> target_user;
+    // 读取剩余所有内容作为消息（处理含空格的情况）
+    std::getline(iss >> std::ws, content);
+    return !target_user.empty() && !content.empty();
+}
+
+// 解析转发文本消息（客户端用）
+bool parseForwardTextMsg(const std::string& msg, std::string& from_user, std::string& content) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_FORWARD_TEXT) return false;
+
+    // 读取发送者用户名
+    iss >> from_user;
+    // 读取剩余所有内容作为消息
+    std::getline(iss >> std::ws, content);
+    return !from_user.empty() && !content.empty();
+}
+
 
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 23
+Lines: 26
 
 //protocol_common.h
 #pragma once
@@ -2084,6 +2243,9 @@ constexpr const char* CMD_ONLINE_USERS  = "ONLINE_USERS";
 constexpr const char* CMD_HEARTBEAT     = "PING";
 constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
+constexpr const char* CMD_SEND_TEXT     = "SEND_TEXT";
+constexpr const char* CMD_FORWARD_TEXT  = "FORWARD_TEXT";
+
 
 // keys
 constexpr const char* KEY_USERNAME  = "username";
@@ -2096,7 +2258,7 @@ constexpr const char* KEY_COUNT     = "count";
 }
 
 ========== ./app/ClientEvent.h ==========
-Lines: 42
+Lines: 49
 
 //ClientEvent.h
 #pragma once
@@ -2123,6 +2285,12 @@ struct ProtoEvtCmdLogin {
 };
 struct ProtoEvHeartbeatAck{};
 
+// 转发文本消息事件（服务器→客户端）
+struct ProtoEvtForwardText {
+    std::string from_user;  // 发送者用户名
+    std::string content;    // 消息内容
+};
+
 using ClientEvent = std::variant<
     // UI 触发的协议命令
     ProtoEvtCmdConnect,
@@ -2138,7 +2306,8 @@ using ClientEvent = std::variant<
     ProtoEvtLoginFail,
     ProtoEvtOnlineUsers,
     ProtoEvtUnknow,
-    ProtoEvHeartbeatAck
+    ProtoEvHeartbeatAck,
+    ProtoEvtForwardText
     >;
 
 ========== ./app/ClientEventFactory.h ==========
@@ -2164,7 +2333,7 @@ private:
 #endif // CLIENTEVENTFACTORY_H
 
 ========== ./app/ClientEventFactory.cpp ==========
-Lines: 31
+Lines: 37
 
 //ClientEventFactory.cpp
 #include "ClientEventFactory.h"
@@ -2193,13 +2362,19 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         return ProtoEvHeartbeatAck{}; // 改为 ProtoEvt 前缀
     }
 
+    // 解析转发文本消息（CMD_FORWARD_TEXT）
+    std::string from_user, content;
+    if (proto::parseForwardTextMsg(msg, from_user, content)) {
+        return ProtoEvtForwardText{from_user, content};
+    }
+
     proto::Unknown req_error;
     req_error.message = msg;
     return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀
 }
 
 ========== ./app/ClientEventEnum.h ==========
-Lines: 27
+Lines: 29
 
 //ClientEventEnum.h
 #pragma once
@@ -2226,7 +2401,9 @@ enum class EventType {
     HeartbeatTick,
 
     SelectLan,
-    SelectVpn
+    SelectVpn,
+    CmdSendText,
+    ForwardText
 };
 
 ========== ./media/CameraManager.cpp ==========
@@ -2391,4 +2568,4 @@ Q_DECLARE_METATYPE(Frame)
 
 =====================================
 Total files: 36
-Total lines: 2188
+Total lines: 2365

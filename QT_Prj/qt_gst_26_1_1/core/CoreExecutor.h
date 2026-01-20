@@ -25,6 +25,7 @@ public:
     void setLanMode() ;
     void setVpnMode() ;
     void sendLocalIP();
+    void sendTextMsg(const std::string& target_user, const std::string& content);
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
