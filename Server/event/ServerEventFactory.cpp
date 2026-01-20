@@ -14,14 +14,24 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         };
     }
 
-    else if (proto::parseLogout(msg)) {
+    if (proto::parseLogout(msg)) {
         return event::Logout{};
     }    
 
-    else if (proto::parseHeartbeat(msg)) {
+    if (proto::parseHeartbeat(msg)) {
         return event::Heartbeat{};
     }
 
+    std::string lan, vpn;
+    int port;
+    if (proto::parseRegisterPeer(msg, lan, vpn, port)) {
+        return event::RegisterPeer{
+            .lanIp = lan,
+            .vpnIp = vpn,
+            .udpPort = port
+        };
+    }
+    
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{

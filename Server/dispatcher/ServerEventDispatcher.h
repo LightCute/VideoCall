@@ -20,6 +20,8 @@ private:
     std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
     std::vector<ServerAction> handle(int fd, const event::Logout& ev);
     std::vector<ServerAction> handle(int fd, const event::Heartbeat& ev);
+    std::vector<ServerAction> handle(int fd, const event::RegisterPeer& ev);
+
     //std::vector<ServerAction> handle(int fd, const event::Logout&)
 
     LoginService&  loginService_;

@@ -198,3 +198,17 @@ void LoginServer::handle(const SendHeartbeatAck& a)
 
     listener_.sendPacket(a.fd, payload);
 }
+
+void LoginServer::handle(const UpdatePeerInfo& a)
+{
+    ClientNetInfo net{
+        .lanIp = a.lanIp,
+        .vpnIp = a.vpnIp,
+        .udpPort = a.udpPort
+    };
+
+    sessionMgr_.updateNetInfo(a.fd, net);
+
+    std::cout << "[Server] Registered peer info for fd=" << a.fd << std::endl;
+}
+

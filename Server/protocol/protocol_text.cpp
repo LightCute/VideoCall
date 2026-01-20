@@ -150,5 +150,20 @@ bool parseHeartbeat(const std::string& msg) {
     return cmd == CMD_HEARTBEAT;
 }
 
+bool parseRegisterPeer(
+    const std::string& msg,
+    std::string& lan,
+    std::string& vpn,
+    int& port)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_REGISTER_PEER) return false;
+
+    iss >> lan >> vpn >> port;
+    return !lan.empty() && port > 0;
+}
 
 } // namespace proto

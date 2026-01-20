@@ -158,7 +158,7 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 200
+Lines: 214
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
@@ -361,8 +361,22 @@ void LoginServer::handle(const SendHeartbeatAck& a)
     listener_.sendPacket(a.fd, payload);
 }
 
+void LoginServer::handle(const UpdatePeerInfo& a)
+{
+    ClientNetInfo net{
+        .lanIp = a.lanIp,
+        .vpnIp = a.vpnIp,
+        .udpPort = a.udpPort
+    };
+
+    sessionMgr_.updateNetInfo(a.fd, net);
+
+    std::cout << "[Server] Registered peer info for fd=" << a.fd << std::endl;
+}
+
+
 ========== ./core/LoginServer.h ==========
-Lines: 50
+Lines: 51
 
 //LoginServer.h
 #pragma once
@@ -406,6 +420,7 @@ private:
     void handle(const SendError&);
     void handle(const BroadcastLogout&);
     void handle(const SendHeartbeatAck& a);
+    void handle(const UpdatePeerInfo&);
 
 
     CommandSocket listener_;
@@ -416,7 +431,7 @@ private:
 };
 
 ========== ./service/ServerActions.h ==========
-Lines: 41
+Lines: 50
 
 // Service/ServerActions.h
 #pragma once
@@ -454,6 +469,15 @@ struct BroadcastLogout {
 struct SendHeartbeatAck {
     int fd;
 };
+
+struct UpdatePeerInfo {
+    int fd;
+    std::string lanIp;
+    std::string vpnIp;
+    int udpPort;
+};
+
+
 
 // 未来可无限加
 // struct KickUser { int fd; };
@@ -526,7 +550,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/ServerAction.h ==========
-Lines: 13
+Lines: 14
 
 // Service/ServerAction.h
 #pragma once
@@ -539,11 +563,12 @@ using ServerAction = std::variant<
     SendLoginFail,
     BroadcastOnlineUsers,
     BroadcastLogout,
-    SendHeartbeatAck
+    SendHeartbeatAck,
+    UpdatePeerInfo
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 88
+Lines: 107
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -634,8 +659,27 @@ std::vector<ServerAction> ServerEventDispatcher::handle(int fd, const event::Hea
     return {SendHeartbeatAck{ .fd = fd }}; // 心跳不触发Ack
 }
 
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::RegisterPeer& ev)
+{
+    std::cout << "[Dispatcher] RegisterPeer from fd=" << fd
+              << " lan=" << ev.lanIp
+              << " vpn=" << ev.vpnIp
+              << " port=" << ev.udpPort << std::endl;
+
+    return {
+        UpdatePeerInfo{
+            .fd = fd,
+            .lanIp = ev.lanIp,
+            .vpnIp = ev.vpnIp,
+            .udpPort = ev.udpPort
+        }
+    };
+}
+
+
 ========== ./dispatcher/ServerEventDispatcher.h ==========
-Lines: 27
+Lines: 29
 
 //ServerEventDispatcher.h
 #pragma once
@@ -659,6 +703,8 @@ private:
     std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
     std::vector<ServerAction> handle(int fd, const event::Logout& ev);
     std::vector<ServerAction> handle(int fd, const event::Heartbeat& ev);
+    std::vector<ServerAction> handle(int fd, const event::RegisterPeer& ev);
+
     //std::vector<ServerAction> handle(int fd, const event::Logout&)
 
     LoginService&  loginService_;
@@ -683,7 +729,7 @@ struct User {
 } // namespace domain
 
 ========== ./session/SessionManager.cpp ==========
-Lines: 31
+Lines: 44
 
 //SessionManager.cpp
 #include "./session/SessionManager.h"
@@ -717,8 +763,21 @@ void SessionManager::updateHeartbeat(int fd) {
     }
 }
 
+void SessionManager::updateNetInfo(int fd, const ClientNetInfo& net) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto it = sessions_.find(fd);
+    if (it != sessions_.end()) {
+        it->second.net = net;
+        std::cout << "[SessionManager] Updated net info for fd=" << fd
+                  << " lan=" << net.lanIp
+                  << " vpn=" << net.vpnIp
+                  << " port=" << net.udpPort << std::endl;
+    }
+}
+
+
 ========== ./session/SessionManager.h ==========
-Lines: 24
+Lines: 32
 
 //SessionManager.h
 #pragma once
@@ -727,10 +786,17 @@ Lines: 24
 #include <string>
 #include "./domain/User.h"
 
+struct ClientNetInfo {
+    std::string lanIp;
+    std::string vpnIp;
+    int udpPort = 0;
+};
+
 struct ClientInfo {
     domain::User user;
     bool online = false;
     std::chrono::steady_clock::time_point lastHeartbeat = std::chrono::steady_clock::now();
+    ClientNetInfo net;
 };
 
 class SessionManager {
@@ -740,6 +806,7 @@ public:
     std::map<int, ClientInfo> snapshot() const;
 
     void updateHeartbeat(int fd);
+    void updateNetInfo(int fd, const ClientNetInfo& net);
 private:
     mutable std::mutex mutex_;
     std::map<int, ClientInfo> sessions_;
@@ -759,7 +826,7 @@ public:
 };
 
 ========== ./event/ServerEventFactory.cpp ==========
-Lines: 31
+Lines: 41
 
 // ServerEventFactory.cpp
 #include "ServerEventFactory.h"
@@ -777,14 +844,24 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         };
     }
 
-    else if (proto::parseLogout(msg)) {
+    if (proto::parseLogout(msg)) {
         return event::Logout{};
     }    
 
-    else if (proto::parseHeartbeat(msg)) {
+    if (proto::parseHeartbeat(msg)) {
         return event::Heartbeat{};
     }
 
+    std::string lan, vpn;
+    int port;
+    if (proto::parseRegisterPeer(msg, lan, vpn, port)) {
+        return event::RegisterPeer{
+            .lanIp = lan,
+            .vpnIp = vpn,
+            .udpPort = port
+        };
+    }
+    
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{
@@ -794,7 +871,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./event/ServerEvents.h ==========
-Lines: 32
+Lines: 38
 
 //ServerEvents.h
 #pragma once
@@ -822,6 +899,12 @@ struct Logout {
 
 struct Heartbeat {};  // 客户端心跳
 
+struct RegisterPeer {
+    std::string lanIp;
+    std::string vpnIp;
+    int udpPort;
+};
+
 
 struct Chat {
     std::string message;
@@ -830,7 +913,7 @@ struct Chat {
 } // namespace event
 
 ========== ./event/ServerEvent.h ==========
-Lines: 19
+Lines: 20
 
 //ServerEvent.h
 #pragma once
@@ -844,7 +927,8 @@ using ServerEvent = std::variant<
     event::ErrorEvent,
     event::LoginRequest,
     event::Logout,
-    event::Heartbeat
+    event::Heartbeat,
+    event::RegisterPeer
     // event::Chat,
     // 以后只需要往这里加
 >;
@@ -1035,7 +1119,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 25
+Lines: 28
 
 //protocol_text.h
 
@@ -1060,11 +1144,14 @@ bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
 bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
 bool parseLogout(const std::string& msg);
 bool parseHeartbeat(const std::string& msg);
+bool parseRegisterPeer(const std::string& msg,std::string& lan,std::string& vpn,int& port);
+
+
 
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 154
+Lines: 169
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1218,6 +1305,21 @@ bool parseHeartbeat(const std::string& msg) {
     return cmd == CMD_HEARTBEAT;
 }
 
+bool parseRegisterPeer(
+    const std::string& msg,
+    std::string& lan,
+    std::string& vpn,
+    int& port)
+{
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_REGISTER_PEER) return false;
+
+    iss >> lan >> vpn >> port;
+    return !lan.empty() && port > 0;
+}
 
 } // namespace proto
 
@@ -1243,7 +1345,7 @@ constexpr const char* CMD_ONLINE_USERS = "ONLINE_USERS";
 constexpr const char* CMD_LOGOUT       = "LOGOUT";
 constexpr const char* CMD_HEARTBEAT = "PING";
 constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
-
+constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";
@@ -1257,4 +1359,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 25
-Total lines: 1105
+Total lines: 1207

@@ -91,8 +91,11 @@ void Widget::on_Bt_video_off_clicked()
     camera_.stop();
 }
 
-void Widget::on_Bt_tcp_send_clicked() {}
-void Widget::on_Bt_tcp_connect_clicked() {}
+void Widget::on_Bt_tcp_send_clicked() {
+
+
+}
+
 
 
 void Widget::handle(const core::OutStateChanged& e) {

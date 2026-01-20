@@ -82,7 +82,30 @@ ServerEventDispatcher::handle(int fd, const event::Logout& ev)
 }
 
 std::vector<ServerAction> ServerEventDispatcher::handle(int fd, const event::Heartbeat&) {
-    std::cout << "[Server] Received PING from fd= " << fd << std::endl;
-    sessionMgr_.updateHeartbeat(fd);  // 更新时间戳
-    return {SendHeartbeatAck{ .fd = fd }}; // 心跳不触发Ack
+    if (!sessionMgr_.exists(fd)) {
+        std::cout << "[Server] Ignore heartbeat before login, fd=" << fd << std::endl;
+        return {};   // ❗ 不回 PONG
+    }
+
+    sessionMgr_.updateHeartbeat(fd);
+    return {SendHeartbeatAck{ .fd = fd }};
 }
+
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::RegisterPeer& ev)
+{
+    std::cout << "[Dispatcher] RegisterPeer from fd=" << fd
+              << " lan=" << ev.lanIp
+              << " vpn=" << ev.vpnIp
+              << " port=" << ev.udpPort << std::endl;
+
+    return {
+        UpdatePeerInfo{
+            .fd = fd,
+            .lanIp = ev.lanIp,
+            .vpnIp = ev.vpnIp,
+            .udpPort = ev.udpPort
+        }
+    };
+}
+

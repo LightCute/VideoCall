@@ -9,5 +9,6 @@ using ServerAction = std::variant<
     SendLoginFail,
     BroadcastOnlineUsers,
     BroadcastLogout,
-    SendHeartbeatAck
+    SendHeartbeatAck,
+    UpdatePeerInfo
 >;

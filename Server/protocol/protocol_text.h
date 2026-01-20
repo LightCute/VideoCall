@@ -21,5 +21,8 @@ bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
 bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
 bool parseLogout(const std::string& msg);
 bool parseHeartbeat(const std::string& msg);
+bool parseRegisterPeer(const std::string& msg,std::string& lan,std::string& vpn,int& port);
+
+
 
 }

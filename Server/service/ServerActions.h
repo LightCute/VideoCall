@@ -35,6 +35,15 @@ struct SendHeartbeatAck {
     int fd;
 };
 
+struct UpdatePeerInfo {
+    int fd;
+    std::string lanIp;
+    std::string vpnIp;
+    int udpPort;
+};
+
+
+
 // 未来可无限加
 // struct KickUser { int fd; };
 // struct ForceLogout { int fd; };

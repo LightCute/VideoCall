@@ -24,6 +24,12 @@ struct Logout {
 
 struct Heartbeat {};  // 客户端心跳
 
+struct RegisterPeer {
+    std::string lanIp;
+    std::string vpnIp;
+    int udpPort;
+};
+
 
 struct Chat {
     std::string message;

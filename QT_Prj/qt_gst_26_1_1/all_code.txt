@@ -3,6 +3,9 @@
 📂 .:
   └─ main.cpp
 
+📂 ./util:
+  └─ GetLocalIP.h
+
 📂 ./core:
   └─ ClientCore.cpp
   └─ ClientCore.h
@@ -94,8 +97,63 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
+========== ./util/GetLocalIP.h ==========
+Lines: 51
+
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <netdb.h>
+std::string getLocalLanIP()
+{
+    struct ifaddrs *ifaddr, *ifa;
+    char host[NI_MAXHOST];
+
+    // 获取所有网络接口信息，失败则返回空字符串
+    if (getifaddrs(&ifaddr) == -1) {
+        perror("getifaddrs failed"); // 打印错误信息
+        return "";
+    }
+
+    std::string result = "";
+
+    // 遍历所有网络接口
+    for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == nullptr) continue;
+
+        // 筛选IPv4地址（AF_INET）
+        if (ifa->ifa_addr->sa_family == AF_INET) {
+            void* addr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+            // 将二进制IP转换为字符串格式
+            inet_ntop(AF_INET, addr, host, NI_MAXHOST);
+
+            std::string ip = host;
+
+            // 过滤回环地址（127.0.0.1），取第一个非回环的LAN IP
+            if (ip != "127.0.0.1") {
+                result = ip;
+                break;
+            }
+        }
+    }
+
+    // 释放接口信息内存
+    freeifaddrs(ifaddr);
+    return result;
+}
+
+
+std::string getVpnIp()
+{
+    return "10.0.0.1";
+}
+
 ========== ./core/ClientCore.cpp ==========
-Lines: 170
+Lines: 179
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -216,6 +274,10 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
         else if constexpr (std::is_same_v<T, core::OutSelectVpn>) {
             execute(e);
         }
+        else if constexpr (std::is_same_v<T, core::OutLoginOk>) {
+            execute(e);
+            broadcastOutput(e);
+        }
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -261,6 +323,11 @@ void ClientCore::execute(const core::OutSelectLan&) {
 void ClientCore::execute(const core::OutSelectVpn&) {
     std::cout << "[Executor] Select VPN" << std::endl;
     executor_->setVpnMode();
+}
+
+void ClientCore::execute(const core::OutLoginOk&) {
+    std::cout << "[Executor] OutLoginOk" << std::endl;
+    executor_->sendLocalIP();
 }
 
 
@@ -599,7 +666,7 @@ void FSM::initTable() {
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 56
+Lines: 57
 
 #pragma once
 #include "CoreInput.h"
@@ -653,19 +720,21 @@ private:
     void execute(const core::OutUpdateAlive&);
     void execute(const core::OutSelectLan&);
     void execute(const core::OutSelectVpn&) ;
+    void execute(const core::OutLoginOk&);
 
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 122
+Lines: 136
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
 #include "ClientEventFactory.h"
 #include <thread>
 #include <iostream>
+#include "./util/GetLocalIP.h"
 
 CoreExecutor::CoreExecutor(InputCallback cb)
     : postInput_(std::move(cb)) {
@@ -784,6 +853,19 @@ void CoreExecutor::setVpnMode() {
     std::cout << "[Executor] Switched to VPN mode\n";
 }
 
+void CoreExecutor::sendLocalIP() {
+    // std::string ping = proto::makeHeartbeat();
+    // socket_.sendMessage(ping);
+    std::string lanIp = getLocalLanIP();   // 你需要实现
+    std::string vpnIp = getVpnIp();        // 先返回 ""
+
+    int port = 5000;
+
+    std::string msg = proto::makeRegisterPeerMsg(lanIp, vpnIp, port);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send Local IP" << std::endl;
+}
+
 ========== ./core/ClientState.h ==========
 Lines: 24
 
@@ -841,7 +923,7 @@ public:
     void stop(); // 资源释放接口
     void setLanMode() ;
     void setVpnMode() ;
-
+    void sendLocalIP();
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
@@ -1205,7 +1287,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 141
+Lines: 144
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -1300,8 +1382,11 @@ void Widget::on_Bt_video_off_clicked()
     camera_.stop();
 }
 
-void Widget::on_Bt_tcp_send_clicked() {}
-void Widget::on_Bt_tcp_connect_clicked() {}
+void Widget::on_Bt_tcp_send_clicked() {
+
+
+}
+
 
 
 void Widget::handle(const core::OutStateChanged& e) {
@@ -1692,7 +1777,7 @@ private:
 };
 
 ========== ./ui/widget.h ==========
-Lines: 74
+Lines: 73
 
 // ui/widget.h（完整修复版）
 #ifndef WIDGET_H
@@ -1731,7 +1816,6 @@ private slots:
     void on_Bt_video_on_off_clicked();
     void on_Bt_video_off_clicked();
     void on_Bt_tcp_send_clicked();
-    void on_Bt_tcp_connect_clicked();
     void handleCoreOutput(const core::CoreOutput& out); // 槽函数声明
 
 private:
@@ -1801,7 +1885,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 20
+Lines: 21
 
 //protocol_text.h
 #pragma once
@@ -1816,6 +1900,7 @@ std::string makeLoginOk(const UserInfo& user, const std::string& msg);
 std::string makeLoginFail(const std::string& msg);
 std::string makeOnlineUsers(const OnlineUsers& users);
 std::string makeHeartbeat();
+std::string makeRegisterPeerMsg(const std::string& lan,const std::string& vpn,int port);
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
 bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
@@ -1825,7 +1910,7 @@ bool parseHeartbeatAck(const std::string& msg);
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 139
+Lines: 155
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1882,6 +1967,22 @@ std::string makeOnlineUsers(const OnlineUsers& users)
 std::string makeHeartbeat() {
     return CMD_HEARTBEAT;
 }
+
+std::string makeRegisterPeerMsg(
+    const std::string& lan,
+    const std::string& vpn,
+    int port)
+{
+    std::ostringstream oss;
+    oss << CMD_REGISTER_PEER << " "
+        << lan << " "
+        << vpn << " "
+        << port;
+    return oss.str();
+}
+
+
+
 
 /* ================= parse ================= */
 
@@ -1968,7 +2069,7 @@ bool parseHeartbeatAck(const std::string& msg) {
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 22
+Lines: 23
 
 //protocol_common.h
 #pragma once
@@ -1982,6 +2083,7 @@ constexpr const char* CMD_LOGIN_FAIL    = "LOGIN_FAIL";
 constexpr const char* CMD_ONLINE_USERS  = "ONLINE_USERS";
 constexpr const char* CMD_HEARTBEAT     = "PING";
 constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
+constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
 
 // keys
 constexpr const char* KEY_USERNAME  = "username";
@@ -2288,5 +2390,5 @@ Q_DECLARE_METATYPE(Frame)
 
 
 =====================================
-Total files: 35
-Total lines: 2093
+Total files: 36
+Total lines: 2188

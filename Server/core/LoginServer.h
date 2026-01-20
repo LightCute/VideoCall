@@ -40,6 +40,7 @@ private:
     void handle(const SendError&);
     void handle(const BroadcastLogout&);
     void handle(const SendHeartbeatAck& a);
+    void handle(const UpdatePeerInfo&);
 
 
     CommandSocket listener_;

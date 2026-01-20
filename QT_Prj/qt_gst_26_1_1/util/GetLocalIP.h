@@ -47,5 +47,5 @@ std::string getLocalLanIP()
 
 std::string getVpnIp()
 {
-    return "";
+    return "10.0.0.1";
 }

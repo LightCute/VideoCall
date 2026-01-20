@@ -29,3 +29,21 @@ void SessionManager::updateHeartbeat(int fd) {
          std::cout << "[SessionManager] Failed to update heartbeat: FD=" << fd << " does not exist" << std::endl;
     }
 }
+
+void SessionManager::updateNetInfo(int fd, const ClientNetInfo& net) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto it = sessions_.find(fd);
+    if (it != sessions_.end()) {
+        it->second.net = net;
+        std::cout << "[SessionManager] Updated net info for fd=" << fd
+                  << " lan=" << net.lanIp
+                  << " vpn=" << net.vpnIp
+                  << " port=" << net.udpPort << std::endl;
+    }
+}
+
+bool SessionManager::exists(int fd) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return sessions_.count(fd) > 0;
+}
+

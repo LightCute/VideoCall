@@ -35,7 +35,6 @@ private slots:
     void on_Bt_video_on_off_clicked();
     void on_Bt_video_off_clicked();
     void on_Bt_tcp_send_clicked();
-    void on_Bt_tcp_connect_clicked();
     void handleCoreOutput(const core::CoreOutput& out); // 槽函数声明
 
 private:
