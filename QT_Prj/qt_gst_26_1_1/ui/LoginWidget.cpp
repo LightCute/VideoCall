@@ -114,6 +114,14 @@ void LoginWidget::handle(const core::OutOnlineUsers&) {
     std::cout << "[UI] OutOnlineUsers" << std::endl;
 }
 
+void LoginWidget::handle(const core::OutSelectLan&) {
+    std::cout << "[UI] OutSelectLan" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSelectVpn&) {
+    std::cout << "[UI] OutSelectVpn" << std::endl;
+}
+
 void LoginWidget::on_Bt_Login_clicked()
 {
     QString qstr_user_name = ui->LE_UserName->text();

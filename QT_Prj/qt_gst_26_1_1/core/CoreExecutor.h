@@ -9,6 +9,7 @@
 
 // 定义回调类型：Executor 执行 IO 后，通过该回调向 ClientCore 推送 CoreInput
 using InputCallback = std::function<void(core::CoreInput)>;
+enum class NetMode { LAN, VPN };
 
 class CoreExecutor {
 public:
@@ -21,7 +22,9 @@ public:
     void sendLoginRequest(const std::string& user, const std::string& pass);
     void sendPing();
     void stop(); // 资源释放接口
-
+    void setLanMode() ;
+    void setVpnMode() ;
+    void sendLocalIP();
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
@@ -35,5 +38,8 @@ private:
 
     std::thread heartbeatThread_;
     void heartbeatLoop();   // 新增
+
+
+    std::atomic<NetMode> mode_{NetMode::LAN};
 
 };

@@ -158,14 +158,12 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 203
+Lines: 200
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
 
 #include "./core/LoginServer.h"
-
-
 
 // 实现 LoginServer 构造函数
 LoginServer::LoginServer() 
@@ -231,7 +229,7 @@ void LoginServer::startHeartbeatMonitor() {
 
 void LoginServer::onAccept(int clientfd) {
     std::cout << "[Server] new client fd=" << clientfd << std::endl;
-
+    
     pool_.post([this, clientfd] {
         clientThread(clientfd);
     });
@@ -354,7 +352,6 @@ void LoginServer::handle(const BroadcastLogout&)
         listener_.sendPacket(fd, payload);
     }
 }
-
 
 void LoginServer::handle(const SendHeartbeatAck& a)
 {
@@ -686,14 +683,16 @@ struct User {
 } // namespace domain
 
 ========== ./session/SessionManager.cpp ==========
-Lines: 25
+Lines: 31
 
 //SessionManager.cpp
 #include "./session/SessionManager.h"
-
+#include "iostream"
 void SessionManager::login(int fd, const ClientInfo& info) {
     std::lock_guard<std::mutex> lock(mutex_);
     sessions_[fd] = info;
+    std::cout << "[SessionManager] User logged in: FD=" << fd 
+              << ", Username=" << info.user.username << std::endl;
 }
 
 void SessionManager::logout(int fd) {
@@ -711,6 +710,10 @@ void SessionManager::updateHeartbeat(int fd) {
     auto it = sessions_.find(fd);
     if (it != sessions_.end()) {
         it->second.lastHeartbeat = std::chrono::steady_clock::now();
+        std::cout << "[SessionManager] Updated heartbeat: FD=" << fd << std::endl;
+    }
+    else {
+         std::cout << "[SessionManager] Failed to update heartbeat: FD=" << fd << " does not exist" << std::endl;
     }
 }
 
@@ -1254,4 +1257,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 25
-Total lines: 1102
+Total lines: 1105

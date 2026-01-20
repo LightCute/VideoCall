@@ -87,6 +87,9 @@ set(PROJECT_SOURCES
     # Qt UI files
     ui/LoginWidget.ui
     ui/widget.ui
+
+    # util files
+    util/GetLocalIP.h
 )
 
 

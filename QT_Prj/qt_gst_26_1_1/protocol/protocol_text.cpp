@@ -54,6 +54,22 @@ std::string makeHeartbeat() {
     return CMD_HEARTBEAT;
 }
 
+std::string makeRegisterPeerMsg(
+    const std::string& lan,
+    const std::string& vpn,
+    int port)
+{
+    std::ostringstream oss;
+    oss << CMD_REGISTER_PEER << " "
+        << lan << " "
+        << vpn << " "
+        << port;
+    return oss.str();
+}
+
+
+
+
 /* ================= parse ================= */
 
 // Server 使用

@@ -96,38 +96,46 @@ void Widget::on_Bt_tcp_connect_clicked() {}
 
 
 void Widget::handle(const core::OutStateChanged& e) {
-    qDebug() << "[Widget] FSM:"
-             << QString::fromStdString(stateToString(e.from))
+    std::cout << "[Widget] FSM:"
+             << (stateToString(e.from))
              << "→"
-             << QString::fromStdString(stateToString(e.to));
+             << (stateToString(e.to)) << std::endl;
 
 
 }
 
 void Widget::handle(const core::OutDisconnected&) {
-    qDebug() << "[Widget] OutDisconnected";
+    std::cout << "[Widget] OutDisconnected" << std::endl;
 }
 
 void Widget::handle(const core::OutConnect&) {
-    qDebug() << "[Widget] Ignore OutConnect (CoreExecutor handles it)";
+    std::cout << "[Widget] Ignore OutConnect (CoreExecutor handles it)" << std::endl;
 }
 
 void Widget::handle(const core::OutSendLogin&) {
-    qDebug() << "[Widget] Ignore OutSendLogin";
+    std::cout << "[Widget] Ignore OutSendLogin" << std::endl;
 }
 
 void Widget::handle(const core::OutSendPing&) {
-    qDebug() << "[Widget] Ignore OutSendPing";
+    std::cout << "[Widget] Ignore OutSendPing" << std::endl;
 }
 
 void Widget::handle(const core::OutUpdateAlive&) {
-    qDebug() << "[Widget] OutUpdateAlive";
+    std::cout << "[Widget] OutUpdateAlive" << std::endl;
 }
 
 void Widget::handle(const core::OutLoginOk&) {
-    qDebug() << "[Widget] OutLoginOk (optional handling)";
+    std::cout << "[Widget] OutLoginOk (optional handling)" << std::endl;
 }
 
 void Widget::handle(const core::OutLoginFail&) {
-    qDebug() << "[Widget] OutLoginFail (optional handling)";
+    std::cout << "[Widget] OutLoginFail (optional handling)" << std::endl;
+}
+
+void Widget::handle(const core::OutSelectLan&) {
+    std::cout << "[Widget] OutSelectLan" << std::endl;
+}
+
+void Widget::handle(const core::OutSelectVpn&) {
+    std::cout << "[Widget] OutSelectVpn)" << std::endl;
 }

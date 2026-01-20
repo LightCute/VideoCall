@@ -63,6 +63,12 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
         else if constexpr (std::is_same_v<T, core::InHeartbeatTick>)
             evType = EventType::HeartbeatTick;
 
+        else if constexpr (std::is_same_v<T, core::InSelectLan>)
+            evType = EventType::SelectLan;
+
+        else if constexpr (std::is_same_v<T, core::InSelectVpn>)
+            evType = EventType::SelectVpn;
+
         else evType = EventType::Unknow;
     }, ev);
     return evType;
@@ -192,6 +198,31 @@ void FSM::initTable() {
             },
             State::LoggedIn
         },
+
+        { State::LoggedIn, EventType::SelectLan,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+
+                if (auto e = std::get_if<core::InSelectLan>(&ev)) {
+                    out.push_back(core::OutSelectLan{});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        { State::LoggedIn, EventType::SelectLan,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+
+                if (auto e = std::get_if<core::InSelectVpn>(&ev)) {
+                    out.push_back(core::OutSelectVpn{});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
+
 
     };
 }

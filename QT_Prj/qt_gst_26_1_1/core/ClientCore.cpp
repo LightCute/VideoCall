@@ -9,7 +9,6 @@ ClientCore::ClientCore() : fsm_() {
             this->postInput(std::move(ev)); // 将 Executor 的事件推入输入队列
         }
         );
-
     // 启动事件处理线程（仅调度，无 IO）
     std::thread([this]{ processEvents(); }).detach();
 }
@@ -112,6 +111,16 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
             execute(e);
             broadcastOutput(e);
         }
+        else if constexpr (std::is_same_v<T, core::OutSelectLan>) {
+            execute(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutSelectVpn>) {
+            execute(e);
+        }
+        else if constexpr (std::is_same_v<T, core::OutLoginOk>) {
+            execute(e);
+            broadcastOutput(e);
+        }
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -147,6 +156,21 @@ void ClientCore::execute(const core::OutSendPing&) {
 
 void ClientCore::execute(const core::OutUpdateAlive&) {
     std::cout << "[Executor] Received PONG from server" << std::endl;
+}
+
+void ClientCore::execute(const core::OutSelectLan&) {
+    std::cout << "[Executor] Select LAN" << std::endl;
+    executor_->setLanMode();
+}
+
+void ClientCore::execute(const core::OutSelectVpn&) {
+    std::cout << "[Executor] Select VPN" << std::endl;
+    executor_->setVpnMode();
+}
+
+void ClientCore::execute(const core::OutLoginOk&) {
+    std::cout << "[Executor] OutLoginOk" << std::endl;
+    executor_->sendLocalIP();
 }
 
 

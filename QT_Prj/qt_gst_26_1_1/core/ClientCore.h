@@ -48,6 +48,10 @@ private:
     void execute(const core::OutSendLogin& e) ; // 补充 core:: 前缀
     void execute(const core::OutSendPing& e);
     void execute(const core::OutUpdateAlive&);
+    void execute(const core::OutSelectLan&);
+    void execute(const core::OutSelectVpn&) ;
+    void execute(const core::OutLoginOk&);
+
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };

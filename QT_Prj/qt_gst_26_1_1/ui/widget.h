@@ -65,5 +65,10 @@ private:
 
     void handle(const core::OutStateChanged&);
 
+    void handle(const core::OutSelectLan&) ;
+
+    void handle(const core::OutSelectVpn&) ;
+
+
 };
 #endif // WIDGET_H

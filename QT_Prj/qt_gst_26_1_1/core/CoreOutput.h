@@ -19,6 +19,8 @@ struct OutSendLogin { std::string user; std::string pass; };
 struct OutSendPing {};   // Core -> Executor：发送心跳
 struct OutUpdateAlive {};
 struct OutOnlineUsers { std::vector<OnlineUser> list; };
+struct OutSelectLan {};
+struct OutSelectVpn {};
 
 
 
@@ -31,7 +33,9 @@ using CoreOutput = std::variant<
     OutSendLogin,
     OutSendPing,
     OutUpdateAlive,
-    OutOnlineUsers
+    OutOnlineUsers,
+    OutSelectLan,
+    OutSelectVpn
     >;
 
 } // namespace core

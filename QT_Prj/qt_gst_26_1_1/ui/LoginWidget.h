@@ -50,6 +50,10 @@ private:
 
     void handle(const core::OutUpdateAlive&);
     void handle(const core::OutOnlineUsers&);
+    void handle(const core::OutSelectLan&) ;
+
+    void handle(const core::OutSelectVpn&) ;
+
 };
 
 #endif // LOGINWIDGET_H

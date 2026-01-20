@@ -3,6 +3,7 @@
 #include "ClientEventFactory.h"
 #include <thread>
 #include <iostream>
+#include "./util/GetLocalIP.h"
 
 CoreExecutor::CoreExecutor(InputCallback cb)
     : postInput_(std::move(cb)) {
@@ -60,6 +61,8 @@ void CoreExecutor::initSocketCallbacks() {
             else {
                 postInput_(core::InUnknow{});
             }
+
+
         }, event);
     });
 }
@@ -107,4 +110,27 @@ void CoreExecutor::sendPing() {
 void CoreExecutor::stop() {
     isRunning_ = false;
     socket_.stop();
+}
+
+void CoreExecutor::setLanMode() {
+    mode_ = NetMode::LAN;
+    std::cout << "[Executor] Switched to LAN mode\n";
+}
+
+void CoreExecutor::setVpnMode() {
+    mode_ = NetMode::VPN;
+    std::cout << "[Executor] Switched to VPN mode\n";
+}
+
+void CoreExecutor::sendLocalIP() {
+    // std::string ping = proto::makeHeartbeat();
+    // socket_.sendMessage(ping);
+    std::string lanIp = getLocalLanIP();   // 你需要实现
+    std::string vpnIp = getVpnIp();        // 先返回 ""
+
+    int port = 5000;
+
+    std::string msg = proto::makeRegisterPeerMsg(lanIp, vpnIp, port);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send Local IP" << std::endl;
 }

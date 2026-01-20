@@ -20,5 +20,8 @@ enum class EventType {
 
     HeartbeatOk,
     HeartbeatTimeout,
-    HeartbeatTick
+    HeartbeatTick,
+
+    SelectLan,
+    SelectVpn
 };

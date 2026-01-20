@@ -8,6 +8,10 @@ namespace core {
 struct OnlineUser {
     std::string name;
     int privilege;
+
+    std::string lan_ip;   // 局域网 IP
+    std::string vpn_ip;   // VPN IP（未来可用）
+    int media_port;       // GStreamer/UDP 视频端口
 };
 
 
@@ -25,6 +29,11 @@ struct InUnknow {};
 struct InHeartbeatOk {};      // 收到 PONG
 struct InHeartbeatTimeout {}; // 心跳超时
 struct InHeartbeatTick {};    // Send PING
+struct InSelectLan {};
+struct InSelectVpn {};
+
+
+
 
 using CoreInput = std::variant<
     InCmdConnect,
@@ -38,6 +47,8 @@ using CoreInput = std::variant<
     InUnknow,
     InHeartbeatOk,
     InHeartbeatTimeout,
-    InHeartbeatTick
+    InHeartbeatTick,
+    InSelectLan,
+    InSelectVpn
     >;
 }

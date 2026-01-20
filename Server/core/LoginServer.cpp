@@ -3,8 +3,6 @@
 
 #include "./core/LoginServer.h"
 
-
-
 // 实现 LoginServer 构造函数
 LoginServer::LoginServer() 
     : dispatcher_(loginService_, sessionMgr_)  // 手动初始化 dispatcher_，传入所需两个参数
@@ -192,7 +190,6 @@ void LoginServer::handle(const BroadcastLogout&)
         listener_.sendPacket(fd, payload);
     }
 }
-
 
 void LoginServer::handle(const SendHeartbeatAck& a)
 {
