@@ -170,10 +170,24 @@ CMakeFiles/login_server.dir/service/LoginService.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/service/LoginService.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/service/LoginService.cpp -o CMakeFiles/login_server.dir/service/LoginService.cpp.s
 
+CMakeFiles/login_server.dir/service/CallService.cpp.o: CMakeFiles/login_server.dir/flags.make
+CMakeFiles/login_server.dir/service/CallService.cpp.o: /home/light/work/Video_Prj/Server/service/CallService.cpp
+CMakeFiles/login_server.dir/service/CallService.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/login_server.dir/service/CallService.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/service/CallService.cpp.o -MF CMakeFiles/login_server.dir/service/CallService.cpp.o.d -o CMakeFiles/login_server.dir/service/CallService.cpp.o -c /home/light/work/Video_Prj/Server/service/CallService.cpp
+
+CMakeFiles/login_server.dir/service/CallService.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/login_server.dir/service/CallService.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/light/work/Video_Prj/Server/service/CallService.cpp > CMakeFiles/login_server.dir/service/CallService.cpp.i
+
+CMakeFiles/login_server.dir/service/CallService.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/login_server.dir/service/CallService.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/light/work/Video_Prj/Server/service/CallService.cpp -o CMakeFiles/login_server.dir/service/CallService.cpp.s
+
 CMakeFiles/login_server.dir/session/SessionManager.cpp.o: CMakeFiles/login_server.dir/flags.make
 CMakeFiles/login_server.dir/session/SessionManager.cpp.o: /home/light/work/Video_Prj/Server/session/SessionManager.cpp
 CMakeFiles/login_server.dir/session/SessionManager.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/login_server.dir/session/SessionManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/login_server.dir/session/SessionManager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/session/SessionManager.cpp.o -MF CMakeFiles/login_server.dir/session/SessionManager.cpp.o.d -o CMakeFiles/login_server.dir/session/SessionManager.cpp.o -c /home/light/work/Video_Prj/Server/session/SessionManager.cpp
 
 CMakeFiles/login_server.dir/session/SessionManager.cpp.i: cmake_force
@@ -187,7 +201,7 @@ CMakeFiles/login_server.dir/session/SessionManager.cpp.s: cmake_force
 CMakeFiles/login_server.dir/util/ThreadPool.cpp.o: CMakeFiles/login_server.dir/flags.make
 CMakeFiles/login_server.dir/util/ThreadPool.cpp.o: /home/light/work/Video_Prj/Server/util/ThreadPool.cpp
 CMakeFiles/login_server.dir/util/ThreadPool.cpp.o: CMakeFiles/login_server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/login_server.dir/util/ThreadPool.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/login_server.dir/util/ThreadPool.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/login_server.dir/util/ThreadPool.cpp.o -MF CMakeFiles/login_server.dir/util/ThreadPool.cpp.o.d -o CMakeFiles/login_server.dir/util/ThreadPool.cpp.o -c /home/light/work/Video_Prj/Server/util/ThreadPool.cpp
 
 CMakeFiles/login_server.dir/util/ThreadPool.cpp.i: cmake_force
@@ -207,6 +221,7 @@ login_server_OBJECTS = \
 "CMakeFiles/login_server.dir/net/CommandSocket.cpp.o" \
 "CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o" \
 "CMakeFiles/login_server.dir/service/LoginService.cpp.o" \
+"CMakeFiles/login_server.dir/service/CallService.cpp.o" \
 "CMakeFiles/login_server.dir/session/SessionManager.cpp.o" \
 "CMakeFiles/login_server.dir/util/ThreadPool.cpp.o"
 
@@ -220,12 +235,13 @@ login_server: CMakeFiles/login_server.dir/event/ServerEventFactory.cpp.o
 login_server: CMakeFiles/login_server.dir/net/CommandSocket.cpp.o
 login_server: CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o
 login_server: CMakeFiles/login_server.dir/service/LoginService.cpp.o
+login_server: CMakeFiles/login_server.dir/service/CallService.cpp.o
 login_server: CMakeFiles/login_server.dir/session/SessionManager.cpp.o
 login_server: CMakeFiles/login_server.dir/util/ThreadPool.cpp.o
 login_server: CMakeFiles/login_server.dir/build.make
 login_server: CMakeFiles/login_server.dir/compiler_depend.ts
 login_server: CMakeFiles/login_server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable login_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable login_server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/login_server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

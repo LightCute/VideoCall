@@ -54,6 +54,24 @@ struct SendUserNotFound {
     std::string target_user;     // 不存在的用户名
 };
 
+// 单播给被呼叫方：有新来电
+struct SendCallIncoming {
+    int target_fd;       // 被呼叫方的FD
+    std::string from_user; // 呼叫方用户名
+};
+
+// 单播：通话已接通（给呼叫方/被呼叫方）
+struct SendCallAccepted {
+    int fd;              // 目标FD
+    std::string peer;    // 通话对方的用户名
+};
+
+// 单播：通话被拒绝（仅给呼叫方）
+struct SendCallRejected {
+    int fd;              // 呼叫方的FD
+    std::string peer;    // 被呼叫方的用户名
+};
+
 
 // 未来可无限加
 // struct KickUser { int fd; };

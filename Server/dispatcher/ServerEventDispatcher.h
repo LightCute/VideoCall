@@ -6,16 +6,20 @@
 #include "./session/SessionManager.h"
 #include "./service/ServerAction.h"
 #include "./service/ServerActions.h"
-
+#include "./service/CallService.h"
 
 class ServerEventDispatcher {
 public:
     ServerEventDispatcher(LoginService& loginService,
-                          SessionManager& sessionMgr);
+                          SessionManager& sessionMgr,
+                          CallService& callService);
 
     std::vector<ServerAction> dispatch(int fd, const ServerEvent& event);
 
 private:
+    std::vector<ServerAction> handle(int fd, const event::CallRequest& ev);
+    std::vector<ServerAction> handle(int fd, const event::CallAccept& ev);
+    std::vector<ServerAction> handle(int fd, const event::CallReject& ev);
     std::vector<ServerAction> handle(int fd, const event::LoginRequest& ev);
     std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
     std::vector<ServerAction> handle(int fd, const event::Logout& ev);
@@ -26,4 +30,5 @@ private:
 
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
+    CallService& callService_;
 };

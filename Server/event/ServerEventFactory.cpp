@@ -42,6 +42,19 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         };
     }
         
+    std::string call_target;
+    if (proto::parseCallRequest(msg, call_target)) {
+        return event::CallRequest{.target_user = call_target};
+    }
+
+    if (proto::parseCallAccept(msg)) {
+        return event::CallAccept{};
+    }
+
+    if (proto::parseCallReject(msg)) {
+        return event::CallReject{};
+    }
+
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{

@@ -12,7 +12,10 @@ using ServerEvent = std::variant<
     event::Logout,
     event::Heartbeat,
     event::RegisterPeer,
-    event::SendTextToUser
+    event::SendTextToUser,
+    event::CallRequest,
+    event::CallAccept,
+    event::CallReject
     // event::Chat,
     // 以后只需要往这里加
 >;

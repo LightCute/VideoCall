@@ -5,7 +5,7 @@
 
 // 实现 LoginServer 构造函数
 LoginServer::LoginServer() 
-    : dispatcher_(loginService_, sessionMgr_)  // 手动初始化 dispatcher_，传入所需两个参数
+    : dispatcher_(loginService_, sessionMgr_, callService_)  // 手动初始化 dispatcher_，传入所需两个参数
 {
     // 构造函数体可留空（如需其他初始化逻辑可补充）
 }
@@ -124,8 +124,38 @@ void LoginServer::onMessage(int fd, const std::string& msg)
     }
 }
 
+// 处理发送新来电通知的Action
+void LoginServer::handle(const SendCallIncoming& a) {
+    // 构建新来电的payload
+    auto payload = proto::makeCallIncoming(a.from_user);
+    // 发送给被呼叫方
+    listener_.sendPacket(a.target_fd, payload);
+    std::cout << "[Server] Send call incoming to fd=" << a.target_fd 
+              << " from=" << a.from_user << std::endl;
+}
 
-// LoginServer.cpp
+// 处理发送通话接通通知的Action
+void LoginServer::handle(const SendCallAccepted& a) {
+    // 构建通话接通的payload
+    auto payload = proto::makeCallAccepted(a.peer);
+    // 发送给目标用户
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send call accepted to fd=" << a.fd 
+              << " peer=" << a.peer << std::endl;
+}
+
+// 处理发送通话被拒通知的Action
+void LoginServer::handle(const SendCallRejected& a) {
+    // 构建通话被拒的payload
+    auto payload = proto::makeCallRejected(a.peer);
+    // 发送给呼叫方
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send call rejected to fd=" << a.fd 
+              << " peer=" << a.peer << std::endl;
+}
+
+
+
 
 void LoginServer::handle(const SendLoginOk& a)
 {

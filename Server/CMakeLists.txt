@@ -43,6 +43,8 @@ add_executable(login_server
     ./service/LoginService.cpp
     ./service/LoginService.h
     ./service/ServerAction.h
+    ./service/CallService.h
+    ./service/CallService.cpp
 
     # session目录文件
     ./session/SessionManager.cpp
@@ -51,6 +53,7 @@ add_executable(login_server
     # util目录文件
     ./util/ThreadPool.cpp
     ./util/ThreadPool.h
+    
 )
 
 # Linux 下链接必要的系统库

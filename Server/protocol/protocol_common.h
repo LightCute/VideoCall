@@ -20,6 +20,14 @@ constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
 constexpr const char* CMD_SEND_TEXT     = "SEND_TEXT";       // 客户端→服务端：发送文本
 constexpr const char* CMD_FORWARD_TEXT  = "FORWARD_TEXT"; // 服务端→客户端：转发文本
+
+constexpr const char* CMD_CALL         = "CALL";         // 客户端发起呼叫
+constexpr const char* CMD_CALL_ACCEPT  = "CALL_ACCEPT";  // 客户端接受呼叫
+constexpr const char* CMD_CALL_REJECT  = "CALL_REJECT";  // 客户端拒绝呼叫
+constexpr const char* CMD_CALL_INCOMING = "CALL_INCOMING"; // 服务端通知新来电
+constexpr const char* CMD_CALL_ACCEPTED = "CALL_ACCEPTED"; // 服务端通知通话接通
+constexpr const char* CMD_CALL_REJECTED = "CALL_REJECTED"; // 服务端通知通话被拒
+
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";

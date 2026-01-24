@@ -8,6 +8,29 @@ namespace proto {
 
 /* ================= build ================= */
 
+
+// ========== 新增：通话协议构建函数 ==========
+// 构建服务端通知新来电的消息（CMD_CALL_INCOMING from_user）
+std::string makeCallIncoming(const std::string& from_user) {
+    std::ostringstream oss;
+    oss << CMD_CALL_INCOMING << " " << from_user;
+    return oss.str();
+}
+
+// 构建服务端通知通话接通的消息（CMD_CALL_ACCEPTED peer）
+std::string makeCallAccepted(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_CALL_ACCEPTED << " " << peer;
+    return oss.str();
+}
+
+// 构建服务端通知通话被拒的消息（CMD_CALL_REJECTED peer）
+std::string makeCallRejected(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_CALL_REJECTED << " " << peer;
+    return oss.str();
+}
+
 // Client 使用
 std::string makeLoginRequest(const std::string& user,
                              const std::string& pwd)
@@ -209,6 +232,33 @@ bool parseSendText(const std::string& msg, std::string& from_user, std::string& 
         std::getline(iss >> std::ws, content);
         return !target_user.empty() && !content.empty();
     }
+
+// 解析客户端的呼叫请求（CMD_CALL target_user）
+bool parseCallRequest(const std::string& msg, std::string& target_user) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_CALL) return false;
+    iss >> target_user;
+    return !target_user.empty();
+}
+
+// 解析客户端的接受呼叫请求（CMD_CALL_ACCEPT）
+bool parseCallAccept(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_CALL_ACCEPT;
+}
+
+// 解析客户端的拒绝呼叫请求（CMD_CALL_REJECT）
+bool parseCallReject(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_CALL_REJECT;
+}
+
 
 
 } // namespace proto

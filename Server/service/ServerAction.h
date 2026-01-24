@@ -12,5 +12,8 @@ using ServerAction = std::variant<
     SendHeartbeatAck,
     UpdatePeerInfo,
     ForwardText,
-    SendUserNotFound
+    SendUserNotFound,
+    SendCallIncoming,
+    SendCallAccepted,
+    SendCallRejected
 >;

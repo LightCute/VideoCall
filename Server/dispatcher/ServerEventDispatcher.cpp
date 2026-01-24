@@ -5,9 +5,11 @@
 
 ServerEventDispatcher::ServerEventDispatcher(
     LoginService& loginService,
-    SessionManager& sessionMgr)
+    SessionManager& sessionMgr,
+    CallService& callService)
     : loginService_(loginService),
-      sessionMgr_(sessionMgr)
+      sessionMgr_(sessionMgr),
+      callService_(callService)
 {}
 
 
@@ -18,6 +20,155 @@ ServerEventDispatcher::dispatch(int fd, const ServerEvent& event)
         return handle(fd, ev);
     }, event);
 }
+
+
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallRequest& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot make call"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 检查目标用户是否在线
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+    if (target_fd == -1) {
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+        return actions;
+    }
+
+    // 4. 调用CallService创建通话会话
+    auto call_session = callService_.onCallRequest(from_user, ev.target_user);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Failed to make call: target user is busy"
+        });
+        return actions;
+    }
+
+    // 5. 生成Action：通知被呼叫方有新来电
+    actions.emplace_back(SendCallIncoming{
+        .target_fd = target_fd,
+        .from_user = from_user
+    });
+
+    std::cout << "[Dispatcher] Call request from " << from_user << " to " << ev.target_user << std::endl;
+    return actions;
+}
+
+// 处理接受通话事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallAccept& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证用户是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot accept call"
+        });
+        return actions;
+    }
+
+    // 2. 获取当前用户（被呼叫方）用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string callee = snapshot.at(fd).user.username;
+
+    // 3. 调用CallService处理接受通话
+    auto call_session = callService_.onAccept(callee);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No incoming call to accept"
+        });
+        return actions;
+    }
+
+    // 4. 获取呼叫方的FD
+    int caller_fd = sessionMgr_.getFdByUsername(call_session->caller);
+    if (caller_fd == -1) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Caller is offline"
+        });
+        return actions;
+    }
+
+    // 5. 生成Action：通知呼叫方和被呼叫方通话已接通
+    // 通知被呼叫方
+    actions.emplace_back(SendCallAccepted{
+        .fd = fd,
+        .peer = call_session->caller
+    });
+    // 通知呼叫方
+    actions.emplace_back(SendCallAccepted{
+        .fd = caller_fd,
+        .peer = callee
+    });
+
+    std::cout << "[Dispatcher] Call accepted: " << call_session->caller << " <-> " << callee << std::endl;
+    return actions;
+}
+
+// 处理拒绝通话事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallReject& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证用户是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot reject call"
+        });
+        return actions;
+    }
+
+    // 2. 获取当前用户（被呼叫方）用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string callee = snapshot.at(fd).user.username;
+
+    // 3. 调用CallService处理拒绝通话
+    auto call_session = callService_.onReject(callee);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No incoming call to reject"
+        });
+        return actions;
+    }
+
+    // 4. 获取呼叫方的FD
+    int caller_fd = sessionMgr_.getFdByUsername(call_session->caller);
+    if (caller_fd != -1) {
+        // 生成Action：通知呼叫方通话被拒绝
+        actions.emplace_back(SendCallRejected{
+            .fd = caller_fd,
+            .peer = callee
+        });
+    }
+
+    std::cout << "[Dispatcher] Call rejected: " << call_session->caller << " -> " << callee << std::endl;
+    return actions;
+}
+
+
 
 
 // 登录

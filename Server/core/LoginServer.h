@@ -21,6 +21,7 @@
 #include "./service/ServerAction.h"
 #include "./protocol/protocol_text.h"
 #include "./protocol/protocol_common.h"
+#include "./service/CallService.h"
 
 class LoginServer {
 public:
@@ -43,9 +44,13 @@ private:
     void handle(const UpdatePeerInfo&);
     void handle(const ForwardText&);          
     void handle(const SendUserNotFound&);     
+    void handle(const SendCallIncoming& a);
+    void handle(const SendCallAccepted& a);
+    void handle(const SendCallRejected& a);
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;
-    ServerEventDispatcher dispatcher_;
     LoginService loginService_;
+    CallService callService_;  // 新增：CallService成员
+    ServerEventDispatcher dispatcher_; // 调整顺序：需在callService_之后初始化
 };

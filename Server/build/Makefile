@@ -273,6 +273,30 @@ server_main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/server_main.cpp.s
 .PHONY : server_main.cpp.s
 
+service/CallService.o: service/CallService.cpp.o
+.PHONY : service/CallService.o
+
+# target to build an object file
+service/CallService.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/service/CallService.cpp.o
+.PHONY : service/CallService.cpp.o
+
+service/CallService.i: service/CallService.cpp.i
+.PHONY : service/CallService.i
+
+# target to preprocess a source file
+service/CallService.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/service/CallService.cpp.i
+.PHONY : service/CallService.cpp.i
+
+service/CallService.s: service/CallService.cpp.s
+.PHONY : service/CallService.s
+
+# target to generate assembly for a file
+service/CallService.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/service/CallService.cpp.s
+.PHONY : service/CallService.cpp.s
+
 service/LoginService.o: service/LoginService.cpp.o
 .PHONY : service/LoginService.o
 
@@ -372,6 +396,9 @@ help:
 	@echo "... server_main.o"
 	@echo "... server_main.i"
 	@echo "... server_main.s"
+	@echo "... service/CallService.o"
+	@echo "... service/CallService.i"
+	@echo "... service/CallService.s"
 	@echo "... service/LoginService.o"
 	@echo "... service/LoginService.i"
 	@echo "... service/LoginService.s"

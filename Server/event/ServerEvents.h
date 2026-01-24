@@ -41,4 +41,12 @@ struct Chat {
     std::string message;
 };
 
+struct CallRequest {
+    std::string target_user;   // 呼叫的目标用户名
+};
+
+struct CallAccept {};  // 接受通话（无需带target，由CallSession维护）
+struct CallReject {};  // 拒绝通话（同理）
+
+
 } // namespace event

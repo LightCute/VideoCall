@@ -12,6 +12,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/login_server.dir/protocol/protocol_text.cpp.o.d"
   "CMakeFiles/login_server.dir/server_main.cpp.o"
   "CMakeFiles/login_server.dir/server_main.cpp.o.d"
+  "CMakeFiles/login_server.dir/service/CallService.cpp.o"
+  "CMakeFiles/login_server.dir/service/CallService.cpp.o.d"
   "CMakeFiles/login_server.dir/service/LoginService.cpp.o"
   "CMakeFiles/login_server.dir/service/LoginService.cpp.o.d"
   "CMakeFiles/login_server.dir/session/SessionManager.cpp.o"

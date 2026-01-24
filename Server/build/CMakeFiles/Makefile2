@@ -85,12 +85,12 @@ clean: CMakeFiles/login_server.dir/clean
 CMakeFiles/login_server.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Built target login_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11 "Built target login_server"
 .PHONY : CMakeFiles/login_server.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/login_server.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/light/work/Video_Prj/Server/build/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/light/work/Video_Prj/Server/build/CMakeFiles 11
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/login_server.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/light/work/Video_Prj/Server/build/CMakeFiles 0
 .PHONY : CMakeFiles/login_server.dir/rule
@@ -102,7 +102,7 @@ login_server: CMakeFiles/login_server.dir/rule
 # codegen rule for target.
 CMakeFiles/login_server.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/login_server.dir/build.make CMakeFiles/login_server.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Finished codegen for target login_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/Server/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11 "Finished codegen for target login_server"
 .PHONY : CMakeFiles/login_server.dir/codegen
 
 # clean rule for target.
