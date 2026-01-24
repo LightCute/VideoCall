@@ -72,7 +72,19 @@ struct SendCallRejected {
     std::string peer;    // 被呼叫方的用户名
 };
 
+//发送媒体Offer（携带对方IP/Port）
+struct SendMediaOffer {
+    int fd;              // 目标FD
+    std::string peer;    // 对方用户名
+    ClientNetInfo peer_net; // 对方的网络信息（lanIp/vpnIp/udpPort）
+};
 
+// 发送媒体Answer（携带对方IP/Port）
+struct SendMediaAnswer {
+    int fd;              // 目标FD
+    std::string peer;    // 对方用户名
+    ClientNetInfo peer_net; // 对方的网络信息
+};
 // 未来可无限加
 // struct KickUser { int fd; };
 // struct ForceLogout { int fd; };

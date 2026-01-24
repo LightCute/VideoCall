@@ -12,6 +12,8 @@
   └─ LoginServer.h
 
 📂 ./service:
+  └─ CallService.cpp
+  └─ CallService.h
   └─ LoginService.cpp
   └─ LoginService.h
   └─ ServerAction.h
@@ -158,7 +160,7 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 214
+Lines: 268
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
@@ -167,7 +169,7 @@ Lines: 214
 
 // 实现 LoginServer 构造函数
 LoginServer::LoginServer() 
-    : dispatcher_(loginService_, sessionMgr_)  // 手动初始化 dispatcher_，传入所需两个参数
+    : dispatcher_(loginService_, sessionMgr_, callService_)  // 手动初始化 dispatcher_，传入所需两个参数
 {
     // 构造函数体可留空（如需其他初始化逻辑可补充）
 }
@@ -286,8 +288,38 @@ void LoginServer::onMessage(int fd, const std::string& msg)
     }
 }
 
+// 处理发送新来电通知的Action
+void LoginServer::handle(const SendCallIncoming& a) {
+    // 构建新来电的payload
+    auto payload = proto::makeCallIncoming(a.from_user);
+    // 发送给被呼叫方
+    listener_.sendPacket(a.target_fd, payload);
+    std::cout << "[Server] Send call incoming to fd=" << a.target_fd 
+              << " from=" << a.from_user << std::endl;
+}
 
-// LoginServer.cpp
+// 处理发送通话接通通知的Action
+void LoginServer::handle(const SendCallAccepted& a) {
+    // 构建通话接通的payload
+    auto payload = proto::makeCallAccepted(a.peer);
+    // 发送给目标用户
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send call accepted to fd=" << a.fd 
+              << " peer=" << a.peer << std::endl;
+}
+
+// 处理发送通话被拒通知的Action
+void LoginServer::handle(const SendCallRejected& a) {
+    // 构建通话被拒的payload
+    auto payload = proto::makeCallRejected(a.peer);
+    // 发送给呼叫方
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send call rejected to fd=" << a.fd 
+              << " peer=" << a.peer << std::endl;
+}
+
+
+
 
 void LoginServer::handle(const SendLoginOk& a)
 {
@@ -375,8 +407,32 @@ void LoginServer::handle(const UpdatePeerInfo& a)
 }
 
 
+void LoginServer::handle(const SendUserNotFound& a)
+{
+    std::string reason = "User not found: " + a.target_user;
+    auto payload = proto::makeLoginFail(reason); // 复用 LoginFail 格式返回错误
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send user not found to fd=" << a.fd << ": " << a.target_user << std::endl;
+}
+
+// 调整：定向转发文本消息给目标用户
+void LoginServer::handle(const ForwardText& a)
+{
+    // 目标用户不存在则跳过
+    if (a.target_fd == -1) return;
+
+    // 构建转发文本的 payload
+    auto payload = proto::makeForwardTextMsg(a.from_user, a.content);
+
+    // 仅发送给目标 FD
+    listener_.sendPacket(a.target_fd, payload);
+    std::cout << "[Server] Forward text to fd=" << a.target_fd 
+              << " from=" << a.from_user 
+              << " content=" << a.content << std::endl;
+}
+
 ========== ./core/LoginServer.h ==========
-Lines: 51
+Lines: 56
 
 //LoginServer.h
 #pragma once
@@ -401,6 +457,7 @@ Lines: 51
 #include "./service/ServerAction.h"
 #include "./protocol/protocol_text.h"
 #include "./protocol/protocol_common.h"
+#include "./service/CallService.h"
 
 class LoginServer {
 public:
@@ -421,17 +478,21 @@ private:
     void handle(const BroadcastLogout&);
     void handle(const SendHeartbeatAck& a);
     void handle(const UpdatePeerInfo&);
-
-
+    void handle(const ForwardText&);          
+    void handle(const SendUserNotFound&);     
+    void handle(const SendCallIncoming& a);
+    void handle(const SendCallAccepted& a);
+    void handle(const SendCallRejected& a);
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;
-    ServerEventDispatcher dispatcher_;
     LoginService loginService_;
+    CallService callService_;  // 新增：CallService成员
+    ServerEventDispatcher dispatcher_; // 调整顺序：需在callService_之后初始化
 };
 
 ========== ./service/ServerActions.h ==========
-Lines: 50
+Lines: 79
 
 // Service/ServerActions.h
 #pragma once
@@ -477,6 +538,35 @@ struct UpdatePeerInfo {
     int udpPort;
 };
 
+struct ForwardText {
+    int target_fd;               // 目标用户 FD（-1 表示用户不存在）
+    std::string from_user;       // 发送者用户名
+    std::string content;         // 消息内容
+    int sender_fd;               // 发送者 FD（用于返回错误）
+};
+
+struct SendUserNotFound {
+    int fd;                      // 发送者 FD
+    std::string target_user;     // 不存在的用户名
+};
+
+// 单播给被呼叫方：有新来电
+struct SendCallIncoming {
+    int target_fd;       // 被呼叫方的FD
+    std::string from_user; // 呼叫方用户名
+};
+
+// 单播：通话已接通（给呼叫方/被呼叫方）
+struct SendCallAccepted {
+    int fd;              // 目标FD
+    std::string peer;    // 通话对方的用户名
+};
+
+// 单播：通话被拒绝（仅给呼叫方）
+struct SendCallRejected {
+    int fd;              // 呼叫方的FD
+    std::string peer;    // 被呼叫方的用户名
+};
 
 
 // 未来可无限加
@@ -510,6 +600,45 @@ public:
     LoginResult handleLogin(const event::LoginRequest& req);
 };
 
+========== ./service/CallService.h ==========
+Lines: 36
+
+// CallService.h
+#pragma once
+#include <map>
+#include <optional>
+#include <string>
+#include <mutex>
+
+// 通话会话：维护单次通话的双方和状态
+struct CallSession {
+    std::string caller;    // 呼叫方用户名
+    std::string callee;    // 被呼叫方用户名
+    enum State { 
+        RINGING,   // 振铃中（被呼叫方未响应）
+        CONNECTED, // 通话已接通
+        REJECTED   // 通话被拒绝
+    } state;
+};
+
+// 通话服务：集中管理所有活跃通话，保证线程安全
+class CallService {
+public:
+    // 处理呼叫请求：返回创建的通话会话（失败则返回空）
+    std::optional<CallSession> onCallRequest(const std::string& from, const std::string& to);
+    
+    // 处理接受通话：根据被呼叫方用户名找到对应的通话会话
+    std::optional<CallSession> onAccept(const std::string& user);
+    
+    // 处理拒绝通话：同理
+    std::optional<CallSession> onReject(const std::string& user);
+
+private:
+    // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
+    std::map<std::string, CallSession> activeCalls_;
+    // 线程安全锁（多线程环境下保护activeCalls_）
+    std::mutex mutex_;
+};
 ========== ./service/LoginService.cpp ==========
 Lines: 35
 
@@ -549,8 +678,78 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
     return r;
 }
 
+========== ./service/CallService.cpp ==========
+Lines: 67
+
+// CallService.cpp
+#include "CallService.h"
+#include <iostream>
+
+// 处理呼叫请求：检查被呼叫方是否已有未处理来电
+std::optional<CallSession> CallService::onCallRequest(const std::string& from, const std::string& to) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    // 检查被呼叫方是否已有活跃来电（防止重复呼叫）
+    if (activeCalls_.find(to) != activeCalls_.end()) {
+        std::cout << "[CallService] User " << to << " is already in a call" << std::endl;
+        return std::nullopt;
+    }
+    
+    // 创建新的通话会话（振铃状态）
+    CallSession session{
+        .caller = from,
+        .callee = to,
+        .state = CallSession::RINGING
+    };
+    activeCalls_[to] = session;
+    
+    std::cout << "[CallService] Create call session: " << from << " -> " << to << std::endl;
+    return session;
+}
+
+// 处理接受通话：找到被呼叫方的活跃通话并更新状态
+std::optional<CallSession> CallService::onAccept(const std::string& user) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    auto it = activeCalls_.find(user);
+    if (it == activeCalls_.end()) {
+        std::cout << "[CallService] No incoming call for user " << user << std::endl;
+        return std::nullopt;
+    }
+    
+    // 更新通话状态为已接通
+    it->second.state = CallSession::CONNECTED;
+    auto session = it->second;
+    
+    // 接通后移除活跃通话（如需保持通话状态可保留，此处仅处理信令）
+    activeCalls_.erase(it);
+    
+    std::cout << "[CallService] Call accepted: " << session.caller << " <-> " << session.callee << std::endl;
+    return session;
+}
+
+// 处理拒绝通话：找到被呼叫方的活跃通话并更新状态
+std::optional<CallSession> CallService::onReject(const std::string& user) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    auto it = activeCalls_.find(user);
+    if (it == activeCalls_.end()) {
+        std::cout << "[CallService] No incoming call for user " << user << std::endl;
+        return std::nullopt;
+    }
+    
+    // 更新通话状态为已拒绝
+    it->second.state = CallSession::REJECTED;
+    auto session = it->second;
+    
+    // 拒绝后移除活跃通话
+    activeCalls_.erase(it);
+    
+    std::cout << "[CallService] Call rejected: " << session.caller << " -> " << session.callee << std::endl;
+    return session;
+}
 ========== ./service/ServerAction.h ==========
-Lines: 14
+Lines: 19
 
 // Service/ServerAction.h
 #pragma once
@@ -564,11 +763,16 @@ using ServerAction = std::variant<
     BroadcastOnlineUsers,
     BroadcastLogout,
     SendHeartbeatAck,
-    UpdatePeerInfo
+    UpdatePeerInfo,
+    ForwardText,
+    SendUserNotFound,
+    SendCallIncoming,
+    SendCallAccepted,
+    SendCallRejected
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 111
+Lines: 307
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -577,9 +781,11 @@ Lines: 111
 
 ServerEventDispatcher::ServerEventDispatcher(
     LoginService& loginService,
-    SessionManager& sessionMgr)
+    SessionManager& sessionMgr,
+    CallService& callService)
     : loginService_(loginService),
-      sessionMgr_(sessionMgr)
+      sessionMgr_(sessionMgr),
+      callService_(callService)
 {}
 
 
@@ -590,6 +796,155 @@ ServerEventDispatcher::dispatch(int fd, const ServerEvent& event)
         return handle(fd, ev);
     }, event);
 }
+
+
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallRequest& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot make call"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 检查目标用户是否在线
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+    if (target_fd == -1) {
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+        return actions;
+    }
+
+    // 4. 调用CallService创建通话会话
+    auto call_session = callService_.onCallRequest(from_user, ev.target_user);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Failed to make call: target user is busy"
+        });
+        return actions;
+    }
+
+    // 5. 生成Action：通知被呼叫方有新来电
+    actions.emplace_back(SendCallIncoming{
+        .target_fd = target_fd,
+        .from_user = from_user
+    });
+
+    std::cout << "[Dispatcher] Call request from " << from_user << " to " << ev.target_user << std::endl;
+    return actions;
+}
+
+// 处理接受通话事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallAccept& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证用户是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot accept call"
+        });
+        return actions;
+    }
+
+    // 2. 获取当前用户（被呼叫方）用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string callee = snapshot.at(fd).user.username;
+
+    // 3. 调用CallService处理接受通话
+    auto call_session = callService_.onAccept(callee);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No incoming call to accept"
+        });
+        return actions;
+    }
+
+    // 4. 获取呼叫方的FD
+    int caller_fd = sessionMgr_.getFdByUsername(call_session->caller);
+    if (caller_fd == -1) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Caller is offline"
+        });
+        return actions;
+    }
+
+    // 5. 生成Action：通知呼叫方和被呼叫方通话已接通
+    // 通知被呼叫方
+    actions.emplace_back(SendCallAccepted{
+        .fd = fd,
+        .peer = call_session->caller
+    });
+    // 通知呼叫方
+    actions.emplace_back(SendCallAccepted{
+        .fd = caller_fd,
+        .peer = callee
+    });
+
+    std::cout << "[Dispatcher] Call accepted: " << call_session->caller << " <-> " << callee << std::endl;
+    return actions;
+}
+
+// 处理拒绝通话事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallReject& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证用户是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot reject call"
+        });
+        return actions;
+    }
+
+    // 2. 获取当前用户（被呼叫方）用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string callee = snapshot.at(fd).user.username;
+
+    // 3. 调用CallService处理拒绝通话
+    auto call_session = callService_.onReject(callee);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No incoming call to reject"
+        });
+        return actions;
+    }
+
+    // 4. 获取呼叫方的FD
+    int caller_fd = sessionMgr_.getFdByUsername(call_session->caller);
+    if (caller_fd != -1) {
+        // 生成Action：通知呼叫方通话被拒绝
+        actions.emplace_back(SendCallRejected{
+            .fd = caller_fd,
+            .peer = callee
+        });
+    }
+
+    std::cout << "[Dispatcher] Call rejected: " << call_session->caller << " -> " << callee << std::endl;
+    return actions;
+}
+
+
 
 
 // 登录
@@ -682,8 +1037,53 @@ ServerEventDispatcher::handle(int fd, const event::RegisterPeer& ev)
 }
 
 
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::SendTextToUser& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否在线
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot send message"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名（从 Session 中读取）
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 根据目标用户名查找 FD
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+
+    if (target_fd == -1) {
+        // 目标用户不存在：返回错误
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+    } else {
+        // 目标用户存在：生成定向转发 Action
+        actions.emplace_back(ForwardText{
+            .target_fd = target_fd,
+            .from_user = from_user,
+            .content = ev.content,
+            .sender_fd = fd
+        });
+    }
+
+    std::cout << "[Dispatcher] SendTextToUser from fd=" << fd 
+              << " user=" << from_user 
+              << " target=" << ev.target_user 
+              << " content=" << ev.content << std::endl;
+
+    return actions;
+}
+
 ========== ./dispatcher/ServerEventDispatcher.h ==========
-Lines: 29
+Lines: 34
 
 //ServerEventDispatcher.h
 #pragma once
@@ -693,26 +1093,31 @@ Lines: 29
 #include "./session/SessionManager.h"
 #include "./service/ServerAction.h"
 #include "./service/ServerActions.h"
-
+#include "./service/CallService.h"
 
 class ServerEventDispatcher {
 public:
     ServerEventDispatcher(LoginService& loginService,
-                          SessionManager& sessionMgr);
+                          SessionManager& sessionMgr,
+                          CallService& callService);
 
     std::vector<ServerAction> dispatch(int fd, const ServerEvent& event);
 
 private:
+    std::vector<ServerAction> handle(int fd, const event::CallRequest& ev);
+    std::vector<ServerAction> handle(int fd, const event::CallAccept& ev);
+    std::vector<ServerAction> handle(int fd, const event::CallReject& ev);
     std::vector<ServerAction> handle(int fd, const event::LoginRequest& ev);
     std::vector<ServerAction> handle(int fd, const event::ErrorEvent& ev);
     std::vector<ServerAction> handle(int fd, const event::Logout& ev);
     std::vector<ServerAction> handle(int fd, const event::Heartbeat& ev);
     std::vector<ServerAction> handle(int fd, const event::RegisterPeer& ev);
-
+    std::vector<ServerAction> handle(int fd, const event::SendTextToUser& ev);
     //std::vector<ServerAction> handle(int fd, const event::Logout&)
 
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
+    CallService& callService_;
 };
 
 ========== ./domain/User.h ==========
@@ -733,7 +1138,7 @@ struct User {
 } // namespace domain
 
 ========== ./session/SessionManager.cpp ==========
-Lines: 49
+Lines: 59
 
 //SessionManager.cpp
 #include "./session/SessionManager.h"
@@ -784,9 +1189,19 @@ bool SessionManager::exists(int fd) {
     return sessions_.count(fd) > 0;
 }
 
+int SessionManager::getFdByUsername(const std::string& username) const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& [fd, info] : sessions_) {
+        if (info.user.username == username) {
+            return fd;
+        }
+    }
+    return -1; // 目标用户不存在
+}
+
 
 ========== ./session/SessionManager.h ==========
-Lines: 33
+Lines: 34
 
 //SessionManager.h
 #pragma once
@@ -817,6 +1232,7 @@ public:
     void updateHeartbeat(int fd);
     void updateNetInfo(int fd, const ClientNetInfo& net);
     bool exists(int fd);
+    int getFdByUsername(const std::string& username) const;
 private:
     mutable std::mutex mutex_;
     std::map<int, ClientInfo> sessions_;
@@ -836,7 +1252,7 @@ public:
 };
 
 ========== ./event/ServerEventFactory.cpp ==========
-Lines: 41
+Lines: 64
 
 // ServerEventFactory.cpp
 #include "ServerEventFactory.h"
@@ -871,7 +1287,30 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
             .udpPort = port
         };
     }
-    
+
+    // 替换原 parseSendText 逻辑：解析客户端的 SEND_TEXT 消息（target_user + content）
+    std::string target_user, content;
+    if (proto::parseSendTextMsg(msg, target_user, content)) {
+        return event::SendTextToUser{
+            .target_user = target_user,
+            .content = content,
+            .from_user = "" // 发送者用户名由 Dispatcher 补全
+        };
+    }
+        
+    std::string call_target;
+    if (proto::parseCallRequest(msg, call_target)) {
+        return event::CallRequest{.target_user = call_target};
+    }
+
+    if (proto::parseCallAccept(msg)) {
+        return event::CallAccept{};
+    }
+
+    if (proto::parseCallReject(msg)) {
+        return event::CallReject{};
+    }
+
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{
@@ -881,7 +1320,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./event/ServerEvents.h ==========
-Lines: 38
+Lines: 52
 
 //ServerEvents.h
 #pragma once
@@ -891,6 +1330,12 @@ Lines: 38
 
 
 namespace event {
+
+struct SendTextToUser {
+    std::string target_user;  // 客户端指定的目标用户名
+    std::string content;      // 消息内容
+    std::string from_user;    // 发送者用户名（服务端从 Session 中补全）
+};
 
 struct ErrorEvent {
     std::string rawMsg;  // 收到的原始消息
@@ -920,10 +1365,18 @@ struct Chat {
     std::string message;
 };
 
+struct CallRequest {
+    std::string target_user;   // 呼叫的目标用户名
+};
+
+struct CallAccept {};  // 接受通话（无需带target，由CallSession维护）
+struct CallReject {};  // 拒绝通话（同理）
+
+
 } // namespace event
 
 ========== ./event/ServerEvent.h ==========
-Lines: 20
+Lines: 24
 
 //ServerEvent.h
 #pragma once
@@ -938,7 +1391,11 @@ using ServerEvent = std::variant<
     event::LoginRequest,
     event::Logout,
     event::Heartbeat,
-    event::RegisterPeer
+    event::RegisterPeer,
+    event::SendTextToUser,
+    event::CallRequest,
+    event::CallAccept,
+    event::CallReject
     // event::Chat,
     // 以后只需要往这里加
 >;
@@ -1129,7 +1586,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 28
+Lines: 41
 
 //protocol_text.h
 
@@ -1147,6 +1604,13 @@ std::string makeOnlineUsers(const OnlineUsers& users);
 std::string makeLogout();
 std::string makeHeartbeat();
 std::string makeHeartbeatAck();   // ⭐ 新增
+std::string makeSendText(const std::string& from_user, const std::string& content);
+std::string makeForwardTextMsg(const std::string& from_user, const std::string& content);
+std::string makeCallIncoming(const std::string& from_user);       // 通知新来电
+std::string makeCallAccepted(const std::string& peer);            // 通知通话接通
+std::string makeCallRejected(const std::string& peer);            // 通知通话被拒
+
+
 
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
@@ -1155,13 +1619,19 @@ bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
 bool parseLogout(const std::string& msg);
 bool parseHeartbeat(const std::string& msg);
 bool parseRegisterPeer(const std::string& msg,std::string& lan,std::string& vpn,int& port);
+bool parseSendText(const std::string& msg, std::string& from_user, std::string& content);
+bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::string& content);
+bool parseCallRequest(const std::string& msg, std::string& target_user); // 解析呼叫请求
+bool parseCallAccept(const std::string& msg);                            // 解析接受呼叫
+bool parseCallReject(const std::string& msg);                            // 解析拒绝呼叫
+
 
 
 
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 169
+Lines: 264
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1172,6 +1642,29 @@ Lines: 169
 namespace proto {
 
 /* ================= build ================= */
+
+
+// ========== 新增：通话协议构建函数 ==========
+// 构建服务端通知新来电的消息（CMD_CALL_INCOMING from_user）
+std::string makeCallIncoming(const std::string& from_user) {
+    std::ostringstream oss;
+    oss << CMD_CALL_INCOMING << " " << from_user;
+    return oss.str();
+}
+
+// 构建服务端通知通话接通的消息（CMD_CALL_ACCEPTED peer）
+std::string makeCallAccepted(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_CALL_ACCEPTED << " " << peer;
+    return oss.str();
+}
+
+// 构建服务端通知通话被拒的消息（CMD_CALL_REJECTED peer）
+std::string makeCallRejected(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_CALL_REJECTED << " " << peer;
+    return oss.str();
+}
 
 // Client 使用
 std::string makeLoginRequest(const std::string& user,
@@ -1225,6 +1718,21 @@ std::string makeHeartbeat() {
 std::string makeHeartbeatAck() {
     return CMD_HEARTBEAT_ACK;  // "PONG"
 }
+
+// 构建客户端发送的文本消息（CMD_SEND_TEXT）
+std::string makeSendText(const std::string& from_user, const std::string& content) {
+    std::ostringstream oss;
+    oss << CMD_SEND_TEXT << " " << from_user << " " << content;
+    return oss.str();
+}
+
+// 构建服务端转发的文本消息（CMD_FORWARD_TEXT）
+std::string makeForwardTextMsg(const std::string& from_user, const std::string& content) {
+    std::ostringstream oss;
+    oss << CMD_FORWARD_TEXT << " " << from_user << " " << content;
+    return oss.str();
+}
+
 
 
 /* ================= parse ================= */
@@ -1331,10 +1839,67 @@ bool parseRegisterPeer(
     return !lan.empty() && port > 0;
 }
 
+// 解析客户端发送的文本消息
+bool parseSendText(const std::string& msg, std::string& from_user, std::string& content) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_SEND_TEXT) return false;
+    
+    iss >> from_user;
+    // 读取剩余所有内容作为消息体（支持空格）
+    std::getline(iss >> std::ws, content);
+    return !from_user.empty() && !content.empty();
+}
+
+// 解析客户端发送的定向文本消息（格式：SEND_TEXT target_user content）
+    bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::string& content) {
+        std::istringstream iss(msg);
+        std::string cmd;
+        iss >> cmd;
+
+        if (cmd != CMD_SEND_TEXT) return false;
+
+        // 读取目标用户名
+        iss >> target_user;
+        // 读取剩余所有内容作为消息（支持含空格的消息）
+        std::getline(iss >> std::ws, content);
+        return !target_user.empty() && !content.empty();
+    }
+
+// 解析客户端的呼叫请求（CMD_CALL target_user）
+bool parseCallRequest(const std::string& msg, std::string& target_user) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_CALL) return false;
+    iss >> target_user;
+    return !target_user.empty();
+}
+
+// 解析客户端的接受呼叫请求（CMD_CALL_ACCEPT）
+bool parseCallAccept(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_CALL_ACCEPT;
+}
+
+// 解析客户端的拒绝呼叫请求（CMD_CALL_REJECT）
+bool parseCallReject(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_CALL_REJECT;
+}
+
+
+
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 29
+Lines: 39
 
 // proto::*
 // ⚠️ PROTOCOL DTO — do NOT use as domain model
@@ -1356,6 +1921,16 @@ constexpr const char* CMD_LOGOUT       = "LOGOUT";
 constexpr const char* CMD_HEARTBEAT = "PING";
 constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
+constexpr const char* CMD_SEND_TEXT     = "SEND_TEXT";       // 客户端→服务端：发送文本
+constexpr const char* CMD_FORWARD_TEXT  = "FORWARD_TEXT"; // 服务端→客户端：转发文本
+
+constexpr const char* CMD_CALL         = "CALL";         // 客户端发起呼叫
+constexpr const char* CMD_CALL_ACCEPT  = "CALL_ACCEPT";  // 客户端接受呼叫
+constexpr const char* CMD_CALL_REJECT  = "CALL_REJECT";  // 客户端拒绝呼叫
+constexpr const char* CMD_CALL_INCOMING = "CALL_INCOMING"; // 服务端通知新来电
+constexpr const char* CMD_CALL_ACCEPTED = "CALL_ACCEPTED"; // 服务端通知通话接通
+constexpr const char* CMD_CALL_REJECTED = "CALL_REJECTED"; // 服务端通知通话被拒
+
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";
@@ -1368,5 +1943,5 @@ constexpr const char* KEY_COUNT     = "count";
 
 
 =====================================
-Total files: 25
-Total lines: 1217
+Total files: 27
+Total lines: 1784

@@ -55,6 +55,16 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         return event::CallReject{};
     }
 
+    // 解析媒体Offer请求
+    std::string media_target;
+    if (proto::parseMediaOffer(msg, media_target)) {
+        return event::MediaOffer{.target_user = media_target};
+    }
+
+    // 解析媒体Answer请求
+    if (proto::parseMediaAnswer(msg, media_target)) {
+        return event::MediaAnswer{.target_user = media_target};
+    }
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{

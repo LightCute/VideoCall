@@ -15,5 +15,7 @@ using ServerAction = std::variant<
     SendUserNotFound,
     SendCallIncoming,
     SendCallAccepted,
-    SendCallRejected
+    SendCallRejected,
+    SendMediaOffer,
+    SendMediaAnswer
 >;

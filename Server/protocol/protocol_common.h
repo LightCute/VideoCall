@@ -28,6 +28,12 @@ constexpr const char* CMD_CALL_INCOMING = "CALL_INCOMING"; // 服务端通知新
 constexpr const char* CMD_CALL_ACCEPTED = "CALL_ACCEPTED"; // 服务端通知通话接通
 constexpr const char* CMD_CALL_REJECTED = "CALL_REJECTED"; // 服务端通知通话被拒
 
+// 媒体协商指令
+constexpr const char* CMD_MEDIA_OFFER  = "MEDIA_OFFER";   // 客户端→服务端：发起媒体协商
+constexpr const char* CMD_MEDIA_ANSWER = "MEDIA_ANSWER";  // 客户端→服务端：回应媒体协商
+constexpr const char* CMD_MEDIA_OFFER_RESP  = "MEDIA_OFFER_RESP";  // 服务端→客户端：下发对方IP（Offer回应）
+constexpr const char* CMD_MEDIA_ANSWER_RESP = "MEDIA_ANSWER_RESP"; // 服务端→客户端：下发对方IP（Answer回应
+
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";

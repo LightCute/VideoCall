@@ -65,3 +65,39 @@ std::optional<CallSession> CallService::onReject(const std::string& user) {
     std::cout << "[CallService] Call rejected: " << session.caller << " -> " << session.callee << std::endl;
     return session;
 }
+
+// 标记媒体协商开始
+std::optional<CallSession> CallService::onMediaNegotiate(const std::string& user) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    auto it = activeCalls_.find(user);
+    if (it == activeCalls_.end()) {
+        std::cout << "[CallService] No active call for media negotiate: " << user << std::endl;
+        return std::nullopt;
+    }
+    
+    // 仅处理信令已接通的会话
+    if (it->second.state != CallSession::CONNECTED) {
+        std::cout << "[CallService] Call not connected for media negotiate: " << user << std::endl;
+        return std::nullopt;
+    }
+    
+    it->second.state = CallSession::MEDIA_NEGOTIATING;
+    std::cout << "[CallService] Media negotiate start: " << it->second.caller << " <-> " << it->second.callee << std::endl;
+    return it->second;
+}
+
+// 标记媒体就绪（完成后删除会话）
+void CallService::onMediaReady(const std::string& user) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    auto it = activeCalls_.find(user);
+    if (it != activeCalls_.end()) {
+        it->second.state = CallSession::MEDIA_READY;
+        std::cout << "[CallService] Media ready, remove session: " << it->second.caller << " <-> " << it->second.callee << std::endl;
+        activeCalls_.erase(it);
+    }
+}
+
+
+

@@ -124,6 +124,44 @@ void LoginServer::onMessage(int fd, const std::string& msg)
     }
 }
 
+// 处理SendMediaOffer动作（下发对方IP/Port）
+void LoginServer::handle(const SendMediaOffer& a) {
+    // 构建媒体Offer回应（携带对方IP/Port）
+    auto payload = proto::makeMediaOfferResp(
+        a.peer,
+        a.peer_net.lanIp,
+        a.peer_net.vpnIp,
+        a.peer_net.udpPort
+    );
+    // 发送给目标用户
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send media offer resp to fd=" << a.fd 
+              << " peer=" << a.peer 
+              << " lan=" << a.peer_net.lanIp
+              << " vpn=" << a.peer_net.vpnIp
+              << " port=" << a.peer_net.udpPort << std::endl;
+}
+
+// 处理SendMediaAnswer动作（下发对方IP/Port）
+void LoginServer::handle(const SendMediaAnswer& a) {
+    // 构建媒体Answer回应（携带对方IP/Port）
+    auto payload = proto::makeMediaAnswerResp(
+        a.peer,
+        a.peer_net.lanIp,
+        a.peer_net.vpnIp,
+        a.peer_net.udpPort
+    );
+    // 发送给目标用户
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send media answer resp to fd=" << a.fd 
+              << " peer=" << a.peer 
+              << " lan=" << a.peer_net.lanIp
+              << " vpn=" << a.peer_net.vpnIp
+              << " port=" << a.peer_net.udpPort << std::endl;
+}
+
+
+
 // 处理发送新来电通知的Action
 void LoginServer::handle(const SendCallIncoming& a) {
     // 构建新来电的payload

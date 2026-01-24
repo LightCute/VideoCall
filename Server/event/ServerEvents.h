@@ -48,5 +48,14 @@ struct CallRequest {
 struct CallAccept {};  // 接受通话（无需带target，由CallSession维护）
 struct CallReject {};  // 拒绝通话（同理）
 
+// 媒体协商相关事件
+struct MediaOffer {
+    std::string target_user;  // 协商的目标用户
+};
+
+struct MediaAnswer {
+    std::string target_user;  // 协商的目标用户
+};
+
 
 } // namespace event

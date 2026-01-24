@@ -10,9 +10,11 @@ struct CallSession {
     std::string caller;    // 呼叫方用户名
     std::string callee;    // 被呼叫方用户名
     enum State { 
-        RINGING,   // 振铃中（被呼叫方未响应）
-        CONNECTED, // 通话已接通
-        REJECTED   // 通话被拒绝
+        RINGING,           // 振铃中（被呼叫方未响应）
+        CONNECTED,         // 信令接通（双方同意通话，未协商媒体）
+        MEDIA_NEGOTIATING, // 媒体协商中（正在下发IP/Port）
+        MEDIA_READY,       // 媒体就绪（可开始UDP推流）
+        REJECTED           // 通话被拒绝
     } state;
 };
 
@@ -27,6 +29,10 @@ public:
     
     // 处理拒绝通话：同理
     std::optional<CallSession> onReject(const std::string& user);
+
+    std::optional<CallSession> onMediaNegotiate(const std::string& user);
+
+    void onMediaReady(const std::string& user);    
 
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）

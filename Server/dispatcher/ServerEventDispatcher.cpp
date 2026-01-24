@@ -22,6 +22,132 @@ ServerEventDispatcher::dispatch(int fd, const ServerEvent& event)
 }
 
 
+
+// 处理MediaOffer事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot send media offer"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 检查目标用户是否在线
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+    if (target_fd == -1) {
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+        return actions;
+    }
+
+    // 4. 验证通话会话是否存在（信令已接通）
+    auto call_session = callService_.onMediaNegotiate(ev.target_user);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No active call for media offer"
+        });
+        return actions;
+    }
+
+    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
+    ClientNetInfo target_net = snapshot.at(target_fd).net;
+    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Target user has no registered peer info"
+        });
+        return actions;
+    }
+
+    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    actions.emplace_back(SendMediaOffer{
+        .fd = fd,
+        .peer = ev.target_user,
+        .peer_net = target_net
+    });
+
+    std::cout << "[Dispatcher] Media offer from " << from_user << " to " << ev.target_user 
+              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    return actions;
+}
+
+// 处理MediaAnswer事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot send media answer"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 检查目标用户是否在线
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+    if (target_fd == -1) {
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+        return actions;
+    }
+
+    // 4. 验证通话会话是否存在（信令已接通）
+    auto call_session = callService_.onMediaNegotiate(ev.target_user);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No active call for media answer"
+        });
+        return actions;
+    }
+
+    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
+    ClientNetInfo target_net = snapshot.at(target_fd).net;
+    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Target user has no registered peer info"
+        });
+        return actions;
+    }
+
+    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    actions.emplace_back(SendMediaAnswer{
+        .fd = fd,
+        .peer = ev.target_user,
+        .peer_net = target_net
+    });
+
+    // 7. 标记媒体就绪（完成后删除通话会话）
+    callService_.onMediaReady(ev.target_user);
+
+    std::cout << "[Dispatcher] Media answer from " << from_user << " to " << ev.target_user 
+              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    return actions;
+}
+
 std::vector<ServerAction>
 ServerEventDispatcher::handle(int fd, const event::CallRequest& ev)
 {

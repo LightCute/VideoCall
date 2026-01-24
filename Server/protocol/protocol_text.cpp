@@ -9,7 +9,29 @@ namespace proto {
 /* ================= build ================= */
 
 
-// ========== 新增：通话协议构建函数 ==========
+// ========== 通话协议构建函数 ==========
+// 构建媒体Offer回应（服务端→客户端，携带对方IP/Port）
+std::string makeMediaOfferResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_OFFER_RESP << " " 
+        << peer << " " 
+        << lanIp << " " 
+        << vpnIp << " " 
+        << udpPort;
+    return oss.str();
+}
+
+// 构建媒体Answer回应（服务端→客户端，携带对方IP/Port）
+std::string makeMediaAnswerResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_ANSWER_RESP << " " 
+        << peer << " " 
+        << lanIp << " " 
+        << vpnIp << " " 
+        << udpPort;
+    return oss.str();
+}
+
 // 构建服务端通知新来电的消息（CMD_CALL_INCOMING from_user）
 std::string makeCallIncoming(const std::string& from_user) {
     std::ostringstream oss;
@@ -259,6 +281,24 @@ bool parseCallReject(const std::string& msg) {
     return cmd == CMD_CALL_REJECT;
 }
 
+// 解析客户端的媒体Offer请求
+bool parseMediaOffer(const std::string& msg, std::string& target_user) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_MEDIA_OFFER) return false;
+    iss >> target_user;
+    return !target_user.empty();
+}
 
+// 解析客户端的媒体Answer请求
+bool parseMediaAnswer(const std::string& msg, std::string& target_user) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_MEDIA_ANSWER) return false;
+    iss >> target_user;
+    return !target_user.empty();
+}
 
 } // namespace proto

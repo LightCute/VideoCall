@@ -47,6 +47,8 @@ private:
     void handle(const SendCallIncoming& a);
     void handle(const SendCallAccepted& a);
     void handle(const SendCallRejected& a);
+    void handle(const SendMediaOffer& a);   
+    void handle(const SendMediaAnswer& a);   
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;
