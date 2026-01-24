@@ -160,7 +160,7 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 268
+Lines: 306
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
@@ -287,6 +287,44 @@ void LoginServer::onMessage(int fd, const std::string& msg)
         }, act);
     }
 }
+
+// 处理SendMediaOffer动作（下发对方IP/Port）
+void LoginServer::handle(const SendMediaOffer& a) {
+    // 构建媒体Offer回应（携带对方IP/Port）
+    auto payload = proto::makeMediaOfferResp(
+        a.peer,
+        a.peer_net.lanIp,
+        a.peer_net.vpnIp,
+        a.peer_net.udpPort
+    );
+    // 发送给目标用户
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send media offer resp to fd=" << a.fd 
+              << " peer=" << a.peer 
+              << " lan=" << a.peer_net.lanIp
+              << " vpn=" << a.peer_net.vpnIp
+              << " port=" << a.peer_net.udpPort << std::endl;
+}
+
+// 处理SendMediaAnswer动作（下发对方IP/Port）
+void LoginServer::handle(const SendMediaAnswer& a) {
+    // 构建媒体Answer回应（携带对方IP/Port）
+    auto payload = proto::makeMediaAnswerResp(
+        a.peer,
+        a.peer_net.lanIp,
+        a.peer_net.vpnIp,
+        a.peer_net.udpPort
+    );
+    // 发送给目标用户
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send media answer resp to fd=" << a.fd 
+              << " peer=" << a.peer 
+              << " lan=" << a.peer_net.lanIp
+              << " vpn=" << a.peer_net.vpnIp
+              << " port=" << a.peer_net.udpPort << std::endl;
+}
+
+
 
 // 处理发送新来电通知的Action
 void LoginServer::handle(const SendCallIncoming& a) {
@@ -432,7 +470,7 @@ void LoginServer::handle(const ForwardText& a)
 }
 
 ========== ./core/LoginServer.h ==========
-Lines: 56
+Lines: 58
 
 //LoginServer.h
 #pragma once
@@ -483,6 +521,8 @@ private:
     void handle(const SendCallIncoming& a);
     void handle(const SendCallAccepted& a);
     void handle(const SendCallRejected& a);
+    void handle(const SendMediaOffer& a);   
+    void handle(const SendMediaAnswer& a);   
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;
@@ -492,7 +532,7 @@ private:
 };
 
 ========== ./service/ServerActions.h ==========
-Lines: 79
+Lines: 91
 
 // Service/ServerActions.h
 #pragma once
@@ -568,7 +608,19 @@ struct SendCallRejected {
     std::string peer;    // 被呼叫方的用户名
 };
 
+//发送媒体Offer（携带对方IP/Port）
+struct SendMediaOffer {
+    int fd;              // 目标FD
+    std::string peer;    // 对方用户名
+    ClientNetInfo peer_net; // 对方的网络信息（lanIp/vpnIp/udpPort）
+};
 
+// 发送媒体Answer（携带对方IP/Port）
+struct SendMediaAnswer {
+    int fd;              // 目标FD
+    std::string peer;    // 对方用户名
+    ClientNetInfo peer_net; // 对方的网络信息
+};
 // 未来可无限加
 // struct KickUser { int fd; };
 // struct ForceLogout { int fd; };
@@ -601,7 +653,7 @@ public:
 };
 
 ========== ./service/CallService.h ==========
-Lines: 36
+Lines: 42
 
 // CallService.h
 #pragma once
@@ -615,9 +667,11 @@ struct CallSession {
     std::string caller;    // 呼叫方用户名
     std::string callee;    // 被呼叫方用户名
     enum State { 
-        RINGING,   // 振铃中（被呼叫方未响应）
-        CONNECTED, // 通话已接通
-        REJECTED   // 通话被拒绝
+        RINGING,           // 振铃中（被呼叫方未响应）
+        CONNECTED,         // 信令接通（双方同意通话，未协商媒体）
+        MEDIA_NEGOTIATING, // 媒体协商中（正在下发IP/Port）
+        MEDIA_READY,       // 媒体就绪（可开始UDP推流）
+        REJECTED           // 通话被拒绝
     } state;
 };
 
@@ -632,6 +686,10 @@ public:
     
     // 处理拒绝通话：同理
     std::optional<CallSession> onReject(const std::string& user);
+
+    std::optional<CallSession> onMediaNegotiate(const std::string& user);
+
+    void onMediaReady(const std::string& user);    
 
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
@@ -679,7 +737,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/CallService.cpp ==========
-Lines: 67
+Lines: 103
 
 // CallService.cpp
 #include "CallService.h"
@@ -748,8 +806,45 @@ std::optional<CallSession> CallService::onReject(const std::string& user) {
     std::cout << "[CallService] Call rejected: " << session.caller << " -> " << session.callee << std::endl;
     return session;
 }
+
+// 标记媒体协商开始
+std::optional<CallSession> CallService::onMediaNegotiate(const std::string& user) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    auto it = activeCalls_.find(user);
+    if (it == activeCalls_.end()) {
+        std::cout << "[CallService] No active call for media negotiate: " << user << std::endl;
+        return std::nullopt;
+    }
+    
+    // 仅处理信令已接通的会话
+    if (it->second.state != CallSession::CONNECTED) {
+        std::cout << "[CallService] Call not connected for media negotiate: " << user << std::endl;
+        return std::nullopt;
+    }
+    
+    it->second.state = CallSession::MEDIA_NEGOTIATING;
+    std::cout << "[CallService] Media negotiate start: " << it->second.caller << " <-> " << it->second.callee << std::endl;
+    return it->second;
+}
+
+// 标记媒体就绪（完成后删除会话）
+void CallService::onMediaReady(const std::string& user) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    
+    auto it = activeCalls_.find(user);
+    if (it != activeCalls_.end()) {
+        it->second.state = CallSession::MEDIA_READY;
+        std::cout << "[CallService] Media ready, remove session: " << it->second.caller << " <-> " << it->second.callee << std::endl;
+        activeCalls_.erase(it);
+    }
+}
+
+
+
+
 ========== ./service/ServerAction.h ==========
-Lines: 19
+Lines: 21
 
 // Service/ServerAction.h
 #pragma once
@@ -768,11 +863,13 @@ using ServerAction = std::variant<
     SendUserNotFound,
     SendCallIncoming,
     SendCallAccepted,
-    SendCallRejected
+    SendCallRejected,
+    SendMediaOffer,
+    SendMediaAnswer
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 307
+Lines: 433
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -797,6 +894,132 @@ ServerEventDispatcher::dispatch(int fd, const ServerEvent& event)
     }, event);
 }
 
+
+
+// 处理MediaOffer事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot send media offer"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 检查目标用户是否在线
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+    if (target_fd == -1) {
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+        return actions;
+    }
+
+    // 4. 验证通话会话是否存在（信令已接通）
+    auto call_session = callService_.onMediaNegotiate(ev.target_user);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No active call for media offer"
+        });
+        return actions;
+    }
+
+    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
+    ClientNetInfo target_net = snapshot.at(target_fd).net;
+    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Target user has no registered peer info"
+        });
+        return actions;
+    }
+
+    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    actions.emplace_back(SendMediaOffer{
+        .fd = fd,
+        .peer = ev.target_user,
+        .peer_net = target_net
+    });
+
+    std::cout << "[Dispatcher] Media offer from " << from_user << " to " << ev.target_user 
+              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    return actions;
+}
+
+// 处理MediaAnswer事件
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证发送者是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot send media answer"
+        });
+        return actions;
+    }
+
+    // 2. 获取发送者用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string from_user = snapshot.at(fd).user.username;
+
+    // 3. 检查目标用户是否在线
+    int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
+    if (target_fd == -1) {
+        actions.emplace_back(SendUserNotFound{
+            .fd = fd,
+            .target_user = ev.target_user
+        });
+        return actions;
+    }
+
+    // 4. 验证通话会话是否存在（信令已接通）
+    auto call_session = callService_.onMediaNegotiate(ev.target_user);
+    if (!call_session) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No active call for media answer"
+        });
+        return actions;
+    }
+
+    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
+    ClientNetInfo target_net = snapshot.at(target_fd).net;
+    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Target user has no registered peer info"
+        });
+        return actions;
+    }
+
+    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    actions.emplace_back(SendMediaAnswer{
+        .fd = fd,
+        .peer = ev.target_user,
+        .peer_net = target_net
+    });
+
+    // 7. 标记媒体就绪（完成后删除通话会话）
+    callService_.onMediaReady(ev.target_user);
+
+    std::cout << "[Dispatcher] Media answer from " << from_user << " to " << ev.target_user 
+              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    return actions;
+}
 
 std::vector<ServerAction>
 ServerEventDispatcher::handle(int fd, const event::CallRequest& ev)
@@ -1083,7 +1306,7 @@ ServerEventDispatcher::handle(int fd, const event::SendTextToUser& ev)
 }
 
 ========== ./dispatcher/ServerEventDispatcher.h ==========
-Lines: 34
+Lines: 36
 
 //ServerEventDispatcher.h
 #pragma once
@@ -1113,7 +1336,9 @@ private:
     std::vector<ServerAction> handle(int fd, const event::Heartbeat& ev);
     std::vector<ServerAction> handle(int fd, const event::RegisterPeer& ev);
     std::vector<ServerAction> handle(int fd, const event::SendTextToUser& ev);
-    //std::vector<ServerAction> handle(int fd, const event::Logout&)
+    std::vector<ServerAction> handle(int fd, const event::MediaOffer& ev);   
+    std::vector<ServerAction> handle(int fd, const event::MediaAnswer& ev);  
+        //std::vector<ServerAction> handle(int fd, const event::Logout&)
 
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
@@ -1252,7 +1477,7 @@ public:
 };
 
 ========== ./event/ServerEventFactory.cpp ==========
-Lines: 64
+Lines: 74
 
 // ServerEventFactory.cpp
 #include "ServerEventFactory.h"
@@ -1311,6 +1536,16 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         return event::CallReject{};
     }
 
+    // 解析媒体Offer请求
+    std::string media_target;
+    if (proto::parseMediaOffer(msg, media_target)) {
+        return event::MediaOffer{.target_user = media_target};
+    }
+
+    // 解析媒体Answer请求
+    if (proto::parseMediaAnswer(msg, media_target)) {
+        return event::MediaAnswer{.target_user = media_target};
+    }
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{
@@ -1320,7 +1555,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./event/ServerEvents.h ==========
-Lines: 52
+Lines: 61
 
 //ServerEvents.h
 #pragma once
@@ -1372,11 +1607,20 @@ struct CallRequest {
 struct CallAccept {};  // 接受通话（无需带target，由CallSession维护）
 struct CallReject {};  // 拒绝通话（同理）
 
+// 媒体协商相关事件
+struct MediaOffer {
+    std::string target_user;  // 协商的目标用户
+};
+
+struct MediaAnswer {
+    std::string target_user;  // 协商的目标用户
+};
+
 
 } // namespace event
 
 ========== ./event/ServerEvent.h ==========
-Lines: 24
+Lines: 26
 
 //ServerEvent.h
 #pragma once
@@ -1395,7 +1639,9 @@ using ServerEvent = std::variant<
     event::SendTextToUser,
     event::CallRequest,
     event::CallAccept,
-    event::CallReject
+    event::CallReject,
+    event::MediaOffer,
+    event::MediaAnswer
     // event::Chat,
     // 以后只需要往这里加
 >;
@@ -1586,7 +1832,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 41
+Lines: 47
 
 //protocol_text.h
 
@@ -1609,7 +1855,9 @@ std::string makeForwardTextMsg(const std::string& from_user, const std::string& 
 std::string makeCallIncoming(const std::string& from_user);       // 通知新来电
 std::string makeCallAccepted(const std::string& peer);            // 通知通话接通
 std::string makeCallRejected(const std::string& peer);            // 通知通话被拒
-
+// 媒体协商指令构建函数
+std::string makeMediaOfferResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort);
+std::string makeMediaAnswerResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort);
 
 
 // parse
@@ -1624,6 +1872,10 @@ bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::str
 bool parseCallRequest(const std::string& msg, std::string& target_user); // 解析呼叫请求
 bool parseCallAccept(const std::string& msg);                            // 解析接受呼叫
 bool parseCallReject(const std::string& msg);                            // 解析拒绝呼叫
+// 媒体协商指令解析函数
+bool parseMediaOffer(const std::string& msg, std::string& target_user);
+bool parseMediaAnswer(const std::string& msg, std::string& target_user);
+
 
 
 
@@ -1631,7 +1883,7 @@ bool parseCallReject(const std::string& msg);                            // 解�
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 264
+Lines: 304
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1644,7 +1896,29 @@ namespace proto {
 /* ================= build ================= */
 
 
-// ========== 新增：通话协议构建函数 ==========
+// ========== 通话协议构建函数 ==========
+// 构建媒体Offer回应（服务端→客户端，携带对方IP/Port）
+std::string makeMediaOfferResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_OFFER_RESP << " " 
+        << peer << " " 
+        << lanIp << " " 
+        << vpnIp << " " 
+        << udpPort;
+    return oss.str();
+}
+
+// 构建媒体Answer回应（服务端→客户端，携带对方IP/Port）
+std::string makeMediaAnswerResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_ANSWER_RESP << " " 
+        << peer << " " 
+        << lanIp << " " 
+        << vpnIp << " " 
+        << udpPort;
+    return oss.str();
+}
+
 // 构建服务端通知新来电的消息（CMD_CALL_INCOMING from_user）
 std::string makeCallIncoming(const std::string& from_user) {
     std::ostringstream oss;
@@ -1894,12 +2168,30 @@ bool parseCallReject(const std::string& msg) {
     return cmd == CMD_CALL_REJECT;
 }
 
+// 解析客户端的媒体Offer请求
+bool parseMediaOffer(const std::string& msg, std::string& target_user) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_MEDIA_OFFER) return false;
+    iss >> target_user;
+    return !target_user.empty();
+}
 
+// 解析客户端的媒体Answer请求
+bool parseMediaAnswer(const std::string& msg, std::string& target_user) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    if (cmd != CMD_MEDIA_ANSWER) return false;
+    iss >> target_user;
+    return !target_user.empty();
+}
 
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 39
+Lines: 45
 
 // proto::*
 // ⚠️ PROTOCOL DTO — do NOT use as domain model
@@ -1931,6 +2223,12 @@ constexpr const char* CMD_CALL_INCOMING = "CALL_INCOMING"; // 服务端通知新
 constexpr const char* CMD_CALL_ACCEPTED = "CALL_ACCEPTED"; // 服务端通知通话接通
 constexpr const char* CMD_CALL_REJECTED = "CALL_REJECTED"; // 服务端通知通话被拒
 
+// 媒体协商指令
+constexpr const char* CMD_MEDIA_OFFER  = "MEDIA_OFFER";   // 客户端→服务端：发起媒体协商
+constexpr const char* CMD_MEDIA_ANSWER = "MEDIA_ANSWER";  // 客户端→服务端：回应媒体协商
+constexpr const char* CMD_MEDIA_OFFER_RESP  = "MEDIA_OFFER_RESP";  // 服务端→客户端：下发对方IP（Offer回应）
+constexpr const char* CMD_MEDIA_ANSWER_RESP = "MEDIA_ANSWER_RESP"; // 服务端→客户端：下发对方IP（Answer回应
+
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";
@@ -1944,4 +2242,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 27
-Total lines: 1784
+Total lines: 2081

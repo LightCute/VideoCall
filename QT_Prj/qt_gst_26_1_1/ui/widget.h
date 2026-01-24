@@ -37,6 +37,12 @@ private slots:
     void on_Bt_tcp_send_clicked();
     void handleCoreOutput(const core::CoreOutput& out); // 槽函数声明
 
+    void on_Bt_Call_clicked();
+
+    void on_Bt_AcceptCall_clicked();
+
+    void on_Bt_RejectCall_clicked();
+
 private:
     Ui::Widget *ui;
     ClientCore* core_; // 新增：Core指针成员
@@ -70,6 +76,20 @@ private:
     void handle(const core::OutSendText& e) ;
 
     void handle(const core::OutForwardText& e) ;
+
+    void handle(const core::OutSendCall&);
+
+    void handle(const core::OutSendAcceptCall&) ;
+
+    void handle(const core::OutSendRejectCall&) ;
+
+    void handle(const core::OutSendMediaOffer&) ;
+
+    void handle(const core::OutSendMediaAnswer&) ;
+
+    void handle(const core::OutMediaReady& e) ;
+
+    void handle(const core::OutShowIncomingCall& e) ;
 
 };
 #endif // WIDGET_H

@@ -75,6 +75,21 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
         else if constexpr (std::is_same_v<T, core::InForwardText>)
             evType = EventType::ForwardText;
 
+        else if constexpr (std::is_same_v<T, core::InCmdCall>)
+            evType = EventType::CmdCall;
+        else if constexpr (std::is_same_v<T, core::InCallIncoming>)
+            evType = EventType::CallIncoming;
+        else if constexpr (std::is_same_v<T, core::InCallAccepted>)
+            evType = EventType::CallAccepted;
+        else if constexpr (std::is_same_v<T, core::InCallRejected>)
+            evType = EventType::CallRejected;
+        else if constexpr (std::is_same_v<T, core::InCmdAcceptCall>)
+            evType = EventType::CmdAcceptCall;
+        else if constexpr (std::is_same_v<T, core::InCmdRejectCall>)
+            evType = EventType::CmdRejectCall;
+        else if constexpr (std::is_same_v<T, core::InMediaPeer>)
+            evType = EventType::MediaPeer;
+
         else evType = EventType::Unknow;
     }, ev);
     return evType;
@@ -249,6 +264,102 @@ void FSM::initTable() {
                 return out;
             },
             State::LoggedIn
+        },
+
+        // 1. LoggedIn状态下发起呼叫
+        { State::LoggedIn, EventType::CmdCall,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCmdCall>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::CALLING});
+                    out.push_back(core::OutSendCall{e->target_user});
+                }
+                return out;
+            },
+            State::CALLING
+        },
+
+        // 2. LoggedIn状态下收到来电
+        { State::LoggedIn, EventType::CallIncoming,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCallIncoming>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::RINGING});
+                    out.push_back(core::OutShowIncomingCall{e->from});
+                }
+                return out;
+            },
+            State::RINGING
+        },
+
+        // 3. RINGING状态下用户接听
+        { State::RINGING, EventType::CmdAcceptCall,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendAcceptCall{});
+                return out;
+            },
+            State::RINGING
+        },
+
+        // 4. RINGING状态下用户拒绝
+        { State::RINGING, EventType::CmdRejectCall,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendRejectCall{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 5. CALLING/RINGING状态下收到通话被接听
+        { State::CALLING, EventType::CallAccepted,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::IN_CALL});
+                    out.push_back(core::OutSendMediaOffer{e->peer});
+                }
+                return out;
+            },
+            State::IN_CALL
+        },
+        { State::RINGING, EventType::CallAccepted,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::IN_CALL});
+                }
+                return out;
+            },
+            State::IN_CALL
+        },
+
+        // 6. CALLING状态下收到通话被拒绝
+        { State::CALLING, EventType::CallRejected,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 7. IN_CALL状态下收到媒体信息
+        { State::IN_CALL, EventType::MediaPeer,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
+                    std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
+                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    // 被动方发送MediaAnswer
+                    out.push_back(core::OutSendMediaAnswer{e->peer});
+                }
+                return out;
+            },
+            State::MEDIA_READY
         },
 
     };

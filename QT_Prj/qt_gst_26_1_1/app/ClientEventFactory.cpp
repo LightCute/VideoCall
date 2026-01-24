@@ -31,6 +31,33 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         return ProtoEvtForwardText{from_user, content};
     }
 
+    // =====调用通话相关解析函数 =====
+    proto::CallIncoming callIn;
+    if (proto::parseCallIncoming(msg, callIn)) {
+        return ProtoEvtCallIncoming{callIn.from};
+    }
+
+    proto::CallAccepted callAc;
+    if (proto::parseCallAccepted(msg, callAc)) {
+        return ProtoEvtCallAccepted{callAc.peer};
+    }
+
+    proto::CallRejected callRe;
+    if (proto::parseCallRejected(msg, callRe)) {
+        return ProtoEvtCallRejected{callRe.peer};
+    }
+
+    proto::MediaPeerResp mediaPeer;
+    if (proto::parseMediaPeerResp(msg, mediaPeer)) {
+        return ProtoEvtMediaPeer{
+            mediaPeer.peer,
+            mediaPeer.lanIp,
+            mediaPeer.vpnIp,
+            mediaPeer.udpPort
+        };
+    }
+
+
     proto::Unknown req_error;
     req_error.message = msg;
     return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀

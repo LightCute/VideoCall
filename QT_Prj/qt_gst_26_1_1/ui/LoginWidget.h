@@ -57,6 +57,20 @@ private:
 
     void handle(const core::OutForwardText& e) ;
 
+    void handle(const core::OutSendCall&);
+
+    void handle(const core::OutSendAcceptCall&) ;
+
+    void handle(const core::OutSendRejectCall&) ;
+
+    void handle(const core::OutSendMediaOffer&) ;
+
+    void handle(const core::OutSendMediaAnswer&) ;
+
+    void handle(const core::OutMediaReady&) ;
+
+    void handle(const core::OutShowIncomingCall&) ;
+
 };
 
 #endif // LOGINWIDGET_H

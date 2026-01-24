@@ -4,7 +4,7 @@
 #include <QDebug>
 #include "ClientCore.h" // 包含Core头文件
 #include "ClientState.h" // 包含状态转换函数
-
+#include <QMessageBox>
 Widget::Widget(ClientCore* core, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -166,3 +166,67 @@ void Widget::handle(const core::OutSelectLan&) {
 void Widget::handle(const core::OutSelectVpn&) {
     std::cout << "[Widget] OutSelectVpn)" << std::endl;
 }
+
+
+//**********************
+void Widget::handle(const core::OutSendCall&) {
+    std::cout << "[Widget] OutSendCall)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendAcceptCall&) {
+    std::cout << "[Widget] OutSendAcceptCall)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendRejectCall&) {
+    std::cout << "[Widget] OutSendRejectCall)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendMediaOffer&) {
+    std::cout << "[Widget] OutSendMediaOffer)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendMediaAnswer&) {
+    std::cout << "[Widget] OutSendMediaAnswer)" << std::endl;
+}
+
+void Widget::handle(const core::OutMediaReady& e) {
+    std::cout << "[Widget] OutMediaReady)" << std::endl;
+    std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
+    //camera_.start("/dev/video0");
+}
+
+void Widget::handle(const core::OutShowIncomingCall& e) {
+    // 弹出来电对话框
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Incoming");
+    msgBox.setText(QString("User %1 is calling you").arg(QString::fromStdString(e.from)));
+    msgBox.addButton("Accept", QMessageBox::AcceptRole);
+    msgBox.addButton("Reject", QMessageBox::RejectRole);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::AcceptRole) {
+        core_->postInput(core::InCmdAcceptCall{});
+    } else {
+        core_->postInput(core::InCmdRejectCall{});
+    }
+}
+
+
+
+void Widget::on_Bt_Call_clicked()
+{
+    QString targetUser = ui->lineEdit_CallTarget->text();
+    core_->postInput(core::InCmdCall{targetUser.toStdString()});
+}
+
+
+void Widget::on_Bt_AcceptCall_clicked()
+{
+    core_->postInput(core::InCmdAcceptCall{});
+}
+
+
+void Widget::on_Bt_RejectCall_clicked()
+{
+    core_->postInput(core::InCmdRejectCall{});
+}
+

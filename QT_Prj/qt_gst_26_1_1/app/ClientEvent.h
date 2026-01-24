@@ -29,6 +29,29 @@ struct ProtoEvtForwardText {
     std::string content;    // 消息内容
 };
 
+// 来电事件
+struct ProtoEvtCallIncoming {
+    std::string from; // 来电方用户名
+};
+
+// 通话被接听事件
+struct ProtoEvtCallAccepted {
+    std::string peer; // 通话对方用户名
+};
+
+// 通话被拒绝事件
+struct ProtoEvtCallRejected {
+    std::string peer; // 拒绝方用户名
+};
+
+// 媒体协商响应事件
+struct ProtoEvtMediaPeer {
+    std::string peer;    // 对方用户名
+    std::string lanIp;   // 对方局域网IP
+    std::string vpnIp;   // 对方VPN IP
+    int udpPort;         // 对方媒体UDP端口
+};
+
 using ClientEvent = std::variant<
     // UI 触发的协议命令
     ProtoEvtCmdConnect,
@@ -45,5 +68,9 @@ using ClientEvent = std::variant<
     ProtoEvtOnlineUsers,
     ProtoEvtUnknow,
     ProtoEvHeartbeatAck,
-    ProtoEvtForwardText
+    ProtoEvtForwardText,
+    ProtoEvtCallIncoming,
+    ProtoEvtCallAccepted,
+    ProtoEvtCallRejected,
+    ProtoEvtMediaPeer
     >;

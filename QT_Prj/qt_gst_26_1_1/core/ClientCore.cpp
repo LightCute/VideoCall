@@ -129,6 +129,20 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
         else if constexpr (std::is_same_v<T, core::OutForwardText>) {
             broadcastOutput(e);
         }
+        else if constexpr (std::is_same_v<T, core::OutSendCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendAcceptCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendRejectCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendMediaOffer>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendMediaAnswer>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutShowIncomingCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutMediaReady>)
+            execute(e);
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -188,6 +202,45 @@ void ClientCore::execute(const core::OutSendText& e) {
 void ClientCore::execute(const core::OutForwardText&) {
     std::cout << "[Executor] OutForwardText" << std::endl;
 }
+
+// 发送呼叫请求
+void ClientCore::execute(const core::OutSendCall& e) {
+    isCaller_ = true;
+    executor_->sendCallRequest(e.target_user);
+}
+
+// 发送接听请求
+void ClientCore::execute(const core::OutSendAcceptCall& e) {
+    executor_->sendAcceptCall();
+}
+
+// 发送拒绝请求
+void ClientCore::execute(const core::OutSendRejectCall& e) {
+    executor_->sendRejectCall();
+}
+
+// 发送媒体Offer
+void ClientCore::execute(const core::OutSendMediaOffer& e) {
+    executor_->sendMediaOffer(e.peer);
+}
+
+// 发送媒体Answer
+void ClientCore::execute(const core::OutSendMediaAnswer& e) {
+    executor_->sendMediaAnswer(e.peer);
+}
+
+// 通知UI弹出来电
+void ClientCore::execute(const core::OutShowIncomingCall& e) {
+    broadcastOutput(e); // 广播给UI监听者
+}
+
+// 媒体信息就绪，启动UDP
+void ClientCore::execute(const core::OutMediaReady& e) {
+    peerIp_ = e.peerIp;
+    peerPort_ = e.peerPort;
+    broadcastOutput(e); // 广播给媒体层监听者
+}
+
 // 废弃原 socket 操作接口（可直接删除）
 // bool ClientCore::connectToServer(const std::string& host, int port) { ... }
 // void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }

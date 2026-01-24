@@ -40,6 +40,10 @@ private:
     std::vector<core::ICoreListener*> listeners_;
     std::mutex listener_mtx_;  // 监听者操作的线程安全锁
 
+    std::string peer_;          // 通话对方用户名
+    std::string peerIp_;        // 对方媒体IP
+    int peerPort_ = 0;          // 对方媒体端口
+    bool isCaller_ = false;     // 是否为主动呼叫方
     // 核心方法（参数补充 core:: 前缀）
     void processEvents();
     void applyStateChange(const core::OutStateChanged& e); // 补充 core:: 前缀
@@ -53,6 +57,13 @@ private:
     void execute(const core::OutLoginOk&);
     void execute(const core::OutSendText& e);
     void execute(const core::OutForwardText&);
+    void execute(const core::OutSendCall& e);
+    void execute(const core::OutSendAcceptCall& e);
+    void execute(const core::OutSendRejectCall& e);
+    void execute(const core::OutSendMediaOffer& e);
+    void execute(const core::OutSendMediaAnswer& e);
+    void execute(const core::OutShowIncomingCall& e);
+    void execute(const core::OutMediaReady& e);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };

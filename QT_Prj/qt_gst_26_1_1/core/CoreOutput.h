@@ -23,7 +23,21 @@ struct OutSelectLan {};
 struct OutSelectVpn {};
 struct OutSendText { std::string target_user; std::string content; };
 struct OutForwardText { std::string from_user; std::string content; };
-
+// 发送呼叫请求
+struct OutSendCall { std::string target_user; };
+// 发送接听/拒绝请求
+struct OutSendAcceptCall {};
+struct OutSendRejectCall {};
+// 发送媒体Offer/Answer
+struct OutSendMediaOffer { std::string peer; };
+struct OutSendMediaAnswer { std::string peer; };
+// 媒体信息就绪
+struct OutMediaReady {
+    std::string peerIp;
+    int peerPort;
+};
+// 来电通知UI
+struct OutShowIncomingCall { std::string from; };
 
 using CoreOutput = std::variant<
     OutStateChanged,
@@ -38,7 +52,14 @@ using CoreOutput = std::variant<
     OutSelectLan,
     OutSelectVpn,
     OutSendText,
-    OutForwardText
+    OutForwardText,
+    OutSendCall,
+    OutSendAcceptCall,
+    OutSendRejectCall,
+    OutSendMediaOffer,
+    OutSendMediaAnswer,
+    OutMediaReady,
+    OutShowIncomingCall
     >;
 
 } // namespace core

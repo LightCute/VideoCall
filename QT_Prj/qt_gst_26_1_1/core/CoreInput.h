@@ -35,6 +35,24 @@ struct InHeartbeatTick {};    // Send PING
 struct InSelectLan {};
 struct InSelectVpn {};
 
+// 发起呼叫
+struct InCmdCall { std::string target_user; };
+// 收到来电
+struct InCallIncoming { std::string from; };
+// 通话被接听
+struct InCallAccepted { std::string peer; };
+// 通话被拒绝
+struct InCallRejected { std::string peer; };
+// 用户接听/拒绝通话
+struct InCmdAcceptCall {};
+struct InCmdRejectCall {};
+// 媒体协商响应
+struct InMediaPeer {
+    std::string peer;
+    std::string lanIp;
+    std::string vpnIp;
+    int udpPort;
+};
 
 
 
@@ -54,6 +72,13 @@ using CoreInput = std::variant<
     InSelectLan,
     InSelectVpn,
     InCmdSendText,
-    InForwardText
+    InForwardText,
+    InCmdCall,
+    InCallIncoming,
+    InCallAccepted,
+    InCallRejected,
+    InCmdAcceptCall,
+    InCmdRejectCall,
+    InMediaPeer
     >;
 }

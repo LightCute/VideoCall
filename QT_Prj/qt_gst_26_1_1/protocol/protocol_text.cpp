@@ -8,6 +8,32 @@ namespace proto {
 
 /* ================= build ================= */
 
+std::string makeCallRequest(const std::string& target_user) {
+    std::ostringstream oss;
+    oss << CMD_CALL << " " << target_user;
+    return oss.str();
+}
+
+std::string makeAcceptCallRequest() {
+    return CMD_CALL_ACCEPT;
+}
+
+std::string makeRejectCallRequest() {
+    return CMD_CALL_REJECT;
+}
+
+std::string makeMediaOfferRequest(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_OFFER << " " << peer;
+    return oss.str();
+}
+
+std::string makeMediaAnswerRequest(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_ANSWER << " " << peer;
+    return oss.str();
+}
+
 // Client 使用
 std::string makeLoginRequest(const std::string& user,
                              const std::string& pwd)
@@ -191,6 +217,53 @@ bool parseForwardTextMsg(const std::string& msg, std::string& from_user, std::st
     std::getline(iss >> std::ws, content);
     return !from_user.empty() && !content.empty();
 }
+
+// 解析来电通知（CMD_CALL_INCOMING）
+bool parseCallIncoming(const std::string& msg, CallIncoming& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_INCOMING) return false;
+    iss >> out.from;
+    return !out.from.empty();
+}
+
+// 解析通话被接听（CMD_CALL_ACCEPTED）
+bool parseCallAccepted(const std::string& msg, CallAccepted& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_ACCEPTED) return false;
+    iss >> out.peer;
+    return !out.peer.empty();
+}
+
+// 解析通话被拒绝（CMD_CALL_REJECTED）
+bool parseCallRejected(const std::string& msg, CallRejected& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_REJECTED) return false;
+    iss >> out.peer;
+    return !out.peer.empty();
+}
+
+// 解析媒体Offer/Answer响应（CMD_MEDIA_OFFER_RESP/CMD_MEDIA_ANSWER_RESP）
+bool parseMediaPeerResp(const std::string& msg, MediaPeerResp& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_MEDIA_OFFER_RESP && cmd != CMD_MEDIA_ANSWER_RESP) return false;
+    iss >> out.peer >> out.lanIp >> out.vpnIp >> out.udpPort;
+
+    // 基础校验：用户名和端口不能为空/无效
+    return !out.peer.empty() && out.udpPort > 0;
+}
+
 
 
 } // namespace proto

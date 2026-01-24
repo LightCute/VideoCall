@@ -25,5 +25,17 @@ enum class EventType {
     SelectLan,
     SelectVpn,
     CmdSendText,
-    ForwardText
+    ForwardText,
+    CmdCall,
+    CallIncoming,
+    CallAccepted,
+    CallRejected,
+    CmdAcceptCall,
+    CmdRejectCall,
+    MediaPeer
+    // CallIncoming,    // 收到来电
+    // CallAccepted,    // 通话被接听
+    // CallRejected,    // 通话被拒绝
+    // MediaOfferResp,  // 媒体Offer响应
+    // MediaAnswerResp  // 媒体Answer响应
 };

@@ -52,8 +52,8 @@
   <widget class="QPushButton" name="Bt_tcp_send">
    <property name="geometry">
     <rect>
-     <x>860</x>
-     <y>460</y>
+     <x>880</x>
+     <y>360</y>
      <width>88</width>
      <height>26</height>
     </rect>
@@ -65,8 +65,8 @@
   <widget class="QLineEdit" name="lineEdit_target_user">
    <property name="geometry">
     <rect>
-     <x>820</x>
-     <y>380</y>
+     <x>840</x>
+     <y>280</y>
      <width>231</width>
      <height>26</height>
     </rect>
@@ -75,8 +75,8 @@
   <widget class="QPlainTextEdit" name="text_onlineUsers">
    <property name="geometry">
     <rect>
-     <x>780</x>
-     <y>100</y>
+     <x>800</x>
+     <y>0</y>
      <width>301</width>
      <height>161</height>
     </rect>
@@ -85,8 +85,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>380</y>
+     <x>770</x>
+     <y>280</y>
      <width>66</width>
      <height>18</height>
     </rect>
@@ -98,8 +98,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>430</y>
+     <x>770</x>
+     <y>330</y>
      <width>66</width>
      <height>18</height>
     </rect>
@@ -111,8 +111,8 @@
   <widget class="QLineEdit" name="lineEdit_msg">
    <property name="geometry">
     <rect>
-     <x>820</x>
-     <y>420</y>
+     <x>840</x>
+     <y>320</y>
      <width>231</width>
      <height>26</height>
     </rect>
@@ -121,11 +121,73 @@
   <widget class="QPlainTextEdit" name="PTE_recv">
    <property name="geometry">
     <rect>
-     <x>780</x>
-     <y>280</y>
+     <x>800</x>
+     <y>180</y>
      <width>301</width>
      <height>70</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Bt_Call">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>410</y>
+     <width>88</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Call</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Bt_AcceptCall">
+   <property name="geometry">
+    <rect>
+     <x>860</x>
+     <y>410</y>
+     <width>88</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>AcceptCall</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Bt_RejectCall">
+   <property name="geometry">
+    <rect>
+     <x>960</x>
+     <y>410</y>
+     <width>88</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RejectCall</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_CallTarget">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>470</y>
+     <width>231</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>470</y>
+     <width>66</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TAR</string>
    </property>
   </widget>
  </widget>

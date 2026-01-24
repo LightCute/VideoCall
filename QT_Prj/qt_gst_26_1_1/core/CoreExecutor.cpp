@@ -61,10 +61,18 @@ void CoreExecutor::initSocketCallbacks() {
             else if constexpr (std::is_same_v<T, ProtoEvtForwardText>) {
                 postInput_(core::InForwardText{e.from_user, e.content});
             }
+
+            else if constexpr (std::is_same_v<T, ProtoEvtCallIncoming>)
+                postInput_(core::InCallIncoming{e.from});
+            else if constexpr (std::is_same_v<T, ProtoEvtCallAccepted>)
+                postInput_(core::InCallAccepted{e.peer});
+            else if constexpr (std::is_same_v<T, ProtoEvtCallRejected>)
+                postInput_(core::InCallRejected{e.peer});
+            else if constexpr (std::is_same_v<T, ProtoEvtMediaPeer>)
+                postInput_(core::InMediaPeer{e.peer, e.lanIp, e.vpnIp, e.udpPort});
             else {
                 postInput_(core::InUnknow{});
             }
-
 
         }, event);
     });
@@ -142,4 +150,39 @@ void CoreExecutor::sendTextMsg(const std::string& target_user, const std::string
     std::string textMsg = proto::makeSendTextMsg(target_user, content);
     socket_.sendMessage(textMsg);
     std::cout << "[Executor] Send text msg to " << target_user << ": " << content << std::endl;
+}
+
+// 发送CALL请求
+void CoreExecutor::sendCallRequest(const std::string& target_user) {
+    std::string msg = proto::makeCallRequest(target_user);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send CALL request to: " << target_user << std::endl;
+}
+
+// 发送CALL_ACCEPT
+void CoreExecutor::sendAcceptCall() {
+    std::string msg = proto::makeAcceptCallRequest();
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send CALL_ACCEPT" << std::endl;
+}
+
+// 发送CALL_REJECT
+void CoreExecutor::sendRejectCall() {
+    std::string msg = proto::makeRejectCallRequest();
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send CALL_REJECT" << std::endl;
+}
+
+// 发送MEDIA_OFFER
+void CoreExecutor::sendMediaOffer(const std::string& peer) {
+    std::string msg = proto::makeMediaOfferRequest(peer);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send MEDIA_OFFER to: " << peer << std::endl;
+}
+
+// 发送MEDIA_ANSWER
+void CoreExecutor::sendMediaAnswer(const std::string& peer) {
+    std::string msg = proto::makeMediaAnswerRequest(peer);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send MEDIA_ANSWER to: " << peer << std::endl;
 }

@@ -143,3 +143,33 @@ void LoginWidget::on_Bt_Login_clicked()
     // 替换为 InCmdLogin
     core_->postInput(core::InCmdLogin{msg_user_name, msg_user_pass});
 }
+
+
+//**********************
+void LoginWidget::handle(const core::OutSendCall&) {
+    std::cout << "[LoginWidget] OutSendCall)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendAcceptCall&) {
+    std::cout << "[LoginWidget] OutSendAcceptCall)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendRejectCall&) {
+    std::cout << "[LoginWidget] OutSendRejectCall)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendMediaOffer&) {
+    std::cout << "[LoginWidget] OutSendMediaOffer)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendMediaAnswer&) {
+    std::cout << "[LoginWidget] OutSendMediaAnswer)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutMediaReady&) {
+    std::cout << "[LoginWidget] OutMediaReady)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutShowIncomingCall&) {
+    std::cout << "[LoginWidget] OutShowIncomingCall)" << std::endl;
+}
