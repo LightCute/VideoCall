@@ -38,9 +38,10 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // 2. 获取发送者用户名
+    // 2. 获取发送者用户名和自身网络信息
     auto snapshot = sessionMgr_.snapshot();
     std::string from_user = snapshot.at(fd).user.username;
+    ClientNetInfo from_net = snapshot.at(fd).net; // 发送者自己的地址
 
     // 3. 检查目标用户是否在线
     int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
@@ -52,7 +53,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // ✅ 修复：传入「发送者用户名」而非「目标用户」查找会话（适配双向查找逻辑）
+    // 4. 查找通话会话（仅验证通话存在）
     auto call_session = callService_.onMediaNegotiate(from_user);
     if (!call_session) {
         actions.emplace_back(SendError{
@@ -62,7 +63,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // 4. 验证会话的目标用户是否匹配（防止跨会话协商）
+    // 5. 验证会话的目标用户是否匹配（防止跨会话协商）
     if (call_session->callee != ev.target_user && call_session->caller != ev.target_user) {
         actions.emplace_back(SendError{
             .fd = fd,
@@ -71,27 +72,21 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
-    ClientNetInfo target_net = snapshot.at(target_fd).net;
-    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "Target user has no registered peer info"
-        });
-        return actions;
-    }
-
-    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    // 6. 核心修改：将「发送者的地址」转发给「目标用户」（而非反向）
     actions.emplace_back(SendMediaOffer{
-        .fd = fd,
-        .peer = ev.target_user,
-        .peer_net = target_net
+        .fd = target_fd,       // 发送给目标用户
+        .peer = from_user,     // 发送者用户名
+        .peer_net = from_net   // 发送者的网络地址
     });
 
-    std::cout << "[Dispatcher] Media offer from " << from_user << " to " << ev.target_user 
-              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    // 7. 标记发送者媒体就绪
+    callService_.markMediaReady(from_user);
+
+    std::cout << "[Dispatcher] Media offer from " << from_user << " forward to " << ev.target_user 
+              << " lan=" << from_net.lanIp << " vpn=" << from_net.vpnIp << " port=" << from_net.udpPort << std::endl;
     return actions;
 }
+
 
 // 处理MediaAnswer事件
 std::vector<ServerAction>
@@ -108,9 +103,10 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // 2. 获取发送者用户名
+    // 2. 获取发送者用户名和自身网络信息
     auto snapshot = sessionMgr_.snapshot();
     std::string from_user = snapshot.at(fd).user.username;
+    ClientNetInfo from_net = snapshot.at(fd).net; // 发送者自己的地址
 
     // 3. 检查目标用户是否在线
     int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
@@ -122,7 +118,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // ✅ 修复：传入「发送者用户名」查找会话
+    // 4. 查找通话会话（仅验证通话存在）
     auto call_session = callService_.onMediaNegotiate(from_user);
     if (!call_session) {
         actions.emplace_back(SendError{
@@ -132,7 +128,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // 4. 验证会话的目标用户是否匹配
+    // 5. 验证会话的目标用户是否匹配
     if (call_session->callee != ev.target_user && call_session->caller != ev.target_user) {
         actions.emplace_back(SendError{
             .fd = fd,
@@ -141,28 +137,18 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
-    ClientNetInfo target_net = snapshot.at(target_fd).net;
-    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "Target user has no registered peer info"
-        });
-        return actions;
-    }
-
-    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    // 6. 核心修改：将「发送者的地址」转发给「目标用户」
     actions.emplace_back(SendMediaAnswer{
-        .fd = fd,
-        .peer = ev.target_user,
-        .peer_net = target_net
+        .fd = target_fd,       // 发送给目标用户
+        .peer = from_user,     // 发送者用户名
+        .peer_net = from_net   // 发送者的网络地址
     });
 
-    // 7. 标记媒体就绪（完成后删除通话会话）
-    callService_.onMediaReady(from_user);
+    // 7. 标记发送者媒体就绪
+    callService_.markMediaReady(from_user);
 
-    std::cout << "[Dispatcher] Media answer from " << from_user << " to " << ev.target_user 
-              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    std::cout << "[Dispatcher] Media answer from " << from_user << " forward to " << ev.target_user 
+              << " lan=" << from_net.lanIp << " vpn=" << from_net.vpnIp << " port=" << from_net.udpPort << std::endl;
     return actions;
 }
 

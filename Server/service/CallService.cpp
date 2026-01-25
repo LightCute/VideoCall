@@ -16,6 +16,8 @@ std::optional<CallSession> CallService::onCallRequest(const std::string& from, c
     CallSession session{
         .caller = from,
         .callee = to,
+        .caller_media_ready = false,
+        .callee_media_ready = false,
         .state = CallSession::RINGING
     };
     activeCalls_[to] = session;
@@ -56,66 +58,49 @@ std::optional<CallSession> CallService::onReject(const std::string& user) {
     it->second.state = CallSession::REJECTED;
     auto session = it->second;
     
-    // 拒绝后移除活跃通话
+    // 拒绝后移除活跃通话（仅拒绝场景删除，媒体就绪不删除）
     activeCalls_.erase(it);
     
     std::cout << "[CallService] Call rejected: " << session.caller << " -> " << session.callee << std::endl;
     return session;
 }
 
-// 标记媒体协商开始
+// 媒体协商：仅查找通话会话，不修改状态（核心修改）
 std::optional<CallSession> CallService::onMediaNegotiate(const std::string& user) {
     std::lock_guard<std::mutex> lock(mutex_);
-    
-    // 方式1：先按 callee 查找（原逻辑）
-    auto it = activeCalls_.find(user);
-    if (it != activeCalls_.end()) {
-        // 仅处理信令已接通的会话
-        if (it->second.state != CallSession::CONNECTED) {
-            std::cout << "[CallService] Call not connected for media negotiate: " << user << std::endl;
-            return std::nullopt;
-        }
-        it->second.state = CallSession::MEDIA_NEGOTIATING;
-        std::cout << "[CallService] Media negotiate start: " << it->second.caller << " <-> " << it->second.callee << std::endl;
-        return it->second;
-    }
-    
-    // 方式2：按 caller 查找（补充双向查找）
-    for (auto& [key, session] : activeCalls_) {
-        if (session.caller == user && session.state == CallSession::CONNECTED) {
-            session.state = CallSession::MEDIA_NEGOTIATING;
-            std::cout << "[CallService] Media negotiate start (by caller): " << session.caller << " <-> " << session.callee << std::endl;
+
+    // 双向查找：既找作为callee的情况，也找作为caller的情况
+    for (auto& [_, session] : activeCalls_) {
+        if (session.caller == user || session.callee == user) {
+            // 仅返回会话，不修改状态（删除原状态修改逻辑）
             return session;
         }
     }
-    
-    std::cout << "[CallService] No active call for media negotiate: " << user << std::endl;
     return std::nullopt;
 }
 
-// 标记媒体就绪（完成后删除会话）
-void CallService::onMediaReady(const std::string& user) {
+// 新增：标记用户媒体就绪，返回是否双方都就绪（核心实现）
+bool CallService::markMediaReady(const std::string& user) {
     std::lock_guard<std::mutex> lock(mutex_);
-    
-    // 按 callee 删除
-    auto it = activeCalls_.find(user);
-    if (it != activeCalls_.end()) {
-        it->second.state = CallSession::MEDIA_READY;
-        std::cout << "[CallService] Media ready, remove session: " << it->second.caller << " <-> " << it->second.callee << std::endl;
-        activeCalls_.erase(it);
-        return;
-    }
-    
-    // 按 caller 删除（补充双向删除）
-    for (auto iter = activeCalls_.begin(); iter != activeCalls_.end(); ++iter) {
-        if (iter->second.caller == user) {
-            iter->second.state = CallSession::MEDIA_READY;
-            std::cout << "[CallService] Media ready, remove session (by caller): " << iter->second.caller << " <-> " << iter->second.callee << std::endl;
-            activeCalls_.erase(iter);
-            break;
+
+    for (auto& [key, session] : activeCalls_) {
+        // 标记当前用户的媒体就绪状态
+        if (session.caller == user) {
+            session.caller_media_ready = true;
+        } else if (session.callee == user) {
+            session.callee_media_ready = true;
+        } else {
+            continue;
         }
+
+        // 检查是否双方都就绪
+        if (session.caller_media_ready && session.callee_media_ready) {
+            session.state = CallSession::MEDIA_READY;
+            // 双方就绪后可选择保留会话（如需支持挂断），也可删除
+            // activeCalls_.erase(key); // 可选：双方就绪后删除会话
+            return true;
+        }
+        return false; // 仅单方就绪
     }
+    return false; // 未找到通话会话
 }
-
-
-

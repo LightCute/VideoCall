@@ -81,4 +81,37 @@ using CoreInput = std::variant<
     InCmdRejectCall,
     InMediaPeer
     >;
+
+
+inline std::string CoreInputIndexToName(size_t index) {
+    // 严格按照CoreInput variant的类型顺序映射索引和名称
+    switch (index) {
+    case 0:  return "InCmdConnect";
+    case 1:  return "InCmdDisconnect";
+    case 2:  return "InCmdLogin";
+    case 3:  return "InTcpConnected";
+    case 4:  return "InTcpDisconnected";
+    case 5:  return "InLoginOk";
+    case 6:  return "InLoginFail";
+    case 7:  return "InOnlineUsers";
+    case 8:  return "InUnknow";
+    case 9:  return "InHeartbeatOk";
+    case 10: return "InHeartbeatTimeout";
+    case 11: return "InHeartbeatTick";
+    case 12: return "InSelectLan";
+    case 13: return "InSelectVpn";
+    case 14: return "InCmdSendText";
+    case 15: return "InForwardText";
+    case 16: return "InCmdCall";
+    case 17: return "InCallIncoming";
+    case 18: return "InCallAccepted";
+    case 19: return "InCallRejected";
+    case 20: return "InCmdAcceptCall";
+    case 21: return "InCmdRejectCall";
+    case 22: return "InMediaPeer";
+    // 兜底：索引超出范围时返回提示（防止新增类型未更新函数）
+    default: return "InUnknownCoreInputType";
+    }
+}
+
 }

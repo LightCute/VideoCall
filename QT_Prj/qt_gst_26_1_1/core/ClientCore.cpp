@@ -76,7 +76,7 @@ void ClientCore::processEvents() {
             ev = std::move(inputQueue_.front());
             inputQueue_.pop();
             std::cout << "[ClientCore] Processing Input event, remaining queue size: " << inputQueue_.size()
-                      << ", Event type index: " << ev.index() << std::endl;
+                      << ", Event type : " <<  core::CoreInputIndexToName(ev.index())  << std::endl;
         }
 
         auto outputs = fsm_.handle(state_, ev);

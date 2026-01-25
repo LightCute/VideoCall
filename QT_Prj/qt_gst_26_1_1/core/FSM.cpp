@@ -15,7 +15,7 @@ FSM::handle(State current, const core::CoreInput& ev)
 {
     EventType evType = eventTypeFromInput(ev);
     std::cout << "[FSM] Current state: " << stateToString(current)
-              << ", Received event type: " << static_cast<int>(evType) << std::endl;
+              << ", Received event type: " << EventTypeToString(evType) << std::endl;
     if (isOnlineState(current) && evType == EventType::HeartbeatTick) {
         // 直接返回，不走 FSM 表
         std::cout << "[FSM] Online state, directly handle HeartbeatTick event" << std::endl;
@@ -296,7 +296,11 @@ void FSM::initTable() {
         { State::RINGING, EventType::CmdAcceptCall,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendAcceptCall{});
+             if (auto e = std::get_if<core::InCmdAcceptCall>(&ev))
+             {
+                 out.push_back(core::OutSendAcceptCall{});
+                 //out.push_back(core::OutSendMediaOffer{e->peer});
+             }
                 return out;
             },
             State::RINGING
@@ -306,8 +310,11 @@ void FSM::initTable() {
         { State::RINGING, EventType::CmdRejectCall,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendRejectCall{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+             if (auto e = std::get_if<core::InCmdRejectCall>(&ev))
+                {
+                    out.push_back(core::OutSendRejectCall{});
+                    out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                }
                 return out;
             },
             State::LoggedIn
@@ -325,11 +332,28 @@ void FSM::initTable() {
             },
             State::IN_CALL
         },
+
+        { State::CALLING, EventType::MediaPeer,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
+                    std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
+                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    // CALLING 状态下收到 MediaPeer，说明是被动方收到 OFFER_RESP，需要发送 ANSWER
+                    out.push_back(core::OutSendMediaAnswer{e->peer});
+                }
+                return out;
+            },
+            State::MEDIA_READY
+        },
+
         { State::RINGING, EventType::CallAccepted,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
                     out.push_back(core::OutStateChanged{cur, State::IN_CALL});
+                     out.push_back(core::OutSendMediaOffer{e->peer});
                 }
                 return out;
             },
@@ -354,13 +378,13 @@ void FSM::initTable() {
                     std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
                     out.push_back(core::OutMediaReady{peerIp, e->udpPort});
-                    // 被动方发送MediaAnswer
-                    out.push_back(core::OutSendMediaAnswer{e->peer});
+
                 }
                 return out;
             },
             State::MEDIA_READY
         },
+
 
     };
 }
