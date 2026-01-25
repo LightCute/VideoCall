@@ -14,7 +14,7 @@ public:
     CameraManager();
     ~CameraManager();
 
-    bool start(const std::string& device);
+    bool start(const std::string& device, const std::string& udpHost, int udpPort);
     void stop();
 
     void setFrameCallback(FrameCallback cb);

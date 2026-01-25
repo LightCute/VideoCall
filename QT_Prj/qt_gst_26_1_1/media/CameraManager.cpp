@@ -15,9 +15,20 @@ void CameraManager::setFrameCallback(FrameCallback cb) {
     callback_ = std::move(cb);
 }
 
-bool CameraManager::start(const std::string& device) {
+bool CameraManager::start(const std::string& device, const std::string& udpHost, int udpPort) {
+    // 新增：参数合法性校验（避免无效配置导致推流失败）
+    if (udpHost.empty()) {
+        std::cout << "[CameraManager] Error: UDP host IP cannot be empty\n";
+        return false;
+    }
+    if ( (udpPort < 1) || (udpPort > 65535) ) {
+        std::cout << "[CameraManager] Error: UDP port must be between 1 and 65535 (got: " << udpPort << ")\n";
+        return false;
+    }
+
     if (pipeline_) return true;
     std::cout << "[CameraManager] Attempting to start camera: " << device << std::endl;
+    // 核心修改：用输入参数udpHost、udpPort替换硬编码的192.168.6.15和5000
     std::string pipelineStr =
         "v4l2src device=" + device +
         " ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 "
@@ -32,7 +43,8 @@ bool CameraManager::start(const std::string& device) {
         "     ! appsink name=sink "
         " t. ! queue "
         "     ! rtph264pay pt=96 config-interval=1 "
-        "     ! udpsink host=192.168.6.15 port=5000 sync=false async=false";
+        // 关键替换：host=${udpHost} port=${udpPort}
+        "     ! udpsink host=" + udpHost + " port=" + std::to_string(udpPort) + " sync=false async=false";
 
     pipeline_ = gst_parse_launch(pipelineStr.c_str(), nullptr);
     if (!pipeline_) {
@@ -46,15 +58,15 @@ bool CameraManager::start(const std::string& device) {
     gst_app_sink_set_emit_signals(GST_APP_SINK(appsink_), true);
     gst_app_sink_set_drop(GST_APP_SINK(appsink_), true);
     gst_app_sink_set_max_buffers(GST_APP_SINK(appsink_), 1);
-    
+
     g_signal_connect(appsink_, "new-sample",
                      G_CALLBACK(onNewSample), this);
 
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    std::cout << "[CameraManager] Camera started successfully: " << device << std::endl;
+    std::cout << "[CameraManager] Camera started successfully: " << device
+              << " | UDP push to: " << udpHost << ":" << udpPort << std::endl;
     return true;
 }
-
 void CameraManager::stop() {
     if (!pipeline_) return;
 

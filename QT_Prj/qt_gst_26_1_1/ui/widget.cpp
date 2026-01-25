@@ -82,7 +82,7 @@ void Widget::handle(const core::OutOnlineUsers& e) {
 void Widget::on_Bt_video_on_off_clicked()
 {
     qDebug("Button clicked!");
-    camera_.start("/dev/video0");
+    //camera_.start("/dev/video0");
 }
 
 void Widget::on_Bt_video_off_clicked()
@@ -192,7 +192,7 @@ void Widget::handle(const core::OutSendMediaAnswer&) {
 void Widget::handle(const core::OutMediaReady& e) {
     std::cout << "[Widget] OutMediaReady)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
-    //camera_.start("/dev/video0");
+    camera_.start("/dev/video0", e.peerIp, e.peerPort);
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {
