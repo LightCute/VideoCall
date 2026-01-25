@@ -43,6 +43,10 @@ private slots:
 
     void on_Bt_RejectCall_clicked();
 
+    void on_Bt_set_lan_clicked();
+
+    void on_Bt_sen_vpn_clicked();
+
 private:
     Ui::Widget *ui;
     ClientCore* core_; // 新增：Core指针成员

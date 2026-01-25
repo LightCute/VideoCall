@@ -139,7 +139,7 @@ void CoreExecutor::sendLocalIP() {
     std::string lanIp = getLocalLanIP();   // 你需要实现
     std::string vpnIp = getVpnIp();        // 先返回 ""
 
-    int port = 5000;
+    int port = 5001;
 
     std::string msg = proto::makeRegisterPeerMsg(lanIp, vpnIp, port);
     socket_.sendMessage(msg);

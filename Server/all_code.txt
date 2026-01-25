@@ -653,7 +653,7 @@ public:
 };
 
 ========== ./service/CallService.h ==========
-Lines: 42
+Lines: 49
 
 // CallService.h
 #pragma once
@@ -666,12 +666,17 @@ Lines: 42
 struct CallSession {
     std::string caller;    // 呼叫方用户名
     std::string callee;    // 被呼叫方用户名
+    
+    // 新增：记录双方媒体就绪状态（核心修改）
+    bool caller_media_ready = false;
+    bool callee_media_ready = false;
+
     enum State { 
         RINGING,           // 振铃中（被呼叫方未响应）
         CONNECTED,         // 信令接通（双方同意通话，未协商媒体）
-        MEDIA_NEGOTIATING, // 媒体协商中（正在下发IP/Port）
-        MEDIA_READY,       // 媒体就绪（可开始UDP推流）
-        REJECTED           // 通话被拒绝
+        MEDIA_NEGOTIATING, // 媒体协商中（兼容旧枚举，无实际语义）
+        MEDIA_READY,        // 双方媒体都就绪
+        REJECTED
     } state;
 };
 
@@ -687,9 +692,11 @@ public:
     // 处理拒绝通话：同理
     std::optional<CallSession> onReject(const std::string& user);
 
+    // 媒体协商：仅查找通话会话，不修改状态（核心修改）
     std::optional<CallSession> onMediaNegotiate(const std::string& user);
 
-    void onMediaReady(const std::string& user);    
+    // 新增：标记指定用户的媒体就绪状态，返回是否双方都就绪
+    bool markMediaReady(const std::string& user);    
 
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
@@ -737,7 +744,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/CallService.cpp ==========
-Lines: 121
+Lines: 106
 
 // CallService.cpp
 #include "CallService.h"
@@ -757,6 +764,8 @@ std::optional<CallSession> CallService::onCallRequest(const std::string& from, c
     CallSession session{
         .caller = from,
         .callee = to,
+        .caller_media_ready = false,
+        .callee_media_ready = false,
         .state = CallSession::RINGING
     };
     activeCalls_[to] = session;
@@ -797,70 +806,52 @@ std::optional<CallSession> CallService::onReject(const std::string& user) {
     it->second.state = CallSession::REJECTED;
     auto session = it->second;
     
-    // 拒绝后移除活跃通话
+    // 拒绝后移除活跃通话（仅拒绝场景删除，媒体就绪不删除）
     activeCalls_.erase(it);
     
     std::cout << "[CallService] Call rejected: " << session.caller << " -> " << session.callee << std::endl;
     return session;
 }
 
-// 标记媒体协商开始
+// 媒体协商：仅查找通话会话，不修改状态（核心修改）
 std::optional<CallSession> CallService::onMediaNegotiate(const std::string& user) {
     std::lock_guard<std::mutex> lock(mutex_);
-    
-    // 方式1：先按 callee 查找（原逻辑）
-    auto it = activeCalls_.find(user);
-    if (it != activeCalls_.end()) {
-        // 仅处理信令已接通的会话
-        if (it->second.state != CallSession::CONNECTED) {
-            std::cout << "[CallService] Call not connected for media negotiate: " << user << std::endl;
-            return std::nullopt;
-        }
-        it->second.state = CallSession::MEDIA_NEGOTIATING;
-        std::cout << "[CallService] Media negotiate start: " << it->second.caller << " <-> " << it->second.callee << std::endl;
-        return it->second;
-    }
-    
-    // 方式2：按 caller 查找（补充双向查找）
-    for (auto& [key, session] : activeCalls_) {
-        if (session.caller == user && session.state == CallSession::CONNECTED) {
-            session.state = CallSession::MEDIA_NEGOTIATING;
-            std::cout << "[CallService] Media negotiate start (by caller): " << session.caller << " <-> " << session.callee << std::endl;
+
+    // 双向查找：既找作为callee的情况，也找作为caller的情况
+    for (auto& [_, session] : activeCalls_) {
+        if (session.caller == user || session.callee == user) {
+            // 仅返回会话，不修改状态（删除原状态修改逻辑）
             return session;
         }
     }
-    
-    std::cout << "[CallService] No active call for media negotiate: " << user << std::endl;
     return std::nullopt;
 }
 
-// 标记媒体就绪（完成后删除会话）
-void CallService::onMediaReady(const std::string& user) {
+// 新增：标记用户媒体就绪，返回是否双方都就绪（核心实现）
+bool CallService::markMediaReady(const std::string& user) {
     std::lock_guard<std::mutex> lock(mutex_);
-    
-    // 按 callee 删除
-    auto it = activeCalls_.find(user);
-    if (it != activeCalls_.end()) {
-        it->second.state = CallSession::MEDIA_READY;
-        std::cout << "[CallService] Media ready, remove session: " << it->second.caller << " <-> " << it->second.callee << std::endl;
-        activeCalls_.erase(it);
-        return;
-    }
-    
-    // 按 caller 删除（补充双向删除）
-    for (auto iter = activeCalls_.begin(); iter != activeCalls_.end(); ++iter) {
-        if (iter->second.caller == user) {
-            iter->second.state = CallSession::MEDIA_READY;
-            std::cout << "[CallService] Media ready, remove session (by caller): " << iter->second.caller << " <-> " << iter->second.callee << std::endl;
-            activeCalls_.erase(iter);
-            break;
+
+    for (auto& [key, session] : activeCalls_) {
+        // 标记当前用户的媒体就绪状态
+        if (session.caller == user) {
+            session.caller_media_ready = true;
+        } else if (session.callee == user) {
+            session.callee_media_ready = true;
+        } else {
+            continue;
         }
+
+        // 检查是否双方都就绪
+        if (session.caller_media_ready && session.callee_media_ready) {
+            session.state = CallSession::MEDIA_READY;
+            // 双方就绪后可选择保留会话（如需支持挂断），也可删除
+            // activeCalls_.erase(key); // 可选：双方就绪后删除会话
+            return true;
+        }
+        return false; // 仅单方就绪
     }
+    return false; // 未找到通话会话
 }
-
-
-
-
 ========== ./service/ServerAction.h ==========
 Lines: 21
 
@@ -887,7 +878,7 @@ using ServerAction = std::variant<
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 451
+Lines: 437
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -929,9 +920,10 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // 2. 获取发送者用户名
+    // 2. 获取发送者用户名和自身网络信息
     auto snapshot = sessionMgr_.snapshot();
     std::string from_user = snapshot.at(fd).user.username;
+    ClientNetInfo from_net = snapshot.at(fd).net; // 发送者自己的地址
 
     // 3. 检查目标用户是否在线
     int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
@@ -943,7 +935,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // ✅ 修复：传入「发送者用户名」而非「目标用户」查找会话（适配双向查找逻辑）
+    // 4. 查找通话会话（仅验证通话存在）
     auto call_session = callService_.onMediaNegotiate(from_user);
     if (!call_session) {
         actions.emplace_back(SendError{
@@ -953,7 +945,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // 4. 验证会话的目标用户是否匹配（防止跨会话协商）
+    // 5. 验证会话的目标用户是否匹配（防止跨会话协商）
     if (call_session->callee != ev.target_user && call_session->caller != ev.target_user) {
         actions.emplace_back(SendError{
             .fd = fd,
@@ -962,27 +954,21 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
-    ClientNetInfo target_net = snapshot.at(target_fd).net;
-    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "Target user has no registered peer info"
-        });
-        return actions;
-    }
-
-    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    // 6. 核心修改：将「发送者的地址」转发给「目标用户」（而非反向）
     actions.emplace_back(SendMediaOffer{
-        .fd = fd,
-        .peer = ev.target_user,
-        .peer_net = target_net
+        .fd = target_fd,       // 发送给目标用户
+        .peer = from_user,     // 发送者用户名
+        .peer_net = from_net   // 发送者的网络地址
     });
 
-    std::cout << "[Dispatcher] Media offer from " << from_user << " to " << ev.target_user 
-              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    // 7. 标记发送者媒体就绪
+    callService_.markMediaReady(from_user);
+
+    std::cout << "[Dispatcher] Media offer from " << from_user << " forward to " << ev.target_user 
+              << " lan=" << from_net.lanIp << " vpn=" << from_net.vpnIp << " port=" << from_net.udpPort << std::endl;
     return actions;
 }
+
 
 // 处理MediaAnswer事件
 std::vector<ServerAction>
@@ -999,9 +985,10 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // 2. 获取发送者用户名
+    // 2. 获取发送者用户名和自身网络信息
     auto snapshot = sessionMgr_.snapshot();
     std::string from_user = snapshot.at(fd).user.username;
+    ClientNetInfo from_net = snapshot.at(fd).net; // 发送者自己的地址
 
     // 3. 检查目标用户是否在线
     int target_fd = sessionMgr_.getFdByUsername(ev.target_user);
@@ -1013,7 +1000,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // ✅ 修复：传入「发送者用户名」查找会话
+    // 4. 查找通话会话（仅验证通话存在）
     auto call_session = callService_.onMediaNegotiate(from_user);
     if (!call_session) {
         actions.emplace_back(SendError{
@@ -1023,7 +1010,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // 4. 验证会话的目标用户是否匹配
+    // 5. 验证会话的目标用户是否匹配
     if (call_session->callee != ev.target_user && call_session->caller != ev.target_user) {
         actions.emplace_back(SendError{
             .fd = fd,
@@ -1032,28 +1019,18 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // 5. 获取目标用户的IP/Port（从SessionManager中读取）
-    ClientNetInfo target_net = snapshot.at(target_fd).net;
-    if (target_net.udpPort == 0 || target_net.lanIp.empty()) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "Target user has no registered peer info"
-        });
-        return actions;
-    }
-
-    // 6. 生成Action：向发送者下发目标用户的IP/Port
+    // 6. 核心修改：将「发送者的地址」转发给「目标用户」
     actions.emplace_back(SendMediaAnswer{
-        .fd = fd,
-        .peer = ev.target_user,
-        .peer_net = target_net
+        .fd = target_fd,       // 发送给目标用户
+        .peer = from_user,     // 发送者用户名
+        .peer_net = from_net   // 发送者的网络地址
     });
 
-    // 7. 标记媒体就绪（完成后删除通话会话）
-    callService_.onMediaReady(from_user);
+    // 7. 标记发送者媒体就绪
+    callService_.markMediaReady(from_user);
 
-    std::cout << "[Dispatcher] Media answer from " << from_user << " to " << ev.target_user 
-              << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
+    std::cout << "[Dispatcher] Media answer from " << from_user << " forward to " << ev.target_user 
+              << " lan=" << from_net.lanIp << " vpn=" << from_net.vpnIp << " port=" << from_net.udpPort << std::endl;
     return actions;
 }
 
@@ -2278,4 +2255,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 27
-Total lines: 2117
+Total lines: 2095

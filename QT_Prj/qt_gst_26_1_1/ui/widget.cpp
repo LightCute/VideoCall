@@ -205,7 +205,7 @@ void Widget::handle(const core::OutMediaReady& e) {
     std::cout << "[Widget] OutMediaReady)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
     camera_.start("/dev/video0", e.peerIp, e.peerPort);
-    receiver_.start(5001);
+    receiver_.start(5000);
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {
@@ -241,5 +241,17 @@ void Widget::on_Bt_AcceptCall_clicked()
 void Widget::on_Bt_RejectCall_clicked()
 {
     core_->postInput(core::InCmdRejectCall{});
+}
+
+
+void Widget::on_Bt_set_lan_clicked()
+{
+    core_->postInput(core::InSelectLan{}); // 触发LAN模式
+}
+
+
+void Widget::on_Bt_sen_vpn_clicked()
+{
+    core_->postInput(core::InSelectVpn{}); // 触发VPN模式
 }
 
