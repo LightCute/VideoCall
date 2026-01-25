@@ -153,7 +153,7 @@ std::string getVpnIp()
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 193
+Lines: 246
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -286,6 +286,20 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
         else if constexpr (std::is_same_v<T, core::OutForwardText>) {
             broadcastOutput(e);
         }
+        else if constexpr (std::is_same_v<T, core::OutSendCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendAcceptCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendRejectCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendMediaOffer>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendMediaAnswer>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutShowIncomingCall>)
+            execute(e);
+        else if constexpr (std::is_same_v<T, core::OutMediaReady>)
+            execute(e);
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -345,6 +359,45 @@ void ClientCore::execute(const core::OutSendText& e) {
 void ClientCore::execute(const core::OutForwardText&) {
     std::cout << "[Executor] OutForwardText" << std::endl;
 }
+
+// 发送呼叫请求
+void ClientCore::execute(const core::OutSendCall& e) {
+    isCaller_ = true;
+    executor_->sendCallRequest(e.target_user);
+}
+
+// 发送接听请求
+void ClientCore::execute(const core::OutSendAcceptCall& e) {
+    executor_->sendAcceptCall();
+}
+
+// 发送拒绝请求
+void ClientCore::execute(const core::OutSendRejectCall& e) {
+    executor_->sendRejectCall();
+}
+
+// 发送媒体Offer
+void ClientCore::execute(const core::OutSendMediaOffer& e) {
+    executor_->sendMediaOffer(e.peer);
+}
+
+// 发送媒体Answer
+void ClientCore::execute(const core::OutSendMediaAnswer& e) {
+    executor_->sendMediaAnswer(e.peer);
+}
+
+// 通知UI弹出来电
+void ClientCore::execute(const core::OutShowIncomingCall& e) {
+    broadcastOutput(e); // 广播给UI监听者
+}
+
+// 媒体信息就绪，启动UDP
+void ClientCore::execute(const core::OutMediaReady& e) {
+    peerIp_ = e.peerIp;
+    peerPort_ = e.peerPort;
+    broadcastOutput(e); // 广播给媒体层监听者
+}
+
 // 废弃原 socket 操作接口（可直接删除）
 // bool ClientCore::connectToServer(const std::string& host, int port) { ... }
 // void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }
@@ -390,7 +443,7 @@ private:
 };
 
 ========== ./core/CoreInput.h ==========
-Lines: 59
+Lines: 84
 
 // core/CoreInput.h
 #pragma once
@@ -429,6 +482,24 @@ struct InHeartbeatTick {};    // Send PING
 struct InSelectLan {};
 struct InSelectVpn {};
 
+// 发起呼叫
+struct InCmdCall { std::string target_user; };
+// 收到来电
+struct InCallIncoming { std::string from; };
+// 通话被接听
+struct InCallAccepted { std::string peer; };
+// 通话被拒绝
+struct InCallRejected { std::string peer; };
+// 用户接听/拒绝通话
+struct InCmdAcceptCall {};
+struct InCmdRejectCall {};
+// 媒体协商响应
+struct InMediaPeer {
+    std::string peer;
+    std::string lanIp;
+    std::string vpnIp;
+    int udpPort;
+};
 
 
 
@@ -448,12 +519,19 @@ using CoreInput = std::variant<
     InSelectLan,
     InSelectVpn,
     InCmdSendText,
-    InForwardText
+    InForwardText,
+    InCmdCall,
+    InCallIncoming,
+    InCallAccepted,
+    InCallRejected,
+    InCmdAcceptCall,
+    InCmdRejectCall,
+    InMediaPeer
     >;
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 255
+Lines: 366
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -531,6 +609,21 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
 
         else if constexpr (std::is_same_v<T, core::InForwardText>)
             evType = EventType::ForwardText;
+
+        else if constexpr (std::is_same_v<T, core::InCmdCall>)
+            evType = EventType::CmdCall;
+        else if constexpr (std::is_same_v<T, core::InCallIncoming>)
+            evType = EventType::CallIncoming;
+        else if constexpr (std::is_same_v<T, core::InCallAccepted>)
+            evType = EventType::CallAccepted;
+        else if constexpr (std::is_same_v<T, core::InCallRejected>)
+            evType = EventType::CallRejected;
+        else if constexpr (std::is_same_v<T, core::InCmdAcceptCall>)
+            evType = EventType::CmdAcceptCall;
+        else if constexpr (std::is_same_v<T, core::InCmdRejectCall>)
+            evType = EventType::CmdRejectCall;
+        else if constexpr (std::is_same_v<T, core::InMediaPeer>)
+            evType = EventType::MediaPeer;
 
         else evType = EventType::Unknow;
     }, ev);
@@ -708,11 +801,107 @@ void FSM::initTable() {
             State::LoggedIn
         },
 
+        // 1. LoggedIn状态下发起呼叫
+        { State::LoggedIn, EventType::CmdCall,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCmdCall>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::CALLING});
+                    out.push_back(core::OutSendCall{e->target_user});
+                }
+                return out;
+            },
+            State::CALLING
+        },
+
+        // 2. LoggedIn状态下收到来电
+        { State::LoggedIn, EventType::CallIncoming,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCallIncoming>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::RINGING});
+                    out.push_back(core::OutShowIncomingCall{e->from});
+                }
+                return out;
+            },
+            State::RINGING
+        },
+
+        // 3. RINGING状态下用户接听
+        { State::RINGING, EventType::CmdAcceptCall,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendAcceptCall{});
+                return out;
+            },
+            State::RINGING
+        },
+
+        // 4. RINGING状态下用户拒绝
+        { State::RINGING, EventType::CmdRejectCall,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendRejectCall{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 5. CALLING/RINGING状态下收到通话被接听
+        { State::CALLING, EventType::CallAccepted,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::IN_CALL});
+                    out.push_back(core::OutSendMediaOffer{e->peer});
+                }
+                return out;
+            },
+            State::IN_CALL
+        },
+        { State::RINGING, EventType::CallAccepted,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
+                    out.push_back(core::OutStateChanged{cur, State::IN_CALL});
+                }
+                return out;
+            },
+            State::IN_CALL
+        },
+
+        // 6. CALLING状态下收到通话被拒绝
+        { State::CALLING, EventType::CallRejected,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 7. IN_CALL状态下收到媒体信息
+        { State::IN_CALL, EventType::MediaPeer,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
+                    std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
+                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    // 被动方发送MediaAnswer
+                    out.push_back(core::OutSendMediaAnswer{e->peer});
+                }
+                return out;
+            },
+            State::MEDIA_READY
+        },
+
     };
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 58
+Lines: 69
 
 #pragma once
 #include "CoreInput.h"
@@ -756,6 +945,10 @@ private:
     std::vector<core::ICoreListener*> listeners_;
     std::mutex listener_mtx_;  // 监听者操作的线程安全锁
 
+    std::string peer_;          // 通话对方用户名
+    std::string peerIp_;        // 对方媒体IP
+    int peerPort_ = 0;          // 对方媒体端口
+    bool isCaller_ = false;     // 是否为主动呼叫方
     // 核心方法（参数补充 core:: 前缀）
     void processEvents();
     void applyStateChange(const core::OutStateChanged& e); // 补充 core:: 前缀
@@ -769,12 +962,19 @@ private:
     void execute(const core::OutLoginOk&);
     void execute(const core::OutSendText& e);
     void execute(const core::OutForwardText&);
+    void execute(const core::OutSendCall& e);
+    void execute(const core::OutSendAcceptCall& e);
+    void execute(const core::OutSendRejectCall& e);
+    void execute(const core::OutSendMediaOffer& e);
+    void execute(const core::OutSendMediaAnswer& e);
+    void execute(const core::OutShowIncomingCall& e);
+    void execute(const core::OutMediaReady& e);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 145
+Lines: 188
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
@@ -839,10 +1039,18 @@ void CoreExecutor::initSocketCallbacks() {
             else if constexpr (std::is_same_v<T, ProtoEvtForwardText>) {
                 postInput_(core::InForwardText{e.from_user, e.content});
             }
+
+            else if constexpr (std::is_same_v<T, ProtoEvtCallIncoming>)
+                postInput_(core::InCallIncoming{e.from});
+            else if constexpr (std::is_same_v<T, ProtoEvtCallAccepted>)
+                postInput_(core::InCallAccepted{e.peer});
+            else if constexpr (std::is_same_v<T, ProtoEvtCallRejected>)
+                postInput_(core::InCallRejected{e.peer});
+            else if constexpr (std::is_same_v<T, ProtoEvtMediaPeer>)
+                postInput_(core::InMediaPeer{e.peer, e.lanIp, e.vpnIp, e.udpPort});
             else {
                 postInput_(core::InUnknow{});
             }
-
 
         }, event);
     });
@@ -922,8 +1130,43 @@ void CoreExecutor::sendTextMsg(const std::string& target_user, const std::string
     std::cout << "[Executor] Send text msg to " << target_user << ": " << content << std::endl;
 }
 
+// 发送CALL请求
+void CoreExecutor::sendCallRequest(const std::string& target_user) {
+    std::string msg = proto::makeCallRequest(target_user);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send CALL request to: " << target_user << std::endl;
+}
+
+// 发送CALL_ACCEPT
+void CoreExecutor::sendAcceptCall() {
+    std::string msg = proto::makeAcceptCallRequest();
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send CALL_ACCEPT" << std::endl;
+}
+
+// 发送CALL_REJECT
+void CoreExecutor::sendRejectCall() {
+    std::string msg = proto::makeRejectCallRequest();
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send CALL_REJECT" << std::endl;
+}
+
+// 发送MEDIA_OFFER
+void CoreExecutor::sendMediaOffer(const std::string& peer) {
+    std::string msg = proto::makeMediaOfferRequest(peer);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send MEDIA_OFFER to: " << peer << std::endl;
+}
+
+// 发送MEDIA_ANSWER
+void CoreExecutor::sendMediaAnswer(const std::string& peer) {
+    std::string msg = proto::makeMediaAnswerRequest(peer);
+    socket_.sendMessage(msg);
+    std::cout << "[Executor] Send MEDIA_ANSWER to: " << peer << std::endl;
+}
+
 ========== ./core/ClientState.h ==========
-Lines: 24
+Lines: 32
 
 // ClientState.h
 #pragma once
@@ -935,7 +1178,11 @@ enum class State {
     Connecting,
     Connected,
     LoggingIn,
-    LoggedIn
+    LoggedIn,
+    CALLING,    // 发起呼叫中
+    RINGING,    // 收到来电响铃中
+    IN_CALL,    // 信令接通
+    MEDIA_READY // 媒体信息就绪
 };
 
 // 将 State 转换为字符串
@@ -946,12 +1193,16 @@ inline std::string stateToString(State s) {
     case State::Connected:    return "Connected";
     case State::LoggingIn:    return "LoggingIn";
     case State::LoggedIn:     return "LoggedIn";
+    case State::CALLING:    return "CALLING";
+    case State::RINGING:    return "RINGING";
+    case State::IN_CALL:    return "IN_CALL";
+    case State::MEDIA_READY:return "MEDIA_READY";
     default:                  return "Unknown";
     }
 }
 
 ========== ./core/CoreExecutor.h ==========
-Lines: 46
+Lines: 51
 
 //CoreExecutor.h
 #pragma once
@@ -981,6 +1232,11 @@ public:
     void setVpnMode() ;
     void sendLocalIP();
     void sendTextMsg(const std::string& target_user, const std::string& content);
+    void sendCallRequest(const std::string& target_user);
+    void sendAcceptCall();
+    void sendRejectCall();
+    void sendMediaOffer(const std::string& peer);
+    void sendMediaAnswer(const std::string& peer);
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
@@ -1020,7 +1276,7 @@ public:
 } // namespace core
 
 ========== ./core/CoreOutput.h ==========
-Lines: 44
+Lines: 65
 
 // core/CoreOutput.h
 #pragma once
@@ -1047,7 +1303,21 @@ struct OutSelectLan {};
 struct OutSelectVpn {};
 struct OutSendText { std::string target_user; std::string content; };
 struct OutForwardText { std::string from_user; std::string content; };
-
+// 发送呼叫请求
+struct OutSendCall { std::string target_user; };
+// 发送接听/拒绝请求
+struct OutSendAcceptCall {};
+struct OutSendRejectCall {};
+// 发送媒体Offer/Answer
+struct OutSendMediaOffer { std::string peer; };
+struct OutSendMediaAnswer { std::string peer; };
+// 媒体信息就绪
+struct OutMediaReady {
+    std::string peerIp;
+    int peerPort;
+};
+// 来电通知UI
+struct OutShowIncomingCall { std::string from; };
 
 using CoreOutput = std::variant<
     OutStateChanged,
@@ -1062,7 +1332,14 @@ using CoreOutput = std::variant<
     OutSelectLan,
     OutSelectVpn,
     OutSendText,
-    OutForwardText
+    OutForwardText,
+    OutSendCall,
+    OutSendAcceptCall,
+    OutSendRejectCall,
+    OutSendMediaOffer,
+    OutSendMediaAnswer,
+    OutMediaReady,
+    OutShowIncomingCall
     >;
 
 } // namespace core
@@ -1347,7 +1624,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 168
+Lines: 232
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -1355,7 +1632,7 @@ Lines: 168
 #include <QDebug>
 #include "ClientCore.h" // 包含Core头文件
 #include "ClientState.h" // 包含状态转换函数
-
+#include <QMessageBox>
 Widget::Widget(ClientCore* core, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -1518,6 +1795,70 @@ void Widget::handle(const core::OutSelectVpn&) {
     std::cout << "[Widget] OutSelectVpn)" << std::endl;
 }
 
+
+//**********************
+void Widget::handle(const core::OutSendCall&) {
+    std::cout << "[Widget] OutSendCall)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendAcceptCall&) {
+    std::cout << "[Widget] OutSendAcceptCall)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendRejectCall&) {
+    std::cout << "[Widget] OutSendRejectCall)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendMediaOffer&) {
+    std::cout << "[Widget] OutSendMediaOffer)" << std::endl;
+}
+
+void Widget::handle(const core::OutSendMediaAnswer&) {
+    std::cout << "[Widget] OutSendMediaAnswer)" << std::endl;
+}
+
+void Widget::handle(const core::OutMediaReady& e) {
+    std::cout << "[Widget] OutMediaReady)" << std::endl;
+    std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
+    //camera_.start("/dev/video0");
+}
+
+void Widget::handle(const core::OutShowIncomingCall& e) {
+    // 弹出来电对话框
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Incoming");
+    msgBox.setText(QString("User %1 is calling you").arg(QString::fromStdString(e.from)));
+    msgBox.addButton("Accept", QMessageBox::AcceptRole);
+    msgBox.addButton("Reject", QMessageBox::RejectRole);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::AcceptRole) {
+        core_->postInput(core::InCmdAcceptCall{});
+    } else {
+        core_->postInput(core::InCmdRejectCall{});
+    }
+}
+
+
+
+void Widget::on_Bt_Call_clicked()
+{
+    QString targetUser = ui->lineEdit_CallTarget->text();
+    core_->postInput(core::InCmdCall{targetUser.toStdString()});
+}
+
+
+void Widget::on_Bt_AcceptCall_clicked()
+{
+    core_->postInput(core::InCmdAcceptCall{});
+}
+
+
+void Widget::on_Bt_RejectCall_clicked()
+{
+    core_->postInput(core::InCmdRejectCall{});
+}
+
+
 ========== ./ui/QtCameraAdapter.cpp ==========
 Lines: 18
 
@@ -1541,7 +1882,7 @@ void QtCameraAdapter::onFrame(Frame f) {
 }
 
 ========== ./ui/LoginWidget.h ==========
-Lines: 62
+Lines: 76
 
 //LoginWidget.h
 #ifndef LOGINWIDGET_H
@@ -1601,6 +1942,20 @@ private:
     void handle(const core::OutSendText& e) ;
 
     void handle(const core::OutForwardText& e) ;
+
+    void handle(const core::OutSendCall&);
+
+    void handle(const core::OutSendAcceptCall&) ;
+
+    void handle(const core::OutSendRejectCall&) ;
+
+    void handle(const core::OutSendMediaOffer&) ;
+
+    void handle(const core::OutSendMediaAnswer&) ;
+
+    void handle(const core::OutMediaReady&) ;
+
+    void handle(const core::OutShowIncomingCall&) ;
 
 };
 
@@ -1691,7 +2046,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 145
+Lines: 175
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -1839,6 +2194,36 @@ void LoginWidget::on_Bt_Login_clicked()
     core_->postInput(core::InCmdLogin{msg_user_name, msg_user_pass});
 }
 
+
+//**********************
+void LoginWidget::handle(const core::OutSendCall&) {
+    std::cout << "[LoginWidget] OutSendCall)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendAcceptCall&) {
+    std::cout << "[LoginWidget] OutSendAcceptCall)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendRejectCall&) {
+    std::cout << "[LoginWidget] OutSendRejectCall)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendMediaOffer&) {
+    std::cout << "[LoginWidget] OutSendMediaOffer)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendMediaAnswer&) {
+    std::cout << "[LoginWidget] OutSendMediaAnswer)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutMediaReady&) {
+    std::cout << "[LoginWidget] OutMediaReady)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutShowIncomingCall&) {
+    std::cout << "[LoginWidget] OutShowIncomingCall)" << std::endl;
+}
+
 ========== ./ui/AppWindow.h ==========
 Lines: 30
 
@@ -1874,7 +2259,7 @@ private:
 };
 
 ========== ./ui/widget.h ==========
-Lines: 75
+Lines: 95
 
 // ui/widget.h（完整修复版）
 #ifndef WIDGET_H
@@ -1915,6 +2300,12 @@ private slots:
     void on_Bt_tcp_send_clicked();
     void handleCoreOutput(const core::CoreOutput& out); // 槽函数声明
 
+    void on_Bt_Call_clicked();
+
+    void on_Bt_AcceptCall_clicked();
+
+    void on_Bt_RejectCall_clicked();
+
 private:
     Ui::Widget *ui;
     ClientCore* core_; // 新增：Core指针成员
@@ -1949,11 +2340,25 @@ private:
 
     void handle(const core::OutForwardText& e) ;
 
+    void handle(const core::OutSendCall&);
+
+    void handle(const core::OutSendAcceptCall&) ;
+
+    void handle(const core::OutSendRejectCall&) ;
+
+    void handle(const core::OutSendMediaOffer&) ;
+
+    void handle(const core::OutSendMediaAnswer&) ;
+
+    void handle(const core::OutMediaReady& e) ;
+
+    void handle(const core::OutShowIncomingCall& e) ;
+
 };
 #endif // WIDGET_H
 
 ========== ./protocol/protocol_types.h ==========
-Lines: 40
+Lines: 63
 
 //protocol_types.h
 #pragma once
@@ -1981,23 +2386,46 @@ struct OnlineUsers {
     std::vector<UserInfo> users;
 };
 
-// 新增：文本消息结构体（客户端→服务器）
+// 文本消息结构体（客户端→服务器）
 struct SendTextMsg {
     std::string target_user;  // 目标用户名
     std::string content;      // 消息内容
     std::string from_user;    // 发送者用户名（服务器填充）
 };
 
-// 新增：转发文本消息结构体（服务器→客户端）
+// 转发文本消息结构体（服务器→客户端）
 struct ForwardTextMsg {
     std::string from_user;    // 发送者用户名
     std::string content;      // 消息内容
 };
 
+// 来电通知结构体
+struct CallIncoming {
+    std::string from; // 来电方用户名
+};
+
+// 通话被接听结构体
+struct CallAccepted {
+    std::string peer; // 通话对方用户名
+};
+
+// 通话被拒绝结构体
+struct CallRejected {
+    std::string peer; // 拒绝方用户名
+};
+
+// 媒体协商响应结构体
+struct MediaPeerResp {
+    std::string peer;    // 对方用户名
+    std::string lanIp;   // 对方局域网IP
+    std::string vpnIp;   // 对方VPN IP
+    int udpPort;         // 对方媒体UDP端口
+};
+
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 27
+Lines: 34
 
 //protocol_text.h
 #pragma once
@@ -2015,7 +2443,11 @@ std::string makeHeartbeat();
 std::string makeRegisterPeerMsg(const std::string& lan,const std::string& vpn,int port);
 std::string makeSendTextMsg(const std::string& target_user, const std::string& content);
 std::string makeForwardTextMsg(const std::string& from_user, const std::string& content);
-
+std::string makeCallRequest(const std::string& target_user);
+std::string makeAcceptCallRequest();
+std::string makeRejectCallRequest();
+std::string makeMediaOfferRequest(const std::string& peer);
+std::string makeMediaAnswerRequest(const std::string& peer);
 
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
@@ -2024,11 +2456,14 @@ bool parseOnlineUsers(const std::string& msg, OnlineUsers& users);
 bool parseHeartbeatAck(const std::string& msg);
 bool parseSendTextMsg(const std::string& msg, std::string& target_user, std::string& content);
 bool parseForwardTextMsg(const std::string& msg, std::string& from_user, std::string& content);
-
+bool parseCallIncoming(const std::string& msg, CallIncoming& out);
+bool parseCallAccepted(const std::string& msg, CallAccepted& out);
+bool parseCallRejected(const std::string& msg, CallRejected& out);
+bool parseMediaPeerResp(const std::string& msg, MediaPeerResp& out);
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 196
+Lines: 269
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -2039,6 +2474,32 @@ Lines: 196
 namespace proto {
 
 /* ================= build ================= */
+
+std::string makeCallRequest(const std::string& target_user) {
+    std::ostringstream oss;
+    oss << CMD_CALL << " " << target_user;
+    return oss.str();
+}
+
+std::string makeAcceptCallRequest() {
+    return CMD_CALL_ACCEPT;
+}
+
+std::string makeRejectCallRequest() {
+    return CMD_CALL_REJECT;
+}
+
+std::string makeMediaOfferRequest(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_OFFER << " " << peer;
+    return oss.str();
+}
+
+std::string makeMediaAnswerRequest(const std::string& peer) {
+    std::ostringstream oss;
+    oss << CMD_MEDIA_ANSWER << " " << peer;
+    return oss.str();
+}
 
 // Client 使用
 std::string makeLoginRequest(const std::string& user,
@@ -2224,11 +2685,58 @@ bool parseForwardTextMsg(const std::string& msg, std::string& from_user, std::st
     return !from_user.empty() && !content.empty();
 }
 
+// 解析来电通知（CMD_CALL_INCOMING）
+bool parseCallIncoming(const std::string& msg, CallIncoming& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_INCOMING) return false;
+    iss >> out.from;
+    return !out.from.empty();
+}
+
+// 解析通话被接听（CMD_CALL_ACCEPTED）
+bool parseCallAccepted(const std::string& msg, CallAccepted& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_ACCEPTED) return false;
+    iss >> out.peer;
+    return !out.peer.empty();
+}
+
+// 解析通话被拒绝（CMD_CALL_REJECTED）
+bool parseCallRejected(const std::string& msg, CallRejected& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_REJECTED) return false;
+    iss >> out.peer;
+    return !out.peer.empty();
+}
+
+// 解析媒体Offer/Answer响应（CMD_MEDIA_OFFER_RESP/CMD_MEDIA_ANSWER_RESP）
+bool parseMediaPeerResp(const std::string& msg, MediaPeerResp& out) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_MEDIA_OFFER_RESP && cmd != CMD_MEDIA_ANSWER_RESP) return false;
+    iss >> out.peer >> out.lanIp >> out.vpnIp >> out.udpPort;
+
+    // 基础校验：用户名和端口不能为空/无效
+    return !out.peer.empty() && out.udpPort > 0;
+}
+
+
 
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 26
+Lines: 36
 
 //protocol_common.h
 #pragma once
@@ -2245,7 +2753,17 @@ constexpr const char* CMD_HEARTBEAT_ACK = "PONG";
 constexpr const char* CMD_REGISTER_PEER = "REGISTER_PEER";
 constexpr const char* CMD_SEND_TEXT     = "SEND_TEXT";
 constexpr const char* CMD_FORWARD_TEXT  = "FORWARD_TEXT";
-
+// 通话相关CMD
+constexpr const char* CMD_CALL               = "CALL";
+constexpr const char* CMD_CALL_INCOMING      = "CALL_INCOMING";
+constexpr const char* CMD_CALL_ACCEPT        = "CALL_ACCEPT";
+constexpr const char* CMD_CALL_REJECT        = "CALL_REJECT";
+constexpr const char* CMD_CALL_ACCEPTED      = "CALL_ACCEPTED";
+constexpr const char* CMD_CALL_REJECTED      = "CALL_REJECTED";
+constexpr const char* CMD_MEDIA_OFFER        = "MEDIA_OFFER";
+constexpr const char* CMD_MEDIA_OFFER_RESP   = "MEDIA_OFFER_RESP";
+constexpr const char* CMD_MEDIA_ANSWER       = "MEDIA_ANSWER";
+constexpr const char* CMD_MEDIA_ANSWER_RESP  = "MEDIA_ANSWER_RESP";
 
 // keys
 constexpr const char* KEY_USERNAME  = "username";
@@ -2258,7 +2776,7 @@ constexpr const char* KEY_COUNT     = "count";
 }
 
 ========== ./app/ClientEvent.h ==========
-Lines: 49
+Lines: 76
 
 //ClientEvent.h
 #pragma once
@@ -2291,6 +2809,29 @@ struct ProtoEvtForwardText {
     std::string content;    // 消息内容
 };
 
+// 来电事件
+struct ProtoEvtCallIncoming {
+    std::string from; // 来电方用户名
+};
+
+// 通话被接听事件
+struct ProtoEvtCallAccepted {
+    std::string peer; // 通话对方用户名
+};
+
+// 通话被拒绝事件
+struct ProtoEvtCallRejected {
+    std::string peer; // 拒绝方用户名
+};
+
+// 媒体协商响应事件
+struct ProtoEvtMediaPeer {
+    std::string peer;    // 对方用户名
+    std::string lanIp;   // 对方局域网IP
+    std::string vpnIp;   // 对方VPN IP
+    int udpPort;         // 对方媒体UDP端口
+};
+
 using ClientEvent = std::variant<
     // UI 触发的协议命令
     ProtoEvtCmdConnect,
@@ -2307,7 +2848,11 @@ using ClientEvent = std::variant<
     ProtoEvtOnlineUsers,
     ProtoEvtUnknow,
     ProtoEvHeartbeatAck,
-    ProtoEvtForwardText
+    ProtoEvtForwardText,
+    ProtoEvtCallIncoming,
+    ProtoEvtCallAccepted,
+    ProtoEvtCallRejected,
+    ProtoEvtMediaPeer
     >;
 
 ========== ./app/ClientEventFactory.h ==========
@@ -2333,7 +2878,7 @@ private:
 #endif // CLIENTEVENTFACTORY_H
 
 ========== ./app/ClientEventFactory.cpp ==========
-Lines: 37
+Lines: 64
 
 //ClientEventFactory.cpp
 #include "ClientEventFactory.h"
@@ -2368,13 +2913,40 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         return ProtoEvtForwardText{from_user, content};
     }
 
+    // =====调用通话相关解析函数 =====
+    proto::CallIncoming callIn;
+    if (proto::parseCallIncoming(msg, callIn)) {
+        return ProtoEvtCallIncoming{callIn.from};
+    }
+
+    proto::CallAccepted callAc;
+    if (proto::parseCallAccepted(msg, callAc)) {
+        return ProtoEvtCallAccepted{callAc.peer};
+    }
+
+    proto::CallRejected callRe;
+    if (proto::parseCallRejected(msg, callRe)) {
+        return ProtoEvtCallRejected{callRe.peer};
+    }
+
+    proto::MediaPeerResp mediaPeer;
+    if (proto::parseMediaPeerResp(msg, mediaPeer)) {
+        return ProtoEvtMediaPeer{
+            mediaPeer.peer,
+            mediaPeer.lanIp,
+            mediaPeer.vpnIp,
+            mediaPeer.udpPort
+        };
+    }
+
+
     proto::Unknown req_error;
     req_error.message = msg;
     return ProtoEvtUnknow{req_error}; // 改为 ProtoEvt 前缀
 }
 
 ========== ./app/ClientEventEnum.h ==========
-Lines: 29
+Lines: 41
 
 //ClientEventEnum.h
 #pragma once
@@ -2403,7 +2975,19 @@ enum class EventType {
     SelectLan,
     SelectVpn,
     CmdSendText,
-    ForwardText
+    ForwardText,
+    CmdCall,
+    CallIncoming,
+    CallAccepted,
+    CallRejected,
+    CmdAcceptCall,
+    CmdRejectCall,
+    MediaPeer
+    // CallIncoming,    // 收到来电
+    // CallAccepted,    // 通话被接听
+    // CallRejected,    // 通话被拒绝
+    // MediaOfferResp,  // 媒体Offer响应
+    // MediaAnswerResp  // 媒体Answer响应
 };
 
 ========== ./media/CameraManager.cpp ==========
@@ -2568,4 +3152,4 @@ Q_DECLARE_METATYPE(Frame)
 
 =====================================
 Total files: 36
-Total lines: 2365
+Total lines: 2949

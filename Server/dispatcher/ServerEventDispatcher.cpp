@@ -52,12 +52,21 @@ ServerEventDispatcher::handle(int fd, const event::MediaOffer& ev)
         return actions;
     }
 
-    // 4. 验证通话会话是否存在（信令已接通）
-    auto call_session = callService_.onMediaNegotiate(ev.target_user);
+    // ✅ 修复：传入「发送者用户名」而非「目标用户」查找会话（适配双向查找逻辑）
+    auto call_session = callService_.onMediaNegotiate(from_user);
     if (!call_session) {
         actions.emplace_back(SendError{
             .fd = fd,
             .reason = "No active call for media offer"
+        });
+        return actions;
+    }
+
+    // 4. 验证会话的目标用户是否匹配（防止跨会话协商）
+    if (call_session->callee != ev.target_user && call_session->caller != ev.target_user) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Media offer target mismatch with active call"
         });
         return actions;
     }
@@ -113,12 +122,21 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
         return actions;
     }
 
-    // 4. 验证通话会话是否存在（信令已接通）
-    auto call_session = callService_.onMediaNegotiate(ev.target_user);
+    // ✅ 修复：传入「发送者用户名」查找会话
+    auto call_session = callService_.onMediaNegotiate(from_user);
     if (!call_session) {
         actions.emplace_back(SendError{
             .fd = fd,
             .reason = "No active call for media answer"
+        });
+        return actions;
+    }
+
+    // 4. 验证会话的目标用户是否匹配
+    if (call_session->callee != ev.target_user && call_session->caller != ev.target_user) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Media answer target mismatch with active call"
         });
         return actions;
     }
@@ -141,7 +159,7 @@ ServerEventDispatcher::handle(int fd, const event::MediaAnswer& ev)
     });
 
     // 7. 标记媒体就绪（完成后删除通话会话）
-    callService_.onMediaReady(ev.target_user);
+    callService_.onMediaReady(from_user);
 
     std::cout << "[Dispatcher] Media answer from " << from_user << " to " << ev.target_user 
               << " lan=" << target_net.lanIp << " vpn=" << target_net.vpnIp << " port=" << target_net.udpPort << std::endl;
