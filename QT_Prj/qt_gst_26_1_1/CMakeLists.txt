@@ -60,6 +60,8 @@ set(PROJECT_SOURCES
     media/CameraManager.cpp
     media/CameraManager.h
     media/Frame.h
+    media/VideoReceiver.h
+    media/VideoReceiver.cpp
 
     # net
     net/CommandSocket.cpp
@@ -104,6 +106,7 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
 else()
     add_executable(${PROJECT_NAME}
         ${PROJECT_SOURCES}
+
         #media/CameraManager.h
 
 

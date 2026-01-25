@@ -233,7 +233,7 @@ void ClientCore::processEvents() {
             ev = std::move(inputQueue_.front());
             inputQueue_.pop();
             std::cout << "[ClientCore] Processing Input event, remaining queue size: " << inputQueue_.size()
-                      << ", Event type index: " << ev.index() << std::endl;
+                      << ", Event type : " <<  core::CoreInputIndexToName(ev.index())  << std::endl;
         }
 
         auto outputs = fsm_.handle(state_, ev);
@@ -443,7 +443,7 @@ private:
 };
 
 ========== ./core/CoreInput.h ==========
-Lines: 84
+Lines: 117
 
 // core/CoreInput.h
 #pragma once
@@ -528,10 +528,43 @@ using CoreInput = std::variant<
     InCmdRejectCall,
     InMediaPeer
     >;
+
+
+inline std::string CoreInputIndexToName(size_t index) {
+    // 严格按照CoreInput variant的类型顺序映射索引和名称
+    switch (index) {
+    case 0:  return "InCmdConnect";
+    case 1:  return "InCmdDisconnect";
+    case 2:  return "InCmdLogin";
+    case 3:  return "InTcpConnected";
+    case 4:  return "InTcpDisconnected";
+    case 5:  return "InLoginOk";
+    case 6:  return "InLoginFail";
+    case 7:  return "InOnlineUsers";
+    case 8:  return "InUnknow";
+    case 9:  return "InHeartbeatOk";
+    case 10: return "InHeartbeatTimeout";
+    case 11: return "InHeartbeatTick";
+    case 12: return "InSelectLan";
+    case 13: return "InSelectVpn";
+    case 14: return "InCmdSendText";
+    case 15: return "InForwardText";
+    case 16: return "InCmdCall";
+    case 17: return "InCallIncoming";
+    case 18: return "InCallAccepted";
+    case 19: return "InCallRejected";
+    case 20: return "InCmdAcceptCall";
+    case 21: return "InCmdRejectCall";
+    case 22: return "InMediaPeer";
+    // 兜底：索引超出范围时返回提示（防止新增类型未更新函数）
+    default: return "InUnknownCoreInputType";
+    }
+}
+
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 366
+Lines: 390
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -550,7 +583,7 @@ FSM::handle(State current, const core::CoreInput& ev)
 {
     EventType evType = eventTypeFromInput(ev);
     std::cout << "[FSM] Current state: " << stateToString(current)
-              << ", Received event type: " << static_cast<int>(evType) << std::endl;
+              << ", Received event type: " << EventTypeToString(evType) << std::endl;
     if (isOnlineState(current) && evType == EventType::HeartbeatTick) {
         // 直接返回，不走 FSM 表
         std::cout << "[FSM] Online state, directly handle HeartbeatTick event" << std::endl;
@@ -831,7 +864,11 @@ void FSM::initTable() {
         { State::RINGING, EventType::CmdAcceptCall,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendAcceptCall{});
+             if (auto e = std::get_if<core::InCmdAcceptCall>(&ev))
+             {
+                 out.push_back(core::OutSendAcceptCall{});
+                 //out.push_back(core::OutSendMediaOffer{e->peer});
+             }
                 return out;
             },
             State::RINGING
@@ -841,8 +878,11 @@ void FSM::initTable() {
         { State::RINGING, EventType::CmdRejectCall,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendRejectCall{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+             if (auto e = std::get_if<core::InCmdRejectCall>(&ev))
+                {
+                    out.push_back(core::OutSendRejectCall{});
+                    out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                }
                 return out;
             },
             State::LoggedIn
@@ -860,11 +900,28 @@ void FSM::initTable() {
             },
             State::IN_CALL
         },
+
+        { State::CALLING, EventType::MediaPeer,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
+                    std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
+                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    // CALLING 状态下收到 MediaPeer，说明是被动方收到 OFFER_RESP，需要发送 ANSWER
+                    out.push_back(core::OutSendMediaAnswer{e->peer});
+                }
+                return out;
+            },
+            State::MEDIA_READY
+        },
+
         { State::RINGING, EventType::CallAccepted,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
                     out.push_back(core::OutStateChanged{cur, State::IN_CALL});
+                     out.push_back(core::OutSendMediaOffer{e->peer});
                 }
                 return out;
             },
@@ -889,13 +946,13 @@ void FSM::initTable() {
                     std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
                     out.push_back(core::OutMediaReady{peerIp, e->udpPort});
-                    // 被动方发送MediaAnswer
-                    out.push_back(core::OutSendMediaAnswer{e->peer});
+
                 }
                 return out;
             },
             State::MEDIA_READY
         },
+
 
     };
 }
@@ -1710,7 +1767,7 @@ void Widget::handle(const core::OutOnlineUsers& e) {
 void Widget::on_Bt_video_on_off_clicked()
 {
     qDebug("Button clicked!");
-    camera_.start("/dev/video0");
+    //camera_.start("/dev/video0");
 }
 
 void Widget::on_Bt_video_off_clicked()
@@ -1820,7 +1877,7 @@ void Widget::handle(const core::OutSendMediaAnswer&) {
 void Widget::handle(const core::OutMediaReady& e) {
     std::cout << "[Widget] OutMediaReady)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
-    //camera_.start("/dev/video0");
+    camera_.start("/dev/video0", e.peerIp, e.peerPort);
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {
@@ -2113,7 +2170,7 @@ void LoginWidget::on_Bt_ConnectToServer_clicked()
 
     ui->TextEdit_tcp_test_recv->setPlainText("Connecting\n");
     // 替换为 InCmdConnect
-    core_->postInput(core::InCmdConnect{"127.0.0.1",6001});
+    core_->postInput(core::InCmdConnect{"192.168.6.64",6001});
 }
 
 void LoginWidget::on_Bt_tcp_test_send_clicked()
@@ -2946,11 +3003,11 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./app/ClientEventEnum.h ==========
-Lines: 41
+Lines: 74
 
 //ClientEventEnum.h
 #pragma once
-
+#include <string>
 
 enum class EventType {
     // ===== UI 命令 =====
@@ -2990,8 +3047,41 @@ enum class EventType {
     // MediaAnswerResp  // 媒体Answer响应
 };
 
+
+inline std::string EventTypeToString(EventType type) {
+    // 使用switch-case精准映射每个枚举值
+    switch (type) {
+    case EventType::CmdConnect:        return "InCmdConnect";
+    case EventType::CmdDisconnect:     return "InCmdDisconnect";
+    case EventType::CmdLogin:          return "InCmdLogin";
+    case EventType::TcpConnected:      return "InTcpConnected";
+    case EventType::TcpDisconnected:   return "InTcpDisconnected";
+    case EventType::LoginOk:           return "InLoginOk";
+    case EventType::LoginFail:         return "InLoginFail";
+    case EventType::OnlineUsers:       return "InOnlineUsers";
+    case EventType::Unknow:            return "InUnknow";
+    case EventType::HeartbeatOk:       return "InHeartbeatOk";
+    case EventType::HeartbeatTimeout:  return "InHeartbeatTimeout";
+    case EventType::HeartbeatTick:     return "InHeartbeatTick";
+    case EventType::SelectLan:         return "InSelectLan";
+    case EventType::SelectVpn:         return "InSelectVpn";
+    case EventType::CmdSendText:       return "InCmdSendText";
+    case EventType::ForwardText:       return "InForwardText";
+    case EventType::CmdCall:           return "InCmdCall";
+    case EventType::CallIncoming:      return "InCallIncoming";
+    case EventType::CallAccepted:      return "InCallAccepted";
+    case EventType::CallRejected:      return "InCallRejected";
+    case EventType::CmdAcceptCall:     return "InCmdAcceptCall";
+    case EventType::CmdRejectCall:     return "InCmdRejectCall";
+    case EventType::MediaPeer:         return "InMediaPeer";
+
+    // 处理未匹配到的枚举值（健壮性保障）
+    default: return "InUnknownEventType";
+    }
+}
+
 ========== ./media/CameraManager.cpp ==========
-Lines: 99
+Lines: 111
 
 //CameraManager.cpp
 #include "CameraManager.h"
@@ -3010,9 +3100,20 @@ void CameraManager::setFrameCallback(FrameCallback cb) {
     callback_ = std::move(cb);
 }
 
-bool CameraManager::start(const std::string& device) {
+bool CameraManager::start(const std::string& device, const std::string& udpHost, int udpPort) {
+    // 新增：参数合法性校验（避免无效配置导致推流失败）
+    if (udpHost.empty()) {
+        std::cout << "[CameraManager] Error: UDP host IP cannot be empty\n";
+        return false;
+    }
+    if ( (udpPort < 1) || (udpPort > 65535) ) {
+        std::cout << "[CameraManager] Error: UDP port must be between 1 and 65535 (got: " << udpPort << ")\n";
+        return false;
+    }
+
     if (pipeline_) return true;
     std::cout << "[CameraManager] Attempting to start camera: " << device << std::endl;
+    // 核心修改：用输入参数udpHost、udpPort替换硬编码的192.168.6.15和5000
     std::string pipelineStr =
         "v4l2src device=" + device +
         " ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 "
@@ -3027,7 +3128,8 @@ bool CameraManager::start(const std::string& device) {
         "     ! appsink name=sink "
         " t. ! queue "
         "     ! rtph264pay pt=96 config-interval=1 "
-        "     ! udpsink host=192.168.6.15 port=5000 sync=false async=false";
+        // 关键替换：host=${udpHost} port=${udpPort}
+        "     ! udpsink host=" + udpHost + " port=" + std::to_string(udpPort) + " sync=false async=false";
 
     pipeline_ = gst_parse_launch(pipelineStr.c_str(), nullptr);
     if (!pipeline_) {
@@ -3041,15 +3143,15 @@ bool CameraManager::start(const std::string& device) {
     gst_app_sink_set_emit_signals(GST_APP_SINK(appsink_), true);
     gst_app_sink_set_drop(GST_APP_SINK(appsink_), true);
     gst_app_sink_set_max_buffers(GST_APP_SINK(appsink_), 1);
-    
+
     g_signal_connect(appsink_, "new-sample",
                      G_CALLBACK(onNewSample), this);
 
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    std::cout << "[CameraManager] Camera started successfully: " << device << std::endl;
+    std::cout << "[CameraManager] Camera started successfully: " << device
+              << " | UDP push to: " << udpHost << ":" << udpPort << std::endl;
     return true;
 }
-
 void CameraManager::stop() {
     if (!pipeline_) return;
 
@@ -3112,7 +3214,7 @@ public:
     CameraManager();
     ~CameraManager();
 
-    bool start(const std::string& device);
+    bool start(const std::string& device, const std::string& udpHost, int udpPort);
     void stop();
 
     void setFrameCallback(FrameCallback cb);
@@ -3152,4 +3254,4 @@ Q_DECLARE_METATYPE(Frame)
 
 =====================================
 Total files: 36
-Total lines: 2949
+Total lines: 3051

@@ -63,7 +63,7 @@ void LoginWidget::on_Bt_ConnectToServer_clicked()
 
     ui->TextEdit_tcp_test_recv->setPlainText("Connecting\n");
     // 替换为 InCmdConnect
-    core_->postInput(core::InCmdConnect{"127.0.0.1",6001});
+    core_->postInput(core::InCmdConnect{"192.168.6.64",6001});
 }
 
 void LoginWidget::on_Bt_tcp_test_send_clicked()

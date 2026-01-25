@@ -20,6 +20,14 @@ Widget::Widget(ClientCore* core, QWidget *parent)
         QMetaObject::invokeMethod(adapter_, "onFrame", Qt::QueuedConnection, Q_ARG(Frame, f));
     });
 
+    // 远端视频初始化（和本地完全对称）
+    remote_video_ = new VideoWidget(ui->remoteVideoContainer); // 需在UI设计师中添加remoteVideoContainer控件
+    remote_adapter_ = new QtCameraAdapter(remote_video_, this);
+    receiver_.setFrameCallback([this](const Frame& f) {
+        // 跨线程调用（接收端在GStreamer线程，UI在主线程）
+        QMetaObject::invokeMethod(remote_adapter_, "onFrame", Qt::QueuedConnection, Q_ARG(Frame, f));
+    });
+
     if (core_) {
         core_->addListener(this);
     }
@@ -36,6 +44,10 @@ Widget::~Widget()
     if (core_) {
         core_->removeListener(this);
     }
+    // 停止接收端
+    receiver_.stop();
+    // 停止发送端（原有逻辑）
+    camera_.stop();
     delete ui;
 }
 
@@ -193,6 +205,7 @@ void Widget::handle(const core::OutMediaReady& e) {
     std::cout << "[Widget] OutMediaReady)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
     camera_.start("/dev/video0", e.peerIp, e.peerPort);
+    receiver_.start(5001);
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {

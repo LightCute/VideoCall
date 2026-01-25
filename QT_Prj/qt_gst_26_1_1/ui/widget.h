@@ -7,7 +7,7 @@
 #include "CameraManager.h"
 #include "core/ICoreListener.h"
 #include "core/CoreOutput.h"
-
+#include "media/VideoReceiver.h"
 // 前置声明（减少耦合）
 class ClientCore;
 
@@ -49,8 +49,9 @@ private:
     VideoWidget *video_;
     CameraManager camera_;
     QtCameraAdapter* adapter_;
-
-
+    VideoWidget *remote_video_;
+    VideoReceiver receiver_;
+    QtCameraAdapter* remote_adapter_;
 
     void handle(const core::OutDisconnected&);
 
