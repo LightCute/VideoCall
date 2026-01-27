@@ -155,7 +155,7 @@ std::string getVpnIp()
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 246
+Lines: 251
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -395,9 +395,14 @@ void ClientCore::execute(const core::OutShowIncomingCall& e) {
 
 // 媒体信息就绪，启动UDP
 void ClientCore::execute(const core::OutMediaReady& e) {
-    peerIp_ = e.peerIp;
+    // 核心：用CoreExecutor的mode_选择最终IP
+    peerIp_ = executor_->selectPeerIp(e.lanIp, e.vpnIp);
     peerPort_ = e.peerPort;
-    broadcastOutput(e); // 广播给媒体层监听者
+
+    std::cout << "[ClientCore] MediaReady -> use IP: " << peerIp_ << ":" << peerPort_ << std::endl;
+
+    // 广播最终IP（而非候选IP）给媒体层
+    broadcastOutput(core::OutMediaReadyFinal{peerIp_, peerPort_});
 }
 
 // 废弃原 socket 操作接口（可直接删除）
@@ -910,7 +915,7 @@ void FSM::initTable() {
                     //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
                     std::string peerIp = e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
-                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    out.push_back(core::OutMediaReady{e->lanIp, e->vpnIp, e->udpPort});
                     // CALLING 状态下收到 MediaPeer，说明是被动方收到 OFFER_RESP，需要发送 ANSWER
                     out.push_back(core::OutSendMediaAnswer{e->peer});
                 }
@@ -949,7 +954,7 @@ void FSM::initTable() {
                     //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
                     std::string peerIp = e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
-                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    out.push_back(core::OutMediaReady{e->lanIp, e->vpnIp, e->udpPort});
 
                 }
                 return out;
@@ -1349,7 +1354,7 @@ public:
 } // namespace core
 
 ========== ./core/CoreOutput.h ==========
-Lines: 65
+Lines: 72
 
 // core/CoreOutput.h
 #pragma once
@@ -1386,9 +1391,15 @@ struct OutSendMediaOffer { std::string peer; };
 struct OutSendMediaAnswer { std::string peer; };
 // 媒体信息就绪
 struct OutMediaReady {
+    std::string lanIp;
+    std::string vpnIp;
+    int peerPort;
+};
+struct OutMediaReadyFinal {
     std::string peerIp;
     int peerPort;
 };
+
 // 来电通知UI
 struct OutShowIncomingCall { std::string from; };
 
@@ -1412,7 +1423,8 @@ using CoreOutput = std::variant<
     OutSendMediaOffer,
     OutSendMediaAnswer,
     OutMediaReady,
-    OutShowIncomingCall
+    OutShowIncomingCall,
+    OutMediaReadyFinal
     >;
 
 } // namespace core
@@ -1697,7 +1709,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 257
+Lines: 262
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -1904,7 +1916,12 @@ void Widget::handle(const core::OutSendMediaAnswer&) {
 
 void Widget::handle(const core::OutMediaReady& e) {
     std::cout << "[Widget] OutMediaReady)" << std::endl;
+}
+
+void Widget::handle(const core::OutMediaReadyFinal& e) {
+    std::cout << "[Widget] OutMediaReadyFinal)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
+    // 核心：使用CoreExecutor选择后的最终IP启动推流
     camera_.start("/dev/video0", e.peerIp, e.peerPort);
     receiver_.start(5001);
 }
@@ -1980,7 +1997,7 @@ void QtCameraAdapter::onFrame(Frame f) {
 }
 
 ========== ./ui/LoginWidget.h ==========
-Lines: 76
+Lines: 77
 
 //LoginWidget.h
 #ifndef LOGINWIDGET_H
@@ -2055,6 +2072,7 @@ private:
 
     void handle(const core::OutShowIncomingCall&) ;
 
+    void handle(const core::OutMediaReadyFinal& e);
 };
 
 #endif // LOGINWIDGET_H
@@ -2144,7 +2162,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 175
+Lines: 179
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -2318,6 +2336,10 @@ void LoginWidget::handle(const core::OutMediaReady&) {
     std::cout << "[LoginWidget] OutMediaReady)" << std::endl;
 }
 
+void LoginWidget::handle(const core::OutMediaReadyFinal&) {
+    std::cout << "[LoginWidget] OutMediaReadyFinal)" << std::endl;
+}
+
 void LoginWidget::handle(const core::OutShowIncomingCall&) {
     std::cout << "[LoginWidget] OutShowIncomingCall)" << std::endl;
 }
@@ -2357,7 +2379,7 @@ private:
 };
 
 ========== ./ui/widget.h ==========
-Lines: 100
+Lines: 102
 
 // ui/widget.h（完整修复版）
 #ifndef WIDGET_H
@@ -2456,6 +2478,8 @@ private:
     void handle(const core::OutMediaReady& e) ;
 
     void handle(const core::OutShowIncomingCall& e) ;
+
+    void handle(const core::OutMediaReadyFinal& e);
 
 };
 #endif // WIDGET_H
@@ -3448,4 +3472,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 38
-Total lines: 3235
+Total lines: 3259

@@ -33,6 +33,7 @@ public:
     void sendRejectCall();
     void sendMediaOffer(const std::string& peer);
     void sendMediaAnswer(const std::string& peer);
+    int getMediaPort() const { return mediaPort_; }
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
@@ -49,5 +50,6 @@ private:
 
 
     std::atomic<NetMode> mode_{NetMode::LAN};
+    std::atomic<int> mediaPort_{0}; // 初始值0表示未选择
 
 };

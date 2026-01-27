@@ -208,9 +208,18 @@ void Widget::handle(const core::OutMediaReady& e) {
 void Widget::handle(const core::OutMediaReadyFinal& e) {
     std::cout << "[Widget] OutMediaReadyFinal)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
-    // 核心：使用CoreExecutor选择后的最终IP启动推流
+
+    // 核心修改：获取自动选择的媒体端口，替换硬编码的5001
+    int mediaPort = core_->getMediaPort();
+    if (mediaPort <= 0) {
+        std::cerr << "[Widget] Invalid media port: " << mediaPort << " (no available port selected)" << std::endl;
+        QMessageBox::warning(this, "Error", "No available UDP port found! Cannot start video receiver.");
+        return;
+    }
+
+    // 启动摄像头推流（对方端口）+ 接收端监听（自动选择的端口）
     camera_.start("/dev/video0", e.peerIp, e.peerPort);
-    receiver_.start(5001);
+    receiver_.start(mediaPort); // 替换原硬编码的5001
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {

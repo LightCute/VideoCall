@@ -4,6 +4,7 @@
 #include <thread>
 #include <iostream>
 #include "./util/GetLocalIP.h"
+#include "./util/PortUtils.h"
 
 CoreExecutor::CoreExecutor(InputCallback cb)
     : postInput_(std::move(cb)) {
@@ -144,16 +145,22 @@ std::string CoreExecutor::selectPeerIp(
 }
 
 void CoreExecutor::sendLocalIP() {
-    // std::string ping = proto::makeHeartbeat();
-    // socket_.sendMessage(ping);
-    std::string lanIp = getLocalLanIP();   // 你需要实现
-    std::string vpnIp = getVpnIp();        // 先返回 ""
+    std::string lanIp = getLocalLanIP();
+    std::string vpnIp = getVpnIp();
 
-    int port = 5001;
+    // 核心修改：自动查找可用端口，替换硬编码的5001
+    int port = findAvailableUdpPort(5000, 6000);
+    if (port == -1) {
+        // 异常处理：无可用端口时提示并返回
+        std::cerr << "[Executor] No available UDP port found, cannot register peer info" << std::endl;
+        return;
+    }
+    mediaPort_ = port; // 保存选择的端口，供VideoReceiver使用
 
+    // 发送注册消息（使用自动选择的端口）
     std::string msg = proto::makeRegisterPeerMsg(lanIp, vpnIp, port);
     socket_.sendMessage(msg);
-    std::cout << "[Executor] Send Local IP" << std::endl;
+    std::cout << "[Executor] Send Local IP and port: lan=" << lanIp << ", vpn=" << vpnIp << ", port=" << port << std::endl;
 }
 
 void CoreExecutor::sendTextMsg(const std::string& target_user, const std::string& content) {

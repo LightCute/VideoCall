@@ -25,6 +25,9 @@ public:
     void addListener(core::ICoreListener* listener);   // 新增
     void removeListener(core::ICoreListener* listener);// 新增
 
+    int getMediaPort() const {
+        return executor_->getMediaPort();
+    }
 private:
     FSM fsm_;
     State state_ = State::Disconnected;

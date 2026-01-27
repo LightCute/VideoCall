@@ -92,6 +92,8 @@ set(PROJECT_SOURCES
 
     # util files
     util/GetLocalIP.h
+    util/PortUtils.h
+    util/PortUtils.cpp
 )
 
 
@@ -106,6 +108,7 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
 else()
     add_executable(${PROJECT_NAME}
         ${PROJECT_SOURCES}
+
 
         #media/CameraManager.h
 
