@@ -236,9 +236,14 @@ void ClientCore::execute(const core::OutShowIncomingCall& e) {
 
 // 媒体信息就绪，启动UDP
 void ClientCore::execute(const core::OutMediaReady& e) {
-    peerIp_ = e.peerIp;
+    // 核心：用CoreExecutor的mode_选择最终IP
+    peerIp_ = executor_->selectPeerIp(e.lanIp, e.vpnIp);
     peerPort_ = e.peerPort;
-    broadcastOutput(e); // 广播给媒体层监听者
+
+    std::cout << "[ClientCore] MediaReady -> use IP: " << peerIp_ << ":" << peerPort_ << std::endl;
+
+    // 广播最终IP（而非候选IP）给媒体层
+    broadcastOutput(core::OutMediaReadyFinal{peerIp_, peerPort_});
 }
 
 // 废弃原 socket 操作接口（可直接删除）

@@ -203,9 +203,14 @@ void Widget::handle(const core::OutSendMediaAnswer&) {
 
 void Widget::handle(const core::OutMediaReady& e) {
     std::cout << "[Widget] OutMediaReady)" << std::endl;
+}
+
+void Widget::handle(const core::OutMediaReadyFinal& e) {
+    std::cout << "[Widget] OutMediaReadyFinal)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
+    // 核心：使用CoreExecutor选择后的最终IP启动推流
     camera_.start("/dev/video0", e.peerIp, e.peerPort);
-    receiver_.start(5000);
+    receiver_.start(5001);
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {

@@ -24,6 +24,8 @@ public:
     void stop(); // 资源释放接口
     void setLanMode() ;
     void setVpnMode() ;
+    std::string selectPeerIp(const std::string& lanIp,
+                             const std::string& vpnIp) const;
     void sendLocalIP();
     void sendTextMsg(const std::string& target_user, const std::string& content);
     void sendCallRequest(const std::string& target_user);

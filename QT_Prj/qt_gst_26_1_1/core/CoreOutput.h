@@ -33,9 +33,15 @@ struct OutSendMediaOffer { std::string peer; };
 struct OutSendMediaAnswer { std::string peer; };
 // 媒体信息就绪
 struct OutMediaReady {
+    std::string lanIp;
+    std::string vpnIp;
+    int peerPort;
+};
+struct OutMediaReadyFinal {
     std::string peerIp;
     int peerPort;
 };
+
 // 来电通知UI
 struct OutShowIncomingCall { std::string from; };
 
@@ -59,7 +65,8 @@ using CoreOutput = std::variant<
     OutSendMediaOffer,
     OutSendMediaAnswer,
     OutMediaReady,
-    OutShowIncomingCall
+    OutShowIncomingCall,
+    OutMediaReadyFinal
     >;
 
 } // namespace core

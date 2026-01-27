@@ -71,6 +71,7 @@ private:
 
     void handle(const core::OutShowIncomingCall&) ;
 
+    void handle(const core::OutMediaReadyFinal& e);
 };
 
 #endif // LOGINWIDGET_H

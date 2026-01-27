@@ -96,5 +96,7 @@ private:
 
     void handle(const core::OutShowIncomingCall& e) ;
 
+    void handle(const core::OutMediaReadyFinal& e);
+
 };
 #endif // WIDGET_H

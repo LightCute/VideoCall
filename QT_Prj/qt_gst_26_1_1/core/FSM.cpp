@@ -232,7 +232,7 @@ void FSM::initTable() {
             State::LoggedIn
         },
 
-        { State::LoggedIn, EventType::SelectLan,
+        { State::LoggedIn, EventType::SelectVpn,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
 
@@ -340,7 +340,7 @@ void FSM::initTable() {
                     //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
                     std::string peerIp = e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
-                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    out.push_back(core::OutMediaReady{e->lanIp, e->vpnIp, e->udpPort});
                     // CALLING 状态下收到 MediaPeer，说明是被动方收到 OFFER_RESP，需要发送 ANSWER
                     out.push_back(core::OutSendMediaAnswer{e->peer});
                 }
@@ -379,7 +379,7 @@ void FSM::initTable() {
                     //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
                     std::string peerIp = e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
-                    out.push_back(core::OutMediaReady{peerIp, e->udpPort});
+                    out.push_back(core::OutMediaReady{e->lanIp, e->vpnIp, e->udpPort});
 
                 }
                 return out;

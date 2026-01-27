@@ -170,6 +170,10 @@ void LoginWidget::handle(const core::OutMediaReady&) {
     std::cout << "[LoginWidget] OutMediaReady)" << std::endl;
 }
 
+void LoginWidget::handle(const core::OutMediaReadyFinal&) {
+    std::cout << "[LoginWidget] OutMediaReadyFinal)" << std::endl;
+}
+
 void LoginWidget::handle(const core::OutShowIncomingCall&) {
     std::cout << "[LoginWidget] OutShowIncomingCall)" << std::endl;
 }

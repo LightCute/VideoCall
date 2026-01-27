@@ -566,7 +566,7 @@ inline std::string CoreInputIndexToName(size_t index) {
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 390
+Lines: 392
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -802,7 +802,7 @@ void FSM::initTable() {
             State::LoggedIn
         },
 
-        { State::LoggedIn, EventType::SelectLan,
+        { State::LoggedIn, EventType::SelectVpn,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
 
@@ -907,7 +907,8 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
-                    std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    std::string peerIp = e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
                     out.push_back(core::OutMediaReady{peerIp, e->udpPort});
                     // CALLING 状态下收到 MediaPeer，说明是被动方收到 OFFER_RESP，需要发送 ANSWER
@@ -945,7 +946,8 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
-                    std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
+                    std::string peerIp = e->lanIp;
                     out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
                     out.push_back(core::OutMediaReady{peerIp, e->udpPort});
 
@@ -1033,7 +1035,7 @@ private:
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 188
+Lines: 198
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
@@ -1170,13 +1172,23 @@ void CoreExecutor::setVpnMode() {
     std::cout << "[Executor] Switched to VPN mode\n";
 }
 
+std::string CoreExecutor::selectPeerIp(
+    const std::string& lanIp,
+    const std::string& vpnIp) const
+{
+    if (mode_ == NetMode::VPN && !vpnIp.empty())
+        return vpnIp;
+
+    return lanIp;
+}
+
 void CoreExecutor::sendLocalIP() {
     // std::string ping = proto::makeHeartbeat();
     // socket_.sendMessage(ping);
     std::string lanIp = getLocalLanIP();   // 你需要实现
     std::string vpnIp = getVpnIp();        // 先返回 ""
 
-    int port = 5000;
+    int port = 5001;
 
     std::string msg = proto::makeRegisterPeerMsg(lanIp, vpnIp, port);
     socket_.sendMessage(msg);
@@ -1261,7 +1273,7 @@ inline std::string stateToString(State s) {
 }
 
 ========== ./core/CoreExecutor.h ==========
-Lines: 51
+Lines: 53
 
 //CoreExecutor.h
 #pragma once
@@ -1289,6 +1301,8 @@ public:
     void stop(); // 资源释放接口
     void setLanMode() ;
     void setVpnMode() ;
+    std::string selectPeerIp(const std::string& lanIp,
+                             const std::string& vpnIp) const;
     void sendLocalIP();
     void sendTextMsg(const std::string& target_user, const std::string& content);
     void sendCallRequest(const std::string& target_user);
@@ -1683,7 +1697,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 245
+Lines: 257
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -1892,7 +1906,7 @@ void Widget::handle(const core::OutMediaReady& e) {
     std::cout << "[Widget] OutMediaReady)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
     camera_.start("/dev/video0", e.peerIp, e.peerPort);
-    receiver_.start(5000);
+    receiver_.start(5001);
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {
@@ -1928,6 +1942,18 @@ void Widget::on_Bt_AcceptCall_clicked()
 void Widget::on_Bt_RejectCall_clicked()
 {
     core_->postInput(core::InCmdRejectCall{});
+}
+
+
+void Widget::on_Bt_set_lan_clicked()
+{
+    core_->postInput(core::InSelectLan{}); // 触发LAN模式
+}
+
+
+void Widget::on_Bt_sen_vpn_clicked()
+{
+    core_->postInput(core::InSelectVpn{}); // 触发VPN模式
 }
 
 
@@ -2331,7 +2357,7 @@ private:
 };
 
 ========== ./ui/widget.h ==========
-Lines: 96
+Lines: 100
 
 // ui/widget.h（完整修复版）
 #ifndef WIDGET_H
@@ -2377,6 +2403,10 @@ private slots:
     void on_Bt_AcceptCall_clicked();
 
     void on_Bt_RejectCall_clicked();
+
+    void on_Bt_set_lan_clicked();
+
+    void on_Bt_sen_vpn_clicked();
 
 private:
     Ui::Widget *ui;
@@ -3418,4 +3448,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 38
-Total lines: 3205
+Total lines: 3235

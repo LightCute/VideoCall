@@ -133,6 +133,16 @@ void CoreExecutor::setVpnMode() {
     std::cout << "[Executor] Switched to VPN mode\n";
 }
 
+std::string CoreExecutor::selectPeerIp(
+    const std::string& lanIp,
+    const std::string& vpnIp) const
+{
+    if (mode_ == NetMode::VPN && !vpnIp.empty())
+        return vpnIp;
+
+    return lanIp;
+}
+
 void CoreExecutor::sendLocalIP() {
     // std::string ping = proto::makeHeartbeat();
     // socket_.sendMessage(ping);
