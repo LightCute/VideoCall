@@ -52,6 +52,12 @@ struct ProtoEvtMediaPeer {
     int udpPort;         // 对方媒体UDP端口
 };
 
+// 解析服务端的CALL_ENDED通知
+struct ProtoEvtCallEnded {
+    std::string peer;
+    std::string reason;
+};
+
 using ClientEvent = std::variant<
     // UI 触发的协议命令
     ProtoEvtCmdConnect,
@@ -72,5 +78,6 @@ using ClientEvent = std::variant<
     ProtoEvtCallIncoming,
     ProtoEvtCallAccepted,
     ProtoEvtCallRejected,
-    ProtoEvtMediaPeer
+    ProtoEvtMediaPeer,
+    ProtoEvtCallEnded
     >;

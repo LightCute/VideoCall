@@ -22,7 +22,10 @@ std::string makeCallRejected(const std::string& peer);            // 通知通�
 // 媒体协商指令构建函数
 std::string makeMediaOfferResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort);
 std::string makeMediaAnswerResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort);
-
+// 客户端→服务端：构建主动挂断请求
+std::string makeCallHangup();
+// 服务端→客户端：构建挂断通知（携带原因）
+std::string makeCallEnded(const std::string& peer, const std::string& reason);
 
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
@@ -40,7 +43,8 @@ bool parseCallReject(const std::string& msg);                            // 解�
 bool parseMediaOffer(const std::string& msg, std::string& target_user);
 bool parseMediaAnswer(const std::string& msg, std::string& target_user);
 
-
+// 客户端解析服务端的挂断通知
+bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason);
 
 
 

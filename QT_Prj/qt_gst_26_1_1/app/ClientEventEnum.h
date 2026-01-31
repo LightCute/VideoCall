@@ -32,7 +32,9 @@ enum class EventType {
     CallRejected,
     CmdAcceptCall,
     CmdRejectCall,
-    MediaPeer
+    MediaPeer,
+    CmdHangup,
+    CallEnded
     // CallIncoming,    // 收到来电
     // CallAccepted,    // 通话被接听
     // CallRejected,    // 通话被拒绝
@@ -67,7 +69,8 @@ inline std::string EventTypeToString(EventType type) {
     case EventType::CmdAcceptCall:     return "InCmdAcceptCall";
     case EventType::CmdRejectCall:     return "InCmdRejectCall";
     case EventType::MediaPeer:         return "InMediaPeer";
-
+    case EventType::CmdHangup:         return "InCmdHangup";
+    case EventType::CallEnded:         return "InCallEnded";
     // 处理未匹配到的枚举值（健壮性保障）
     default: return "InUnknownEventType";
     }

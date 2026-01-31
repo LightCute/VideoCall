@@ -1,5 +1,6 @@
 // core/FSM.cpp
 #include "FSM.h"
+#include <set>
 
 FSM::FSM() {
     initTable();
@@ -27,6 +28,23 @@ FSM::handle(State current, const core::CoreInput& ev)
         return { core::OutUpdateAlive{} };
     }
 
+    if (isOnlineState(current)) {
+        // 定义需要统一处理的掉线事件类型
+        std::set<EventType> disconnectEvents = {
+            EventType::TcpDisconnected,  // TCP链路断开
+            EventType::HeartbeatTimeout   // 心跳超时（触发主动断线）
+        };
+
+        if (disconnectEvents.count(evType) > 0) {
+            std::cout << "[FSM] Online state, directly handle disconnect event: " << EventTypeToString(evType) << std::endl;
+            // 统一返回掉线输出，所有在线状态掉线都切换到Disconnected
+            return {
+                core::OutStateChanged{current, State::Disconnected},
+                core::OutDisconnected{}
+            };
+        }
+    }
+
     for (auto& entry : table_) {
         if (entry.current_state == current &&
             entry.event_type == evType) {
@@ -42,7 +60,6 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
     EventType evType = EventType::Unknow;
     std::visit([&evType](auto&& e){
         using T = std::decay_t<decltype(e)>;
-        // 全部替换为 InXXX 前缀
         if constexpr (std::is_same_v<T, core::InCmdConnect>)      evType = EventType::CmdConnect;
         else if constexpr (std::is_same_v<T, core::InCmdDisconnect>) evType = EventType::CmdDisconnect;
         else if constexpr (std::is_same_v<T, core::InCmdLogin>)   evType = EventType::CmdLogin;
@@ -89,6 +106,10 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
             evType = EventType::CmdRejectCall;
         else if constexpr (std::is_same_v<T, core::InMediaPeer>)
             evType = EventType::MediaPeer;
+        else if constexpr (std::is_same_v<T, core::InCmdHangup>)
+            evType = EventType::CmdHangup;
+        else if constexpr (std::is_same_v<T, core::InCallEnded>)
+            evType = EventType::CallEnded;
 
         else evType = EventType::Unknow;
     }, ev);
@@ -176,37 +197,6 @@ void FSM::initTable() {
               State::Connected
           },
 
-          // ===== 任何在线状态断线 =====
-          { State::Connected,  EventType::TcpDisconnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput&){
-                  return std::vector<core::CoreOutput>{
-                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                      core::OutDisconnected{} // 补充 core::
-                  };
-              },
-              State::Disconnected
-          },
-          { State::LoggingIn,  EventType::TcpDisconnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput&){
-                  return std::vector<core::CoreOutput>{
-                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                      core::OutDisconnected{} // 补充 core::
-                  };
-              },
-              State::Disconnected
-          },
-          { State::LoggedIn,   EventType::TcpDisconnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput&){
-                  return std::vector<core::CoreOutput>{
-                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                      core::OutDisconnected{} // 补充 core::
-                  };
-              },
-              State::Disconnected
-          },
 
         { State::LoggedIn, EventType::OnlineUsers,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
@@ -387,6 +377,111 @@ void FSM::initTable() {
             State::MEDIA_READY
         },
 
+        // ===== 新增：主动挂断（CmdHangup）=====
+        // 1. CALLING状态下主动挂断
+        { State::CALLING, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});          // 上报服务端
+                out.push_back(core::OutStopMedia{});           // 停止本地媒体
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 回到登录状态
+                out.push_back(core::OutCallEnded{"", "local_hangup"}); // 通知UI
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 2. RINGING状态下主动挂断
+        { State::RINGING, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 3. IN_CALL状态下主动挂断
+        { State::IN_CALL, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 4. MEDIA_READY状态下主动挂断（核心，当前通话的最终状态）
+        { State::MEDIA_READY, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // ===== 新增：被动挂断（CallEnded，收到服务端通知）=====
+        // 1. CALLING状态下收到被动挂断
+        { State::CALLING, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 2. RINGING状态下收到被动挂断
+        { State::RINGING, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 3. IN_CALL状态下收到被动挂断
+        { State::IN_CALL, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 4. MEDIA_READY状态下收到被动挂断（核心）
+        { State::MEDIA_READY, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        }
 
     };
 }

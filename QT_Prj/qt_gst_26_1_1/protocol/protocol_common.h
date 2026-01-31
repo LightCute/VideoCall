@@ -24,7 +24,9 @@ constexpr const char* CMD_MEDIA_OFFER        = "MEDIA_OFFER";
 constexpr const char* CMD_MEDIA_OFFER_RESP   = "MEDIA_OFFER_RESP";
 constexpr const char* CMD_MEDIA_ANSWER       = "MEDIA_ANSWER";
 constexpr const char* CMD_MEDIA_ANSWER_RESP  = "MEDIA_ANSWER_RESP";
-
+// 在通话相关CMD后新增
+constexpr const char* CMD_CALL_HANGUP    = "CALL_HANGUP";    // 客户端→服务端：主动挂断请求
+constexpr const char* CMD_CALL_ENDED     = "CALL_ENDED";     // 服务端→客户端：通知对端挂断（携带原因）
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";

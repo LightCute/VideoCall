@@ -54,7 +54,14 @@ struct InMediaPeer {
     int udpPort;
 };
 
+// 用户主动点击挂断（UI触发）
+struct InCmdHangup {};
 
+// 收到服务端通知（对端挂断/服务器回收）
+struct InCallEnded {
+    std::string peer;    // 对方用户名
+    std::string reason;  // 挂断原因："peer_hangup" / "server_timeout"
+};
 
 using CoreInput = std::variant<
     InCmdConnect,
@@ -79,7 +86,9 @@ using CoreInput = std::variant<
     InCallRejected,
     InCmdAcceptCall,
     InCmdRejectCall,
-    InMediaPeer
+    InMediaPeer,
+    InCmdHangup,
+    InCallEnded
     >;
 
 

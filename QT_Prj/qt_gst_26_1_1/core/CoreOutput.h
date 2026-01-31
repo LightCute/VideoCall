@@ -45,6 +45,19 @@ struct OutMediaReadyFinal {
 // 来电通知UI
 struct OutShowIncomingCall { std::string from; };
 
+
+// 发送主动挂断请求到服务端（Core→Executor）
+struct OutSendHangup {};
+
+// 停止本地媒体推流/接收（Core→媒体层）
+struct OutStopMedia {};
+
+// 通知UI通话会话结束（Core→UI）
+struct OutCallEnded {
+    std::string peer;
+    std::string reason;
+};
+
 using CoreOutput = std::variant<
     OutStateChanged,
     OutLoginOk,
@@ -66,7 +79,10 @@ using CoreOutput = std::variant<
     OutSendMediaAnswer,
     OutMediaReady,
     OutShowIncomingCall,
-    OutMediaReadyFinal
+    OutMediaReadyFinal,
+    OutSendHangup,
+    OutStopMedia,
+    OutCallEnded
     >;
 
 } // namespace core

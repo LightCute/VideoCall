@@ -161,6 +161,10 @@ void ClientCore::applyStateChange(const core::OutStateChanged& e) { // 补充 co
     //outputQueue_.push(e);
 }
 
+void ClientCore::execute(const core::OutSendHangup&) {
+    executor_->sendHangup();
+}
+
 // 关键修改：execute 仅调用 Executor 接口，无 IO 逻辑（补充 core:: 前缀）
 void ClientCore::execute(const core::OutConnect& e) { // 补充 core:: 前缀
     // 调度 Executor 执行连接（Core 仅发命令，不做具体操作）

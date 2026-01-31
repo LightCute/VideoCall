@@ -8,6 +8,16 @@ namespace proto {
 
 /* ================= build ================= */
 
+std::string makeCallHangup() {
+    return CMD_CALL_HANGUP; // 主动挂断无需额外参数，直接返回命令
+}
+
+std::string makeCallEnded(const std::string& peer, const std::string& reason) {
+    std::ostringstream oss;
+    oss << CMD_CALL_ENDED << " " << peer << " " << reason;
+    return oss.str();
+}
+
 std::string makeCallRequest(const std::string& target_user) {
     std::ostringstream oss;
     oss << CMD_CALL << " " << target_user;
@@ -110,6 +120,16 @@ std::string makeForwardTextMsg(const std::string& from_user, const std::string& 
 
 
 /* ================= parse ================= */
+
+bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_ENDED) return false;
+    iss >> peer >> reason;
+    return !peer.empty() && !reason.empty();
+}
 
 // Server 使用
 bool parseLoginRequest(const std::string& msg,

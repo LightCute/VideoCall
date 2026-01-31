@@ -5,6 +5,8 @@
 
 📂 ./util:
   └─ GetLocalIP.h
+  └─ PortUtils.cpp
+  └─ PortUtils.h
 
 📂 ./core:
   └─ ClientCore.cpp
@@ -99,6 +101,20 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
+========== ./util/PortUtils.h ==========
+Lines: 10
+
+//PortUtils.h
+#pragma once
+#include <cstdint>
+
+// 检测指定UDP端口是否可用（绑定成功则可用）
+bool isUdpPortAvailable(uint16_t port);
+
+// 查找指定范围内的可用UDP端口，无可用返回-1
+// 默认范围：5000-65535（避开知名端口，适合音视频传输）
+int findAvailableUdpPort(uint16_t startPort = 5000, uint16_t endPort = 65535);
+
 ========== ./util/GetLocalIP.h ==========
 Lines: 51
 
@@ -152,6 +168,59 @@ std::string getLocalLanIP()
 std::string getVpnIp()
 {
     return "10.0.0.1";
+}
+
+========== ./util/PortUtils.cpp ==========
+Lines: 49
+
+//PortUtils.cpp
+#include "PortUtils.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <iostream>
+
+bool isUdpPortAvailable(uint16_t port) {
+    // 1. 创建UDP套接字（SOCK_DGRAM）
+    // 原因：UDP端口检测必须用UDP套接字，TCP检测结果不适用
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
+        std::cerr << "Failed to create socket for port check: " << port << std::endl;
+        return false;
+    }
+
+    // 2. 设置端口复用
+    // 原因：避免TIME_WAIT状态导致的端口暂时不可用，提高检测准确性
+    int opt = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+    // 3. 尝试绑定端口
+    // 原因：UDP端口是否可用的核心判断依据（能绑定则未被占用）
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = INADDR_ANY; // 绑定所有网卡
+
+    bool available = (bind(sockfd, (sockaddr*)&addr, sizeof(addr)) == 0);
+
+    // 4. 关闭套接字
+    // 原因：仅检测可用性，无需保留套接字，释放资源
+    close(sockfd);
+
+    return available;
+}
+
+int findAvailableUdpPort(uint16_t startPort, uint16_t endPort) {
+    // 遍历端口范围，返回第一个可用端口
+    // 原因：优先使用低端口（5000+），符合音视频传输的常用端口习惯
+    for (uint16_t port = startPort; port <= endPort; ++port) {
+        if (isUdpPortAvailable(port)) {
+            std::cout << "[PortUtils] Found available UDP port: " << port << std::endl;
+            return port;
+        }
+    }
+    std::cerr << "[PortUtils] No available UDP port in range [" << startPort << ", " << endPort << "]" << std::endl;
+    return -1;
 }
 
 ========== ./core/ClientCore.cpp ==========
@@ -571,10 +640,11 @@ inline std::string CoreInputIndexToName(size_t index) {
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 392
+Lines: 378
 
 // core/FSM.cpp
 #include "FSM.h"
+#include <set>
 
 FSM::FSM() {
     initTable();
@@ -602,6 +672,23 @@ FSM::handle(State current, const core::CoreInput& ev)
         return { core::OutUpdateAlive{} };
     }
 
+    if (isOnlineState(current)) {
+        // 定义需要统一处理的掉线事件类型
+        std::set<EventType> disconnectEvents = {
+            EventType::TcpDisconnected,  // TCP链路断开
+            EventType::HeartbeatTimeout   // 心跳超时（触发主动断线）
+        };
+
+        if (disconnectEvents.count(evType) > 0) {
+            std::cout << "[FSM] Online state, directly handle disconnect event: " << EventTypeToString(evType) << std::endl;
+            // 统一返回掉线输出，所有在线状态掉线都切换到Disconnected
+            return {
+                core::OutStateChanged{current, State::Disconnected},
+                core::OutDisconnected{}
+            };
+        }
+    }
+
     for (auto& entry : table_) {
         if (entry.current_state == current &&
             entry.event_type == evType) {
@@ -617,7 +704,6 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
     EventType evType = EventType::Unknow;
     std::visit([&evType](auto&& e){
         using T = std::decay_t<decltype(e)>;
-        // 全部替换为 InXXX 前缀
         if constexpr (std::is_same_v<T, core::InCmdConnect>)      evType = EventType::CmdConnect;
         else if constexpr (std::is_same_v<T, core::InCmdDisconnect>) evType = EventType::CmdDisconnect;
         else if constexpr (std::is_same_v<T, core::InCmdLogin>)   evType = EventType::CmdLogin;
@@ -751,37 +837,6 @@ void FSM::initTable() {
               State::Connected
           },
 
-          // ===== 任何在线状态断线 =====
-          { State::Connected,  EventType::TcpDisconnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput&){
-                  return std::vector<core::CoreOutput>{
-                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                      core::OutDisconnected{} // 补充 core::
-                  };
-              },
-              State::Disconnected
-          },
-          { State::LoggingIn,  EventType::TcpDisconnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput&){
-                  return std::vector<core::CoreOutput>{
-                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                      core::OutDisconnected{} // 补充 core::
-                  };
-              },
-              State::Disconnected
-          },
-          { State::LoggedIn,   EventType::TcpDisconnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput&){
-                  return std::vector<core::CoreOutput>{
-                      core::OutStateChanged{cur, State::Disconnected}, // 补充 core::
-                      core::OutDisconnected{} // 补充 core::
-                  };
-              },
-              State::Disconnected
-          },
 
         { State::LoggedIn, EventType::OnlineUsers,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
@@ -967,7 +1022,7 @@ void FSM::initTable() {
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 69
+Lines: 72
 
 #pragma once
 #include "CoreInput.h"
@@ -996,6 +1051,9 @@ public:
     void addListener(core::ICoreListener* listener);   // 新增
     void removeListener(core::ICoreListener* listener);// 新增
 
+    int getMediaPort() const {
+        return executor_->getMediaPort();
+    }
 private:
     FSM fsm_;
     State state_ = State::Disconnected;
@@ -1040,7 +1098,7 @@ private:
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 198
+Lines: 205
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
@@ -1048,6 +1106,7 @@ Lines: 198
 #include <thread>
 #include <iostream>
 #include "./util/GetLocalIP.h"
+#include "./util/PortUtils.h"
 
 CoreExecutor::CoreExecutor(InputCallback cb)
     : postInput_(std::move(cb)) {
@@ -1188,16 +1247,22 @@ std::string CoreExecutor::selectPeerIp(
 }
 
 void CoreExecutor::sendLocalIP() {
-    // std::string ping = proto::makeHeartbeat();
-    // socket_.sendMessage(ping);
-    std::string lanIp = getLocalLanIP();   // 你需要实现
-    std::string vpnIp = getVpnIp();        // 先返回 ""
+    std::string lanIp = getLocalLanIP();
+    std::string vpnIp = getVpnIp();
 
-    int port = 5001;
+    // 核心修改：自动查找可用端口，替换硬编码的5001
+    int port = findAvailableUdpPort(5000, 6000);
+    if (port == -1) {
+        // 异常处理：无可用端口时提示并返回
+        std::cerr << "[Executor] No available UDP port found, cannot register peer info" << std::endl;
+        return;
+    }
+    mediaPort_ = port; // 保存选择的端口，供VideoReceiver使用
 
+    // 发送注册消息（使用自动选择的端口）
     std::string msg = proto::makeRegisterPeerMsg(lanIp, vpnIp, port);
     socket_.sendMessage(msg);
-    std::cout << "[Executor] Send Local IP" << std::endl;
+    std::cout << "[Executor] Send Local IP and port: lan=" << lanIp << ", vpn=" << vpnIp << ", port=" << port << std::endl;
 }
 
 void CoreExecutor::sendTextMsg(const std::string& target_user, const std::string& content) {
@@ -1278,7 +1343,7 @@ inline std::string stateToString(State s) {
 }
 
 ========== ./core/CoreExecutor.h ==========
-Lines: 53
+Lines: 55
 
 //CoreExecutor.h
 #pragma once
@@ -1315,6 +1380,7 @@ public:
     void sendRejectCall();
     void sendMediaOffer(const std::string& peer);
     void sendMediaAnswer(const std::string& peer);
+    int getMediaPort() const { return mediaPort_; }
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
@@ -1331,6 +1397,7 @@ private:
 
 
     std::atomic<NetMode> mode_{NetMode::LAN};
+    std::atomic<int> mediaPort_{0}; // 初始值0表示未选择
 
 };
 
@@ -1709,7 +1776,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 262
+Lines: 271
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -1921,9 +1988,18 @@ void Widget::handle(const core::OutMediaReady& e) {
 void Widget::handle(const core::OutMediaReadyFinal& e) {
     std::cout << "[Widget] OutMediaReadyFinal)" << std::endl;
     std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
-    // 核心：使用CoreExecutor选择后的最终IP启动推流
+
+    // 核心修改：获取自动选择的媒体端口，替换硬编码的5001
+    int mediaPort = core_->getMediaPort();
+    if (mediaPort <= 0) {
+        std::cerr << "[Widget] Invalid media port: " << mediaPort << " (no available port selected)" << std::endl;
+        QMessageBox::warning(this, "Error", "No available UDP port found! Cannot start video receiver.");
+        return;
+    }
+
+    // 启动摄像头推流（对方端口）+ 接收端监听（自动选择的端口）
     camera_.start("/dev/video0", e.peerIp, e.peerPort);
-    receiver_.start(5001);
+    receiver_.start(mediaPort); // 替换原硬编码的5001
 }
 
 void Widget::handle(const core::OutShowIncomingCall& e) {
@@ -3471,5 +3547,5 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 
 =====================================
-Total files: 38
-Total lines: 3259
+Total files: 40
+Total lines: 3325

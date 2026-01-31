@@ -67,6 +67,7 @@ private:
     void execute(const core::OutSendMediaAnswer& e);
     void execute(const core::OutShowIncomingCall& e);
     void execute(const core::OutMediaReady& e);
+    void execute(const core::OutSendHangup&);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };

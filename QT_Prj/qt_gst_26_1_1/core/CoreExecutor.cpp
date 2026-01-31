@@ -71,6 +71,12 @@ void CoreExecutor::initSocketCallbacks() {
                 postInput_(core::InCallRejected{e.peer});
             else if constexpr (std::is_same_v<T, ProtoEvtMediaPeer>)
                 postInput_(core::InMediaPeer{e.peer, e.lanIp, e.vpnIp, e.udpPort});
+
+            else if constexpr (std::is_same_v<T, ProtoEvtCallEnded>) {
+                postInput_(core::InCallEnded{e.peer, e.reason});
+                std::cout << "[Executor] Push InCallEnded to Core (peer: " << e.peer << ", reason: " << e.reason << ")" << std::endl;
+            }
+
             else {
                 postInput_(core::InUnknow{});
             }
@@ -91,6 +97,12 @@ void CoreExecutor::connectToServer(const std::string& host, int port) {
             std::cout << "[Executor] Successfully connected to server: " << host << ":" << port << std::endl;
         }
     }).detach();
+}
+
+void CoreExecutor::sendHangup() {
+    std::string hangupMsg = proto::makeCallHangup();
+    socket_.sendMessage(hangupMsg);
+    std::cout << "[Executor] Send CALL_HANGUP to server" << std::endl;
 }
 
 void CoreExecutor::sendLoginRequest(const std::string& user, const std::string& pass) {

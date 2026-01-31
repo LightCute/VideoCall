@@ -34,6 +34,10 @@ constexpr const char* CMD_MEDIA_ANSWER = "MEDIA_ANSWER";  // 客户端→服务�
 constexpr const char* CMD_MEDIA_OFFER_RESP  = "MEDIA_OFFER_RESP";  // 服务端→客户端：下发对方IP（Offer回应）
 constexpr const char* CMD_MEDIA_ANSWER_RESP = "MEDIA_ANSWER_RESP"; // 服务端→客户端：下发对方IP（Answer回应
 
+// 在通话相关CMD后新增
+constexpr const char* CMD_CALL_HANGUP    = "CALL_HANGUP";    // 客户端→服务端：主动挂断请求
+constexpr const char* CMD_CALL_ENDED     = "CALL_ENDED";     // 服务端→客户端：通知对端挂断（携带原因）
+
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";
@@ -41,5 +45,7 @@ constexpr const char* KEY_PRIVILEGE = "privilege";
 constexpr const char* KEY_MESSAGE   = "message";
 constexpr const char* KEY_USERS     = "users";
 constexpr const char* KEY_COUNT     = "count";
+
+
 
 }

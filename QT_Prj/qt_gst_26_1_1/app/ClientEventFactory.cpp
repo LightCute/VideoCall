@@ -57,6 +57,11 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         };
     }
 
+    // 解析CALL_ENDED通知
+    std::string peer, reason;
+    if (proto::parseCallEnded(msg, peer, reason)) {
+        return ProtoEvtCallEnded{peer, reason};
+    }
 
     proto::Unknown req_error;
     req_error.message = msg;
