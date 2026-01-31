@@ -72,6 +72,12 @@ private:
     void handle(const core::OutShowIncomingCall&) ;
 
     void handle(const core::OutMediaReadyFinal& e);
+
+    void handle(const core::OutCallEnded& e);
+
+    void handle(const core::OutStopMedia&);
+
+    void handle(const core::OutSendHangup&) ;
 };
 
 #endif // LOGINWIDGET_H

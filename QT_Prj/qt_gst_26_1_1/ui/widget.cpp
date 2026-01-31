@@ -120,12 +120,38 @@ void Widget::on_Bt_tcp_send_clicked() {
     ui->lineEdit_msg->clear();
 }
 
-// 新增：处理发送文本消息（仅日志）
+void Widget::handle(const core::OutSendHangup&) {
+    std::cout << "[Widget] OutSendHangup" << std::endl;
+}
+
+// 处理OutStopMedia（停止媒体推流/接收）
+void Widget::handle(const core::OutStopMedia&) {
+    std::cout << "[Widget] Stop media (camera and video receiver)" << std::endl;
+    // 停止摄像头推流
+    camera_.stop();
+    // 停止视频接收
+    receiver_.stop();
+    // 清空视频窗口
+    video_->setFrame(QImage());
+    remote_video_->setFrame(QImage());
+}
+
+// 处理OutCallEnded（更新UI，通知用户会话结束）
+void Widget::handle(const core::OutCallEnded& e) {
+    std::cout << "[Widget] Call ended: peer=" << e.peer << ", reason=" << e.reason << std::endl;
+    // 显示UI提示
+    // QString tip = QString("Call ended: %1 (reason: %2)").arg(QString::fromStdString(e.peer)).arg(QString::fromStdString(e.reason));
+    // ui->PTE_recv->appendPlainText(tip);
+    // 重置通话相关UI状态
+    ui->lineEdit_CallTarget->clear();
+}
+
+// 处理发送文本消息（仅日志）
 void Widget::handle(const core::OutSendText& e) {
     std::cout << "[Widget] Send text to  " << e.target_user << ": " << e.content << std::endl;
 }
 
-// 新增：处理接收转发文本消息（显示到UI）
+// 处理接收转发文本消息（显示到UI）
 void Widget::handle(const core::OutForwardText& e) {
     std::cout << "[Widget] recev from " << e.from_user << " msg: " << e.content << std::endl;
     // 追加到文本框
@@ -267,5 +293,11 @@ void Widget::on_Bt_set_lan_clicked()
 void Widget::on_Bt_sen_vpn_clicked()
 {
     core_->postInput(core::InSelectVpn{}); // 触发VPN模式
+}
+
+
+void Widget::on_Bt_Hangup_clicked()
+{
+    core_->postInput(core::InCmdHangup{});
 }
 

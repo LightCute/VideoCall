@@ -532,7 +532,7 @@ private:
 };
 
 ========== ./service/ServerActions.h ==========
-Lines: 91
+Lines: 99
 
 // Service/ServerActions.h
 #pragma once
@@ -621,6 +621,14 @@ struct SendMediaAnswer {
     std::string peer;    // 对方用户名
     ClientNetInfo peer_net; // 对方的网络信息
 };
+
+// 通知对端客户端通话结束
+struct SendCallEnded {
+    int fd;              // 目标客户端fd
+    std::string peer;    // 挂断方用户名
+    std::string reason;  // 挂断原因
+};
+
 // 未来可无限加
 // struct KickUser { int fd; };
 // struct ForceLogout { int fd; };
@@ -653,7 +661,7 @@ public:
 };
 
 ========== ./service/CallService.h ==========
-Lines: 49
+Lines: 55
 
 // CallService.h
 #pragma once
@@ -695,8 +703,14 @@ public:
     // 媒体协商：仅查找通话会话，不修改状态（核心修改）
     std::optional<CallSession> onMediaNegotiate(const std::string& user);
 
-    // 新增：标记指定用户的媒体就绪状态，返回是否双方都就绪
+    // 标记指定用户的媒体就绪状态，返回是否双方都就绪
     bool markMediaReady(const std::string& user);    
+
+    // 删除指定通话会话（按被呼叫方用户名）
+    void deleteCallSession(const std::string& callee);
+
+    // 通过呼叫方用户名查找通话会话（双向查找）
+    std::optional<CallSession> findSessionByCaller(const std::string& caller);
 
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
@@ -744,7 +758,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/CallService.cpp ==========
-Lines: 106
+Lines: 123
 
 // CallService.cpp
 #include "CallService.h"
@@ -852,8 +866,26 @@ bool CallService::markMediaReady(const std::string& user) {
     }
     return false; // 未找到通话会话
 }
+
+
+void CallService::deleteCallSession(const std::string& callee) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    activeCalls_.erase(callee);
+    std::cout << "[CallService] Delete call session for callee: " << callee << std::endl;
+}
+
+std::optional<CallSession> CallService::findSessionByCaller(const std::string& caller) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& [callee, session] : activeCalls_) {
+        if (session.caller == caller) {
+            return session;
+        }
+    }
+    return std::nullopt;
+}
+
 ========== ./service/ServerAction.h ==========
-Lines: 21
+Lines: 22
 
 // Service/ServerAction.h
 #pragma once
@@ -874,7 +906,8 @@ using ServerAction = std::variant<
     SendCallAccepted,
     SendCallRejected,
     SendMediaOffer,
-    SendMediaAnswer
+    SendMediaAnswer,
+    SendCallEnded
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
@@ -1490,7 +1523,7 @@ public:
 };
 
 ========== ./event/ServerEventFactory.cpp ==========
-Lines: 74
+Lines: 79
 
 // ServerEventFactory.cpp
 #include "ServerEventFactory.h"
@@ -1559,6 +1592,11 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
     if (proto::parseMediaAnswer(msg, media_target)) {
         return event::MediaAnswer{.target_user = media_target};
     }
+
+    std::string peer;
+    std::string reason;
+    if (proto::parseCallEnded(msg, peer, reason))
+    
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{
@@ -1568,7 +1606,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./event/ServerEvents.h ==========
-Lines: 61
+Lines: 63
 
 //ServerEvents.h
 #pragma once
@@ -1629,11 +1667,13 @@ struct MediaAnswer {
     std::string target_user;  // 协商的目标用户
 };
 
+struct CallHangup {};
+
 
 } // namespace event
 
 ========== ./event/ServerEvent.h ==========
-Lines: 26
+Lines: 27
 
 //ServerEvent.h
 #pragma once
@@ -1654,7 +1694,8 @@ using ServerEvent = std::variant<
     event::CallAccept,
     event::CallReject,
     event::MediaOffer,
-    event::MediaAnswer
+    event::MediaAnswer,
+    event::CallHangup
     // event::Chat,
     // 以后只需要往这里加
 >;
@@ -1845,7 +1886,7 @@ struct OnlineUsers {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 47
+Lines: 51
 
 //protocol_text.h
 
@@ -1871,7 +1912,10 @@ std::string makeCallRejected(const std::string& peer);            // 通知通�
 // 媒体协商指令构建函数
 std::string makeMediaOfferResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort);
 std::string makeMediaAnswerResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort);
-
+// 客户端→服务端：构建主动挂断请求
+std::string makeCallHangup();
+// 服务端→客户端：构建挂断通知（携带原因）
+std::string makeCallEnded(const std::string& peer, const std::string& reason);
 
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
@@ -1889,14 +1933,15 @@ bool parseCallReject(const std::string& msg);                            // 解�
 bool parseMediaOffer(const std::string& msg, std::string& target_user);
 bool parseMediaAnswer(const std::string& msg, std::string& target_user);
 
-
+// 客户端解析服务端的挂断通知
+bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason);
 
 
 
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 304
+Lines: 323
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -1908,7 +1953,15 @@ namespace proto {
 
 /* ================= build ================= */
 
+std::string makeCallHangup() {
+    return CMD_CALL_HANGUP; // 主动挂断无需额外参数，直接返回命令
+}
 
+std::string makeCallEnded(const std::string& peer, const std::string& reason) {
+    std::ostringstream oss;
+    oss << CMD_CALL_ENDED << " " << peer << " " << reason;
+    return oss.str();
+}
 // ========== 通话协议构建函数 ==========
 // 构建媒体Offer回应（服务端→客户端，携带对方IP/Port）
 std::string makeMediaOfferResp(const std::string& peer, const std::string& lanIp, const std::string& vpnIp, int udpPort) {
@@ -2023,6 +2076,17 @@ std::string makeForwardTextMsg(const std::string& from_user, const std::string& 
 
 
 /* ================= parse ================= */
+
+
+bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_ENDED) return false;
+    iss >> peer >> reason;
+    return !peer.empty() && !reason.empty();
+}
 
 // Server 使用
 bool parseLoginRequest(const std::string& msg,
@@ -2204,7 +2268,7 @@ bool parseMediaAnswer(const std::string& msg, std::string& target_user) {
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 45
+Lines: 51
 
 // proto::*
 // ⚠️ PROTOCOL DTO — do NOT use as domain model
@@ -2242,6 +2306,10 @@ constexpr const char* CMD_MEDIA_ANSWER = "MEDIA_ANSWER";  // 客户端→服务�
 constexpr const char* CMD_MEDIA_OFFER_RESP  = "MEDIA_OFFER_RESP";  // 服务端→客户端：下发对方IP（Offer回应）
 constexpr const char* CMD_MEDIA_ANSWER_RESP = "MEDIA_ANSWER_RESP"; // 服务端→客户端：下发对方IP（Answer回应
 
+// 在通话相关CMD后新增
+constexpr const char* CMD_CALL_HANGUP    = "CALL_HANGUP";    // 客户端→服务端：主动挂断请求
+constexpr const char* CMD_CALL_ENDED     = "CALL_ENDED";     // 服务端→客户端：通知对端挂断（携带原因）
+
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";
@@ -2250,9 +2318,11 @@ constexpr const char* KEY_MESSAGE   = "message";
 constexpr const char* KEY_USERS     = "users";
 constexpr const char* KEY_COUNT     = "count";
 
+
+
 }
 
 
 =====================================
 Total files: 27
-Total lines: 2095
+Total lines: 2164

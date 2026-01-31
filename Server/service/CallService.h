@@ -38,8 +38,14 @@ public:
     // 媒体协商：仅查找通话会话，不修改状态（核心修改）
     std::optional<CallSession> onMediaNegotiate(const std::string& user);
 
-    // 新增：标记指定用户的媒体就绪状态，返回是否双方都就绪
+    // 标记指定用户的媒体就绪状态，返回是否双方都就绪
     bool markMediaReady(const std::string& user);    
+
+    // 删除指定通话会话（按被呼叫方用户名）
+    void deleteCallSession(const std::string& callee);
+
+    // 通过呼叫方用户名查找通话会话（双向查找）
+    std::optional<CallSession> findSessionByCaller(const std::string& caller);
 
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）

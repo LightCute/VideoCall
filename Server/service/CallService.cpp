@@ -104,3 +104,20 @@ bool CallService::markMediaReady(const std::string& user) {
     }
     return false; // 未找到通话会话
 }
+
+
+void CallService::deleteCallSession(const std::string& callee) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    activeCalls_.erase(callee);
+    std::cout << "[CallService] Delete call session for callee: " << callee << std::endl;
+}
+
+std::optional<CallSession> CallService::findSessionByCaller(const std::string& caller) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& [callee, session] : activeCalls_) {
+        if (session.caller == caller) {
+            return session;
+        }
+    }
+    return std::nullopt;
+}

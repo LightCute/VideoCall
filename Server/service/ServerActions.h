@@ -85,6 +85,14 @@ struct SendMediaAnswer {
     std::string peer;    // 对方用户名
     ClientNetInfo peer_net; // 对方的网络信息
 };
+
+// 通知对端客户端通话结束
+struct SendCallEnded {
+    int fd;              // 目标客户端fd
+    std::string peer;    // 挂断方用户名
+    std::string reason;  // 挂断原因
+};
+
 // 未来可无限加
 // struct KickUser { int fd; };
 // struct ForceLogout { int fd; };

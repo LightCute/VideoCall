@@ -57,5 +57,12 @@ struct MediaAnswer {
     std::string target_user;  // 协商的目标用户
 };
 
+struct CallHangup {};
+
+// 新增：通话结束事件（承载peer和reason信息）
+struct CallEnded {
+    std::string peer;       // 对端用户名
+    std::string reason;     // 挂断原因（如"主动挂断"、"超时"等）
+};
 
 } // namespace event

@@ -226,6 +226,19 @@
     <string>VPN</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="Bt_Hangup">
+   <property name="geometry">
+    <rect>
+     <x>1080</x>
+     <y>410</y>
+     <width>88</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Hangup</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

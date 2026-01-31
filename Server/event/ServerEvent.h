@@ -17,8 +17,10 @@ using ServerEvent = std::variant<
     event::CallAccept,
     event::CallReject,
     event::MediaOffer,
-    event::MediaAnswer
-    // event::Chat,
+    event::MediaAnswer,
+    event::CallHangup,
+    event::CallEnded  
+        // event::Chat,
     // 以后只需要往这里加
 >;
 

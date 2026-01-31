@@ -32,7 +32,6 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         };
     }
 
-    // 替换原 parseSendText 逻辑：解析客户端的 SEND_TEXT 消息（target_user + content）
     std::string target_user, content;
     if (proto::parseSendTextMsg(msg, target_user, content)) {
         return event::SendTextToUser{
@@ -65,6 +64,18 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
     if (proto::parseMediaAnswer(msg, media_target)) {
         return event::MediaAnswer{.target_user = media_target};
     }
+
+    // 新增：完善 parseCallEnded 逻辑（核心修改，用上parseCallEnded并传递信息）
+    std::string peer;
+    std::string reason;
+    if (proto::parseCallEnded(msg, peer, reason)) {
+        // 将解析出的peer和reason封装为CallEnded事件返回，传递到下一层级
+        return event::CallEnded{
+            .peer = peer,
+            .reason = reason
+        };
+    }    
+    
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{

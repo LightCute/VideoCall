@@ -47,6 +47,8 @@ private slots:
 
     void on_Bt_sen_vpn_clicked();
 
+    void on_Bt_Hangup_clicked();
+
 private:
     Ui::Widget *ui;
     ClientCore* core_; // 新增：Core指针成员
@@ -98,5 +100,9 @@ private:
 
     void handle(const core::OutMediaReadyFinal& e);
 
+    void handle(const core::OutCallEnded& e);
+
+    void handle(const core::OutStopMedia&);
+    void handle(const core::OutSendHangup&) ;
 };
 #endif // WIDGET_H

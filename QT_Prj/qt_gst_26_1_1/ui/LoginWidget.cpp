@@ -72,6 +72,8 @@ void LoginWidget::on_Bt_tcp_test_send_clicked()
     std::string msg = qmsg.toStdString();
 }
 
+
+
 // 所有 handle 函数参数补充 core:: 前缀
 void LoginWidget::handle(const core::OutLoginFail&) {
     std::cout << "[UI] handle OutLoginFail: " << std::endl;
@@ -176,4 +178,16 @@ void LoginWidget::handle(const core::OutMediaReadyFinal&) {
 
 void LoginWidget::handle(const core::OutShowIncomingCall&) {
     std::cout << "[LoginWidget] OutShowIncomingCall)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutStopMedia&) {
+    std::cout << "[LoginWidget] OutStopMedia)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutCallEnded& e) {
+    std::cout << "[LoginWidget] OutCallEnded)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendHangup&) {
+    std::cout << "[LoginWidget] OutSendHangup)" << std::endl;
 }
