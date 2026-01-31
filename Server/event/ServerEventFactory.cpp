@@ -65,6 +65,10 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         return event::MediaAnswer{.target_user = media_target};
     }
 
+    if (proto::parseCallHangup(msg)) {
+    return event::CallHangup{};
+    }
+
     // 新增：完善 parseCallEnded 逻辑（核心修改，用上parseCallEnded并传递信息）
     std::string peer;
     std::string reason;
@@ -75,7 +79,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
             .reason = reason
         };
     }    
-    
+
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{

@@ -47,6 +47,8 @@ public:
     // 通过呼叫方用户名查找通话会话（双向查找）
     std::optional<CallSession> findSessionByCaller(const std::string& caller);
 
+    void deleteCallSessionByAnyUser(const std::string& username);
+    
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
     std::map<std::string, CallSession> activeCalls_;

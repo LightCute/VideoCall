@@ -121,3 +121,18 @@ std::optional<CallSession> CallService::findSessionByCaller(const std::string& c
     }
     return std::nullopt;
 }
+
+// 按任意一方用户名删除会话（兼容caller/callee，通用清理）
+void CallService::deleteCallSessionByAnyUser(const std::string& username) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto it = activeCalls_.begin(); it != activeCalls_.end(); ) {
+        const auto& session = it->second;
+        if (session.caller == username || session.callee == username) {
+            std::cout << "[CallService] Delete call session (any user): " 
+                      << session.caller << " <-> " << session.callee << std::endl;
+            it = activeCalls_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}

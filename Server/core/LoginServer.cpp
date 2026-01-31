@@ -124,6 +124,17 @@ void LoginServer::onMessage(int fd, const std::string& msg)
     }
 }
 
+// 新增：处理SendCallEnded动作（给对端客户端发送通话结束通知）
+void LoginServer::handle(const SendCallEnded& a) {
+    // 构建通话结束通知的payload（调用proto层的构建函数）
+    auto payload = proto::makeCallEnded(a.peer, a.reason);
+    // 发送给目标客户端（对端）
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send call ended to fd=" << a.fd 
+              << " peer=" << a.peer 
+              << " reason=" << a.reason << std::endl;
+}
+
 // 处理SendMediaOffer动作（下发对方IP/Port）
 void LoginServer::handle(const SendMediaOffer& a) {
     // 构建媒体Offer回应（携带对方IP/Port）

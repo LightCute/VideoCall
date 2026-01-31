@@ -133,6 +133,13 @@ std::string makeForwardTextMsg(const std::string& from_user, const std::string& 
 /* ================= parse ================= */
 
 
+bool parseCallHangup(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_CALL_HANGUP;
+}
+
 bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason) {
     std::istringstream iss(msg);
     std::string cmd;

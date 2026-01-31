@@ -224,7 +224,7 @@ int findAvailableUdpPort(uint16_t startPort, uint16_t endPort) {
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 251
+Lines: 255
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -389,6 +389,10 @@ void ClientCore::applyStateChange(const core::OutStateChanged& e) { // 补充 co
     //outputQueue_.push(e);
 }
 
+void ClientCore::execute(const core::OutSendHangup&) {
+    executor_->sendHangup();
+}
+
 // 关键修改：execute 仅调用 Executor 接口，无 IO 逻辑（补充 core:: 前缀）
 void ClientCore::execute(const core::OutConnect& e) { // 补充 core:: 前缀
     // 调度 Executor 执行连接（Core 仅发命令，不做具体操作）
@@ -519,7 +523,7 @@ private:
 };
 
 ========== ./core/CoreInput.h ==========
-Lines: 117
+Lines: 126
 
 // core/CoreInput.h
 #pragma once
@@ -577,7 +581,14 @@ struct InMediaPeer {
     int udpPort;
 };
 
+// 用户主动点击挂断（UI触发）
+struct InCmdHangup {};
 
+// 收到服务端通知（对端挂断/服务器回收）
+struct InCallEnded {
+    std::string peer;    // 对方用户名
+    std::string reason;  // 挂断原因："peer_hangup" / "server_timeout"
+};
 
 using CoreInput = std::variant<
     InCmdConnect,
@@ -602,7 +613,9 @@ using CoreInput = std::variant<
     InCallRejected,
     InCmdAcceptCall,
     InCmdRejectCall,
-    InMediaPeer
+    InMediaPeer,
+    InCmdHangup,
+    InCallEnded
     >;
 
 
@@ -640,7 +653,7 @@ inline std::string CoreInputIndexToName(size_t index) {
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 378
+Lines: 487
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -750,6 +763,10 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
             evType = EventType::CmdRejectCall;
         else if constexpr (std::is_same_v<T, core::InMediaPeer>)
             evType = EventType::MediaPeer;
+        else if constexpr (std::is_same_v<T, core::InCmdHangup>)
+            evType = EventType::CmdHangup;
+        else if constexpr (std::is_same_v<T, core::InCallEnded>)
+            evType = EventType::CallEnded;
 
         else evType = EventType::Unknow;
     }, ev);
@@ -1017,12 +1034,117 @@ void FSM::initTable() {
             State::MEDIA_READY
         },
 
+        // ===== 新增：主动挂断（CmdHangup）=====
+        // 1. CALLING状态下主动挂断
+        { State::CALLING, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});          // 上报服务端
+                out.push_back(core::OutStopMedia{});           // 停止本地媒体
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 回到登录状态
+                out.push_back(core::OutCallEnded{"", "local_hangup"}); // 通知UI
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 2. RINGING状态下主动挂断
+        { State::RINGING, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 3. IN_CALL状态下主动挂断
+        { State::IN_CALL, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 4. MEDIA_READY状态下主动挂断（核心，当前通话的最终状态）
+        { State::MEDIA_READY, EventType::CmdHangup,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                out.push_back(core::OutSendHangup{});
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // ===== 新增：被动挂断（CallEnded，收到服务端通知）=====
+        // 1. CALLING状态下收到被动挂断
+        { State::CALLING, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 2. RINGING状态下收到被动挂断
+        { State::RINGING, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 3. IN_CALL状态下收到被动挂断
+        { State::IN_CALL, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        // 4. MEDIA_READY状态下收到被动挂断（核心）
+        { State::MEDIA_READY, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
+        }
 
     };
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 72
+Lines: 73
 
 #pragma once
 #include "CoreInput.h"
@@ -1093,12 +1215,13 @@ private:
     void execute(const core::OutSendMediaAnswer& e);
     void execute(const core::OutShowIncomingCall& e);
     void execute(const core::OutMediaReady& e);
+    void execute(const core::OutSendHangup&);
     void broadcastOutput(const core::CoreOutput& out);
     std::atomic<bool> is_running_{true};
 };
 
 ========== ./core/CoreExecutor.cpp ==========
-Lines: 205
+Lines: 217
 
 //CoreExecutor.cpp
 #include "CoreExecutor.h"
@@ -1173,6 +1296,12 @@ void CoreExecutor::initSocketCallbacks() {
                 postInput_(core::InCallRejected{e.peer});
             else if constexpr (std::is_same_v<T, ProtoEvtMediaPeer>)
                 postInput_(core::InMediaPeer{e.peer, e.lanIp, e.vpnIp, e.udpPort});
+
+            else if constexpr (std::is_same_v<T, ProtoEvtCallEnded>) {
+                postInput_(core::InCallEnded{e.peer, e.reason});
+                std::cout << "[Executor] Push InCallEnded to Core (peer: " << e.peer << ", reason: " << e.reason << ")" << std::endl;
+            }
+
             else {
                 postInput_(core::InUnknow{});
             }
@@ -1193,6 +1322,12 @@ void CoreExecutor::connectToServer(const std::string& host, int port) {
             std::cout << "[Executor] Successfully connected to server: " << host << ":" << port << std::endl;
         }
     }).detach();
+}
+
+void CoreExecutor::sendHangup() {
+    std::string hangupMsg = proto::makeCallHangup();
+    socket_.sendMessage(hangupMsg);
+    std::cout << "[Executor] Send CALL_HANGUP to server" << std::endl;
 }
 
 void CoreExecutor::sendLoginRequest(const std::string& user, const std::string& pass) {
@@ -1343,7 +1478,7 @@ inline std::string stateToString(State s) {
 }
 
 ========== ./core/CoreExecutor.h ==========
-Lines: 55
+Lines: 56
 
 //CoreExecutor.h
 #pragma once
@@ -1381,6 +1516,7 @@ public:
     void sendMediaOffer(const std::string& peer);
     void sendMediaAnswer(const std::string& peer);
     int getMediaPort() const { return mediaPort_; }
+    void sendHangup();
 private:
     // 封装的 socket 实例（Executor 唯一持有）
     CommandSocket socket_;
@@ -1421,7 +1557,7 @@ public:
 } // namespace core
 
 ========== ./core/CoreOutput.h ==========
-Lines: 72
+Lines: 88
 
 // core/CoreOutput.h
 #pragma once
@@ -1470,6 +1606,19 @@ struct OutMediaReadyFinal {
 // 来电通知UI
 struct OutShowIncomingCall { std::string from; };
 
+
+// 发送主动挂断请求到服务端（Core→Executor）
+struct OutSendHangup {};
+
+// 停止本地媒体推流/接收（Core→媒体层）
+struct OutStopMedia {};
+
+// 通知UI通话会话结束（Core→UI）
+struct OutCallEnded {
+    std::string peer;
+    std::string reason;
+};
+
 using CoreOutput = std::variant<
     OutStateChanged,
     OutLoginOk,
@@ -1491,7 +1640,10 @@ using CoreOutput = std::variant<
     OutSendMediaAnswer,
     OutMediaReady,
     OutShowIncomingCall,
-    OutMediaReadyFinal
+    OutMediaReadyFinal,
+    OutSendHangup,
+    OutStopMedia,
+    OutCallEnded
     >;
 
 } // namespace core
@@ -1776,7 +1928,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 271
+Lines: 303
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -1900,12 +2052,38 @@ void Widget::on_Bt_tcp_send_clicked() {
     ui->lineEdit_msg->clear();
 }
 
-// 新增：处理发送文本消息（仅日志）
+void Widget::handle(const core::OutSendHangup&) {
+    std::cout << "[Widget] OutSendHangup" << std::endl;
+}
+
+// 处理OutStopMedia（停止媒体推流/接收）
+void Widget::handle(const core::OutStopMedia&) {
+    std::cout << "[Widget] Stop media (camera and video receiver)" << std::endl;
+    // 停止摄像头推流
+    camera_.stop();
+    // 停止视频接收
+    receiver_.stop();
+    // 清空视频窗口
+    video_->setFrame(QImage());
+    remote_video_->setFrame(QImage());
+}
+
+// 处理OutCallEnded（更新UI，通知用户会话结束）
+void Widget::handle(const core::OutCallEnded& e) {
+    std::cout << "[Widget] Call ended: peer=" << e.peer << ", reason=" << e.reason << std::endl;
+    // 显示UI提示
+    // QString tip = QString("Call ended: %1 (reason: %2)").arg(QString::fromStdString(e.peer)).arg(QString::fromStdString(e.reason));
+    // ui->PTE_recv->appendPlainText(tip);
+    // 重置通话相关UI状态
+    ui->lineEdit_CallTarget->clear();
+}
+
+// 处理发送文本消息（仅日志）
 void Widget::handle(const core::OutSendText& e) {
     std::cout << "[Widget] Send text to  " << e.target_user << ": " << e.content << std::endl;
 }
 
-// 新增：处理接收转发文本消息（显示到UI）
+// 处理接收转发文本消息（显示到UI）
 void Widget::handle(const core::OutForwardText& e) {
     std::cout << "[Widget] recev from " << e.from_user << " msg: " << e.content << std::endl;
     // 追加到文本框
@@ -2050,6 +2228,12 @@ void Widget::on_Bt_sen_vpn_clicked()
 }
 
 
+void Widget::on_Bt_Hangup_clicked()
+{
+    core_->postInput(core::InCmdHangup{});
+}
+
+
 ========== ./ui/QtCameraAdapter.cpp ==========
 Lines: 18
 
@@ -2073,7 +2257,7 @@ void QtCameraAdapter::onFrame(Frame f) {
 }
 
 ========== ./ui/LoginWidget.h ==========
-Lines: 77
+Lines: 83
 
 //LoginWidget.h
 #ifndef LOGINWIDGET_H
@@ -2149,6 +2333,12 @@ private:
     void handle(const core::OutShowIncomingCall&) ;
 
     void handle(const core::OutMediaReadyFinal& e);
+
+    void handle(const core::OutCallEnded& e);
+
+    void handle(const core::OutStopMedia&);
+
+    void handle(const core::OutSendHangup&) ;
 };
 
 #endif // LOGINWIDGET_H
@@ -2238,7 +2428,7 @@ private:
 };
 
 ========== ./ui/LoginWidget.cpp ==========
-Lines: 179
+Lines: 193
 
 //LoginWidget.cpp
 #include "LoginWidget.h"
@@ -2313,6 +2503,8 @@ void LoginWidget::on_Bt_tcp_test_send_clicked()
     QString qmsg = ui->LE_tcp_send_test->text();
     std::string msg = qmsg.toStdString();
 }
+
+
 
 // 所有 handle 函数参数补充 core:: 前缀
 void LoginWidget::handle(const core::OutLoginFail&) {
@@ -2420,6 +2612,18 @@ void LoginWidget::handle(const core::OutShowIncomingCall&) {
     std::cout << "[LoginWidget] OutShowIncomingCall)" << std::endl;
 }
 
+void LoginWidget::handle(const core::OutStopMedia&) {
+    std::cout << "[LoginWidget] OutStopMedia)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutCallEnded& e) {
+    std::cout << "[LoginWidget] OutCallEnded)" << std::endl;
+}
+
+void LoginWidget::handle(const core::OutSendHangup&) {
+    std::cout << "[LoginWidget] OutSendHangup)" << std::endl;
+}
+
 ========== ./ui/AppWindow.h ==========
 Lines: 30
 
@@ -2455,7 +2659,7 @@ private:
 };
 
 ========== ./ui/widget.h ==========
-Lines: 102
+Lines: 108
 
 // ui/widget.h（完整修复版）
 #ifndef WIDGET_H
@@ -2505,6 +2709,8 @@ private slots:
     void on_Bt_set_lan_clicked();
 
     void on_Bt_sen_vpn_clicked();
+
+    void on_Bt_Hangup_clicked();
 
 private:
     Ui::Widget *ui;
@@ -2557,6 +2763,10 @@ private:
 
     void handle(const core::OutMediaReadyFinal& e);
 
+    void handle(const core::OutCallEnded& e);
+
+    void handle(const core::OutStopMedia&);
+    void handle(const core::OutSendHangup&) ;
 };
 #endif // WIDGET_H
 
@@ -2628,7 +2838,7 @@ struct MediaPeerResp {
 }
 
 ========== ./protocol/protocol_text.h ==========
-Lines: 34
+Lines: 39
 
 //protocol_text.h
 #pragma once
@@ -2651,7 +2861,10 @@ std::string makeAcceptCallRequest();
 std::string makeRejectCallRequest();
 std::string makeMediaOfferRequest(const std::string& peer);
 std::string makeMediaAnswerRequest(const std::string& peer);
-
+// 客户端→服务端：构建主动挂断请求
+std::string makeCallHangup();
+// 服务端→客户端：构建挂断通知（携带原因）
+std::string makeCallEnded(const std::string& peer, const std::string& reason);
 // parse
 bool parseLoginRequest(const std::string& msg, std::string& user, std::string& pwd);
 bool parseLoginResponse(const std::string& msg, LoginResponse& resp);
@@ -2663,10 +2876,12 @@ bool parseCallIncoming(const std::string& msg, CallIncoming& out);
 bool parseCallAccepted(const std::string& msg, CallAccepted& out);
 bool parseCallRejected(const std::string& msg, CallRejected& out);
 bool parseMediaPeerResp(const std::string& msg, MediaPeerResp& out);
+// 客户端解析服务端的挂断通知
+bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason);
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 269
+Lines: 289
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -2677,6 +2892,16 @@ Lines: 269
 namespace proto {
 
 /* ================= build ================= */
+
+std::string makeCallHangup() {
+    return CMD_CALL_HANGUP; // 主动挂断无需额外参数，直接返回命令
+}
+
+std::string makeCallEnded(const std::string& peer, const std::string& reason) {
+    std::ostringstream oss;
+    oss << CMD_CALL_ENDED << " " << peer << " " << reason;
+    return oss.str();
+}
 
 std::string makeCallRequest(const std::string& target_user) {
     std::ostringstream oss;
@@ -2780,6 +3005,16 @@ std::string makeForwardTextMsg(const std::string& from_user, const std::string& 
 
 
 /* ================= parse ================= */
+
+bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd != CMD_CALL_ENDED) return false;
+    iss >> peer >> reason;
+    return !peer.empty() && !reason.empty();
+}
 
 // Server 使用
 bool parseLoginRequest(const std::string& msg,
@@ -2939,7 +3174,7 @@ bool parseMediaPeerResp(const std::string& msg, MediaPeerResp& out) {
 } // namespace proto
 
 ========== ./protocol/protocol_common.h ==========
-Lines: 36
+Lines: 38
 
 //protocol_common.h
 #pragma once
@@ -2967,7 +3202,9 @@ constexpr const char* CMD_MEDIA_OFFER        = "MEDIA_OFFER";
 constexpr const char* CMD_MEDIA_OFFER_RESP   = "MEDIA_OFFER_RESP";
 constexpr const char* CMD_MEDIA_ANSWER       = "MEDIA_ANSWER";
 constexpr const char* CMD_MEDIA_ANSWER_RESP  = "MEDIA_ANSWER_RESP";
-
+// 在通话相关CMD后新增
+constexpr const char* CMD_CALL_HANGUP    = "CALL_HANGUP";    // 客户端→服务端：主动挂断请求
+constexpr const char* CMD_CALL_ENDED     = "CALL_ENDED";     // 服务端→客户端：通知对端挂断（携带原因）
 // keys
 constexpr const char* KEY_USERNAME  = "username";
 constexpr const char* KEY_PASSWORD  = "password";
@@ -2979,7 +3216,7 @@ constexpr const char* KEY_COUNT     = "count";
 }
 
 ========== ./app/ClientEvent.h ==========
-Lines: 76
+Lines: 83
 
 //ClientEvent.h
 #pragma once
@@ -3035,6 +3272,12 @@ struct ProtoEvtMediaPeer {
     int udpPort;         // 对方媒体UDP端口
 };
 
+// 解析服务端的CALL_ENDED通知
+struct ProtoEvtCallEnded {
+    std::string peer;
+    std::string reason;
+};
+
 using ClientEvent = std::variant<
     // UI 触发的协议命令
     ProtoEvtCmdConnect,
@@ -3055,7 +3298,8 @@ using ClientEvent = std::variant<
     ProtoEvtCallIncoming,
     ProtoEvtCallAccepted,
     ProtoEvtCallRejected,
-    ProtoEvtMediaPeer
+    ProtoEvtMediaPeer,
+    ProtoEvtCallEnded
     >;
 
 ========== ./app/ClientEventFactory.h ==========
@@ -3081,7 +3325,7 @@ private:
 #endif // CLIENTEVENTFACTORY_H
 
 ========== ./app/ClientEventFactory.cpp ==========
-Lines: 64
+Lines: 69
 
 //ClientEventFactory.cpp
 #include "ClientEventFactory.h"
@@ -3142,6 +3386,11 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
         };
     }
 
+    // 解析CALL_ENDED通知
+    std::string peer, reason;
+    if (proto::parseCallEnded(msg, peer, reason)) {
+        return ProtoEvtCallEnded{peer, reason};
+    }
 
     proto::Unknown req_error;
     req_error.message = msg;
@@ -3149,7 +3398,7 @@ ClientEvent ClientEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./app/ClientEventEnum.h ==========
-Lines: 74
+Lines: 77
 
 //ClientEventEnum.h
 #pragma once
@@ -3185,7 +3434,9 @@ enum class EventType {
     CallRejected,
     CmdAcceptCall,
     CmdRejectCall,
-    MediaPeer
+    MediaPeer,
+    CmdHangup,
+    CallEnded
     // CallIncoming,    // 收到来电
     // CallAccepted,    // 通话被接听
     // CallRejected,    // 通话被拒绝
@@ -3220,7 +3471,8 @@ inline std::string EventTypeToString(EventType type) {
     case EventType::CmdAcceptCall:     return "InCmdAcceptCall";
     case EventType::CmdRejectCall:     return "InCmdRejectCall";
     case EventType::MediaPeer:         return "InMediaPeer";
-
+    case EventType::CmdHangup:         return "InCmdHangup";
+    case EventType::CallEnded:         return "InCallEnded";
     // 处理未匹配到的枚举值（健壮性保障）
     default: return "InUnknownEventType";
     }
@@ -3548,4 +3800,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 40
-Total lines: 3325
+Total lines: 3577

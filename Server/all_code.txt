@@ -911,7 +911,7 @@ using ServerAction = std::variant<
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 437
+Lines: 483
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -1351,8 +1351,54 @@ ServerEventDispatcher::handle(int fd, const event::SendTextToUser& ev)
     return actions;
 }
 
+
+// 新增：处理CallEnded事件，传递peer和reason到业务层
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallEnded& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证当前用户是否已登录
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot send call ended notification"
+        });
+        return actions;
+    }
+
+    // 2. 获取当前用户用户名（挂断方）
+    auto snapshot = sessionMgr_.snapshot();
+    std::string current_user = snapshot.at(fd).user.username;
+
+    // 3. 查找对端（ev.peer）的FD（验证对端是否在线）
+    int peer_fd = sessionMgr_.getFdByUsername(ev.peer);
+    if (peer_fd == -1) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "Peer user " + ev.peer + " is offline"
+        });
+        return actions;
+    }
+
+    // 4. 生成SendCallEnded动作，将peer（挂断方）和reason（挂断原因）传递到业务层
+    actions.emplace_back(SendCallEnded{
+        .fd = peer_fd,          // 目标fd：对端客户端
+        .peer = current_user,    // 挂断方用户名
+        .reason = ev.reason      // 挂断原因（从事件中传递而来）
+    });
+
+    // 5. （可选）清理对应的通话会话（优化：避免残留无效会话）
+    callService_.deleteCallSession(ev.peer);
+
+    std::cout << "[Dispatcher] Call ended notification: " << current_user 
+              << " -> " << ev.peer << " reason: " << ev.reason << std::endl;
+    return actions;
+}
+
+
 ========== ./dispatcher/ServerEventDispatcher.h ==========
-Lines: 36
+Lines: 37
 
 //ServerEventDispatcher.h
 #pragma once
@@ -1384,7 +1430,8 @@ private:
     std::vector<ServerAction> handle(int fd, const event::SendTextToUser& ev);
     std::vector<ServerAction> handle(int fd, const event::MediaOffer& ev);   
     std::vector<ServerAction> handle(int fd, const event::MediaAnswer& ev);  
-        //std::vector<ServerAction> handle(int fd, const event::Logout&)
+    std::vector<ServerAction> handle(int fd, const event::CallEnded& ev);
+    std::vector<ServerAction> handle(int fd, const event::CallHangup& ev);
 
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
@@ -1523,7 +1570,7 @@ public:
 };
 
 ========== ./event/ServerEventFactory.cpp ==========
-Lines: 79
+Lines: 85
 
 // ServerEventFactory.cpp
 #include "ServerEventFactory.h"
@@ -1559,7 +1606,6 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         };
     }
 
-    // 替换原 parseSendText 逻辑：解析客户端的 SEND_TEXT 消息（target_user + content）
     std::string target_user, content;
     if (proto::parseSendTextMsg(msg, target_user, content)) {
         return event::SendTextToUser{
@@ -1593,9 +1639,16 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         return event::MediaAnswer{.target_user = media_target};
     }
 
+    // 新增：完善 parseCallEnded 逻辑（核心修改，用上parseCallEnded并传递信息）
     std::string peer;
     std::string reason;
-    if (proto::parseCallEnded(msg, peer, reason))
+    if (proto::parseCallEnded(msg, peer, reason)) {
+        // 将解析出的peer和reason封装为CallEnded事件返回，传递到下一层级
+        return event::CallEnded{
+            .peer = peer,
+            .reason = reason
+        };
+    }    
     
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
@@ -1606,7 +1659,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./event/ServerEvents.h ==========
-Lines: 63
+Lines: 68
 
 //ServerEvents.h
 #pragma once
@@ -1669,11 +1722,16 @@ struct MediaAnswer {
 
 struct CallHangup {};
 
+// 新增：通话结束事件（承载peer和reason信息）
+struct CallEnded {
+    std::string peer;       // 对端用户名
+    std::string reason;     // 挂断原因（如"主动挂断"、"超时"等）
+};
 
 } // namespace event
 
 ========== ./event/ServerEvent.h ==========
-Lines: 27
+Lines: 28
 
 //ServerEvent.h
 #pragma once
@@ -1695,8 +1753,9 @@ using ServerEvent = std::variant<
     event::CallReject,
     event::MediaOffer,
     event::MediaAnswer,
-    event::CallHangup
-    // event::Chat,
+    event::CallHangup,
+    event::CallEnded  
+        // event::Chat,
     // 以后只需要往这里加
 >;
 
@@ -2325,4 +2384,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 27
-Total lines: 2164
+Total lines: 2223

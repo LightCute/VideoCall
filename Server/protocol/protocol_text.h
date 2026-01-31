@@ -45,7 +45,7 @@ bool parseMediaAnswer(const std::string& msg, std::string& target_user);
 
 // 客户端解析服务端的挂断通知
 bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason);
-
+bool parseCallHangup(const std::string& msg);
 
 
 }
