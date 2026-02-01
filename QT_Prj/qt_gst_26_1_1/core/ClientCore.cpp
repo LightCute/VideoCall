@@ -143,6 +143,10 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
             execute(e);
         else if constexpr (std::is_same_v<T, core::OutMediaReady>)
             execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendHangup>)
+            execute(e);
+
+
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件

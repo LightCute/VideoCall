@@ -160,7 +160,7 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 306
+Lines: 317
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
@@ -286,6 +286,17 @@ void LoginServer::onMessage(int fd, const std::string& msg)
             handle(a);
         }, act);
     }
+}
+
+// 新增：处理SendCallEnded动作（给对端客户端发送通话结束通知）
+void LoginServer::handle(const SendCallEnded& a) {
+    // 构建通话结束通知的payload（调用proto层的构建函数）
+    auto payload = proto::makeCallEnded(a.peer, a.reason);
+    // 发送给目标客户端（对端）
+    listener_.sendPacket(a.fd, payload);
+    std::cout << "[Server] Send call ended to fd=" << a.fd 
+              << " peer=" << a.peer 
+              << " reason=" << a.reason << std::endl;
 }
 
 // 处理SendMediaOffer动作（下发对方IP/Port）
@@ -470,7 +481,7 @@ void LoginServer::handle(const ForwardText& a)
 }
 
 ========== ./core/LoginServer.h ==========
-Lines: 58
+Lines: 59
 
 //LoginServer.h
 #pragma once
@@ -523,6 +534,7 @@ private:
     void handle(const SendCallRejected& a);
     void handle(const SendMediaOffer& a);   
     void handle(const SendMediaAnswer& a);   
+    void handle(const SendCallEnded& a);
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;
@@ -661,7 +673,7 @@ public:
 };
 
 ========== ./service/CallService.h ==========
-Lines: 55
+Lines: 57
 
 // CallService.h
 #pragma once
@@ -712,6 +724,8 @@ public:
     // 通过呼叫方用户名查找通话会话（双向查找）
     std::optional<CallSession> findSessionByCaller(const std::string& caller);
 
+    void deleteCallSessionByAnyUser(const std::string& username);
+    
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
     std::map<std::string, CallSession> activeCalls_;
@@ -758,7 +772,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/CallService.cpp ==========
-Lines: 123
+Lines: 138
 
 // CallService.cpp
 #include "CallService.h"
@@ -884,6 +898,21 @@ std::optional<CallSession> CallService::findSessionByCaller(const std::string& c
     return std::nullopt;
 }
 
+// 按任意一方用户名删除会话（兼容caller/callee，通用清理）
+void CallService::deleteCallSessionByAnyUser(const std::string& username) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto it = activeCalls_.begin(); it != activeCalls_.end(); ) {
+        const auto& session = it->second;
+        if (session.caller == username || session.callee == username) {
+            std::cout << "[CallService] Delete call session (any user): " 
+                      << session.caller << " <-> " << session.callee << std::endl;
+            it = activeCalls_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
 ========== ./service/ServerAction.h ==========
 Lines: 22
 
@@ -911,7 +940,7 @@ using ServerAction = std::variant<
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 483
+Lines: 539
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -1397,6 +1426,62 @@ ServerEventDispatcher::handle(int fd, const event::CallEnded& ev)
 }
 
 
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
+{
+    std::vector<ServerAction> actions;
+
+    // 1. 验证当前用户是否已登录（防御式编程，避免未登录用户发送挂断请求）
+    if (!sessionMgr_.exists(fd)) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "You are not logged in, cannot hang up call"
+        });
+        return actions;
+    }
+
+    // 2. 获取当前用户（主动挂断方）的用户名
+    auto snapshot = sessionMgr_.snapshot();
+    std::string current_user = snapshot.at(fd).user.username;
+
+    // 3. 查找当前用户的活跃通话会话（双向查找：呼叫方/被呼叫方）
+    // 先按呼叫方查找，再按媒体协商会话查找（兼容现有CallService逻辑）
+    std::optional<CallSession> call_session = callService_.findSessionByCaller(current_user);
+    if (!call_session) {
+        call_session = callService_.onMediaNegotiate(current_user);
+        if (!call_session) {
+            actions.emplace_back(SendError{
+                .fd = fd,
+                .reason = "No active call to hang up"
+            });
+            return actions;
+        }
+    }
+
+    // 4. 确定对端用户名（区分呼叫方/被呼叫方）
+    std::string peer_user = (call_session->caller == current_user) 
+        ? call_session->callee 
+        : call_session->caller;
+
+    // 5. 查找对端用户的FD（验证对端是否在线）
+    int peer_fd = sessionMgr_.getFdByUsername(peer_user);
+    if (peer_fd != -1) {
+        // 生成SendCallEnded动作，通知对端客户端（原因：主动挂断）
+        actions.emplace_back(SendCallEnded{
+            .fd = peer_fd,
+            .peer = current_user,
+            .reason = "Peer actively hung up the call"
+        });
+    }
+
+    // 6. 清理活跃通话会话（避免残留无效会话，保证CallService数据一致性）
+    callService_.deleteCallSession(call_session->callee);
+
+    std::cout << "[Dispatcher] Call hung up by user: " << current_user 
+              << ", peer: " << peer_user << std::endl;
+    return actions;
+}
+
 ========== ./dispatcher/ServerEventDispatcher.h ==========
 Lines: 37
 
@@ -1570,7 +1655,7 @@ public:
 };
 
 ========== ./event/ServerEventFactory.cpp ==========
-Lines: 85
+Lines: 89
 
 // ServerEventFactory.cpp
 #include "ServerEventFactory.h"
@@ -1639,6 +1724,10 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
         return event::MediaAnswer{.target_user = media_target};
     }
 
+    if (proto::parseCallHangup(msg)) {
+    return event::CallHangup{};
+    }
+
     // 新增：完善 parseCallEnded 逻辑（核心修改，用上parseCallEnded并传递信息）
     std::string peer;
     std::string reason;
@@ -1649,7 +1738,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
             .reason = reason
         };
     }    
-    
+
     // ❗ 如果你愿意，可以抛异常 / optional
     // fallback -> 返回 ErrorEvent
     return event::ErrorEvent{
@@ -1994,13 +2083,13 @@ bool parseMediaAnswer(const std::string& msg, std::string& target_user);
 
 // 客户端解析服务端的挂断通知
 bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason);
-
+bool parseCallHangup(const std::string& msg);
 
 
 }
 
 ========== ./protocol/protocol_text.cpp ==========
-Lines: 323
+Lines: 330
 
 //protocol_text.cpp
 #include "protocol_text.h"
@@ -2136,6 +2225,13 @@ std::string makeForwardTextMsg(const std::string& from_user, const std::string& 
 
 /* ================= parse ================= */
 
+
+bool parseCallHangup(const std::string& msg) {
+    std::istringstream iss(msg);
+    std::string cmd;
+    iss >> cmd;
+    return cmd == CMD_CALL_HANGUP;
+}
 
 bool parseCallEnded(const std::string& msg, std::string& peer, std::string& reason) {
     std::istringstream iss(msg);
@@ -2384,4 +2480,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 27
-Total lines: 2223
+Total lines: 2319
