@@ -481,6 +481,19 @@ void FSM::initTable() {
                 return out;
             },
             State::LoggedIn
+        },
+
+        // 5 LoggedIn状态下收到被动挂断（核心）
+        { State::LoggedIn, EventType::CallEnded,
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                auto& e = std::get<core::InCallEnded>(ev);
+                out.push_back(core::OutStopMedia{});
+                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                out.push_back(core::OutCallEnded{e.peer, e.reason});
+                return out;
+            },
+            State::LoggedIn
         }
 
     };
