@@ -383,9 +383,9 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 out.push_back(core::OutSendHangup{});          // 上报服务端
-                out.push_back(core::OutStopMedia{});           // 停止本地媒体
+                //out.push_back(core::OutStopMedia{});           // 停止本地媒体
                 out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 回到登录状态
-                out.push_back(core::OutCallEnded{"", "local_hangup"}); // 通知UI
+                //out.push_back(core::OutCallEnded{"", "local_hangup"}); // 通知UI
                 return out;
             },
             State::LoggedIn
@@ -396,9 +396,9 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 out.push_back(core::OutSendHangup{});
-                out.push_back(core::OutStopMedia{});
+                //out.push_back(core::OutStopMedia{});
                 out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                //out.push_back(core::OutCallEnded{"", "local_hangup"});
                 return out;
             },
             State::LoggedIn
@@ -409,9 +409,9 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 out.push_back(core::OutSendHangup{});
-                out.push_back(core::OutStopMedia{});
+                //out.push_back(core::OutStopMedia{});
                 out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                //out.push_back(core::OutCallEnded{"", "local_hangup"});
                 return out;
             },
             State::LoggedIn
@@ -422,9 +422,9 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 out.push_back(core::OutSendHangup{});
-                out.push_back(core::OutStopMedia{});
+                //out.push_back(core::OutStopMedia{});
                 out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                out.push_back(core::OutCallEnded{"", "local_hangup"});
+                //out.push_back(core::OutCallEnded{"", "local_hangup"});
                 return out;
             },
             State::LoggedIn
