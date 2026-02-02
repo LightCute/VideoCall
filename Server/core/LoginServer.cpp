@@ -43,8 +43,15 @@ void LoginServer::startHeartbeatMonitor() {
 
                 if (dur > 15) { // 超过 15 秒没心跳就下线
                     std::cout << "[Server] heartbeat timeout fd=" << fd << std::endl;
+                    
+                    // 新增：先记录用户名（logout后会丢失）
+                    std::string username = info.user.username;
+                    
                     sessionMgr_.logout(fd);
                     close(fd);
+
+                    // 新增：处理该用户的活跃通话（等价于Hangup）
+                    handleUserDisconnectedAsHangup(username);
 
                     // 广播新的在线用户列表
                     auto onlineSnapshot = sessionMgr_.snapshot();
@@ -64,7 +71,6 @@ void LoginServer::startHeartbeatMonitor() {
     }).detach();
 }
 
-
 void LoginServer::onAccept(int clientfd) {
     std::cout << "[Server] new client fd=" << clientfd << std::endl;
     
@@ -77,12 +83,11 @@ void LoginServer::clientThread(int clientfd) {
     std::vector<char> recvBuffer;
     char buf[1024];
 
-
-    
     while (true) {
         int n = recv(clientfd, buf, sizeof(buf), 0);
         if (n <= 0) {
-            break;}
+            break;
+        }
 
         recvBuffer.insert(recvBuffer.end(), buf, buf + n);
 
@@ -92,18 +97,29 @@ void LoginServer::clientThread(int clientfd) {
         }
     }
 
-    
-
     // 客户端断开处理
+    // 新增：先记录用户名（logout后会丢失）
+    std::string username;
+    auto snapshot = sessionMgr_.snapshot();
+    auto fd_it = snapshot.find(clientfd);
+    if (fd_it != snapshot.end()) {
+        username = fd_it->second.user.username;
+    }
+
     sessionMgr_.logout(clientfd);
 
-    auto snapshot = sessionMgr_.snapshot();
+    // 新增：处理该用户的活跃通话（等价于Hangup）
+    if (!username.empty()) {
+        handleUserDisconnectedAsHangup(username);
+    }
+
+    auto onlineSnapshot = sessionMgr_.snapshot();
     proto::OnlineUsers users;
-    for (auto& [fd, info] : snapshot) {
+    for (auto& [fd, info] : onlineSnapshot) {
         users.users.push_back({info.user.username, info.user.privilege});
     }
     auto payload = proto::makeOnlineUsers(users);
-    for (auto& [fd, _] : snapshot) {
+    for (auto& [fd, _] : onlineSnapshot) {
         listener_.sendPacket(fd, payload);
     }
 
@@ -314,4 +330,32 @@ void LoginServer::handle(const ForwardText& a)
     std::cout << "[Server] Forward text to fd=" << a.target_fd 
               << " from=" << a.from_user 
               << " content=" << a.content << std::endl;
+}
+
+
+// 新增：处理用户断开（心跳超时/TCP断开）等价于主动Hangup
+void LoginServer::handleUserDisconnectedAsHangup(const std::string& username) {
+    // 1. 查找该用户的活跃通话会话
+    std::optional<CallSession> call_session = callService_.findSessionByAnyUser(username);
+    if (!call_session) {
+        return; // 无活跃通话，直接返回
+    }
+
+    // 2. 确定对端用户名
+    std::string peer_user = (call_session->caller == username) 
+        ? call_session->callee 
+        : call_session->caller;
+
+    // 3. 查找对端FD并发送CALL_ENDED
+    int peer_fd = sessionMgr_.getFdByUsername(peer_user);
+    if (peer_fd != -1) {
+        auto payload = proto::makeCallEnded(username, "Peer disconnected unexpectedly");
+        listener_.sendPacket(peer_fd, payload);
+        std::cout << "[Server] Send call ended to fd=" << peer_fd 
+                  << " peer=" << username 
+                  << " reason=Peer disconnected unexpectedly" << std::endl;
+    }
+
+    // 4. 清理通话会话
+    callService_.deleteCallSessionByAnyUser(username);
 }

@@ -224,7 +224,7 @@ int findAvailableUdpPort(uint16_t startPort, uint16_t endPort) {
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 255
+Lines: 259
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -371,6 +371,10 @@ void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
             execute(e);
         else if constexpr (std::is_same_v<T, core::OutMediaReady>)
             execute(e);
+        else if constexpr (std::is_same_v<T, core::OutSendHangup>)
+            execute(e);
+
+
         else {
             // outputQueue_.push(std::move(e));
             broadcastOutput(e); // 广播其他事件
@@ -3800,4 +3804,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 40
-Total lines: 3577
+Total lines: 3581

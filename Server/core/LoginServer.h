@@ -50,10 +50,12 @@ private:
     void handle(const SendMediaOffer& a);   
     void handle(const SendMediaAnswer& a);   
     void handle(const SendCallEnded& a);
+
+    void handleUserDisconnectedAsHangup(const std::string& username);
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;
     LoginService loginService_;
-    CallService callService_;  // 新增：CallService成员
+    CallService callService_;  // CallService成员
     ServerEventDispatcher dispatcher_; // 调整顺序：需在callService_之后初始化
 };

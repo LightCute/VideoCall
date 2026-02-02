@@ -47,6 +47,9 @@ public:
     // 通过呼叫方用户名查找通话会话（双向查找）
     std::optional<CallSession> findSessionByCaller(const std::string& caller);
 
+    // 双向查找会话（新增：根据任意一方用户名查找完整会话）
+    std::optional<CallSession> findSessionByAnyUser(const std::string& username);
+
     void deleteCallSessionByAnyUser(const std::string& username);
     
 private:

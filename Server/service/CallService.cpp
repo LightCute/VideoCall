@@ -96,15 +96,13 @@ bool CallService::markMediaReady(const std::string& user) {
         // 检查是否双方都就绪
         if (session.caller_media_ready && session.callee_media_ready) {
             session.state = CallSession::MEDIA_READY;
-            // 双方就绪后可选择保留会话（如需支持挂断），也可删除
-            // activeCalls_.erase(key); // 可选：双方就绪后删除会话
+            // 双方就绪后保留会话，供挂断逻辑使用
             return true;
         }
         return false; // 仅单方就绪
     }
     return false; // 未找到通话会话
 }
-
 
 void CallService::deleteCallSession(const std::string& callee) {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -116,6 +114,17 @@ std::optional<CallSession> CallService::findSessionByCaller(const std::string& c
     std::lock_guard<std::mutex> lock(mutex_);
     for (const auto& [callee, session] : activeCalls_) {
         if (session.caller == caller) {
+            return session;
+        }
+    }
+    return std::nullopt;
+}
+
+// 新增：双向查找会话（根据任意一方用户名）
+std::optional<CallSession> CallService::findSessionByAnyUser(const std::string& username) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& [_, session] : activeCalls_) {
+        if (session.caller == username || session.callee == username) {
             return session;
         }
     }

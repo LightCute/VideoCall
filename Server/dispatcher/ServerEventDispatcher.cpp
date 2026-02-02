@@ -436,58 +436,26 @@ ServerEventDispatcher::handle(int fd, const event::SendTextToUser& ev)
     return actions;
 }
 
-
-// 新增：处理CallEnded事件，传递peer和reason到业务层
+// 简化：CALL_ENDED仅由服务端下发，客户端无需发送该指令，此处标记为废弃
 std::vector<ServerAction>
 ServerEventDispatcher::handle(int fd, const event::CallEnded& ev)
 {
     std::vector<ServerAction> actions;
-
-    // 1. 验证当前用户是否已登录
-    if (!sessionMgr_.exists(fd)) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "You are not logged in, cannot send call ended notification"
-        });
-        return actions;
-    }
-
-    // 2. 获取当前用户用户名（挂断方）
-    auto snapshot = sessionMgr_.snapshot();
-    std::string current_user = snapshot.at(fd).user.username;
-
-    // 3. 查找对端（ev.peer）的FD（验证对端是否在线）
-    int peer_fd = sessionMgr_.getFdByUsername(ev.peer);
-    if (peer_fd == -1) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "Peer user " + ev.peer + " is offline"
-        });
-        return actions;
-    }
-
-    // 4. 生成SendCallEnded动作，将peer（挂断方）和reason（挂断原因）传递到业务层
-    actions.emplace_back(SendCallEnded{
-        .fd = peer_fd,          // 目标fd：对端客户端
-        .peer = current_user,    // 挂断方用户名
-        .reason = ev.reason      // 挂断原因（从事件中传递而来）
+    actions.emplace_back(SendError{
+        .fd = fd,
+        .reason = "Client cannot send CALL_ENDED, please use CALL_HANGUP instead"
     });
-
-    // 5. （可选）清理对应的通话会话（优化：避免残留无效会话）
-    callService_.deleteCallSession(ev.peer);
-
-    std::cout << "[Dispatcher] Call ended notification: " << current_user 
-              << " -> " << ev.peer << " reason: " << ev.reason << std::endl;
+    std::cout << "[Dispatcher] Rejected client CALL_ENDED request from fd=" << fd << std::endl;
     return actions;
 }
 
-
+// 处理CallHangup事件（核心重构：收回通话结束裁决权）
 std::vector<ServerAction>
 ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
 {
     std::vector<ServerAction> actions;
 
-    // 1. 验证当前用户是否已登录（防御式编程，避免未登录用户发送挂断请求）
+    // 1. 验证当前用户是否已登录（防御式编程）
     if (!sessionMgr_.exists(fd)) {
         actions.emplace_back(SendError{
             .fd = fd,
@@ -498,31 +466,36 @@ ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
 
     // 2. 获取当前用户（主动挂断方）的用户名
     auto snapshot = sessionMgr_.snapshot();
-    std::string current_user = snapshot.at(fd).user.username;
+    auto fd_it = snapshot.find(fd);
+    if (fd_it == snapshot.end()) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "User session not found"
+        });
+        return actions;
+    }
+    std::string current_user = fd_it->second.user.username;
 
-    // 3. 查找当前用户的活跃通话会话（双向查找：呼叫方/被呼叫方）
-    // 先按呼叫方查找，再按媒体协商会话查找（兼容现有CallService逻辑）
-    std::optional<CallSession> call_session = callService_.findSessionByCaller(current_user);
+    // 3. 双向查找当前用户的活跃通话会话（使用新增的findSessionByAnyUser）
+    std::optional<CallSession> call_session = callService_.findSessionByAnyUser(current_user);
     if (!call_session) {
-        call_session = callService_.onMediaNegotiate(current_user);
-        if (!call_session) {
-            actions.emplace_back(SendError{
-                .fd = fd,
-                .reason = "No active call to hang up"
-            });
-            return actions;
-        }
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No active call to hang up"
+        });
+        return actions;
     }
 
-    // 4. 确定对端用户名（区分呼叫方/被呼叫方）
+    // 4. 确定对端用户名
     std::string peer_user = (call_session->caller == current_user) 
         ? call_session->callee 
         : call_session->caller;
 
-    // 5. 查找对端用户的FD（验证对端是否在线）
+    // 5. 查找对端用户的FD
     int peer_fd = sessionMgr_.getFdByUsername(peer_user);
+
+    // 6. 步骤1：给对端发送CALL_ENDED（通知对方通话结束）
     if (peer_fd != -1) {
-        // 生成SendCallEnded动作，通知对端客户端（原因：主动挂断）
         actions.emplace_back(SendCallEnded{
             .fd = peer_fd,
             .peer = current_user,
@@ -530,8 +503,15 @@ ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
         });
     }
 
-    // 6. 清理活跃通话会话（避免残留无效会话，保证CallService数据一致性）
-    callService_.deleteCallSession(call_session->callee);
+    // 7. 步骤2：给自身发送CALL_ENDED（关键：让客户端FSM靠服务端通知结束，而非本地按钮）
+    actions.emplace_back(SendCallEnded{
+        .fd = fd,
+        .peer = peer_user,
+        .reason = "You hung up the call"
+    });
+
+    // 8. 步骤3：最后清理活跃通话会话（顺序不可乱，先通知再删除）
+    callService_.deleteCallSessionByAnyUser(current_user);
 
     std::cout << "[Dispatcher] Call hung up by user: " << current_user 
               << ", peer: " << peer_user << std::endl;
