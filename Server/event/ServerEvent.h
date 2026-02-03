@@ -19,7 +19,8 @@ using ServerEvent = std::variant<
     event::MediaOffer,
     event::MediaAnswer,
     event::CallHangup,
-    event::CallEnded  
+    event::CallEnded ,
+    event::UserDisconnected
         // event::Chat,
     // 以后只需要往这里加
 >;

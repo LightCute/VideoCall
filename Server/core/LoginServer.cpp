@@ -50,9 +50,11 @@ void LoginServer::startHeartbeatMonitor() {
                     sessionMgr_.logout(fd);
                     close(fd);
 
-                    // 新增：处理该用户的活跃通话（等价于Hangup）
-                    handleUserDisconnectedAsHangup(username);
-
+                    if (!username.empty()) {
+                        // 仅上报“用户断开”事实，不做任何业务判断
+                        dispatcher_.dispatch(fd, event::UserDisconnected{username});
+                    }
+                    
                     // 广播新的在线用户列表
                     auto onlineSnapshot = sessionMgr_.snapshot();
                     proto::OnlineUsers users;
@@ -110,7 +112,7 @@ void LoginServer::clientThread(int clientfd) {
 
     // 新增：处理该用户的活跃通话（等价于Hangup）
     if (!username.empty()) {
-        handleUserDisconnectedAsHangup(username);
+        dispatcher_.dispatch(clientfd, event::UserDisconnected{username});
     }
 
     auto onlineSnapshot = sessionMgr_.snapshot();
@@ -332,30 +334,3 @@ void LoginServer::handle(const ForwardText& a)
               << " content=" << a.content << std::endl;
 }
 
-
-// 新增：处理用户断开（心跳超时/TCP断开）等价于主动Hangup
-void LoginServer::handleUserDisconnectedAsHangup(const std::string& username) {
-    // 1. 查找该用户的活跃通话会话
-    std::optional<CallSession> call_session = callService_.findSessionByAnyUser(username);
-    if (!call_session) {
-        return; // 无活跃通话，直接返回
-    }
-
-    // 2. 确定对端用户名
-    std::string peer_user = (call_session->caller == username) 
-        ? call_session->callee 
-        : call_session->caller;
-
-    // 3. 查找对端FD并发送CALL_ENDED
-    int peer_fd = sessionMgr_.getFdByUsername(peer_user);
-    if (peer_fd != -1) {
-        auto payload = proto::makeCallEnded(username, "Peer disconnected unexpectedly");
-        listener_.sendPacket(peer_fd, payload);
-        std::cout << "[Server] Send call ended to fd=" << peer_fd 
-                  << " peer=" << username 
-                  << " reason=Peer disconnected unexpectedly" << std::endl;
-    }
-
-    // 4. 清理通话会话
-    callService_.deleteCallSessionByAnyUser(username);
-}

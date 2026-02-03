@@ -51,7 +51,6 @@ private:
     void handle(const SendMediaAnswer& a);   
     void handle(const SendCallEnded& a);
 
-    void handleUserDisconnectedAsHangup(const std::string& username);
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;

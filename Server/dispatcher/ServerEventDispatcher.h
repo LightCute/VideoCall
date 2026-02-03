@@ -30,7 +30,8 @@ private:
     std::vector<ServerAction> handle(int fd, const event::MediaAnswer& ev);  
     std::vector<ServerAction> handle(int fd, const event::CallEnded& ev);
     std::vector<ServerAction> handle(int fd, const event::CallHangup& ev);
-
+    std::vector<ServerAction> handle(int fd, const event::UserDisconnected& ev);
+    
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
     CallService& callService_;

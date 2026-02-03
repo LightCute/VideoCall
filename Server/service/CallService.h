@@ -52,6 +52,17 @@ public:
 
     void deleteCallSessionByAnyUser(const std::string& username);
     
+    // 查询指定用户是否处于活跃通话中（纯能力接口，仅返回结果，不做后续处理）
+    bool isInCall(const std::string& username) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (const auto& [_, session] : activeCalls_) {
+            if (session.caller == username || session.callee == username) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
     std::map<std::string, CallSession> activeCalls_;

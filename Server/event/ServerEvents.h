@@ -59,10 +59,15 @@ struct MediaAnswer {
 
 struct CallHangup {};
 
-// 新增：通话结束事件（承载peer和reason信息）
+// 通话结束事件（承载peer和reason信息）
 struct CallEnded {
     std::string peer;       // 对端用户名
     std::string reason;     // 挂断原因（如"主动挂断"、"超时"等）
+};
+
+// 用户断开事件（core 上报“用户断开”这一事实，无业务逻辑）
+struct UserDisconnected {
+    std::string username; // 断开连接的用户名（用于后续业务处理）
 };
 
 } // namespace event

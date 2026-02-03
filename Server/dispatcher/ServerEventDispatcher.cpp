@@ -517,3 +517,45 @@ ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
               << ", peer: " << peer_user << std::endl;
     return actions;
 }
+
+
+// 处理 UserDisconnected 事件，接管业务裁决
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::UserDisconnected& ev) {
+    std::vector<ServerAction> actions;
+    const std::string& username = ev.username;
+
+    // 步骤1：裁决 - 判断用户是否处于活跃通话中（调用 CallService 的纯能力接口）
+    if (!callService_.isInCall(username)) {
+        // 无活跃通话，直接返回，不执行任何后续操作
+        return actions;
+    }
+
+    // 步骤2：获取通话会话信息（调用 CallService 的纯能力接口）
+    std::optional<CallSession> call_session = callService_.findSessionByAnyUser(username);
+    if (!call_session) {
+        return actions;
+    }
+
+    // 步骤3：确定对端用户名和 FD（调用 SessionManager 的查询能力）
+    std::string peer_user = (call_session->caller == username) 
+        ? call_session->callee 
+        : call_session->caller;
+    int peer_fd = sessionMgr_.getFdByUsername(peer_user);
+
+    // 步骤4：生成 Action - 通知对端通话结束（业务执行）
+    if (peer_fd != -1) {
+        actions.emplace_back(SendCallEnded{
+            .fd = peer_fd,
+            .peer = username,
+            .reason = "Peer disconnected unexpectedly"
+        });
+    }
+
+    // 步骤5：清理通话会话（调用 CallService 的纯能力接口）
+    callService_.deleteCallSessionByAnyUser(username);
+
+    std::cout << "[Dispatcher] User disconnected and call ended: " << username 
+              << ", peer: " << peer_user << std::endl;
+    return actions;
+}
