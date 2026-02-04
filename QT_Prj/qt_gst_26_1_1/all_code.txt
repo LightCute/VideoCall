@@ -2126,7 +2126,7 @@ void Widget::onUiOutput(const core::UiOutput& out)
 }
 void Widget::handleCoreOutput(const core::UiOutput& out)
 {
-    std::visit([this](auto&& e) {
+    std::visit([this, &out](auto&& e) {
         using T = std::decay_t<decltype(e)>; // 获取移除引用/const 后的原始类型
         // 匹配 Widget 关心的所有类型
         if constexpr (std::is_same_v<T, core::UiOutStateChanged>) {
@@ -2516,7 +2516,7 @@ void LoginWidget::onUiOutput(const core::UiOutput& out) {
 
 // UI 线程处理 Core 事件（安全操作 UI）- 已添加兜底处理
 void LoginWidget::handleCoreOutput(const core::UiOutput& out) {
-    std::visit([this](auto&& e) {
+    std::visit([this, &out](auto&& e) {
         using T = std::decay_t<decltype(e)>; // 获取移除引用/const 后的原始类型
         // 匹配 LoginWidget 关心的所有类型
         if constexpr (std::is_same_v<T, core::UiOutStateChanged>) {
