@@ -1,5 +1,6 @@
 #include "ClientCore.h"
 #include <algorithm>
+#include <iostream>
 
 // 构造函数：初始化 Executor，设置回调
 ClientCore::ClientCore() : fsm_() {
@@ -25,7 +26,8 @@ void ClientCore::stop() {
     is_running_ = false;
     cv_.notify_one(); // 唤醒等待的线程，使其退出循环
 }
-// 原 postInput/pollOutput 逻辑不变（补充 core:: 前缀）
+
+// 线程安全：推入输入事件
 void ClientCore::postInput(core::CoreInput ev) {
     {
         std::lock_guard<std::mutex> lock(mtx_);
@@ -49,211 +51,198 @@ void ClientCore::removeListener(core::ICoreListener* listener) {
         );
 }
 
-// 新增：广播输出事件给所有监听者（Core 线程调用）
-void ClientCore::broadcastOutput(const core::CoreOutput& out) {
-    std::lock_guard<std::mutex> lock(listener_mtx_);
-    for (auto* listener : listeners_) {
-        listener->onCoreOutput(out); // 调用监听者的回调（Core 线程）
-    }
-}
-
-
-// bool ClientCore::pollOutput(core::CoreOutput& out) { // 补充 core:: 前缀
-//     std::lock_guard<std::mutex> lock(mtx_);
-//     if (outputQueue_.empty()) return false;
-//     out = std::move(outputQueue_.front());
-//     outputQueue_.pop();
-//     return true;
-// }
-
-// 原 processEvents 逻辑不变（补充 core:: 前缀）
+// 事件处理主循环（保留原有线程模型，适配新输出逻辑）
 void ClientCore::processEvents() {
     while (is_running_) {
         core::CoreInput ev;
         {
             std::unique_lock<std::mutex> lock(mtx_);
-            cv_.wait(lock, [this]{ return !inputQueue_.empty(); });
+            cv_.wait(lock, [this]{ return !inputQueue_.empty() || !is_running_; });
+            if (!is_running_ && inputQueue_.empty()) break; // 退出条件：停止且队列空
             ev = std::move(inputQueue_.front());
             inputQueue_.pop();
             std::cout << "[ClientCore] Processing Input event, remaining queue size: " << inputQueue_.size()
-                      << ", Event type : " <<  core::CoreInputIndexToName(ev.index())  << std::endl;
+                      << ", Event type : " << core::CoreInputIndexToName(ev.index())  << std::endl;
         }
 
+        // 调用 FSM 处理输入，获取新语义规范的 CoreOutput 列表
         auto outputs = fsm_.handle(state_, ev);
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
-                handleOutput(std::move(o));
+                handleOutput(std::move(o)); // 处理每个输出事件
             }
         }
     }
 }
 
-// 原 handleOutput/applyStateChange 逻辑不变（补充 core:: 前缀）
-void ClientCore::handleOutput(core::CoreOutput&& o) { // 补充 core:: 前缀
-    std::visit([this](auto&& e){
-        using T = std::decay_t<decltype(e)>;
+// 核心：总输出处理入口，实现三路分流
+void ClientCore::handleOutput(core::CoreOutput&& o) {
+    std::visit([this](auto&& out){
+        using T = std::decay_t<decltype(out)>;
 
-        if constexpr (std::is_same_v<T, core::OutStateChanged>) { // 补充 core:: 前缀
-            applyStateChange(e);
-            broadcastOutput(e); // Broadcast state change
+        // 分流1：处理 Executor 输出（IO 命令）
+        if constexpr (std::is_same_v<T, core::ExecOutput>) {
+            handleExecOutput(std::move(out));
         }
-        else if constexpr (std::is_same_v<T, core::OutConnect>) { // 补充 core:: 前缀
-            execute(e);
+        // 分流2：广播 UI 输出（状态通知）
+        else if constexpr (std::is_same_v<T, core::UiOutput>) {
+            // 先处理状态变更，更新内部 state_
+            std::visit([this](auto&& ui_out){
+                using UiT = std::decay_t<decltype(ui_out)>;
+                if constexpr (std::is_same_v<UiT, core::UiOutStateChanged>) {
+                    std::cout << "[Core] State: "
+                              << stateToString(ui_out.from)
+                              << " -> "
+                              << stateToString(ui_out.to)
+                              << std::endl;
+                    state_ = ui_out.to; // 更新内部状态
+                }
+            }, out);
+            // 广播 UI 事件给所有监听者
+            broadcastUiOutput(out);
         }
-        else if constexpr (std::is_same_v<T, core::OutSendLogin>) { // 补充 core:: 前缀
-            execute(e);
-        }
-        else if constexpr (std::is_same_v<T, core::OutSendPing>) {
-            execute(e);
-        }
-        else if constexpr (std::is_same_v<T, core::OutUpdateAlive>) {
-            execute(e);
-            broadcastOutput(e);
-        }
-        else if constexpr (std::is_same_v<T, core::OutSelectLan>) {
-            execute(e);
-        }
-        else if constexpr (std::is_same_v<T, core::OutSelectVpn>) {
-            execute(e);
-        }
-        else if constexpr (std::is_same_v<T, core::OutLoginOk>) {
-            execute(e);
-            broadcastOutput(e);
-        }
-        // 新增：处理发送文本消息
-        else if constexpr (std::is_same_v<T, core::OutSendText>) {
-            execute(e);
-        }
-        // 新增：广播转发文本消息给UI
-        else if constexpr (std::is_same_v<T, core::OutForwardText>) {
-            broadcastOutput(e);
-        }
-        else if constexpr (std::is_same_v<T, core::OutSendCall>)
-            execute(e);
-        else if constexpr (std::is_same_v<T, core::OutSendAcceptCall>)
-            execute(e);
-        else if constexpr (std::is_same_v<T, core::OutSendRejectCall>)
-            execute(e);
-        else if constexpr (std::is_same_v<T, core::OutSendMediaOffer>)
-            execute(e);
-        else if constexpr (std::is_same_v<T, core::OutSendMediaAnswer>)
-            execute(e);
-        else if constexpr (std::is_same_v<T, core::OutShowIncomingCall>)
-            execute(e);
-        else if constexpr (std::is_same_v<T, core::OutMediaReady>)
-            execute(e);
-        else if constexpr (std::is_same_v<T, core::OutSendHangup>)
-            execute(e);
-
-
-        else {
-            // outputQueue_.push(std::move(e));
-            broadcastOutput(e); // 广播其他事件
+        // 分流3：处理 Core 内部辅助事件（无对外交互）
+        else if constexpr (std::is_same_v<T, core::InternalOutUpdateAlive>) {
+            std::cout << "[Executor] Received PONG from server" << std::endl;
         }
     }, std::move(o));
 }
 
-void ClientCore::applyStateChange(const core::OutStateChanged& e) { // 补充 core:: 前缀
-    std::cout << "[Core] State: "
-              << stateToString(e.from)
-              << " -> "
-              << stateToString(e.to)
-              << std::endl;
+// 分流函数1：处理 Executor 输出，分发到对应 execute 方法
+void ClientCore::handleExecOutput(core::ExecOutput&& out) {
+    std::visit([this](auto&& e){
+        using T = std::decay_t<decltype(e)>;
 
-    state_ = e.to;
-    //outputQueue_.push(e);
+        // 按 ExecOutXXX 类型分发（覆盖所有 CoreOutput.h 定义的类型）
+        if constexpr (std::is_same_v<T, core::ExecOutConnect>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendLogin>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendPing>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSelectLan>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSelectVpn>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutLoginOk>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendText>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendCall>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendAcceptCall>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendRejectCall>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendMediaOffer>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendMediaAnswer>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutMediaReady>) {
+            execute(std::move(e));
+        }
+        else if constexpr (std::is_same_v<T, core::ExecOutSendHangup>) {
+            execute(std::move(e));
+        }
+    }, std::move(out));
 }
 
-void ClientCore::execute(const core::OutSendHangup&) {
-    executor_->sendHangup();
+// 分流函数2：广播 UI 输出，仅发送 UiOutput 给监听者（线程安全）
+void ClientCore::broadcastUiOutput(const core::UiOutput& out) {
+    std::lock_guard<std::mutex> lock(listener_mtx_);
+    for (auto* l : listeners_) {
+        if (l) { // 防止空指针
+            l->onUiOutput(out); // 调用监听者的 UI 回调
+        }
+    }
 }
 
-// 关键修改：execute 仅调用 Executor 接口，无 IO 逻辑（补充 core:: 前缀）
-void ClientCore::execute(const core::OutConnect& e) { // 补充 core:: 前缀
-    // 调度 Executor 执行连接（Core 仅发命令，不做具体操作）
+// ========== 新的 execute 重载函数（适配 ExecOutXXX 类型） ==========
+void ClientCore::execute(const core::ExecOutConnect& e) {
     executor_->connectToServer(e.host, e.port);
 }
 
-void ClientCore::execute(const core::OutSendLogin& e) { // 补充 core:: 前缀
-    // 调度 Executor 发送登录请求
+void ClientCore::execute(const core::ExecOutSendLogin& e) {
     executor_->sendLoginRequest(e.user, e.pass);
 }
 
-void ClientCore::execute(const core::OutSendPing&) {
+void ClientCore::execute(const core::ExecOutSendPing& e) {
+    (void)e; // 消除未使用参数警告
     executor_->sendPing();
 }
 
-void ClientCore::execute(const core::OutUpdateAlive&) {
-    std::cout << "[Executor] Received PONG from server" << std::endl;
-}
-
-void ClientCore::execute(const core::OutSelectLan&) {
+void ClientCore::execute(const core::ExecOutSelectLan& e) {
+    (void)e; // 消除未使用参数警告
     std::cout << "[Executor] Select LAN" << std::endl;
     executor_->setLanMode();
 }
 
-void ClientCore::execute(const core::OutSelectVpn&) {
+void ClientCore::execute(const core::ExecOutSelectVpn& e) {
+    (void)e; // 消除未使用参数警告
     std::cout << "[Executor] Select VPN" << std::endl;
     executor_->setVpnMode();
 }
 
-void ClientCore::execute(const core::OutLoginOk&) {
-    std::cout << "[Executor] OutLoginOk" << std::endl;
+void ClientCore::execute(const core::ExecOutLoginOk& e) {
+    (void)e; // 消除未使用参数警告
+    std::cout << "[Executor] ExecOutLoginOk: Send local IP to server" << std::endl;
     executor_->sendLocalIP();
 }
 
-void ClientCore::execute(const core::OutSendText& e) {
+void ClientCore::execute(const core::ExecOutSendText& e) {
     executor_->sendTextMsg(e.target_user, e.content);
 }
 
-void ClientCore::execute(const core::OutForwardText&) {
-    std::cout << "[Executor] OutForwardText" << std::endl;
-}
-
-// 发送呼叫请求
-void ClientCore::execute(const core::OutSendCall& e) {
+void ClientCore::execute(const core::ExecOutSendCall& e) {
     isCaller_ = true;
     executor_->sendCallRequest(e.target_user);
 }
 
-// 发送接听请求
-void ClientCore::execute(const core::OutSendAcceptCall& e) {
+void ClientCore::execute(const core::ExecOutSendAcceptCall& e) {
+    (void)e; // 消除未使用参数警告
     executor_->sendAcceptCall();
 }
 
-// 发送拒绝请求
-void ClientCore::execute(const core::OutSendRejectCall& e) {
+void ClientCore::execute(const core::ExecOutSendRejectCall& e) {
+    (void)e; // 消除未使用参数警告
     executor_->sendRejectCall();
 }
 
-// 发送媒体Offer
-void ClientCore::execute(const core::OutSendMediaOffer& e) {
+void ClientCore::execute(const core::ExecOutSendMediaOffer& e) {
     executor_->sendMediaOffer(e.peer);
 }
 
-// 发送媒体Answer
-void ClientCore::execute(const core::OutSendMediaAnswer& e) {
+void ClientCore::execute(const core::ExecOutSendMediaAnswer& e) {
     executor_->sendMediaAnswer(e.peer);
 }
 
-// 通知UI弹出来电
-void ClientCore::execute(const core::OutShowIncomingCall& e) {
-    broadcastOutput(e); // 广播给UI监听者
+void ClientCore::execute(const core::ExecOutSendHangup& e) {
+    (void)e; // 消除未使用参数警告
+    executor_->sendHangup();
 }
 
-// 媒体信息就绪，启动UDP
-void ClientCore::execute(const core::OutMediaReady& e) {
-    // 核心：用CoreExecutor的mode_选择最终IP
+// 重点：封装 ExecOutMediaReady 到 UiOutMediaReadyFinal 的转换逻辑（内部隐藏）
+void ClientCore::execute(const core::ExecOutMediaReady& e) {
+    // 1. 调用 Executor 选择最终 IP（仅 Core 内部与 Executor 交互）
     peerIp_ = executor_->selectPeerIp(e.lanIp, e.vpnIp);
     peerPort_ = e.peerPort;
 
     std::cout << "[ClientCore] MediaReady -> use IP: " << peerIp_ << ":" << peerPort_ << std::endl;
 
-    // 广播最终IP（而非候选IP）给媒体层
-    broadcastOutput(core::OutMediaReadyFinal{peerIp_, peerPort_});
+    // 2. 构建 UI 输出，广播给媒体层（不暴露原始 lanIp/vpnIp）
+    core::UiOutMediaReadyFinal uiMediaReadyFinal{peerIp_, peerPort_};
+    broadcastUiOutput(core::UiOutput{uiMediaReadyFinal});
 }
-
-// 废弃原 socket 操作接口（可直接删除）
-// bool ClientCore::connectToServer(const std::string& host, int port) { ... }
-// void ClientCore::sendLogin(const std::string& user, const std::string& pass) { ... }

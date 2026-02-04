@@ -1,6 +1,8 @@
 // core/FSM.cpp
 #include "FSM.h"
+#include "CoreOutput.h"
 #include <set>
+#include <iostream>
 
 FSM::FSM() {
     initTable();
@@ -10,7 +12,7 @@ bool FSM::isOnlineState(State s) {
     return s != State::Disconnected;
 }
 
-// 补充 core:: 前缀
+// 补充 core:: 前缀，返回符合新语义规范的 CoreOutput 列表
 std::vector<core::CoreOutput>
 FSM::handle(State current, const core::CoreInput& ev)
 {
@@ -18,14 +20,16 @@ FSM::handle(State current, const core::CoreInput& ev)
     std::cout << "[FSM] Current state: " << stateToString(current)
               << ", Received event type: " << EventTypeToString(evType) << std::endl;
     if (isOnlineState(current) && evType == EventType::HeartbeatTick) {
-        // 直接返回，不走 FSM 表
+        // 直接返回，不走 FSM 表：OutSendPing 对应 ExecOutSendPing，包裹进 ExecOutput
         std::cout << "[FSM] Online state, directly handle HeartbeatTick event" << std::endl;
-        return { core::OutSendPing{} };
+        core::ExecOutSendPing execSendPing;
+        return { core::ExecOutput{execSendPing} };
     }
 
     else if (isOnlineState(current) && evType == EventType::HeartbeatOk) {
-        // 直接返回，不走 FSM 表
-        return { core::OutUpdateAlive{} };
+        // 直接返回，不走 FSM 表：OutUpdateAlive 对应 InternalOutUpdateAlive，直接作为 CoreOutput
+        core::InternalOutUpdateAlive internalUpdateAlive;
+        return { internalUpdateAlive };
     }
 
     if (isOnlineState(current)) {
@@ -38,10 +42,14 @@ FSM::handle(State current, const core::CoreInput& ev)
         if (disconnectEvents.count(evType) > 0) {
             std::cout << "[FSM] Online state, directly handle disconnect event: " << EventTypeToString(evType) << std::endl;
             // 统一返回掉线输出，所有在线状态掉线都切换到Disconnected
-            return {
-                core::OutStateChanged{current, State::Disconnected},
-                core::OutDisconnected{}
-            };
+            // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+            // 2. 掉线通知：UiOutDisconnected 包裹进 UiOutput
+            std::vector<core::CoreOutput> out;
+            core::UiOutStateChanged uiStateChange{current, State::Disconnected};
+            core::UiOutDisconnected uiDisconnected;
+            out.push_back(core::UiOutput{uiStateChange});
+            out.push_back(core::UiOutput{uiDisconnected});
+            return out;
         }
     }
 
@@ -118,92 +126,117 @@ EventType FSM::eventTypeFromInput(const core::CoreInput& ev) {
 
 void FSM::initTable() {
     table_ = {
-          // ===== 断开态 =====
-          { State::Disconnected, EventType::CmdConnect,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                  std::vector<core::CoreOutput> out;
-                  // 替换为 InCmdConnect
-                  if (auto e = std::get_if<core::InCmdConnect>(&ev)) {
-                      out.push_back(core::OutStateChanged{cur, State::Connecting}); // 补充 core::
-                      out.push_back(core::OutConnect{e->host, e->port}); // 补充 core::
-                  }
-                  return out;
-              },
-              State::Connecting
-          },
+        // ===== 断开态 =====
+        { State::Disconnected, EventType::CmdConnect,
+            // 补充 core:: 前缀，按新语义规范构建输出
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                // 替换为 InCmdConnect，构建 UiOutput 和 ExecOutput
+                if (auto e = std::get_if<core::InCmdConnect>(&ev)) {
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::Connecting};
+                    out.push_back(core::UiOutput{uiStateChange});
 
-          // ===== 正在连接 =====
-          { State::Connecting, EventType::TcpConnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                  std::vector<core::CoreOutput> out;
-                  // 替换为 InTcpConnected
-                  if (auto e = std::get_if<core::InTcpConnected>(&ev)) {
-                      out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
-                  }
-                  return out;
-              },
-              State::Connected
-          },
+                    // 2. 连接命令：ExecOutConnect 包裹进 ExecOutput
+                    core::ExecOutConnect execConnect{e->host, e->port};
+                    out.push_back(core::ExecOutput{execConnect});
+                }
+                return out;
+            },
+            State::Connecting
+        },
 
-          { State::Connecting, EventType::TcpDisconnected,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput&){ return std::vector<core::CoreOutput>{}; },
-              State::Disconnected
-          },
+        // ===== 正在连接 =====
+        { State::Connecting, EventType::TcpConnected,
+            // 补充 core:: 前缀，按新语义规范构建输出
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                // 替换为 InTcpConnected，构建 UiOutput（状态变更）
+                if (auto e = std::get_if<core::InTcpConnected>(&ev)) {
+                    core::UiOutStateChanged uiStateChange{cur, State::Connected};
+                    out.push_back(core::UiOutput{uiStateChange});
+                }
+                return out;
+            },
+            State::Connected
+        },
 
-          // ===== 已连接 =====
-          { State::Connected, EventType::CmdLogin,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                  std::vector<core::CoreOutput> out;
-                  // 替换为 InCmdLogin
-                  if (auto e = std::get_if<core::InCmdLogin>(&ev)) {
-                      out.push_back(core::OutStateChanged{cur, State::LoggingIn}); // 补充 core::
-                      out.push_back(core::OutSendLogin{e->user, e->pass}); // 补充 core::
-                  }
-                  return out;
-              },
-              State::LoggingIn
-          },
+        { State::Connecting, EventType::TcpDisconnected,
+            // 补充 core:: 前缀，无输出（空列表）
+            [](State cur, const core::CoreInput&){ return std::vector<core::CoreOutput>{}; },
+            State::Disconnected
+        },
 
-          // ===== 正在登录 =====
-          { State::LoggingIn, EventType::LoginOk ,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                  std::vector<core::CoreOutput> out;
-                  // 替换为 InLoginOk
-                  if (auto e = std::get_if<core::InLoginOk>(&ev)) {
-                      out.push_back(core::OutLoginOk{}); // 补充 core::
-                      out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 补充 core::
-                  }
-                  return out;
-              },
-              State::LoggedIn
-          },
+        // ===== 已连接 =====
+        { State::Connected, EventType::CmdLogin,
+            // 补充 core:: 前缀，按新语义规范构建输出
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                // 替换为 InCmdLogin，构建 UiOutput 和 ExecOutput
+                if (auto e = std::get_if<core::InCmdLogin>(&ev)) {
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::LoggingIn};
+                    out.push_back(core::UiOutput{uiStateChange});
 
-          { State::LoggingIn, EventType::LoginFail ,
-              // 补充 core:: 前缀
-              [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
-                  std::vector<core::CoreOutput> out;
-                  // 替换为 InLoginFail
-                  if (auto e = std::get_if<core::InLoginFail>(&ev)) {
-                      out.push_back(core::OutLoginFail{e->msg}); // 补充 core::
-                      out.push_back(core::OutStateChanged{cur, State::Connected}); // 补充 core::
-                  }
-                  return out;
-              },
-              State::Connected
-          },
+                    // 2. 发送登录命令：ExecOutSendLogin 包裹进 ExecOutput
+                    core::ExecOutSendLogin execSendLogin{e->user, e->pass};
+                    out.push_back(core::ExecOutput{execSendLogin});
+                }
+                return out;
+            },
+            State::LoggingIn
+        },
 
+        // ===== 正在登录 =====
+        { State::LoggingIn, EventType::LoginOk ,
+            // 补充 core:: 前缀，按新语义规范构建输出
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                // 替换为 InLoginOk，构建 ExecOutput 和两个 UiOutput
+                if (auto e = std::get_if<core::InLoginOk>(&ev)) {
+                    // 1. 通知 Executor 发送本地 IP：ExecOutLoginOk 包裹进 ExecOutput
+                    core::ExecOutLoginOk execLoginOk;
+                    out.push_back(core::ExecOutput{execLoginOk});
+
+                    // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                    out.push_back(core::UiOutput{uiStateChange});
+
+                    // 3. 通知 UI 登录成功：UiOutLoginOk 包裹进 UiOutput
+                    core::UiOutLoginOk uiLoginOk;
+                    out.push_back(core::UiOutput{uiLoginOk});
+                }
+                return out;
+            },
+            State::LoggedIn
+        },
+
+        { State::LoggingIn, EventType::LoginFail ,
+            // 补充 core:: 前缀，按新语义规范构建输出
+            [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
+                std::vector<core::CoreOutput> out;
+                // 替换为 InLoginFail，构建 UiOutput（登录失败+状态变更）
+                if (auto e = std::get_if<core::InLoginFail>(&ev)) {
+                    // 1. 通知 UI 登录失败：UiOutLoginFail 包裹进 UiOutput
+                    core::UiOutLoginFail uiLoginFail{e->msg};
+                    out.push_back(core::UiOutput{uiLoginFail});
+
+                    // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::Connected};
+                    out.push_back(core::UiOutput{uiStateChange});
+                }
+                return out;
+            },
+            State::Connected
+        },
 
         { State::LoggedIn, EventType::OnlineUsers,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-
                 if (auto e = std::get_if<core::InOnlineUsers>(&ev)) {
-                    out.push_back(core::OutOnlineUsers{e->users});
+                    // 通知 UI 更新在线用户列表：UiOutOnlineUsers 包裹进 UiOutput
+                    core::UiOutOnlineUsers uiOnlineUsers{e->users};
+                    out.push_back(core::UiOutput{uiOnlineUsers});
                 }
                 return out;
             },
@@ -213,9 +246,10 @@ void FSM::initTable() {
         { State::LoggedIn, EventType::SelectLan,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-
                 if (auto e = std::get_if<core::InSelectLan>(&ev)) {
-                    out.push_back(core::OutSelectLan{});
+                    // 通知 Executor 选择 LAN：ExecOutSelectLan 包裹进 ExecOutput
+                    core::ExecOutSelectLan execSelectLan;
+                    out.push_back(core::ExecOutput{execSelectLan});
                 }
                 return out;
             },
@@ -225,9 +259,10 @@ void FSM::initTable() {
         { State::LoggedIn, EventType::SelectVpn,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-
                 if (auto e = std::get_if<core::InSelectVpn>(&ev)) {
-                    out.push_back(core::OutSelectVpn{});
+                    // 通知 Executor 选择 VPN：ExecOutSelectVpn 包裹进 ExecOutput
+                    core::ExecOutSelectVpn execSelectVpn;
+                    out.push_back(core::ExecOutput{execSelectVpn});
                 }
                 return out;
             },
@@ -238,7 +273,9 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InCmdSendText>(&ev)) {
-                    out.push_back(core::OutSendText{e->target_user, e->content});
+                    // 通知 Executor 发送文本：ExecOutSendText 包裹进 ExecOutput
+                    core::ExecOutSendText execSendText{e->target_user, e->content};
+                    out.push_back(core::ExecOutput{execSendText});
                 }
                 return out;
             },
@@ -249,7 +286,9 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InForwardText>(&ev)) {
-                    out.push_back(core::OutForwardText{e->from_user, e->content});
+                    // 通知 UI 显示转发文本：UiOutForwardText 包裹进 UiOutput
+                    core::UiOutForwardText uiForwardText{e->from_user, e->content};
+                    out.push_back(core::UiOutput{uiForwardText});
                 }
                 return out;
             },
@@ -261,8 +300,13 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InCmdCall>(&ev)) {
-                    out.push_back(core::OutStateChanged{cur, State::CALLING});
-                    out.push_back(core::OutSendCall{e->target_user});
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::CALLING};
+                    out.push_back(core::UiOutput{uiStateChange});
+
+                    // 2. 通知 Executor 发送呼叫：ExecOutSendCall 包裹进 ExecOutput
+                    core::ExecOutSendCall execSendCall{e->target_user};
+                    out.push_back(core::ExecOutput{execSendCall});
                 }
                 return out;
             },
@@ -274,8 +318,13 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InCallIncoming>(&ev)) {
-                    out.push_back(core::OutStateChanged{cur, State::RINGING});
-                    out.push_back(core::OutShowIncomingCall{e->from});
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::RINGING};
+                    out.push_back(core::UiOutput{uiStateChange});
+
+                    // 2. 通知 UI 显示来电：UiOutShowIncomingCall 包裹进 UiOutput
+                    core::UiOutShowIncomingCall uiShowIncomingCall{e->from};
+                    out.push_back(core::UiOutput{uiShowIncomingCall});
                 }
                 return out;
             },
@@ -286,11 +335,12 @@ void FSM::initTable() {
         { State::RINGING, EventType::CmdAcceptCall,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-             if (auto e = std::get_if<core::InCmdAcceptCall>(&ev))
-             {
-                 out.push_back(core::OutSendAcceptCall{});
-                 //out.push_back(core::OutSendMediaOffer{e->peer});
-             }
+                if (auto e = std::get_if<core::InCmdAcceptCall>(&ev))
+                {
+                    // 通知 Executor 发送接听命令：ExecOutSendAcceptCall 包裹进 ExecOutput
+                    core::ExecOutSendAcceptCall execSendAcceptCall;
+                    out.push_back(core::ExecOutput{execSendAcceptCall});
+                }
                 return out;
             },
             State::RINGING
@@ -300,10 +350,15 @@ void FSM::initTable() {
         { State::RINGING, EventType::CmdRejectCall,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-             if (auto e = std::get_if<core::InCmdRejectCall>(&ev))
+                if (auto e = std::get_if<core::InCmdRejectCall>(&ev))
                 {
-                    out.push_back(core::OutSendRejectCall{});
-                    out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                    // 1. 通知 Executor 发送拒绝命令：ExecOutSendRejectCall 包裹进 ExecOutput
+                    core::ExecOutSendRejectCall execSendRejectCall;
+                    out.push_back(core::ExecOutput{execSendRejectCall});
+
+                    // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                    out.push_back(core::UiOutput{uiStateChange});
                 }
                 return out;
             },
@@ -315,8 +370,13 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
-                    out.push_back(core::OutStateChanged{cur, State::IN_CALL});
-                    out.push_back(core::OutSendMediaOffer{e->peer});
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::IN_CALL};
+                    out.push_back(core::UiOutput{uiStateChange});
+
+                    // 2. 通知 Executor 发送媒体 Offer：ExecOutSendMediaOffer 包裹进 ExecOutput
+                    core::ExecOutSendMediaOffer execSendMediaOffer{e->peer};
+                    out.push_back(core::ExecOutput{execSendMediaOffer});
                 }
                 return out;
             },
@@ -327,12 +387,17 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
-                    //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
-                    std::string peerIp = e->lanIp;
-                    out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
-                    out.push_back(core::OutMediaReady{e->lanIp, e->vpnIp, e->udpPort});
-                    // CALLING 状态下收到 MediaPeer，说明是被动方收到 OFFER_RESP，需要发送 ANSWER
-                    out.push_back(core::OutSendMediaAnswer{e->peer});
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::MEDIA_READY};
+                    out.push_back(core::UiOutput{uiStateChange});
+
+                    // 2. 通知 Executor 媒体就绪（选择 IP）：ExecOutMediaReady 包裹进 ExecOutput
+                    core::ExecOutMediaReady execMediaReady{e->lanIp, e->vpnIp, e->udpPort};
+                    out.push_back(core::ExecOutput{execMediaReady});
+
+                    // 3. 通知 Executor 发送媒体 Answer：ExecOutSendMediaAnswer 包裹进 ExecOutput
+                    core::ExecOutSendMediaAnswer execSendMediaAnswer{e->peer};
+                    out.push_back(core::ExecOutput{execSendMediaAnswer});
                 }
                 return out;
             },
@@ -343,8 +408,13 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InCallAccepted>(&ev)) {
-                    out.push_back(core::OutStateChanged{cur, State::IN_CALL});
-                     out.push_back(core::OutSendMediaOffer{e->peer});
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::IN_CALL};
+                    out.push_back(core::UiOutput{uiStateChange});
+
+                    // 2. 通知 Executor 发送媒体 Offer：ExecOutSendMediaOffer 包裹进 ExecOutput
+                    core::ExecOutSendMediaOffer execSendMediaOffer{e->peer};
+                    out.push_back(core::ExecOutput{execSendMediaOffer});
                 }
                 return out;
             },
@@ -355,7 +425,9 @@ void FSM::initTable() {
         { State::CALLING, EventType::CallRejected,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
+                // 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
                 return out;
             },
             State::LoggedIn
@@ -366,11 +438,13 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 if (auto e = std::get_if<core::InMediaPeer>(&ev)) {
-                    //std::string peerIp = !e->vpnIp.empty() ? e->vpnIp : e->lanIp;
-                    std::string peerIp = e->lanIp;
-                    out.push_back(core::OutStateChanged{cur, State::MEDIA_READY});
-                    out.push_back(core::OutMediaReady{e->lanIp, e->vpnIp, e->udpPort});
+                    // 1. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                    core::UiOutStateChanged uiStateChange{cur, State::MEDIA_READY};
+                    out.push_back(core::UiOutput{uiStateChange});
 
+                    // 2. 通知 Executor 媒体就绪（选择 IP）：ExecOutMediaReady 包裹进 ExecOutput
+                    core::ExecOutMediaReady execMediaReady{e->lanIp, e->vpnIp, e->udpPort};
+                    out.push_back(core::ExecOutput{execMediaReady});
                 }
                 return out;
             },
@@ -382,10 +456,14 @@ void FSM::initTable() {
         { State::CALLING, EventType::CmdHangup,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendHangup{});          // 上报服务端
-                //out.push_back(core::OutStopMedia{});           // 停止本地媒体
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn}); // 回到登录状态
-                //out.push_back(core::OutCallEnded{"", "local_hangup"}); // 通知UI
+                // 1. 通知 Executor 发送挂断命令：ExecOutSendHangup 包裹进 ExecOutput
+                core::ExecOutSendHangup execSendHangup;
+                out.push_back(core::ExecOutput{execSendHangup});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
                 return out;
             },
             State::LoggedIn
@@ -395,10 +473,14 @@ void FSM::initTable() {
         { State::RINGING, EventType::CmdHangup,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendHangup{});
-                //out.push_back(core::OutStopMedia{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                //out.push_back(core::OutCallEnded{"", "local_hangup"});
+                // 1. 通知 Executor 发送挂断命令：ExecOutSendHangup 包裹进 ExecOutput
+                core::ExecOutSendHangup execSendHangup;
+                out.push_back(core::ExecOutput{execSendHangup});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
                 return out;
             },
             State::LoggedIn
@@ -408,10 +490,14 @@ void FSM::initTable() {
         { State::IN_CALL, EventType::CmdHangup,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendHangup{});
-                //out.push_back(core::OutStopMedia{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                //out.push_back(core::OutCallEnded{"", "local_hangup"});
+                // 1. 通知 Executor 发送挂断命令：ExecOutSendHangup 包裹进 ExecOutput
+                core::ExecOutSendHangup execSendHangup;
+                out.push_back(core::ExecOutput{execSendHangup});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
                 return out;
             },
             State::LoggedIn
@@ -421,10 +507,14 @@ void FSM::initTable() {
         { State::MEDIA_READY, EventType::CmdHangup,
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
-                out.push_back(core::OutSendHangup{});
-                //out.push_back(core::OutStopMedia{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                //out.push_back(core::OutCallEnded{"", "local_hangup"});
+                // 1. 通知 Executor 发送挂断命令：ExecOutSendHangup 包裹进 ExecOutput
+                core::ExecOutSendHangup execSendHangup;
+                out.push_back(core::ExecOutput{execSendHangup});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
                 return out;
             },
             State::LoggedIn
@@ -436,9 +526,19 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
-                out.push_back(core::OutStopMedia{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                out.push_back(core::OutCallEnded{e.peer, e.reason});
+
+                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
+                core::UiOutStopMedia uiStopMedia;
+                out.push_back(core::UiOutput{uiStopMedia});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
+                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                out.push_back(core::UiOutput{uiCallEnded});
+
                 return out;
             },
             State::LoggedIn
@@ -449,9 +549,19 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
-                out.push_back(core::OutStopMedia{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                out.push_back(core::OutCallEnded{e.peer, e.reason});
+
+                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
+                core::UiOutStopMedia uiStopMedia;
+                out.push_back(core::UiOutput{uiStopMedia});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
+                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                out.push_back(core::UiOutput{uiCallEnded});
+
                 return out;
             },
             State::LoggedIn
@@ -462,9 +572,19 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
-                out.push_back(core::OutStopMedia{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                out.push_back(core::OutCallEnded{e.peer, e.reason});
+
+                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
+                core::UiOutStopMedia uiStopMedia;
+                out.push_back(core::UiOutput{uiStopMedia});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
+                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                out.push_back(core::UiOutput{uiCallEnded});
+
                 return out;
             },
             State::LoggedIn
@@ -475,9 +595,19 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
-                out.push_back(core::OutStopMedia{});
-                out.push_back(core::OutStateChanged{cur, State::LoggedIn});
-                out.push_back(core::OutCallEnded{e.peer, e.reason});
+
+                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
+                core::UiOutStopMedia uiStopMedia;
+                out.push_back(core::UiOutput{uiStopMedia});
+
+                // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
+                core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
+                out.push_back(core::UiOutput{uiStateChange});
+
+                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                out.push_back(core::UiOutput{uiCallEnded});
+
                 return out;
             },
             State::LoggedIn

@@ -23,10 +23,7 @@ LoginWidget::LoginWidget(ClientCore* core, QWidget *parent)
             this, &LoginWidget::handleCoreOutput,
             Qt::QueuedConnection);
 
-    // 移除：删除 QTimer 轮询逻辑
-    // QTimer* timer = new QTimer(this);
-    // connect(timer, &QTimer::timeout, this, [this]{ ... });
-    // timer->start(10);
+
 }
 
 LoginWidget::~LoginWidget() {
@@ -38,16 +35,33 @@ LoginWidget::~LoginWidget() {
 }
 
 
-// 实现 ICoreListener 接口（Core 线程调用，绝不操作 UI）
-void LoginWidget::onCoreOutput(const core::CoreOutput& out) {
-    // 仅转发为 Qt 信号，交给 UI 线程处理
+// 新接口实现
+void LoginWidget::onUiOutput(const core::UiOutput& out) {
     emit coreOutputReceived(out);
 }
 
-// UI 线程处理 Core 事件（安全操作 UI）
-void LoginWidget::handleCoreOutput(const core::CoreOutput& out) {
-    std::visit([this](auto&& e) {
-        handle(e);
+// UI 线程处理 Core 事件（安全操作 UI）- 已添加兜底处理
+void LoginWidget::handleCoreOutput(const core::UiOutput& out) {
+    std::visit([this, &out](auto&& e) {
+        using T = std::decay_t<decltype(e)>; // 获取移除引用/const 后的原始类型
+        // 匹配 LoginWidget 关心的所有类型
+        if constexpr (std::is_same_v<T, core::UiOutStateChanged>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutLoginOk>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutLoginFail>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutDisconnected>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutOnlineUsers>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutForwardText>) {
+            handle(e);
+        }
+        // 兜底：未处理的 UiOutput 类型，打印日志（避免潜在问题，方便后续调试）
+        else {
+            std::cerr << "[LoginWidget] Unhandled UiOutput type, index: " << out.index() << std::endl;
+        }
     }, out);
 }
 
@@ -74,66 +88,6 @@ void LoginWidget::on_Bt_tcp_test_send_clicked()
 
 
 
-// 所有 handle 函数参数补充 core:: 前缀
-void LoginWidget::handle(const core::OutLoginFail&) {
-    std::cout << "[UI] handle OutLoginFail: " << std::endl;
-    ui->TextEdit_tcp_test_recv->setPlainText("Login failed");
-}
-
-void LoginWidget::handle(const core::OutDisconnected&) {
-    std::cout << "[UI] handle OutDisconnected: " << std::endl;
-    ui->TextEdit_tcp_test_recv->setPlainText("OutDisconnected");
-}
-
-void LoginWidget::handle(const core::OutLoginOk&) {
-    std::cout << "[UI] handle OutLoginOk: " << std::endl;
-    ui->TextEdit_tcp_test_recv->setPlainText("Login success");
-    emit loginSuccess();
-}
-
-void LoginWidget::handle(const core::OutStateChanged& e) {
-    std::cout << "[UI] handle OutStateChanged: " << stateToString(e.from) << " to " << stateToString(e.to) << std::endl;
-    ui->TextEdit_FSM_State->setPlainText(QString::fromStdString(stateToString(e.to)));
-}
-
-void LoginWidget::handle(const core::OutConnect&) {
-    std::cout << "[UI] Ignore OutConnect (CoreExecutor handles it)" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutSendLogin&) {
-    std::cout << "[UI] Ignore OutSendLogin (CoreExecutor handles it)" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutSendPing&) {
-    std::cout << "[UI] Ignore OutSendPing (CoreExecutor handles it)" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutUpdateAlive&) {
-    std::cout << "[UI] Ignore OutUpdateAlive" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutOnlineUsers&) {
-    std::cout << "[UI] OutOnlineUsers" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutSelectLan&) {
-    std::cout << "[UI] OutSelectLan" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutSelectVpn&) {
-    std::cout << "[UI] OutSelectVpn" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutSendText& e) {
-    std::cout << "[UI] OutSendText  "  << std::endl;
-}
-
-// 新增：处理接收转发文本消息（显示到UI）
-void LoginWidget::handle(const core::OutForwardText& e) {
-    std::cout << "[UI] OutForwardText " << std::endl;
-
-}
-
 void LoginWidget::on_Bt_Login_clicked()
 {
     QString qstr_user_name = ui->LE_UserName->text();
@@ -146,48 +100,33 @@ void LoginWidget::on_Bt_Login_clicked()
     core_->postInput(core::InCmdLogin{msg_user_name, msg_user_pass});
 }
 
-
-//**********************
-void LoginWidget::handle(const core::OutSendCall&) {
-    std::cout << "[LoginWidget] OutSendCall)" << std::endl;
+// 只保留登录界面关心的事件
+void LoginWidget::handle(const core::UiOutStateChanged& e) {
+    std::cout << "[UI] State: " << stateToString(e.from) << " → " << stateToString(e.to) << std::endl;
+    ui->TextEdit_FSM_State->setPlainText(QString::fromStdString(stateToString(e.to)));
 }
 
-void LoginWidget::handle(const core::OutSendAcceptCall&) {
-    std::cout << "[LoginWidget] OutSendAcceptCall)" << std::endl;
+void LoginWidget::handle(const core::UiOutLoginOk&) {
+    std::cout << "[UI] Login success" << std::endl;
+    ui->TextEdit_tcp_test_recv->setPlainText("Login success");
+    emit loginSuccess();
 }
 
-void LoginWidget::handle(const core::OutSendRejectCall&) {
-    std::cout << "[LoginWidget] OutSendRejectCall)" << std::endl;
+void LoginWidget::handle(const core::UiOutLoginFail& e) {
+    std::cout << "[UI] Login failed: " << e.msg << std::endl;
+    ui->TextEdit_tcp_test_recv->setPlainText("Login failed: " + QString::fromStdString(e.msg));
 }
 
-void LoginWidget::handle(const core::OutSendMediaOffer&) {
-    std::cout << "[LoginWidget] OutSendMediaOffer)" << std::endl;
+void LoginWidget::handle(const core::UiOutDisconnected&) {
+    std::cout << "[UI] Disconnected" << std::endl;
+    ui->TextEdit_tcp_test_recv->setPlainText("Disconnected");
 }
 
-void LoginWidget::handle(const core::OutSendMediaAnswer&) {
-    std::cout << "[LoginWidget] OutSendMediaAnswer)" << std::endl;
+void LoginWidget::handle(const core::UiOutOnlineUsers&) {
+    // 登录界面不需要处理在线用户，空实现即可
 }
 
-void LoginWidget::handle(const core::OutMediaReady&) {
-    std::cout << "[LoginWidget] OutMediaReady)" << std::endl;
+void LoginWidget::handle(const core::UiOutForwardText&) {
+    // 登录界面不需要处理消息
 }
 
-void LoginWidget::handle(const core::OutMediaReadyFinal&) {
-    std::cout << "[LoginWidget] OutMediaReadyFinal)" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutShowIncomingCall&) {
-    std::cout << "[LoginWidget] OutShowIncomingCall)" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutStopMedia&) {
-    std::cout << "[LoginWidget] OutStopMedia)" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutCallEnded& e) {
-    std::cout << "[LoginWidget] OutCallEnded)" << std::endl;
-}
-
-void LoginWidget::handle(const core::OutSendHangup&) {
-    std::cout << "[LoginWidget] OutSendHangup)" << std::endl;
-}

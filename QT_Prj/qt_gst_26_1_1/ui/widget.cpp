@@ -51,45 +51,44 @@ Widget::~Widget()
     delete ui;
 }
 
-// 实现ICoreListener接口：接收Core输出事件
-void Widget::onCoreOutput(const core::CoreOutput& out)
+// 新接口实现：只转发信号
+void Widget::onUiOutput(const core::UiOutput& out)
 {
-    qDebug() << "Main UI received core output, type index:" << out.index();
-    // 转发为Qt信号（确保UI线程处理）
+    qDebug() << "Main UI received core ui output, type index:" << out.index();
     emit coreOutputReceived(out);
 }
-
-void Widget::handleCoreOutput(const core::CoreOutput& out)
+void Widget::handleCoreOutput(const core::UiOutput& out)
 {
-    std::visit([this](auto&& e) {
-        handle(e);   // 🔥 和 LoginWidget 一模一样的分发风格
+    std::visit([this, &out](auto&& e) {
+        using T = std::decay_t<decltype(e)>; // 获取移除引用/const 后的原始类型
+        // 匹配 Widget 关心的所有类型
+        if constexpr (std::is_same_v<T, core::UiOutStateChanged>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutLoginOk>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutLoginFail>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutDisconnected>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutOnlineUsers>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutForwardText>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutShowIncomingCall>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutMediaReadyFinal>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutCallEnded>) {
+            handle(e);
+        } else if constexpr (std::is_same_v<T, core::UiOutStopMedia>) {
+            handle(e);
+        }
+        // 兜底：未处理的 UiOutput 类型，打印日志（避免潜在问题，方便后续调试）
+        else {
+            std::cerr << "[Widget] Unhandled UiOutput type, index: " << out.index() << std::endl;
+        }
     }, out);
 }
-
-void Widget::handle(const core::OutOnlineUsers& e) {
-    std::cout << "[UI] OutOnlineUsers" << std::endl;
-    QString text;
-
-    for (const auto& u : e.list) {
-        text += QString("%1 (priv=%2)\n")
-                    .arg(QString::fromStdString(u.name))
-                    .arg(u.privilege);
-    }
-
-    ui->text_onlineUsers->setPlainText(text);
-}
-// // 实现槽函数：处理Core输出事件（UI线程）
-// void Widget::handleCoreOutput(const core::CoreOutput& out)
-// {
-//     // 可根据需要扩展处理逻辑，目前打印日志
-//     std::visit([](auto&& e) {
-//         using T = std::decay_t<decltype(e)>;
-//         if constexpr (std::is_same_v<T, core::OutStateChanged>) {
-//             qDebug() << "Main UI state change:" << QString::fromStdString(stateToString(e.from))
-//                      << "→" << QString::fromStdString(stateToString(e.to));
-//         }
-//     }, out);
-// }
 
 void Widget::on_Bt_video_on_off_clicked()
 {
@@ -120,148 +119,7 @@ void Widget::on_Bt_tcp_send_clicked() {
     ui->lineEdit_msg->clear();
 }
 
-void Widget::handle(const core::OutSendHangup&) {
-    std::cout << "[Widget] OutSendHangup" << std::endl;
-}
 
-// 处理OutStopMedia（停止媒体推流/接收）
-void Widget::handle(const core::OutStopMedia&) {
-    std::cout << "[Widget] Stop media (camera and video receiver)" << std::endl;
-    // 停止摄像头推流
-    camera_.stop();
-    // 停止视频接收
-    receiver_.stop();
-    // 清空视频窗口
-    video_->setFrame(QImage());
-    remote_video_->setFrame(QImage());
-}
-
-// 处理OutCallEnded（更新UI，通知用户会话结束）
-void Widget::handle(const core::OutCallEnded& e) {
-    std::cout << "[Widget] Call ended: peer=" << e.peer << ", reason=" << e.reason << std::endl;
-    // 显示UI提示
-    // QString tip = QString("Call ended: %1 (reason: %2)").arg(QString::fromStdString(e.peer)).arg(QString::fromStdString(e.reason));
-    // ui->PTE_recv->appendPlainText(tip);
-    // 重置通话相关UI状态
-    ui->lineEdit_CallTarget->clear();
-}
-
-// 处理发送文本消息（仅日志）
-void Widget::handle(const core::OutSendText& e) {
-    std::cout << "[Widget] Send text to  " << e.target_user << ": " << e.content << std::endl;
-}
-
-// 处理接收转发文本消息（显示到UI）
-void Widget::handle(const core::OutForwardText& e) {
-    std::cout << "[Widget] recev from " << e.from_user << " msg: " << e.content << std::endl;
-    // 追加到文本框
-    QString text = ui->PTE_recv->toPlainText();
-    text += QString("[%1]: %2\n").arg(QString::fromStdString(e.from_user)).arg(QString::fromStdString(e.content));
-    ui->PTE_recv->setPlainText(text);
-}
-
-void Widget::handle(const core::OutStateChanged& e) {
-    std::cout << "[Widget] FSM:"
-             << (stateToString(e.from))
-             << "→"
-             << (stateToString(e.to)) << std::endl;
-
-
-}
-
-void Widget::handle(const core::OutDisconnected&) {
-    std::cout << "[Widget] OutDisconnected" << std::endl;
-}
-
-void Widget::handle(const core::OutConnect&) {
-    std::cout << "[Widget] Ignore OutConnect (CoreExecutor handles it)" << std::endl;
-}
-
-void Widget::handle(const core::OutSendLogin&) {
-    std::cout << "[Widget] Ignore OutSendLogin" << std::endl;
-}
-
-void Widget::handle(const core::OutSendPing&) {
-    std::cout << "[Widget] Ignore OutSendPing" << std::endl;
-}
-
-void Widget::handle(const core::OutUpdateAlive&) {
-    std::cout << "[Widget] OutUpdateAlive" << std::endl;
-}
-
-void Widget::handle(const core::OutLoginOk&) {
-    std::cout << "[Widget] OutLoginOk (optional handling)" << std::endl;
-}
-
-void Widget::handle(const core::OutLoginFail&) {
-    std::cout << "[Widget] OutLoginFail (optional handling)" << std::endl;
-}
-
-void Widget::handle(const core::OutSelectLan&) {
-    std::cout << "[Widget] OutSelectLan" << std::endl;
-}
-
-void Widget::handle(const core::OutSelectVpn&) {
-    std::cout << "[Widget] OutSelectVpn)" << std::endl;
-}
-
-
-//**********************
-void Widget::handle(const core::OutSendCall&) {
-    std::cout << "[Widget] OutSendCall)" << std::endl;
-}
-
-void Widget::handle(const core::OutSendAcceptCall&) {
-    std::cout << "[Widget] OutSendAcceptCall)" << std::endl;
-}
-
-void Widget::handle(const core::OutSendRejectCall&) {
-    std::cout << "[Widget] OutSendRejectCall)" << std::endl;
-}
-
-void Widget::handle(const core::OutSendMediaOffer&) {
-    std::cout << "[Widget] OutSendMediaOffer)" << std::endl;
-}
-
-void Widget::handle(const core::OutSendMediaAnswer&) {
-    std::cout << "[Widget] OutSendMediaAnswer)" << std::endl;
-}
-
-void Widget::handle(const core::OutMediaReady& e) {
-    std::cout << "[Widget] OutMediaReady)" << std::endl;
-}
-
-void Widget::handle(const core::OutMediaReadyFinal& e) {
-    std::cout << "[Widget] OutMediaReadyFinal)" << std::endl;
-    std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
-
-    // 核心修改：获取自动选择的媒体端口，替换硬编码的5001
-    int mediaPort = core_->getMediaPort();
-    if (mediaPort <= 0) {
-        std::cerr << "[Widget] Invalid media port: " << mediaPort << " (no available port selected)" << std::endl;
-        QMessageBox::warning(this, "Error", "No available UDP port found! Cannot start video receiver.");
-        return;
-    }
-
-    // 启动摄像头推流（对方端口）+ 接收端监听（自动选择的端口）
-    camera_.start("/dev/video0", e.peerIp, e.peerPort);
-    receiver_.start(mediaPort); // 替换原硬编码的5001
-}
-
-void Widget::handle(const core::OutShowIncomingCall& e) {
-    // 弹出来电对话框
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Incoming");
-    msgBox.setText(QString("User %1 is calling you").arg(QString::fromStdString(e.from)));
-    msgBox.addButton("Accept", QMessageBox::AcceptRole);
-    msgBox.addButton("Reject", QMessageBox::RejectRole);
-    int ret = msgBox.exec();
-    if (ret == QMessageBox::AcceptRole) {
-        core_->postInput(core::InCmdAcceptCall{});
-    } else {
-        core_->postInput(core::InCmdRejectCall{});
-    }
-}
 
 
 
@@ -301,3 +159,85 @@ void Widget::on_Bt_Hangup_clicked()
     core_->postInput(core::InCmdHangup{});
 }
 
+
+// 只保留 UiOutXXX 相关 handle
+void Widget::handle(const core::UiOutStateChanged& e) {
+    std::cout << "[Widget] FSM:"
+              << stateToString(e.from)
+              << "→"
+              << stateToString(e.to) << std::endl;
+}
+
+void Widget::handle(const core::UiOutLoginOk&) {
+    std::cout << "[Widget] UiOutLoginOk" << std::endl;
+}
+
+void Widget::handle(const core::UiOutLoginFail& e) {
+    std::cout << "[Widget] UiOutLoginFail: " << e.msg << std::endl;
+    QMessageBox::warning(this, "Login Failed", QString::fromStdString(e.msg));
+}
+
+void Widget::handle(const core::UiOutDisconnected&) {
+    std::cout << "[Widget] UiOutDisconnected" << std::endl;
+    QMessageBox::information(this, "Info", "Disconnected from server");
+}
+
+void Widget::handle(const core::UiOutOnlineUsers& e) {
+    std::cout << "[UI] UiOutOnlineUsers" << std::endl;
+    QString text;
+    for (const auto& u : e.list) {
+        text += QString("%1 (priv=%2)\n")
+                    .arg(QString::fromStdString(u.name))
+                    .arg(u.privilege);
+    }
+    ui->text_onlineUsers->setPlainText(text);
+}
+
+void Widget::handle(const core::UiOutForwardText& e) {
+    std::cout << "[Widget] recev from " << e.from_user << " msg: " << e.content << std::endl;
+    QString text = ui->PTE_recv->toPlainText();
+    text += QString("[%1]: %2\n").arg(QString::fromStdString(e.from_user)).arg(QString::fromStdString(e.content));
+    ui->PTE_recv->setPlainText(text);
+}
+
+void Widget::handle(const core::UiOutShowIncomingCall& e) {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Incoming");
+    msgBox.setText(QString("User %1 is calling you").arg(QString::fromStdString(e.from)));
+    msgBox.addButton("Accept", QMessageBox::AcceptRole);
+    msgBox.addButton("Reject", QMessageBox::RejectRole);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::AcceptRole) {
+        core_->postInput(core::InCmdAcceptCall{});
+    } else {
+        core_->postInput(core::InCmdRejectCall{});
+    }
+}
+
+void Widget::handle(const core::UiOutMediaReadyFinal& e) {
+    std::cout << "[Widget] UiOutMediaReadyFinal" << std::endl;
+    std::cout << "[UI] Media ready, peer IP: " << e.peerIp << ", port: " << e.peerPort << std::endl;
+
+    int mediaPort = core_->getMediaPort();
+    if (mediaPort <= 0) {
+        std::cerr << "[Widget] Invalid media port: " << mediaPort << std::endl;
+        QMessageBox::warning(this, "Error", "No available UDP port found!");
+        return;
+    }
+
+    camera_.start("/dev/video0", e.peerIp, e.peerPort);
+    receiver_.start(mediaPort);
+}
+
+void Widget::handle(const core::UiOutCallEnded& e) {
+    std::cout << "[Widget] Call ended: peer=" << e.peer << ", reason=" << e.reason << std::endl;
+    ui->lineEdit_CallTarget->clear();
+}
+
+void Widget::handle(const core::UiOutStopMedia&) {
+    std::cout << "[Widget] Stop media" << std::endl;
+    camera_.stop();
+    receiver_.stop();
+    video_->setFrame(QImage());
+    remote_video_->setFrame(QImage());
+}

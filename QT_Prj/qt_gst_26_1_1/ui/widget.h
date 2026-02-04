@@ -26,16 +26,16 @@ public:
     ~Widget() override;
 
     // 仅实现ICoreListener要求的纯虚函数
-    void onCoreOutput(const core::CoreOutput& out) override;
+    void onUiOutput(const core::UiOutput& out) override;
 
 signals:
-    void coreOutputReceived(const core::CoreOutput& out);
+    void coreOutputReceived(const core::UiOutput& out);
 
 private slots:
     void on_Bt_video_on_off_clicked();
     void on_Bt_video_off_clicked();
     void on_Bt_tcp_send_clicked();
-    void handleCoreOutput(const core::CoreOutput& out); // 槽函数声明
+    void handleCoreOutput(const core::UiOutput& out); // 槽函数声明
 
     void on_Bt_Call_clicked();
 
@@ -59,50 +59,16 @@ private:
     VideoReceiver receiver_;
     QtCameraAdapter* remote_adapter_;
 
-    void handle(const core::OutDisconnected&);
+    void handle(const core::UiOutStateChanged&);
+    void handle(const core::UiOutLoginOk&);
+    void handle(const core::UiOutLoginFail&);
+    void handle(const core::UiOutDisconnected&);
+    void handle(const core::UiOutOnlineUsers&);
+    void handle(const core::UiOutForwardText& e);
+    void handle(const core::UiOutShowIncomingCall& e);
+    void handle(const core::UiOutMediaReadyFinal& e);
+    void handle(const core::UiOutCallEnded& e);
+    void handle(const core::UiOutStopMedia&);
 
-    void handle(const core::OutConnect&);
-
-    void handle(const core::OutSendLogin&);
-
-    void handle(const core::OutSendPing&);
-
-    void handle(const core::OutUpdateAlive&);
-
-    void handle(const core::OutLoginOk&);
-
-    void handle(const core::OutLoginFail&);
-
-    void handle(const core::OutOnlineUsers&);
-
-    void handle(const core::OutStateChanged&);
-
-    void handle(const core::OutSelectLan&) ;
-
-    void handle(const core::OutSelectVpn&) ;
-    void handle(const core::OutSendText& e) ;
-
-    void handle(const core::OutForwardText& e) ;
-
-    void handle(const core::OutSendCall&);
-
-    void handle(const core::OutSendAcceptCall&) ;
-
-    void handle(const core::OutSendRejectCall&) ;
-
-    void handle(const core::OutSendMediaOffer&) ;
-
-    void handle(const core::OutSendMediaAnswer&) ;
-
-    void handle(const core::OutMediaReady& e) ;
-
-    void handle(const core::OutShowIncomingCall& e) ;
-
-    void handle(const core::OutMediaReadyFinal& e);
-
-    void handle(const core::OutCallEnded& e);
-
-    void handle(const core::OutStopMedia&);
-    void handle(const core::OutSendHangup&) ;
 };
 #endif // WIDGET_H

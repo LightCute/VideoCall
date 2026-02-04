@@ -21,63 +21,30 @@ public:
     explicit LoginWidget(ClientCore* core, QWidget* parent = nullptr);
     ~LoginWidget() override;
 
-    void onCoreOutput(const core::CoreOutput& out) override;
+    void onUiOutput(const core::UiOutput& out) override;
 
 signals:
     void loginSuccess();
-    void coreOutputReceived(const core::CoreOutput& out);
+    void coreOutputReceived(const core::UiOutput& out);
 
 private slots:
     void on_Bt_Jump_Test_clicked();
     void on_Bt_ConnectToServer_clicked();
     void on_Bt_tcp_test_send_clicked();
     void on_Bt_Login_clicked();
-    void handleCoreOutput(const core::CoreOutput& out);
+    void handleCoreOutput(const core::UiOutput& out);
 
 private:
     Ui::LoginWidget *ui;
     ClientCore* core_;
-    // 新增：UI 线程处理 Core 事件
-    // 所有参数补充 core:: 前缀
-    void handle(const core::OutLoginFail&);
-    void handle(const core::OutDisconnected&) ;
-    void handle(const core::OutLoginOk&) ;
-    void handle(const core::OutStateChanged& e) ;
-    void handle(const core::OutConnect&);       // 新增
-    void handle(const core::OutSendLogin&);     // 新增
 
-    void handle(const core::OutSendPing&);
+    void handle(const core::UiOutStateChanged& e);
+    void handle(const core::UiOutLoginOk&);
+    void handle(const core::UiOutLoginFail& e);
+    void handle(const core::UiOutDisconnected&);
+    void handle(const core::UiOutOnlineUsers&);
+    void handle(const core::UiOutForwardText& e);
 
-    void handle(const core::OutUpdateAlive&);
-    void handle(const core::OutOnlineUsers&);
-    void handle(const core::OutSelectLan&) ;
-
-    void handle(const core::OutSelectVpn&) ;
-    void handle(const core::OutSendText& e) ;
-
-    void handle(const core::OutForwardText& e) ;
-
-    void handle(const core::OutSendCall&);
-
-    void handle(const core::OutSendAcceptCall&) ;
-
-    void handle(const core::OutSendRejectCall&) ;
-
-    void handle(const core::OutSendMediaOffer&) ;
-
-    void handle(const core::OutSendMediaAnswer&) ;
-
-    void handle(const core::OutMediaReady&) ;
-
-    void handle(const core::OutShowIncomingCall&) ;
-
-    void handle(const core::OutMediaReadyFinal& e);
-
-    void handle(const core::OutCallEnded& e);
-
-    void handle(const core::OutStopMedia&);
-
-    void handle(const core::OutSendHangup&) ;
 };
 
 #endif // LOGINWIDGET_H
