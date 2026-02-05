@@ -108,6 +108,9 @@ if(QT_VERSION_MAJOR GREATER_EQUAL 6)
 else()
     add_executable(${PROJECT_NAME}
         ${PROJECT_SOURCES}
+        core/CallSession.h
+        core/CallManager.h
+        core/CallManager.cpp
 
 
         #media/CameraManager.h

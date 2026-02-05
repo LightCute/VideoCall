@@ -9,6 +9,9 @@
   └─ PortUtils.h
 
 📂 ./core:
+  └─ CallManager.cpp
+  └─ CallManager.h
+  └─ CallSession.h
   └─ ClientCore.cpp
   └─ ClientCore.h
   └─ ClientState.h
@@ -93,7 +96,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     qRegisterMetaType<Frame>("Frame");
-    qRegisterMetaType<core::CoreOutput>("core::UiOutput");  // 新增
+    qRegisterMetaType<core::UiOutput>("core::UiOutput");  // 新增
     AppWindow w;
     //LoginWidget login_W;
     //login_W.show();
@@ -1568,6 +1571,41 @@ void CoreExecutor::sendMediaAnswer(const std::string& peer) {
     std::cout << "[Executor] Send MEDIA_ANSWER to: " << peer << std::endl;
 }
 
+========== ./core/CallSession.h ==========
+Lines: 31
+
+// CallSession.h - 仅封装会话数据，无任何业务逻辑
+#pragma once
+#include <string>
+
+// 引入旧状态枚举（若原有枚举在其他文件，直接#include即可）
+enum class OldCallState {
+    IDLE,        // 空闲
+    CONNECTING,  // 连接中
+    CONNECTED,   // 已连接
+    DISCONNECTED // 已断开
+};
+
+// 纯数据载体：仅存字段，无业务方法
+struct CallSession {
+    // 会话唯一标识（便于后续追踪，阶段1可简单生成）
+    std::string sessionId;
+    // 迁移的通话资源字段
+    std::string peerName;  // 对应原peer_
+    std::string peerIp;    // 对应原peerIp_
+    int peerPort = 0;      // 对应原peerPort_
+    bool isCaller = false; // 是否为呼叫方
+    // 映射旧状态，与FSM保持一致
+    OldCallState callState = OldCallState::IDLE;
+
+    // 可选：简化初始化的构造函数（非必须，提升易用性）
+    CallSession() = default;
+    CallSession(const std::string& id, const std::string& peer, const std::string& ip,
+                int port, bool caller, OldCallState state)
+        : sessionId(id), peerName(peer), peerIp(ip), peerPort(port),
+        isCaller(caller), callState(state) {}
+};
+
 ========== ./core/ClientState.h ==========
 Lines: 32
 
@@ -1662,6 +1700,50 @@ private:
     std::atomic<NetMode> mode_{NetMode::LAN};
     std::atomic<int> mediaPort_{0}; // 初始值0表示未选择
 
+};
+
+========== ./core/CallManager.h ==========
+Lines: 40
+
+// CallManager.h - 逻辑管理类，持有CallSession
+#pragma once
+#include <optional>
+#include "CallSession.h" // 引入独立的CallSession类
+
+class CallManager {
+private:
+    // 核心新增：用optional管理会话（安全处理无会话场景）
+    std::optional<CallSession> currentSession;
+
+    // 保留旧状态/字段（FSM/UI仍使用，阶段1不删除）
+    OldCallState oldFsmState = OldCallState::IDLE;
+    std::string peer_;
+    std::string peerIp_;
+    int peerPort_ = 0;
+    bool isCaller_ = false;
+
+public:
+    // 原有核心方法（完全保留，不做任何修改）
+    void fsmHandleState(OldCallState newState);
+    void notifyUiOutStateChanged(OldCallState state);
+
+    // 后续步骤要实现的方法（先声明）
+    void initCall(const std::string& peerName, const std::string& peerIp, int peerPort, bool isCaller);
+    void updatePeerIp(const std::string& newIp);
+    void endCurrentSession();
+
+    // 原有结束相关方法（保留，后续替换实现）
+    void onHangup();
+    void onNetworkError();
+    void onMediaStreamEnd();
+    void onPeerHangup();
+    void onTimeout();
+
+private:
+    // 原有资源释放方法（保留，后续统一调用）
+    void releaseMediaResources();
+    void closeNetworkConnection();
+    void clearCallLogs();
 };
 
 ========== ./core/ICoreListener.h ==========
@@ -1782,6 +1864,95 @@ using CoreOutput = std::variant<
     >;
 
 } // namespace core
+
+========== ./core/CallManager.cpp ==========
+Lines: 85
+
+// CallManager.cpp
+#include "CallManager.h"
+#include <ctime> // 用于生成简单的sessionId
+
+void CallManager::initCall(const std::string& peerName, const std::string& peerIp, int peerPort, bool isCaller) {
+    // 步骤1：生成唯一sessionId（阶段1可简化，后续可优化为UUID）
+    std::string sessionId = "call_" + std::to_string(time(nullptr));
+
+    // 步骤2：写入CallSession（真相源，核心操作）
+    currentSession = CallSession(
+        sessionId,
+        peerName,
+        peerIp,
+        peerPort,
+        isCaller,
+        OldCallState::CONNECTING
+        );
+
+    // 步骤3：同步旧字段（兼容现有逻辑，100%安全）
+    peer_ = peerName;
+    peerIp_ = peerIp;
+    peerPort_ = peerPort;
+    isCaller_ = isCaller;
+
+    // 步骤4：原有逻辑完全保留（FSM/UI无感知）
+    oldFsmState = OldCallState::CONNECTING;
+    notifyUiOutStateChanged(oldFsmState);
+}
+
+// 示例：修改“更新对端IP”方法（其他写入方法同理）
+void CallManager::updatePeerIp(const std::string& newIp) {
+    // 先写入Session（真相源）
+    if (currentSession.has_value()) { // 有会话时才更新
+        currentSession->peerIp = newIp;
+    }
+    // 同步旧字段（兼容）
+    peerIp_ = newIp;
+}
+
+void CallManager::endCurrentSession() {
+    // 步骤1：清理Session（真相源）
+    if (currentSession.has_value()) {
+        currentSession.reset(); // 销毁会话，释放资源
+    }
+
+    // 步骤2：重置旧状态/字段（兼容现有逻辑）
+    oldFsmState = OldCallState::IDLE;
+    peer_ = "";
+    peerIp_ = "";
+    peerPort_ = 0;
+    isCaller_ = false;
+
+    // 步骤3：统一释放所有通话资源（原有分散的释放逻辑迁移至此）
+    releaseMediaResources();   // 释放媒体资源
+    closeNetworkConnection();  // 关闭网络连接
+    clearCallLogs();           // 清理通话日志
+
+    // 步骤4：原有UI通知逻辑不变（无感知）
+    notifyUiOutStateChanged(oldFsmState);
+}
+
+void CallManager::onHangup() {
+    // 原有分散逻辑删除 → 统一调用
+    endCurrentSession();
+}
+
+// 2. 网络异常断开
+void CallManager::onNetworkError() {
+    endCurrentSession();
+}
+
+// 3. 媒体流结束
+void CallManager::onMediaStreamEnd() {
+    endCurrentSession();
+}
+
+// 4. 对端挂断
+void CallManager::onPeerHangup() {
+    endCurrentSession();
+}
+
+// 5. 通话超时
+void CallManager::onTimeout() {
+    endCurrentSession();
+}
 
 ========== ./net/PacketCodec.h ==========
 Lines: 39
@@ -3746,5 +3917,5 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 
 =====================================
-Total files: 40
-Total lines: 3524
+Total files: 43
+Total lines: 3680
