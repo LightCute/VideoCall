@@ -47,7 +47,8 @@ private:
     std::mutex listener_mtx_;  // 监听者操作的线程安全锁
 
     std::optional<CallSession> current_call_session_;
-    // 通话相关成员变量（保留原有逻辑）
+
+    // 通话相关成员变量（仅作为CallSession的镜像，禁止直接写入，仅从Session同步）    std::string peer_;          // 通话对方用户名
     std::string peer_;          // 通话对方用户名
     std::string peerIp_;        // 对方媒体IP
     int peerPort_ = 0;          // 对方媒体端口

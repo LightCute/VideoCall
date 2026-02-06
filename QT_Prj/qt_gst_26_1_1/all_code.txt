@@ -227,7 +227,7 @@ int findAvailableUdpPort(uint16_t startPort, uint16_t endPort) {
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 248
+Lines: 335
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -243,6 +243,7 @@ ClientCore::ClientCore() : fsm_() {
         );
     // 启动事件处理线程（仅调度，无 IO）
     std::thread([this]{ processEvents(); }).detach();
+    current_call_session_.emplace();
 }
 
 ClientCore::~ClientCore() {
@@ -298,6 +299,25 @@ void ClientCore::processEvents() {
 
         // 调用 FSM 处理输入，获取新语义规范的 CoreOutput 列表
         auto outputs = fsm_.handle(state_, ev);
+
+        if (core::CoreInputIndexToName(ev.index()) == "InCallIncoming") {
+            auto& incoming = std::get<core::InCallIncoming>(ev);
+            // 新增：确保Session已初始化（防止空指针）
+            if (!current_call_session_.has_value()) {
+                current_call_session_.emplace(); // 初始化空Session
+                std::cout << "[ClientCore] Create new Session for incoming call from: " << incoming.from << std::endl;
+            }
+            auto& session = current_call_session_.value();
+            // 1. 优先写入Session（唯一真相源）
+            session.peerName = incoming.from;
+            session.isCaller = false;
+            session.currentCallState = CallState::Ringing;
+            // 2. 同步到旧字段（仅镜像，禁止直接修改旧字段）
+            peer_ = incoming.from;
+            isCaller_ = false;
+            std::cout << "[ClientCore] Incoming call: Session updated (peer: " << session.peerName << ", sessionId: " << session.sessionId << ")" << std::endl;
+        }
+
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
@@ -305,6 +325,38 @@ void ClientCore::processEvents() {
             }
         }
     }
+}
+
+// core/ClientCore.cpp
+void ClientCore::endCurrentSession(const std::string& reason) {
+    // 1. 校验：当前是否有活跃会话
+    if (!current_call_session_.has_value()) {
+        std::cerr << "[ClientCore] No active session to end" << std::endl;
+        return;
+    }
+    auto& session = current_call_session_.value();
+    std::cout << "[ClientCore] Ending session: " << session.sessionId << ", reason: " << reason << std::endl;
+
+    // 2. 重置 Session（唯一真相源）
+    current_call_session_.reset();
+
+    // 3. 同步旧字段（清空）
+    peer_.clear();
+    peerIp_.clear();
+    peerPort_ = 0;
+    isCaller_ = false;
+
+    // 4. 收口操作：停止媒体、发送挂断信令（复用原有逻辑）
+    executor_->sendHangup(); // 原有挂断信令逻辑
+    // 触发 UI 停止媒体（复用原有 UiOutStopMedia）
+    broadcastUiOutput(core::UiOutput{core::UiOutStopMedia{}});
+
+    // 5. 同步旧 State 到 LoggedIn（复用原有逻辑）
+    core::UiOutStateChanged uiStateChange{state_, State::LoggedIn};
+    broadcastUiOutput(core::UiOutput{uiStateChange});
+    state_ = State::LoggedIn;
+
+    std::cout << "[ClientCore] Session ended successfully: " << session.sessionId << std::endl;
 }
 
 // 核心：总输出处理入口，实现三路分流
@@ -386,7 +438,8 @@ void ClientCore::handleExecOutput(core::ExecOutput&& out) {
             execute(std::move(e));
         }
         else if constexpr (std::is_same_v<T, core::ExecOutSendHangup>) {
-            execute(std::move(e));
+            //execute(std::move(e));
+            this->endCurrentSession("user hangup");
         }
     }, std::move(out));
 }
@@ -438,18 +491,41 @@ void ClientCore::execute(const core::ExecOutSendText& e) {
 }
 
 void ClientCore::execute(const core::ExecOutSendCall& e) {
+    // 第一步：先写入 CallSession（唯一真相源）
+    if (current_call_session_.has_value()) {
+        auto& session = current_call_session_.value();
+        session.peerName = e.target_user; // 写入 peerName
+        session.isCaller = true;          // 写入 isCaller
+        session.currentCallState = CallState::Calling; // 同步状态
+    }
+
+    // 第二步：同步到旧字段（保留原有逻辑，不删除）
     isCaller_ = true;
+    peer_ = e.target_user; // 补充：原有代码未写 peer_，这里补上以同步
+
+    // 原有逻辑：调用 executor 发送呼叫
     executor_->sendCallRequest(e.target_user);
 }
 
 void ClientCore::execute(const core::ExecOutSendAcceptCall& e) {
-    (void)e; // 消除未使用参数警告
+    (void)e;
     executor_->sendAcceptCall();
+
+    // 新增：更新Session状态（唯一真相源）
+    if (current_call_session_.has_value()) {
+        auto& session = current_call_session_.value();
+        session.currentCallState = CallState::InCall; // 标记为“通话中”
+        std::cout << "[ClientCore] Accept call: Session state updated to InCall (sessionId: " << session.sessionId << ")" << std::endl;
+    }
 }
 
 void ClientCore::execute(const core::ExecOutSendRejectCall& e) {
-    (void)e; // 消除未使用参数警告
+    (void)e;
     executor_->sendRejectCall();
+
+    // 新增：拒绝通话直接结束Session（统一走endCurrentSession）
+    endCurrentSession("user reject call");
+    std::cout << "[ClientCore] Reject call: Session ended" << std::endl;
 }
 
 void ClientCore::execute(const core::ExecOutSendMediaOffer& e) {
@@ -465,15 +541,26 @@ void ClientCore::execute(const core::ExecOutSendHangup& e) {
     executor_->sendHangup();
 }
 
-// 重点：封装 ExecOutMediaReady 到 UiOutMediaReadyFinal 的转换逻辑（内部隐藏）
 void ClientCore::execute(const core::ExecOutMediaReady& e) {
-    // 1. 调用 Executor 选择最终 IP（仅 Core 内部与 Executor 交互）
-    peerIp_ = executor_->selectPeerIp(e.lanIp, e.vpnIp);
-    peerPort_ = e.peerPort;
+    // 1. 计算最终Peer IP/Port（仅计算，不直接写入旧字段）
+    std::string peerIp = executor_->selectPeerIp(e.lanIp, e.vpnIp);
+    int peerPort = e.peerPort;
 
+    // 2. 优先写入Session（唯一真相源）
+    if (current_call_session_.has_value()) {
+        auto& session = current_call_session_.value();
+        session.peerIp = peerIp;
+        session.peerPort = peerPort;
+        session.currentCallState = CallState::MediaReady;
+        std::cout << "[ClientCore] MediaReady: Session updated (peerIp: " << peerIp << ", port: " << peerPort << ")" << std::endl;
+    }
+
+    // 3. 同步到旧字段（仅镜像，禁止直接修改）
+    peerIp_ = peerIp;
+    peerPort_ = peerPort;
+
+    // 4. 原有逻辑：构建UI输出（数据来自Session的镜像）
     std::cout << "[ClientCore] MediaReady -> use IP: " << peerIp_ << ":" << peerPort_ << std::endl;
-
-    // 2. 构建 UI 输出，广播给媒体层（不暴露原始 lanIp/vpnIp）
     core::UiOutMediaReadyFinal uiMediaReadyFinal{peerIp_, peerPort_};
     broadcastUiOutput(core::UiOutput{uiMediaReadyFinal});
 }
@@ -1270,7 +1357,7 @@ void FSM::initTable() {
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 77
+Lines: 83
 
 //core/ClientCore.h
 #pragma once
@@ -1287,6 +1374,8 @@ Lines: 77
 #include "ICoreListener.h"
 #include <vector>
 #include <atomic> // 补充 atomic 头文件，支持 std::atomic
+#include "CallSession.h"
+#include <optional> // 用于 optional<CallSession>
 
 class ClientCore {
 public:
@@ -1318,7 +1407,9 @@ private:
     std::vector<core::ICoreListener*> listeners_;
     std::mutex listener_mtx_;  // 监听者操作的线程安全锁
 
-    // 通话相关成员变量（保留原有逻辑）
+    std::optional<CallSession> current_call_session_;
+
+    // 通话相关成员变量（仅作为CallSession的镜像，禁止直接写入，仅从Session同步）    std::string peer_;          // 通话对方用户名
     std::string peer_;          // 通话对方用户名
     std::string peerIp_;        // 对方媒体IP
     int peerPort_ = 0;          // 对方媒体端口
@@ -1330,6 +1421,8 @@ private:
     void handleExecOutput(core::ExecOutput&& out); // 处理 Executor 输出（IO 命令）
     void broadcastUiOutput(const core::UiOutput& out); // 广播 UI 输出（状态通知）
 
+
+    void endCurrentSession(const std::string& reason = "");
     // 新的 execute 重载函数（适配 ExecOutXXX 类型）
     void execute(const core::ExecOutConnect& e);
     void execute(const core::ExecOutSendLogin& e);
@@ -1572,8 +1665,63 @@ void CoreExecutor::sendMediaAnswer(const std::string& peer) {
 }
 
 ========== ./core/CallSession.h ==========
-Lines: 0
+Lines: 55
 
+// core/CallSession.h
+#pragma once
+#include <string>
+#include <cstdint>
+#include "ClientState.h" // 引入旧 State 用于映射
+
+// 最小版 CallState：仅映射旧 State 中的通话状态，不新增 Ending/MediaReady
+enum class CallState {
+    Idle,        // 对应旧 State::LoggedIn（无通话）
+    Calling,     // 对应旧 State::CALLING
+    Ringing,     // 对应旧 State::RINGING
+    InCall,      // 对应旧 State::IN_CALL
+    MediaReady   // 对应旧 State::MEDIA_READY
+};
+
+// 生成唯一 SessionId（极简版：自增整数，线程安全）
+static std::atomic<uint64_t> g_next_session_id = 1;
+inline uint64_t generateUniqueSessionId() {
+    return g_next_session_id.fetch_add(1);
+}
+
+// 最小版 CallSession：仅包含基础字段，无任何业务逻辑
+struct CallSession {
+    uint64_t sessionId;          // 唯一标识
+    std::string peerName;        // 对应旧 peer_
+    std::string peerIp;          // 对应旧 peerIp_
+    int peerPort = 0;            // 对应旧 peerPort_
+    bool isCaller = false;       // 对应旧 isCaller_
+    CallState currentCallState;  // 映射旧 State 的通话状态
+
+    // 构造函数：初始化基础字段
+    CallSession() : sessionId(generateUniqueSessionId()), currentCallState(CallState::Idle) {}
+
+    // 辅助：CallState 转旧 State（用于兼容，不修改旧逻辑）
+    State toOldState() const {
+        switch (currentCallState) {
+        case CallState::Calling: return State::CALLING;
+        case CallState::Ringing: return State::RINGING;
+        case CallState::InCall: return State::IN_CALL;
+        case CallState::MediaReady: return State::MEDIA_READY;
+        default: return State::LoggedIn;
+        }
+    }
+};
+
+// 辅助：旧 State 转 CallState（用于初始化 Session）
+inline CallState fromOldState(State oldState) {
+    switch (oldState) {
+    case State::CALLING: return CallState::Calling;
+    case State::RINGING: return CallState::Ringing;
+    case State::IN_CALL: return CallState::InCall;
+    case State::MEDIA_READY: return CallState::MediaReady;
+    default: return CallState::Idle;
+    }
+}
 
 ========== ./core/ClientState.h ==========
 Lines: 32
@@ -3762,4 +3910,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 43
-Total lines: 3524
+Total lines: 3672
