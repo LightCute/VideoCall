@@ -13,6 +13,8 @@
 #include "ICoreListener.h"
 #include <vector>
 #include <atomic> // 补充 atomic 头文件，支持 std::atomic
+#include "CallSession.h"
+#include <optional> // 用于 optional<CallSession>
 
 class ClientCore {
 public:
@@ -44,6 +46,7 @@ private:
     std::vector<core::ICoreListener*> listeners_;
     std::mutex listener_mtx_;  // 监听者操作的线程安全锁
 
+    std::optional<CallSession> current_call_session_;
     // 通话相关成员变量（保留原有逻辑）
     std::string peer_;          // 通话对方用户名
     std::string peerIp_;        // 对方媒体IP
@@ -56,6 +59,8 @@ private:
     void handleExecOutput(core::ExecOutput&& out); // 处理 Executor 输出（IO 命令）
     void broadcastUiOutput(const core::UiOutput& out); // 广播 UI 输出（状态通知）
 
+
+    void endCurrentSession(const std::string& reason = "");
     // 新的 execute 重载函数（适配 ExecOutXXX 类型）
     void execute(const core::ExecOutConnect& e);
     void execute(const core::ExecOutSendLogin& e);

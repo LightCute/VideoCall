@@ -12,6 +12,7 @@ ClientCore::ClientCore() : fsm_() {
         );
     // 启动事件处理线程（仅调度，无 IO）
     std::thread([this]{ processEvents(); }).detach();
+    current_call_session_.emplace();
 }
 
 ClientCore::~ClientCore() {
@@ -67,6 +68,18 @@ void ClientCore::processEvents() {
 
         // 调用 FSM 处理输入，获取新语义规范的 CoreOutput 列表
         auto outputs = fsm_.handle(state_, ev);
+        if (ev.index() == 17) { // InCallIncoming 的索引（CoreInput 中第17位）
+            auto& incoming = std::get<core::InCallIncoming>(ev);
+            if (current_call_session_.has_value()) {
+                auto& session = current_call_session_.value();
+                session.peerName = incoming.from;
+                session.isCaller = false;
+                session.currentCallState = CallState::Ringing;
+                // 同步旧字段
+                peer_ = incoming.from;
+                isCaller_ = false;
+            }
+        }
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
@@ -74,6 +87,38 @@ void ClientCore::processEvents() {
             }
         }
     }
+}
+
+// core/ClientCore.cpp
+void ClientCore::endCurrentSession(const std::string& reason) {
+    // 1. 校验：当前是否有活跃会话
+    if (!current_call_session_.has_value()) {
+        std::cerr << "[ClientCore] No active session to end" << std::endl;
+        return;
+    }
+    auto& session = current_call_session_.value();
+    std::cout << "[ClientCore] Ending session: " << session.sessionId << ", reason: " << reason << std::endl;
+
+    // 2. 重置 Session（唯一真相源）
+    current_call_session_.reset();
+
+    // 3. 同步旧字段（清空）
+    peer_.clear();
+    peerIp_.clear();
+    peerPort_ = 0;
+    isCaller_ = false;
+
+    // 4. 收口操作：停止媒体、发送挂断信令（复用原有逻辑）
+    executor_->sendHangup(); // 原有挂断信令逻辑
+    // 触发 UI 停止媒体（复用原有 UiOutStopMedia）
+    broadcastUiOutput(core::UiOutput{core::UiOutStopMedia{}});
+
+    // 5. 同步旧 State 到 LoggedIn（复用原有逻辑）
+    core::UiOutStateChanged uiStateChange{state_, State::LoggedIn};
+    broadcastUiOutput(core::UiOutput{uiStateChange});
+    state_ = State::LoggedIn;
+
+    std::cout << "[ClientCore] Session ended successfully: " << session.sessionId << std::endl;
 }
 
 // 核心：总输出处理入口，实现三路分流
@@ -155,7 +200,8 @@ void ClientCore::handleExecOutput(core::ExecOutput&& out) {
             execute(std::move(e));
         }
         else if constexpr (std::is_same_v<T, core::ExecOutSendHangup>) {
-            execute(std::move(e));
+            //execute(std::move(e));
+            this->endCurrentSession("user hangup");
         }
     }, std::move(out));
 }
@@ -207,7 +253,19 @@ void ClientCore::execute(const core::ExecOutSendText& e) {
 }
 
 void ClientCore::execute(const core::ExecOutSendCall& e) {
+    // 第一步：先写入 CallSession（唯一真相源）
+    if (current_call_session_.has_value()) {
+        auto& session = current_call_session_.value();
+        session.peerName = e.target_user; // 写入 peerName
+        session.isCaller = true;          // 写入 isCaller
+        session.currentCallState = CallState::Calling; // 同步状态
+    }
+
+    // 第二步：同步到旧字段（保留原有逻辑，不删除）
     isCaller_ = true;
+    peer_ = e.target_user; // 补充：原有代码未写 peer_，这里补上以同步
+
+    // 原有逻辑：调用 executor 发送呼叫
     executor_->sendCallRequest(e.target_user);
 }
 
@@ -234,15 +292,21 @@ void ClientCore::execute(const core::ExecOutSendHangup& e) {
     executor_->sendHangup();
 }
 
-// 重点：封装 ExecOutMediaReady 到 UiOutMediaReadyFinal 的转换逻辑（内部隐藏）
 void ClientCore::execute(const core::ExecOutMediaReady& e) {
-    // 1. 调用 Executor 选择最终 IP（仅 Core 内部与 Executor 交互）
+    // 1. 原有逻辑：选择最终 Peer IP
     peerIp_ = executor_->selectPeerIp(e.lanIp, e.vpnIp);
     peerPort_ = e.peerPort;
 
-    std::cout << "[ClientCore] MediaReady -> use IP: " << peerIp_ << ":" << peerPort_ << std::endl;
+    // 新增：先写入 CallSession（唯一真相源）
+    if (current_call_session_.has_value()) {
+        auto& session = current_call_session_.value();
+        session.peerIp = peerIp_;    // 写入 peerIp
+        session.peerPort = peerPort_;// 写入 peerPort
+        session.currentCallState = CallState::MediaReady; // 同步状态
+    }
 
-    // 2. 构建 UI 输出，广播给媒体层（不暴露原始 lanIp/vpnIp）
+    // 2. 原有逻辑：构建 UI 输出
+    std::cout << "[ClientCore] MediaReady -> use IP: " << peerIp_ << ":" << peerPort_ << std::endl;
     core::UiOutMediaReadyFinal uiMediaReadyFinal{peerIp_, peerPort_};
     broadcastUiOutput(core::UiOutput{uiMediaReadyFinal});
 }
