@@ -227,7 +227,7 @@ int findAvailableUdpPort(uint16_t startPort, uint16_t endPort) {
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 363
+Lines: 367
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -297,8 +297,6 @@ void ClientCore::processEvents() {
                       << ", Event type : " << core::CoreInputIndexToName(ev.index())  << std::endl;
         }
 
-        // 调用 FSM 处理输入，获取新语义规范的 CoreOutput 列表
-        auto outputs = fsm_.handle(state_, ev);
 
         if (core::CoreInputIndexToName(ev.index()) == "InCallIncoming") {
             auto& incoming = std::get<core::InCallIncoming>(ev);
@@ -326,6 +324,7 @@ void ClientCore::processEvents() {
             }
             this->endCurrentSession(reason);
             std::cout << "[ClientCore] opposite hang up: " << callEnded.peer << ", reason: " << callEnded.reason << "）" << std::endl;
+            return;
         }
 
         if (core::CoreInputIndexToName(ev.index()) == "InTcpDisconnected") {
@@ -340,6 +339,11 @@ void ClientCore::processEvents() {
                 std::cout << "[ClientCore] 心跳超时，结束活跃会话" << std::endl;
             }
         }
+
+        // 调用 FSM 处理输入，获取新语义规范的 CoreOutput 列表
+        auto outputs = fsm_.handle(state_, ev);
+
+
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
@@ -1299,9 +1303,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },
@@ -1318,9 +1322,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },
@@ -1337,9 +1341,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },
@@ -1356,9 +1360,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },
@@ -3947,4 +3951,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 43
-Total lines: 3709
+Total lines: 3713

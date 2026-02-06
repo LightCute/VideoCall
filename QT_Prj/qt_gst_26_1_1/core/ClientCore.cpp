@@ -93,6 +93,7 @@ void ClientCore::processEvents() {
             }
             this->endCurrentSession(reason);
             std::cout << "[ClientCore] opposite hang up: " << callEnded.peer << ", reason: " << callEnded.reason << "）" << std::endl;
+            return;
         }
 
         if (core::CoreInputIndexToName(ev.index()) == "InTcpDisconnected") {

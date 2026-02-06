@@ -118,6 +118,8 @@ inline std::string CoreInputIndexToName(size_t index) {
     case 20: return "InCmdAcceptCall";
     case 21: return "InCmdRejectCall";
     case 22: return "InMediaPeer";
+    case 23: return "InCmdHangup";
+    case 24: return "InCallEnded";
     // 兜底：索引超出范围时返回提示（防止新增类型未更新函数）
     default: return "InUnknownCoreInputType";
     }
