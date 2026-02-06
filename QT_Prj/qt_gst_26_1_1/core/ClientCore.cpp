@@ -87,6 +87,28 @@ void ClientCore::processEvents() {
             std::cout << "[ClientCore] Incoming call: Session updated (peer: " << session.peerName << ", sessionId: " << session.sessionId << ")" << std::endl;
         }
 
+        if (core::CoreInputIndexToName(ev.index()) == "InCallEnded") {
+            auto& callEnded = std::get<core::InCallEnded>(ev);
+            CallEndReason reason = CallEndReason::PeerHangup;
+            if (callEnded.reason == "server_timeout") {
+                reason = CallEndReason::ServerTimeout;
+            }
+            this->endCurrentSession(reason);
+            std::cout << "[ClientCore] opposite hang up: " << callEnded.peer << ", reason: " << callEnded.reason << "）" << std::endl;
+        }
+
+        if (core::CoreInputIndexToName(ev.index()) == "InTcpDisconnected") {
+            if (current_call_session_.has_value()) {
+                this->endCurrentSession(CallEndReason::NetworkError);
+                std::cout << "[ClientCore] 网络断开，结束活跃会话" << std::endl;
+            }
+        }
+        if (core::CoreInputIndexToName(ev.index()) == "InHeartbeatTimeout") {
+            if (current_call_session_.has_value()) {
+                this->endCurrentSession(CallEndReason::NetworkError);
+                std::cout << "[ClientCore] 心跳超时，结束活跃会话" << std::endl;
+            }
+        }
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
@@ -96,36 +118,41 @@ void ClientCore::processEvents() {
     }
 }
 
-// core/ClientCore.cpp
-void ClientCore::endCurrentSession(const std::string& reason) {
-    // 1. 校验：当前是否有活跃会话
+void ClientCore::endCurrentSession(CallEndReason reason) {
+    // 1️⃣ 防重复结束：无活跃Session 或 正在结束，直接返回
     if (!current_call_session_.has_value()) {
-        std::cerr << "[ClientCore] No active session to end" << std::endl;
+        std::cerr << "[ClientCore] endCurrentSession: 无活跃会话，跳过结束逻辑" << std::endl;
         return;
     }
     auto& session = current_call_session_.value();
-    std::cout << "[ClientCore] Ending session: " << session.sessionId << ", reason: " << reason << std::endl;
+    if (session.currentCallState == CallState::Ending) {
+        std::cout << "[ClientCore] endCurrentSession: 会话正在结束（reason: " << callEndReasonToString(reason) << "），跳过重复调用" << std::endl;
+        return;
+    }
 
-    // 2. 重置 Session（唯一真相源）
+    // 2️⃣ 标记为Ending状态，阻止后续重复调用
+    session.currentCallState = CallState::Ending;
+    std::cout << "[ClientCore] 开始结束会话（sessionId: " << session.sessionId << ", reason: " << callEndReasonToString(reason) << "）" << std::endl;
+
+    // 3️⃣ 停止媒体（通过UI事件通知，而非直接调用——符合UI/Core职责边界）
+    // 原因：CameraManager/VideoReceiver由UI层持有，Core不直接操作UI层实例
+    broadcastUiOutput(core::UiOutput{core::UiOutStopMedia{}});
+    std::cout << "[ClientCore] 发送停止媒体事件（sessionId: " << session.sessionId << "）" << std::endl;
+
+    // 4️⃣ 清理Session（唯一真相源）
     current_call_session_.reset();
+    std::cout << "[ClientCore] 清理Session（sessionId: " << session.sessionId << "）" << std::endl;
 
-    // 3. 同步旧字段（清空）
+    // 5️⃣ 同步旧字段（仅过渡用，commit4可删除）
     peer_.clear();
     peerIp_.clear();
     peerPort_ = 0;
     isCaller_ = false;
 
-    // 4. 收口操作：停止媒体、发送挂断信令（复用原有逻辑）
-    executor_->sendHangup(); // 原有挂断信令逻辑
-    // 触发 UI 停止媒体（复用原有 UiOutStopMedia）
-    broadcastUiOutput(core::UiOutput{core::UiOutStopMedia{}});
-
-    // 5. 同步旧 State 到 LoggedIn（复用原有逻辑）
-    core::UiOutStateChanged uiStateChange{state_, State::LoggedIn};
-    broadcastUiOutput(core::UiOutput{uiStateChange});
-    state_ = State::LoggedIn;
-
-    std::cout << "[ClientCore] Session ended successfully: " << session.sessionId << std::endl;
+    // 6️⃣ 发送通话结束UI事件（仅通知，不强制改状态——由FSM决定状态迁移）
+    core::UiOutCallEnded uiCallEnded{session.peerName, callEndReasonToString(reason)};
+    broadcastUiOutput(core::UiOutput{uiCallEnded});
+    std::cout << "[ClientCore] 发送通话结束事件（peer: " << session.peerName << ", reason: " << callEndReasonToString(reason) << "）" << std::endl;
 }
 
 // 核心：总输出处理入口，实现三路分流
@@ -207,8 +234,9 @@ void ClientCore::handleExecOutput(core::ExecOutput&& out) {
             execute(std::move(e));
         }
         else if constexpr (std::is_same_v<T, core::ExecOutSendHangup>) {
-            //execute(std::move(e));
-            this->endCurrentSession("user hangup");
+            executor_->sendHangup();
+            this->endCurrentSession(CallEndReason::UserHangup);
+            std::cout << "[ClientCore] user hang up: send + end session" << std::endl;
         }
     }, std::move(out));
 }
@@ -293,7 +321,7 @@ void ClientCore::execute(const core::ExecOutSendRejectCall& e) {
     executor_->sendRejectCall();
 
     // 新增：拒绝通话直接结束Session（统一走endCurrentSession）
-    endCurrentSession("user reject call");
+    endCurrentSession(CallEndReason::UserReject);
     std::cout << "[ClientCore] Reject call: Session ended" << std::endl;
 }
 

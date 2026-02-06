@@ -16,6 +16,29 @@
 #include "CallSession.h"
 #include <optional> // 用于 optional<CallSession>
 
+enum class CallEndReason {
+    UserHangup,        // 用户主动挂断
+    UserReject,        // 用户拒绝通话
+    PeerHangup,        // 对端挂断
+    NetworkError,      // 网络错误
+    MediaError,        // 媒体错误
+    ServerTimeout,     // 服务端超时
+    Unknown            // 未知原因
+};
+
+// 辅助函数：枚举转字符串（方便日志）
+inline std::string callEndReasonToString(CallEndReason reason) {
+    switch (reason) {
+    case CallEndReason::UserHangup: return "UserHangup";
+    case CallEndReason::UserReject: return "UserReject";
+    case CallEndReason::PeerHangup: return "PeerHangup";
+    case CallEndReason::NetworkError: return "NetworkError";
+    case CallEndReason::MediaError: return "MediaError";
+    case CallEndReason::ServerTimeout: return "ServerTimeout";
+    default: return "Unknown";
+    }
+}
+
 class ClientCore {
 public:
     ClientCore();
@@ -61,7 +84,7 @@ private:
     void broadcastUiOutput(const core::UiOutput& out); // 广播 UI 输出（状态通知）
 
 
-    void endCurrentSession(const std::string& reason = "");
+    void endCurrentSession(CallEndReason reason = CallEndReason::Unknown);
     // 新的 execute 重载函数（适配 ExecOutXXX 类型）
     void execute(const core::ExecOutConnect& e);
     void execute(const core::ExecOutSendLogin& e);

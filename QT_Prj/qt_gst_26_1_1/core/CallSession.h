@@ -10,7 +10,8 @@ enum class CallState {
     Calling,     // 对应旧 State::CALLING
     Ringing,     // 对应旧 State::RINGING
     InCall,      // 对应旧 State::IN_CALL
-    MediaReady   // 对应旧 State::MEDIA_READY
+    MediaReady,  // 对应旧 State::MEDIA_READY
+    Ending       // 新增：标记会话正在结束，防重复调用
 };
 
 // 生成唯一 SessionId（极简版：自增整数，线程安全）
@@ -38,6 +39,7 @@ struct CallSession {
         case CallState::Ringing: return State::RINGING;
         case CallState::InCall: return State::IN_CALL;
         case CallState::MediaReady: return State::MEDIA_READY;
+        case CallState::Ending: return State::LoggedIn; // 新增
         default: return State::LoggedIn;
         }
     }

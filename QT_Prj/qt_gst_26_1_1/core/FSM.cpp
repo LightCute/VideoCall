@@ -527,10 +527,6 @@ void FSM::initTable() {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
 
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
-
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
@@ -549,10 +545,6 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
-
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
 
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
@@ -573,10 +565,6 @@ void FSM::initTable() {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
 
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
-
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
@@ -595,10 +583,6 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
-
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
 
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
