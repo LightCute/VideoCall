@@ -227,7 +227,7 @@ int findAvailableUdpPort(uint16_t startPort, uint16_t endPort) {
 }
 
 ========== ./core/ClientCore.cpp ==========
-Lines: 335
+Lines: 363
 
 #include "ClientCore.h"
 #include <algorithm>
@@ -318,6 +318,28 @@ void ClientCore::processEvents() {
             std::cout << "[ClientCore] Incoming call: Session updated (peer: " << session.peerName << ", sessionId: " << session.sessionId << ")" << std::endl;
         }
 
+        if (core::CoreInputIndexToName(ev.index()) == "InCallEnded") {
+            auto& callEnded = std::get<core::InCallEnded>(ev);
+            CallEndReason reason = CallEndReason::PeerHangup;
+            if (callEnded.reason == "server_timeout") {
+                reason = CallEndReason::ServerTimeout;
+            }
+            this->endCurrentSession(reason);
+            std::cout << "[ClientCore] opposite hang up: " << callEnded.peer << ", reason: " << callEnded.reason << "）" << std::endl;
+        }
+
+        if (core::CoreInputIndexToName(ev.index()) == "InTcpDisconnected") {
+            if (current_call_session_.has_value()) {
+                this->endCurrentSession(CallEndReason::NetworkError);
+                std::cout << "[ClientCore] 网络断开，结束活跃会话" << std::endl;
+            }
+        }
+        if (core::CoreInputIndexToName(ev.index()) == "InHeartbeatTimeout") {
+            if (current_call_session_.has_value()) {
+                this->endCurrentSession(CallEndReason::NetworkError);
+                std::cout << "[ClientCore] 心跳超时，结束活跃会话" << std::endl;
+            }
+        }
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
@@ -327,36 +349,41 @@ void ClientCore::processEvents() {
     }
 }
 
-// core/ClientCore.cpp
-void ClientCore::endCurrentSession(const std::string& reason) {
-    // 1. 校验：当前是否有活跃会话
+void ClientCore::endCurrentSession(CallEndReason reason) {
+    // 1️⃣ 防重复结束：无活跃Session 或 正在结束，直接返回
     if (!current_call_session_.has_value()) {
-        std::cerr << "[ClientCore] No active session to end" << std::endl;
+        std::cerr << "[ClientCore] endCurrentSession: 无活跃会话，跳过结束逻辑" << std::endl;
         return;
     }
     auto& session = current_call_session_.value();
-    std::cout << "[ClientCore] Ending session: " << session.sessionId << ", reason: " << reason << std::endl;
+    if (session.currentCallState == CallState::Ending) {
+        std::cout << "[ClientCore] endCurrentSession: 会话正在结束（reason: " << callEndReasonToString(reason) << "），跳过重复调用" << std::endl;
+        return;
+    }
 
-    // 2. 重置 Session（唯一真相源）
+    // 2️⃣ 标记为Ending状态，阻止后续重复调用
+    session.currentCallState = CallState::Ending;
+    std::cout << "[ClientCore] 开始结束会话（sessionId: " << session.sessionId << ", reason: " << callEndReasonToString(reason) << "）" << std::endl;
+
+    // 3️⃣ 停止媒体（通过UI事件通知，而非直接调用——符合UI/Core职责边界）
+    // 原因：CameraManager/VideoReceiver由UI层持有，Core不直接操作UI层实例
+    broadcastUiOutput(core::UiOutput{core::UiOutStopMedia{}});
+    std::cout << "[ClientCore] 发送停止媒体事件（sessionId: " << session.sessionId << "）" << std::endl;
+
+    // 4️⃣ 清理Session（唯一真相源）
     current_call_session_.reset();
+    std::cout << "[ClientCore] 清理Session（sessionId: " << session.sessionId << "）" << std::endl;
 
-    // 3. 同步旧字段（清空）
+    // 5️⃣ 同步旧字段（仅过渡用，commit4可删除）
     peer_.clear();
     peerIp_.clear();
     peerPort_ = 0;
     isCaller_ = false;
 
-    // 4. 收口操作：停止媒体、发送挂断信令（复用原有逻辑）
-    executor_->sendHangup(); // 原有挂断信令逻辑
-    // 触发 UI 停止媒体（复用原有 UiOutStopMedia）
-    broadcastUiOutput(core::UiOutput{core::UiOutStopMedia{}});
-
-    // 5. 同步旧 State 到 LoggedIn（复用原有逻辑）
-    core::UiOutStateChanged uiStateChange{state_, State::LoggedIn};
-    broadcastUiOutput(core::UiOutput{uiStateChange});
-    state_ = State::LoggedIn;
-
-    std::cout << "[ClientCore] Session ended successfully: " << session.sessionId << std::endl;
+    // 6️⃣ 发送通话结束UI事件（仅通知，不强制改状态——由FSM决定状态迁移）
+    core::UiOutCallEnded uiCallEnded{session.peerName, callEndReasonToString(reason)};
+    broadcastUiOutput(core::UiOutput{uiCallEnded});
+    std::cout << "[ClientCore] 发送通话结束事件（peer: " << session.peerName << ", reason: " << callEndReasonToString(reason) << "）" << std::endl;
 }
 
 // 核心：总输出处理入口，实现三路分流
@@ -438,8 +465,9 @@ void ClientCore::handleExecOutput(core::ExecOutput&& out) {
             execute(std::move(e));
         }
         else if constexpr (std::is_same_v<T, core::ExecOutSendHangup>) {
-            //execute(std::move(e));
-            this->endCurrentSession("user hangup");
+            executor_->sendHangup();
+            this->endCurrentSession(CallEndReason::UserHangup);
+            std::cout << "[ClientCore] user hang up: send + end session" << std::endl;
         }
     }, std::move(out));
 }
@@ -524,7 +552,7 @@ void ClientCore::execute(const core::ExecOutSendRejectCall& e) {
     executor_->sendRejectCall();
 
     // 新增：拒绝通话直接结束Session（统一走endCurrentSession）
-    endCurrentSession("user reject call");
+    endCurrentSession(CallEndReason::UserReject);
     std::cout << "[ClientCore] Reject call: Session ended" << std::endl;
 }
 
@@ -736,7 +764,7 @@ inline std::string CoreInputIndexToName(size_t index) {
 }
 
 ========== ./core/FSM.cpp ==========
-Lines: 617
+Lines: 601
 
 // core/FSM.cpp
 #include "FSM.h"
@@ -1267,10 +1295,6 @@ void FSM::initTable() {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
 
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
-
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
@@ -1289,10 +1313,6 @@ void FSM::initTable() {
             [](State cur, const core::CoreInput& ev) -> std::vector<core::CoreOutput> {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
-
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
 
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
@@ -1313,10 +1333,6 @@ void FSM::initTable() {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
 
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
-
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
@@ -1336,10 +1352,6 @@ void FSM::initTable() {
                 std::vector<core::CoreOutput> out;
                 auto& e = std::get<core::InCallEnded>(ev);
 
-                // 1. 通知 UI 停止媒体：UiOutStopMedia 包裹进 UiOutput
-                core::UiOutStopMedia uiStopMedia;
-                out.push_back(core::UiOutput{uiStopMedia});
-
                 // 2. 状态变更：UiOutStateChanged 包裹进 UiOutput
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
@@ -1357,7 +1369,7 @@ void FSM::initTable() {
 }
 
 ========== ./core/ClientCore.h ==========
-Lines: 83
+Lines: 106
 
 //core/ClientCore.h
 #pragma once
@@ -1376,6 +1388,29 @@ Lines: 83
 #include <atomic> // 补充 atomic 头文件，支持 std::atomic
 #include "CallSession.h"
 #include <optional> // 用于 optional<CallSession>
+
+enum class CallEndReason {
+    UserHangup,        // 用户主动挂断
+    UserReject,        // 用户拒绝通话
+    PeerHangup,        // 对端挂断
+    NetworkError,      // 网络错误
+    MediaError,        // 媒体错误
+    ServerTimeout,     // 服务端超时
+    Unknown            // 未知原因
+};
+
+// 辅助函数：枚举转字符串（方便日志）
+inline std::string callEndReasonToString(CallEndReason reason) {
+    switch (reason) {
+    case CallEndReason::UserHangup: return "UserHangup";
+    case CallEndReason::UserReject: return "UserReject";
+    case CallEndReason::PeerHangup: return "PeerHangup";
+    case CallEndReason::NetworkError: return "NetworkError";
+    case CallEndReason::MediaError: return "MediaError";
+    case CallEndReason::ServerTimeout: return "ServerTimeout";
+    default: return "Unknown";
+    }
+}
 
 class ClientCore {
 public:
@@ -1422,7 +1457,7 @@ private:
     void broadcastUiOutput(const core::UiOutput& out); // 广播 UI 输出（状态通知）
 
 
-    void endCurrentSession(const std::string& reason = "");
+    void endCurrentSession(CallEndReason reason = CallEndReason::Unknown);
     // 新的 execute 重载函数（适配 ExecOutXXX 类型）
     void execute(const core::ExecOutConnect& e);
     void execute(const core::ExecOutSendLogin& e);
@@ -1665,7 +1700,7 @@ void CoreExecutor::sendMediaAnswer(const std::string& peer) {
 }
 
 ========== ./core/CallSession.h ==========
-Lines: 55
+Lines: 57
 
 // core/CallSession.h
 #pragma once
@@ -1679,7 +1714,8 @@ enum class CallState {
     Calling,     // 对应旧 State::CALLING
     Ringing,     // 对应旧 State::RINGING
     InCall,      // 对应旧 State::IN_CALL
-    MediaReady   // 对应旧 State::MEDIA_READY
+    MediaReady,  // 对应旧 State::MEDIA_READY
+    Ending       // 新增：标记会话正在结束，防重复调用
 };
 
 // 生成唯一 SessionId（极简版：自增整数，线程安全）
@@ -1707,6 +1743,7 @@ struct CallSession {
         case CallState::Ringing: return State::RINGING;
         case CallState::InCall: return State::IN_CALL;
         case CallState::MediaReady: return State::MEDIA_READY;
+        case CallState::Ending: return State::LoggedIn; // 新增
         default: return State::LoggedIn;
         }
     }
@@ -3910,4 +3947,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 43
-Total lines: 3672
+Total lines: 3709

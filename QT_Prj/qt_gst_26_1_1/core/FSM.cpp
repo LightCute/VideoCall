@@ -531,9 +531,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },
@@ -550,9 +550,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },
@@ -569,9 +569,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },
@@ -588,9 +588,9 @@ void FSM::initTable() {
                 core::UiOutStateChanged uiStateChange{cur, State::LoggedIn};
                 out.push_back(core::UiOutput{uiStateChange});
 
-                // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
-                core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
-                out.push_back(core::UiOutput{uiCallEnded});
+                // // 3. 通知 UI 通话结束：UiOutCallEnded 包裹进 UiOutput
+                // core::UiOutCallEnded uiCallEnded{e.peer, e.reason};
+                // out.push_back(core::UiOutput{uiCallEnded});
 
                 return out;
             },

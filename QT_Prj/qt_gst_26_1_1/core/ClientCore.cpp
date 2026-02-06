@@ -66,8 +66,6 @@ void ClientCore::processEvents() {
                       << ", Event type : " << core::CoreInputIndexToName(ev.index())  << std::endl;
         }
 
-        // 调用 FSM 处理输入，获取新语义规范的 CoreOutput 列表
-        auto outputs = fsm_.handle(state_, ev);
 
         if (core::CoreInputIndexToName(ev.index()) == "InCallIncoming") {
             auto& incoming = std::get<core::InCallIncoming>(ev);
@@ -109,6 +107,11 @@ void ClientCore::processEvents() {
                 std::cout << "[ClientCore] 心跳超时，结束活跃会话" << std::endl;
             }
         }
+
+        // 调用 FSM 处理输入，获取新语义规范的 CoreOutput 列表
+        auto outputs = fsm_.handle(state_, ev);
+
+
         {
             std::lock_guard<std::mutex> lock(mtx_);
             for (auto& o : outputs) {
