@@ -239,6 +239,16 @@
     <string>Hangup</string>
    </property>
   </widget>
+  <widget class="QPlainTextEdit" name="PTE_state">
+   <property name="geometry">
+    <rect>
+     <x>840</x>
+     <y>560</y>
+     <width>191</width>
+     <height>81</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

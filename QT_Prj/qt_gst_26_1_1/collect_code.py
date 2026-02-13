@@ -1,7 +1,7 @@
 import os
 
 OUTPUT_FILE = "all_code.txt"
-SKIP_DIRS = {"build", ".git", ".vscode"}
+SKIP_DIRS = {"build", ".git", ".vscode", "cmake-build-debug"}
 
 # 存储目录结构：key为目录路径，value为该目录下的.h/.cpp文件列表
 dir_structure = {}

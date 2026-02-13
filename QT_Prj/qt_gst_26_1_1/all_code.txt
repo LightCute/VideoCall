@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     qRegisterMetaType<Frame>("Frame");
-    qRegisterMetaType<core::CoreOutput>("core::UiOutput");  // 新增
+    qRegisterMetaType<core::UiOutput>("core::UiOutput");  // 新增
     AppWindow w;
     //LoginWidget login_W;
     //login_W.show();
@@ -2063,7 +2063,7 @@ void VideoWidget::paintEvent(QPaintEvent *) {
 
 
 ========== ./ui/widget.cpp ==========
-Lines: 243
+Lines: 244
 
 // ui/widget.cpp（完整修复版）
 #include "widget.h"
@@ -2233,6 +2233,7 @@ void Widget::handle(const core::UiOutStateChanged& e) {
               << stateToString(e.from)
               << "→"
               << stateToString(e.to) << std::endl;
+    ui -> PTE_state ->setPlainText(QString::fromStdString(stateToString(e.to)));
 }
 
 void Widget::handle(const core::UiOutLoginOk&) {
@@ -3747,4 +3748,4 @@ GstFlowReturn VideoReceiver::onNewSample(GstAppSink* sink, gpointer user_data) {
 
 =====================================
 Total files: 40
-Total lines: 3524
+Total lines: 3525

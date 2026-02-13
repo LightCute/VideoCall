@@ -166,6 +166,7 @@ void Widget::handle(const core::UiOutStateChanged& e) {
               << stateToString(e.from)
               << "→"
               << stateToString(e.to) << std::endl;
+    ui -> PTE_state ->setPlainText(QString::fromStdString(stateToString(e.to)));
 }
 
 void Widget::handle(const core::UiOutLoginOk&) {
