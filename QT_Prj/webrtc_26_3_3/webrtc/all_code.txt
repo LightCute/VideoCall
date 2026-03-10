@@ -1,0 +1,533 @@
+========== 工程目录结构（仅含.h/.cpp）==========
+
+📂 .:
+  └─ main.cpp
+
+📂 ./src/utilities:
+  └─ log.h
+
+📂 ./src/core:
+  └─ ConnectEvent.h
+  └─ IEventData.h
+  └─ IEventQueue.h
+  └─ core.cpp
+  └─ core.h
+
+📂 ./src/net:
+  └─ INet.h
+  └─ Websocket.cpp
+  └─ Websocket.h
+
+📂 ./src/ui:
+  └─ IUI.h
+  └─ widget.cpp
+  └─ widget.h
+
+==================================================
+========== 所有.h/.cpp文件内容 ==========
+
+
+========== ./main.cpp ==========
+Lines: 53
+
+#include "src/ui/widget.h"
+
+#include <QApplication>
+#include <iostream>
+#include <rtc/rtc.hpp>
+#include "eventpp/eventdispatcher.h"
+#include "./src/net/Websocket.h"
+#include "./src/core/core.h"
+#include "src/utilities/log.h"
+
+
+void myLogCallback(rtcLogLevel level, const char* message) {
+    switch (level) {
+        case RTC_LOG_FATAL:
+        case RTC_LOG_ERROR:
+            Log::error("[RTC] {}", message);
+            break;
+        case RTC_LOG_WARNING:
+            Log::warn("[RTC] {}", message);
+            break;
+        case RTC_LOG_INFO:
+            Log::info("[RTC] {}", message);
+            break;
+        case RTC_LOG_DEBUG:
+            Log::debug("[RTC] {}", message);
+            break;
+        case RTC_LOG_VERBOSE:
+            Log::trace("[RTC] {}", message);
+            break;
+        default:
+            Log::info("[RTC] {}", message);
+            break;
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+
+    Log::init("webrtc.log", Log::Mode::Async, spdlog::level::trace);
+
+    rtcInitLogger(RTC_LOG_DEBUG, myLogCallback);
+
+    Core core;
+
+    WebSocketClient net(&core);
+
+    Widget w(&core);
+
+    w.show();
+
+    return a.exec();
+}
+
+========== ./src/utilities/log.h ==========
+Lines: 100
+
+#pragma once
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/async.h>
+#include <memory>
+#include <vector>
+#include <iostream>
+#include <sstream>
+
+class Log {
+public:
+    // 新增：日志模式枚举
+    enum class Mode {
+        Sync,   // 同步模式
+        Async   // 异步模式
+    };
+
+    // 统一初始化接口
+    // filename: 日志文件名
+    // mode: 同步或异步，默认异步
+    // level: 日志输出级别，默认 info (即 info/warn/error/critical 会输出，trace/debug 会被过滤)
+    static void init(const std::string& filename = "app.log", 
+                     Mode mode = Mode::Async,
+                     spdlog::level::level_enum level = spdlog::level::info) {
+        static bool initialized = false;
+        if (initialized) return;
+
+        try {
+            // 1. 创建 sinks (控制台 + 文件)
+            auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
+            
+            // 注意：sink 本身的级别设为最低，主要靠全局 logger 级别来过滤
+            console_sink->set_level(spdlog::level::trace);
+            file_sink->set_level(spdlog::level::trace);
+
+            std::vector<spdlog::sink_ptr> sinks { console_sink, file_sink };
+
+            // 2. 根据模式创建 logger
+            std::shared_ptr<spdlog::logger> logger;
+            
+            if (mode == Mode::Async) {
+                // 异步模式：初始化线程池
+                spdlog::init_thread_pool(8192, 1);
+                logger = std::make_shared<spdlog::async_logger>(
+                    "async_logger", 
+                    sinks.begin(), 
+                    sinks.end(),
+                    spdlog::thread_pool(), 
+                    spdlog::async_overflow_policy::block
+                );
+            } else {
+                // 同步模式
+                logger = std::make_shared<spdlog::logger>("sync_logger", sinks.begin(), sinks.end());
+            }
+
+            // 3. 设置默认 logger
+            spdlog::set_default_logger(logger);
+            
+            // 4. 设置格式
+            spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%t] [%l] %v");
+
+            // 5. 设置全局过滤级别 (核心改动在这里)
+            spdlog::set_level(level); 
+
+            initialized = true;
+            std::cout << "Log init success. Mode: " << (mode == Mode::Async ? "Async" : "Sync") 
+                      << ", Level: " << spdlog::level::to_string_view(level).data() << std::endl;
+        } catch (const spdlog::spdlog_ex &ex) {
+            std::cerr << "Log init failed: " << ex.what() << std::endl;
+        }
+    }
+
+    // 辅助函数：将 thread::id 转为 string
+    static std::string threadIdToString(const std::thread::id& id) {
+        std::ostringstream oss;
+        oss << id;
+        return oss.str();
+    }    
+
+    // 日志接口
+    template<typename... Args>
+    static void trace(const char* fmt, Args&&... args) { spdlog::trace(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void debug(const char* fmt, Args&&... args) { spdlog::debug(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void info(const char* fmt, Args&&... args) { spdlog::info(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void warn(const char* fmt, Args&&... args) { spdlog::warn(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void error(const char* fmt, Args&&... args) { spdlog::error(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void critical(const char* fmt, Args&&... args) { spdlog::critical(fmt, std::forward<Args>(args)...); }
+};
+========== ./src/core/ConnectEvent.h ==========
+Lines: 13
+
+#pragma once
+#include <string>
+#include "IEventData.h"
+
+class MessageEvent : public IEventData {
+public:
+    MessageEvent(const std::string& msg, bool u) : message(msg), urgent(u) {}
+
+    std::string getURL() {return message;}
+private:
+    std::string message;
+    bool urgent;
+};
+
+========== ./src/core/core.cpp ==========
+Lines: 0
+
+
+========== ./src/core/IEventQueue.h ==========
+Lines: 18
+
+// IEventQueue.h
+#pragma once
+#include <string>
+#include <functional>
+#include <eventpp/eventqueue.h>
+#include "IEventData.h"
+using EventQueue = eventpp::EventQueue<EventType, void(std::shared_ptr<IEventData>)>;
+class IEventQueue {
+public:
+    virtual ~IEventQueue() = default;
+    virtual void enqueue(EventType event,
+        std::shared_ptr<IEventData> data) = 0;
+
+    virtual void appendListener(
+        EventType event,
+        std::function<void(std::shared_ptr<IEventData>)> cb) = 0;
+    virtual bool process() = 0;
+};
+
+========== ./src/core/core.h ==========
+Lines: 29
+
+#pragma once
+#include <eventpp/eventqueue.h>
+#include <string>
+#include "IEventQueue.h"
+
+class Core : public IEventQueue {
+public:
+
+    void enqueue(EventType event,
+                 std::shared_ptr<IEventData> data) override
+    {
+        queue.enqueue(event, data);
+    }
+
+    void appendListener(
+        EventType event,
+        std::function<void(std::shared_ptr<IEventData>)> cb) override
+    {
+        queue.appendListener(event, cb);
+    }
+
+    bool process() override
+    {
+        return queue.process();
+    }
+
+private:
+    EventQueue queue;
+};
+
+========== ./src/core/IEventData.h ==========
+Lines: 11
+
+#pragma once
+enum class EventType {
+    UI_NetConnectServer,
+    Net_RecvMessage,
+    UI_SendMessage
+};
+
+class IEventData {
+public:
+    virtual ~IEventData() = default;
+};
+
+========== ./src/net/Websocket.cpp ==========
+Lines: 87
+
+#include "Websocket.h"
+#include <iostream>
+#include "../core/ConnectEvent.h"
+WebSocketClient::WebSocketClient(IEventQueue* queue)
+    : m_queue( queue)
+{
+    //rtc::InitLogger(rtc::LogLevel::Debug);
+
+    m_queue->appendListener(
+        EventType::UI_NetConnectServer,
+        [this](std::shared_ptr<IEventData> data)
+        {
+            auto msg = std::dynamic_pointer_cast<MessageEvent>(data);
+            if(msg)
+                connect(msg->getURL());
+        }
+        );
+}
+
+WebSocketClient::~WebSocketClient()
+{
+    close();
+}
+
+void WebSocketClient::connect(const std::string& url)
+{
+    running = true;
+
+    networkThread = std::thread([this, url]()
+    {
+        ws = std::make_shared<rtc::WebSocket>();
+
+        ws->onOpen([]()
+        {
+            std::cout << "WebSocket connected\n";
+        });
+
+        ws->onClosed([]()
+        {
+            std::cout << "WebSocket closed\n";
+        });
+
+        ws->onMessage([this](rtc::message_variant msg)
+        {
+
+        });
+
+        ws->open(url);
+
+        while(running)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    });
+}
+
+void WebSocketClient::send(const std::string& msg)
+{
+    if(ws)
+        ws->send(msg);
+}
+
+void WebSocketClient::close()
+{
+    running = false;
+
+    if(ws)
+        ws->close();
+
+    if(networkThread.joinable())
+        networkThread.join();
+}
+
+
+// void WebSocketClient::onMessage(MessageCallback cb)
+// {
+//     ws->onMessage([this](rtc::message_variant msg)
+//                   {
+//                       if(auto str = std::get_if<std::string>(&msg))
+//                       {
+//                           m_queue->enqueue(
+//                               EventType::Net_RecvMessage,
+//                               std::make_shared<MessageEvent>(*str,false)
+//                               );
+//                       }
+//                   });
+// }
+
+========== ./src/net/INet.h ==========
+Lines: 17
+
+#pragma once
+#include <string>
+#include <functional>
+
+class INet
+{
+public:
+
+    virtual ~INet() = default;
+
+    virtual void connect(const std::string& url) = 0;
+
+    virtual void send(const std::string& msg) = 0;
+
+    virtual void close() = 0;
+
+};
+
+========== ./src/net/Websocket.h ==========
+Lines: 29
+
+#pragma once
+#include <rtc/rtc.hpp>
+#include <thread>
+#include <atomic>
+#include <functional>
+#include "INet.h"
+#include "../core/IEventQueue.h"
+class WebSocketClient : public INet
+{
+public:
+    WebSocketClient(IEventQueue* queue);
+    ~WebSocketClient();
+
+    void connect(const std::string& url) override;
+    void send(const std::string& msg) override;
+    void close() override;
+
+
+private:
+    void run();
+
+private:
+    std::shared_ptr<rtc::WebSocket> ws;
+
+    std::thread networkThread;
+    std::atomic<bool> running{false};
+
+    IEventQueue* m_queue;
+};
+
+========== ./src/ui/widget.cpp ==========
+Lines: 47
+
+#include "widget.h"
+#include "ui_widget.h"
+#include <memory>
+#include <nlohmann/json.hpp>
+#include "../core/core.h"
+#include "../ui/IUI.h"
+#include <iostream>
+#include "../core/ConnectEvent.h"
+
+Widget::Widget(IEventQueue* queue, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::Widget)
+    , m_timer(new QTimer(this))
+    , m_queue(queue)
+{
+    ui->setupUi(this);
+    
+
+    connect(m_timer, &QTimer::timeout, [this]() {
+        m_queue->process();
+    });
+    m_timer->start(10);
+}
+
+Widget::~Widget()
+{
+    delete ui;
+}
+
+
+
+
+void Widget::on_bt_connect_clicked()
+{
+    m_queue->enqueue(
+        EventType::UI_NetConnectServer,
+        std::make_shared<MessageEvent>(
+            "ws://120.79.210.6:8000/abcd", false)
+        );
+}
+
+
+void Widget::showMessage(const std::string& msg)
+{
+
+    ui->recvEdit->append(QString::fromStdString(msg));
+}
+
+========== ./src/ui/IUI.h ==========
+Lines: 12
+
+#pragma once
+#include <string>
+
+class IUI
+{
+public:
+    virtual ~IUI() = default;
+
+    virtual void showMessage(const std::string& msg) = 0;
+
+    //virtual void run() = 0;
+};
+
+========== ./src/ui/widget.h ==========
+Lines: 33
+
+#ifndef WIDGET_H
+#define WIDGET_H
+
+#include <QWidget>
+#include <memory>
+#include <QTimer>
+#include "../net/Websocket.h"       // ✅ 正确：src/ui/ → src/ → src/net/
+#include "IUI.h"                    // ✅ 正确：IUI.h 和 widget.h 在同一目录
+#include "../core/IEventQueue.h"    // ✅ 正确：src/ui/ → src/ → src/core/
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class Widget;
+}
+QT_END_NAMESPACE
+
+class Widget : public QWidget , public IUI
+{
+    Q_OBJECT
+
+public:
+    Widget(IEventQueue* queue, QWidget *parent = nullptr);
+    ~Widget();
+    void showMessage(const std::string& msg) override;
+private slots:
+
+    void on_bt_connect_clicked();
+
+private:
+    Ui::Widget *ui;
+    QTimer* m_timer;
+    IEventQueue* m_queue;
+};
+#endif // WIDGET_H
+
+
+=====================================
+Total files: 13
+Total lines: 449

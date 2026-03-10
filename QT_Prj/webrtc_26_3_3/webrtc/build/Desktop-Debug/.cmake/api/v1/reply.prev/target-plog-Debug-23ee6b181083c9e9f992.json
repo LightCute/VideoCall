@@ -1,0 +1,41 @@
+{
+	"abstract" : true,
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library"
+		],
+		"files" : 
+		[
+			"3rdparty/libdatachannel/deps/plog/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 26,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 9
+	},
+	"id" : "plog::@8207f334e4487df1eb12",
+	"name" : "plog",
+	"paths" : 
+	{
+		"build" : "3rdparty/libdatachannel/deps/plog",
+		"source" : "3rdparty/libdatachannel/deps/plog"
+	},
+	"sources" : [],
+	"type" : "INTERFACE_LIBRARY"
+}

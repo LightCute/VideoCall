@@ -1,0 +1,161 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"3rdparty/libdatachannel/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 516,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 527,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 532,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 553,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 9
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"3rdparty/libdatachannel/libdatachannel.so.0.24.1",
+				"3rdparty/libdatachannel/libdatachannel.so.0.24"
+			],
+			"targetId" : "datachannel::@91367b40241320001754",
+			"targetIndex" : 1,
+			"targetInstallNamelink" : "skip",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"3rdparty/libdatachannel/libdatachannel.so"
+			],
+			"targetId" : "datachannel::@91367b40241320001754",
+			"targetIndex" : 1,
+			"targetInstallNamelink" : "only",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "include/rtc",
+			"paths" : 
+			[
+				"3rdparty/libdatachannel/include/rtc/candidate.hpp",
+				"3rdparty/libdatachannel/include/rtc/channel.hpp",
+				"3rdparty/libdatachannel/include/rtc/configuration.hpp",
+				"3rdparty/libdatachannel/include/rtc/datachannel.hpp",
+				"3rdparty/libdatachannel/include/rtc/dependencydescriptor.hpp",
+				"3rdparty/libdatachannel/include/rtc/description.hpp",
+				"3rdparty/libdatachannel/include/rtc/iceudpmuxlistener.hpp",
+				"3rdparty/libdatachannel/include/rtc/mediahandler.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtcpreceivingsession.hpp",
+				"3rdparty/libdatachannel/include/rtc/common.hpp",
+				"3rdparty/libdatachannel/include/rtc/global.hpp",
+				"3rdparty/libdatachannel/include/rtc/message.hpp",
+				"3rdparty/libdatachannel/include/rtc/frameinfo.hpp",
+				"3rdparty/libdatachannel/include/rtc/peerconnection.hpp",
+				"3rdparty/libdatachannel/include/rtc/reliability.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtc.h",
+				"3rdparty/libdatachannel/include/rtc/rtc.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtp.hpp",
+				"3rdparty/libdatachannel/include/rtc/track.hpp",
+				"3rdparty/libdatachannel/include/rtc/websocket.hpp",
+				"3rdparty/libdatachannel/include/rtc/websocketserver.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtppacketizationconfig.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtcpsrreporter.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtppacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtpdepacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/h264rtppacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/h264rtpdepacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/nalunit.hpp",
+				"3rdparty/libdatachannel/include/rtc/h265rtppacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/h265rtpdepacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/h265nalunit.hpp",
+				"3rdparty/libdatachannel/include/rtc/av1rtppacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/vp8rtppacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/vp8rtpdepacketizer.hpp",
+				"3rdparty/libdatachannel/include/rtc/rtcpnackresponder.hpp",
+				"3rdparty/libdatachannel/include/rtc/utils.hpp",
+				"3rdparty/libdatachannel/include/rtc/plihandler.hpp",
+				"3rdparty/libdatachannel/include/rtc/pacinghandler.hpp",
+				"3rdparty/libdatachannel/include/rtc/rembhandler.hpp",
+				"3rdparty/libdatachannel/include/rtc/version.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/LibDataChannel",
+			"exportName" : "LibDataChannelTargets",
+			"exportTargets" : 
+			[
+				{
+					"id" : "datachannel::@91367b40241320001754",
+					"index" : 1
+				}
+			],
+			"paths" : 
+			[
+				"3rdparty/libdatachannel/CMakeFiles/Export/32c821eb1e7b36c3a3818aec162f7fd2/LibDataChannelTargets.cmake"
+			],
+			"type" : "export"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/LibDataChannel",
+			"paths" : 
+			[
+				"build/Desktop-Debug/LibDataChannelConfig.cmake",
+				"build/Desktop-Debug/LibDataChannelConfigVersion.cmake"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "3rdparty/libdatachannel",
+		"source" : "3rdparty/libdatachannel"
+	}
+}

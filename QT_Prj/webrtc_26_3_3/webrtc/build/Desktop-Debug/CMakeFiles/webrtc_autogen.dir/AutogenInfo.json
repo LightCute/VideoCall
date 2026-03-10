@@ -1,0 +1,239 @@
+{
+	"BUILD_DIR" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/webrtc_autogen",
+	"CMAKE_BINARY_DIR" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc",
+	"CMAKE_EXECUTABLE" : "/usr/local/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/CMakeLists.txt",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/.qtc/package-manager/auto-setup.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/CMakeFiles/4.2.0-rc4/CMakeSystem.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeSystemSpecificInitialize.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linux-Initialize.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeSystemSpecificInformation.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeGenericSystem.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeInitializeConfigs.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linux.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/UnixPaths.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeCXXInformation.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeLanguageInformation.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Compiler/Clang-CXX.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Compiler/Clang.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Compiler/GNU.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linux-Clang-CXX.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linux-GNU-CXX.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linux-GNU.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeCommonLanguageInclude.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Internal/CMakeCXXLinkerInformation.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Internal/CMakeCommonLinkerInformation.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Linker/GNU-CXX.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Linker/GNU.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linker/Linux-GNU-CXX.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linker/Linux-GNU.cmake",
+		"/usr/local/share/cmake-4.2/Modules/Platform/Linker/GNU.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreMacros.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeParseArguments.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTabletPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CMakeParseArguments.cmake",
+		"/usr/local/share/cmake-4.2/Modules/FindThreads.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CheckLibraryExists.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CheckIncludeFileCXX.cmake",
+		"/usr/local/share/cmake-4.2/Modules/CheckCXXSourceCompiles.cmake",
+		"/usr/local/share/cmake-4.2/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/local/share/cmake-4.2/Modules/FindPackageMessage.cmake",
+		"/usr/local/share/cmake-4.2/Modules/GNUInstallDirs.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/webrtc_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "webrtc_autogen/timestamp",
+	"HEADERS" : 
+	[
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/core/ConnectEvent.h",
+			"MU",
+			"PRMOGMWJPH/moc_ConnectEvent.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/core/IEventData.h",
+			"MU",
+			"PRMOGMWJPH/moc_IEventData.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/core/IEventQueue.h",
+			"MU",
+			"PRMOGMWJPH/moc_IEventQueue.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/core/core.h",
+			"MU",
+			"PRMOGMWJPH/moc_core.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/net/INet.h",
+			"MU",
+			"7OIUYE7PDQ/moc_INet.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/net/Websocket.h",
+			"MU",
+			"7OIUYE7PDQ/moc_Websocket.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/IUI.h",
+			"MU",
+			"YPKJ5OE7LN/moc_IUI.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/widget.h",
+			"MU",
+			"YPKJ5OE7LN/moc_widget.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/utilities/log.h",
+			"MU",
+			"JLQFWLRVOM/moc_log.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/webrtc_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/webrtc_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_WIDGETS_LIB",
+		"RTC_ENABLE_MEDIA=1",
+		"RTC_ENABLE_WEBSOCKET=1"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/libdatachannel/include",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/libdatachannel/deps/json/include",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/eventpp/include",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include",
+		"/usr/include/x86_64-linux-gnu/qt5",
+		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+		"/usr/include/x86_64-linux-gnu/qt5/QtGui",
+		"/usr/include/x86_64-linux-gnu/qt5/QtCore",
+		"/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
+		"/usr/include/c++/13",
+		"/usr/include/x86_64-linux-gnu/c++/13",
+		"/usr/include/c++/13/backward",
+		"/usr/lib/llvm-18/lib/clang/18/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu",
+		"/usr/include"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/clang++-18",
+		"-std=gnu++17",
+		"-w",
+		"-dM",
+		"-E",
+		"/usr/local/share/cmake-4.2/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/webrtc_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/CMakeFiles/webrtc_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/lib/qt5/bin/uic",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/CMakeFiles/webrtc_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/core/core.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/net/Websocket.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/widget.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}

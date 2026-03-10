@@ -1,0 +1,23 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/deps/plog/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/deps/usrsctp/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/deps/usrsctp/usrsctplib/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/deps/libsrtp/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/deps/libjuice/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/deps/json/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/client/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/client-benchmark/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/media-receiver/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/media-sender/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/media-sfu/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/streamer/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/copy-paste/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel/examples/copy-paste-capi/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/eventpp/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

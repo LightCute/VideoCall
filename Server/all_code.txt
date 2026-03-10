@@ -160,7 +160,7 @@ private:
 };
 
 ========== ./core/LoginServer.cpp ==========
-Lines: 317
+Lines: 336
 
 //LoginServer.cpp
 // LoginServer: protocol ↔ domain 的边界层
@@ -207,9 +207,18 @@ void LoginServer::startHeartbeatMonitor() {
 
                 if (dur > 15) { // 超过 15 秒没心跳就下线
                     std::cout << "[Server] heartbeat timeout fd=" << fd << std::endl;
+                    
+                    // 新增：先记录用户名（logout后会丢失）
+                    std::string username = info.user.username;
+                    
                     sessionMgr_.logout(fd);
                     close(fd);
 
+                    if (!username.empty()) {
+                        // 仅上报“用户断开”事实，不做任何业务判断
+                        dispatcher_.dispatch(fd, event::UserDisconnected{username});
+                    }
+                    
                     // 广播新的在线用户列表
                     auto onlineSnapshot = sessionMgr_.snapshot();
                     proto::OnlineUsers users;
@@ -228,7 +237,6 @@ void LoginServer::startHeartbeatMonitor() {
     }).detach();
 }
 
-
 void LoginServer::onAccept(int clientfd) {
     std::cout << "[Server] new client fd=" << clientfd << std::endl;
     
@@ -241,12 +249,11 @@ void LoginServer::clientThread(int clientfd) {
     std::vector<char> recvBuffer;
     char buf[1024];
 
-
-    
     while (true) {
         int n = recv(clientfd, buf, sizeof(buf), 0);
         if (n <= 0) {
-            break;}
+            break;
+        }
 
         recvBuffer.insert(recvBuffer.end(), buf, buf + n);
 
@@ -256,18 +263,29 @@ void LoginServer::clientThread(int clientfd) {
         }
     }
 
-    
-
     // 客户端断开处理
+    // 新增：先记录用户名（logout后会丢失）
+    std::string username;
+    auto snapshot = sessionMgr_.snapshot();
+    auto fd_it = snapshot.find(clientfd);
+    if (fd_it != snapshot.end()) {
+        username = fd_it->second.user.username;
+    }
+
     sessionMgr_.logout(clientfd);
 
-    auto snapshot = sessionMgr_.snapshot();
+    // 新增：处理该用户的活跃通话（等价于Hangup）
+    if (!username.empty()) {
+        dispatcher_.dispatch(clientfd, event::UserDisconnected{username});
+    }
+
+    auto onlineSnapshot = sessionMgr_.snapshot();
     proto::OnlineUsers users;
-    for (auto& [fd, info] : snapshot) {
+    for (auto& [fd, info] : onlineSnapshot) {
         users.users.push_back({info.user.username, info.user.privilege});
     }
     auto payload = proto::makeOnlineUsers(users);
-    for (auto& [fd, _] : snapshot) {
+    for (auto& [fd, _] : onlineSnapshot) {
         listener_.sendPacket(fd, payload);
     }
 
@@ -480,8 +498,9 @@ void LoginServer::handle(const ForwardText& a)
               << " content=" << a.content << std::endl;
 }
 
+
 ========== ./core/LoginServer.h ==========
-Lines: 59
+Lines: 60
 
 //LoginServer.h
 #pragma once
@@ -535,11 +554,12 @@ private:
     void handle(const SendMediaOffer& a);   
     void handle(const SendMediaAnswer& a);   
     void handle(const SendCallEnded& a);
+
     CommandSocket listener_;
     ThreadPool pool_{8};
     SessionManager sessionMgr_;
     LoginService loginService_;
-    CallService callService_;  // 新增：CallService成员
+    CallService callService_;  // CallService成员
     ServerEventDispatcher dispatcher_; // 调整顺序：需在callService_之后初始化
 };
 
@@ -673,7 +693,7 @@ public:
 };
 
 ========== ./service/CallService.h ==========
-Lines: 57
+Lines: 71
 
 // CallService.h
 #pragma once
@@ -724,8 +744,22 @@ public:
     // 通过呼叫方用户名查找通话会话（双向查找）
     std::optional<CallSession> findSessionByCaller(const std::string& caller);
 
+    // 双向查找会话（新增：根据任意一方用户名查找完整会话）
+    std::optional<CallSession> findSessionByAnyUser(const std::string& username);
+
     void deleteCallSessionByAnyUser(const std::string& username);
     
+    // 查询指定用户是否处于活跃通话中（纯能力接口，仅返回结果，不做后续处理）
+    bool isInCall(const std::string& username) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (const auto& [_, session] : activeCalls_) {
+            if (session.caller == username || session.callee == username) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 private:
     // 存储活跃通话：key=被呼叫方用户名（保证一个用户同时只能接一个来电）
     std::map<std::string, CallSession> activeCalls_;
@@ -772,7 +806,7 @@ LoginResult LoginService::handleLogin(const event::LoginRequest& req) {
 }
 
 ========== ./service/CallService.cpp ==========
-Lines: 138
+Lines: 147
 
 // CallService.cpp
 #include "CallService.h"
@@ -872,15 +906,13 @@ bool CallService::markMediaReady(const std::string& user) {
         // 检查是否双方都就绪
         if (session.caller_media_ready && session.callee_media_ready) {
             session.state = CallSession::MEDIA_READY;
-            // 双方就绪后可选择保留会话（如需支持挂断），也可删除
-            // activeCalls_.erase(key); // 可选：双方就绪后删除会话
+            // 双方就绪后保留会话，供挂断逻辑使用
             return true;
         }
         return false; // 仅单方就绪
     }
     return false; // 未找到通话会话
 }
-
 
 void CallService::deleteCallSession(const std::string& callee) {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -892,6 +924,17 @@ std::optional<CallSession> CallService::findSessionByCaller(const std::string& c
     std::lock_guard<std::mutex> lock(mutex_);
     for (const auto& [callee, session] : activeCalls_) {
         if (session.caller == caller) {
+            return session;
+        }
+    }
+    return std::nullopt;
+}
+
+// 新增：双向查找会话（根据任意一方用户名）
+std::optional<CallSession> CallService::findSessionByAnyUser(const std::string& username) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& [_, session] : activeCalls_) {
+        if (session.caller == username || session.callee == username) {
             return session;
         }
     }
@@ -912,7 +955,6 @@ void CallService::deleteCallSessionByAnyUser(const std::string& username) {
         }
     }
 }
-
 ========== ./service/ServerAction.h ==========
 Lines: 22
 
@@ -940,7 +982,7 @@ using ServerAction = std::variant<
 >;
 
 ========== ./dispatcher/ServerEventDispatcher.cpp ==========
-Lines: 539
+Lines: 561
 
 //ServerEventDispatcher.cpp
 #include "./dispatcher/ServerEventDispatcher.h"
@@ -1380,58 +1422,26 @@ ServerEventDispatcher::handle(int fd, const event::SendTextToUser& ev)
     return actions;
 }
 
-
-// 新增：处理CallEnded事件，传递peer和reason到业务层
+// 简化：CALL_ENDED仅由服务端下发，客户端无需发送该指令，此处标记为废弃
 std::vector<ServerAction>
 ServerEventDispatcher::handle(int fd, const event::CallEnded& ev)
 {
     std::vector<ServerAction> actions;
-
-    // 1. 验证当前用户是否已登录
-    if (!sessionMgr_.exists(fd)) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "You are not logged in, cannot send call ended notification"
-        });
-        return actions;
-    }
-
-    // 2. 获取当前用户用户名（挂断方）
-    auto snapshot = sessionMgr_.snapshot();
-    std::string current_user = snapshot.at(fd).user.username;
-
-    // 3. 查找对端（ev.peer）的FD（验证对端是否在线）
-    int peer_fd = sessionMgr_.getFdByUsername(ev.peer);
-    if (peer_fd == -1) {
-        actions.emplace_back(SendError{
-            .fd = fd,
-            .reason = "Peer user " + ev.peer + " is offline"
-        });
-        return actions;
-    }
-
-    // 4. 生成SendCallEnded动作，将peer（挂断方）和reason（挂断原因）传递到业务层
-    actions.emplace_back(SendCallEnded{
-        .fd = peer_fd,          // 目标fd：对端客户端
-        .peer = current_user,    // 挂断方用户名
-        .reason = ev.reason      // 挂断原因（从事件中传递而来）
+    actions.emplace_back(SendError{
+        .fd = fd,
+        .reason = "Client cannot send CALL_ENDED, please use CALL_HANGUP instead"
     });
-
-    // 5. （可选）清理对应的通话会话（优化：避免残留无效会话）
-    callService_.deleteCallSession(ev.peer);
-
-    std::cout << "[Dispatcher] Call ended notification: " << current_user 
-              << " -> " << ev.peer << " reason: " << ev.reason << std::endl;
+    std::cout << "[Dispatcher] Rejected client CALL_ENDED request from fd=" << fd << std::endl;
     return actions;
 }
 
-
+// 处理CallHangup事件（核心重构：收回通话结束裁决权）
 std::vector<ServerAction>
 ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
 {
     std::vector<ServerAction> actions;
 
-    // 1. 验证当前用户是否已登录（防御式编程，避免未登录用户发送挂断请求）
+    // 1. 验证当前用户是否已登录（防御式编程）
     if (!sessionMgr_.exists(fd)) {
         actions.emplace_back(SendError{
             .fd = fd,
@@ -1442,31 +1452,36 @@ ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
 
     // 2. 获取当前用户（主动挂断方）的用户名
     auto snapshot = sessionMgr_.snapshot();
-    std::string current_user = snapshot.at(fd).user.username;
+    auto fd_it = snapshot.find(fd);
+    if (fd_it == snapshot.end()) {
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "User session not found"
+        });
+        return actions;
+    }
+    std::string current_user = fd_it->second.user.username;
 
-    // 3. 查找当前用户的活跃通话会话（双向查找：呼叫方/被呼叫方）
-    // 先按呼叫方查找，再按媒体协商会话查找（兼容现有CallService逻辑）
-    std::optional<CallSession> call_session = callService_.findSessionByCaller(current_user);
+    // 3. 双向查找当前用户的活跃通话会话（使用新增的findSessionByAnyUser）
+    std::optional<CallSession> call_session = callService_.findSessionByAnyUser(current_user);
     if (!call_session) {
-        call_session = callService_.onMediaNegotiate(current_user);
-        if (!call_session) {
-            actions.emplace_back(SendError{
-                .fd = fd,
-                .reason = "No active call to hang up"
-            });
-            return actions;
-        }
+        actions.emplace_back(SendError{
+            .fd = fd,
+            .reason = "No active call to hang up"
+        });
+        return actions;
     }
 
-    // 4. 确定对端用户名（区分呼叫方/被呼叫方）
+    // 4. 确定对端用户名
     std::string peer_user = (call_session->caller == current_user) 
         ? call_session->callee 
         : call_session->caller;
 
-    // 5. 查找对端用户的FD（验证对端是否在线）
+    // 5. 查找对端用户的FD
     int peer_fd = sessionMgr_.getFdByUsername(peer_user);
+
+    // 6. 步骤1：给对端发送CALL_ENDED（通知对方通话结束）
     if (peer_fd != -1) {
-        // 生成SendCallEnded动作，通知对端客户端（原因：主动挂断）
         actions.emplace_back(SendCallEnded{
             .fd = peer_fd,
             .peer = current_user,
@@ -1474,16 +1489,65 @@ ServerEventDispatcher::handle(int fd, const event::CallHangup& ev)
         });
     }
 
-    // 6. 清理活跃通话会话（避免残留无效会话，保证CallService数据一致性）
-    callService_.deleteCallSession(call_session->callee);
+    // 7. 步骤2：给自身发送CALL_ENDED（关键：让客户端FSM靠服务端通知结束，而非本地按钮）
+    actions.emplace_back(SendCallEnded{
+        .fd = fd,
+        .peer = peer_user,
+        .reason = "You hung up the call"
+    });
+
+    // 8. 步骤3：最后清理活跃通话会话（顺序不可乱，先通知再删除）
+    callService_.deleteCallSessionByAnyUser(current_user);
 
     std::cout << "[Dispatcher] Call hung up by user: " << current_user 
               << ", peer: " << peer_user << std::endl;
     return actions;
 }
 
+
+// 处理 UserDisconnected 事件，接管业务裁决
+std::vector<ServerAction>
+ServerEventDispatcher::handle(int fd, const event::UserDisconnected& ev) {
+    std::vector<ServerAction> actions;
+    const std::string& username = ev.username;
+
+    // 步骤1：裁决 - 判断用户是否处于活跃通话中（调用 CallService 的纯能力接口）
+    if (!callService_.isInCall(username)) {
+        // 无活跃通话，直接返回，不执行任何后续操作
+        return actions;
+    }
+
+    // 步骤2：获取通话会话信息（调用 CallService 的纯能力接口）
+    std::optional<CallSession> call_session = callService_.findSessionByAnyUser(username);
+    if (!call_session) {
+        return actions;
+    }
+
+    // 步骤3：确定对端用户名和 FD（调用 SessionManager 的查询能力）
+    std::string peer_user = (call_session->caller == username) 
+        ? call_session->callee 
+        : call_session->caller;
+    int peer_fd = sessionMgr_.getFdByUsername(peer_user);
+
+    // 步骤4：生成 Action - 通知对端通话结束（业务执行）
+    if (peer_fd != -1) {
+        actions.emplace_back(SendCallEnded{
+            .fd = peer_fd,
+            .peer = username,
+            .reason = "Peer disconnected unexpectedly"
+        });
+    }
+
+    // 步骤5：清理通话会话（调用 CallService 的纯能力接口）
+    callService_.deleteCallSessionByAnyUser(username);
+
+    std::cout << "[Dispatcher] User disconnected and call ended: " << username 
+              << ", peer: " << peer_user << std::endl;
+    return actions;
+}
+
 ========== ./dispatcher/ServerEventDispatcher.h ==========
-Lines: 37
+Lines: 38
 
 //ServerEventDispatcher.h
 #pragma once
@@ -1517,7 +1581,8 @@ private:
     std::vector<ServerAction> handle(int fd, const event::MediaAnswer& ev);  
     std::vector<ServerAction> handle(int fd, const event::CallEnded& ev);
     std::vector<ServerAction> handle(int fd, const event::CallHangup& ev);
-
+    std::vector<ServerAction> handle(int fd, const event::UserDisconnected& ev);
+    
     LoginService&  loginService_;
     SessionManager& sessionMgr_;
     CallService& callService_;
@@ -1748,7 +1813,7 @@ ServerEvent ServerEventFactory::makeEvent(const std::string& msg)
 }
 
 ========== ./event/ServerEvents.h ==========
-Lines: 68
+Lines: 73
 
 //ServerEvents.h
 #pragma once
@@ -1811,16 +1876,21 @@ struct MediaAnswer {
 
 struct CallHangup {};
 
-// 新增：通话结束事件（承载peer和reason信息）
+// 通话结束事件（承载peer和reason信息）
 struct CallEnded {
     std::string peer;       // 对端用户名
     std::string reason;     // 挂断原因（如"主动挂断"、"超时"等）
 };
 
+// 用户断开事件（core 上报“用户断开”这一事实，无业务逻辑）
+struct UserDisconnected {
+    std::string username; // 断开连接的用户名（用于后续业务处理）
+};
+
 } // namespace event
 
 ========== ./event/ServerEvent.h ==========
-Lines: 28
+Lines: 29
 
 //ServerEvent.h
 #pragma once
@@ -1843,7 +1913,8 @@ using ServerEvent = std::variant<
     event::MediaOffer,
     event::MediaAnswer,
     event::CallHangup,
-    event::CallEnded  
+    event::CallEnded ,
+    event::UserDisconnected
         // event::Chat,
     // 以后只需要往这里加
 >;
@@ -2480,4 +2551,4 @@ constexpr const char* KEY_COUNT     = "count";
 
 =====================================
 Total files: 27
-Total lines: 2319
+Total lines: 2391

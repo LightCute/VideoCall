@@ -1,0 +1,1 @@
+/bin/clang-18 -g -Xlinker --dependency-file=CMakeFiles/cipher_driver.dir/link.d CMakeFiles/cipher_driver.dir/crypto/test/cipher_driver.c.o CMakeFiles/cipher_driver.dir/test/getopt_s.c.o -o cipher_driver  libsrtp2.a /usr/lib/x86_64-linux-gnu/libcrypto.so

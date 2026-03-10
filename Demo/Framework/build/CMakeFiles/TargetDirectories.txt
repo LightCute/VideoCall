@@ -1,0 +1,3 @@
+/home/light/work/Video_Prj/Demo/Framework/build/CMakeFiles/app.dir
+/home/light/work/Video_Prj/Demo/Framework/build/CMakeFiles/edit_cache.dir
+/home/light/work/Video_Prj/Demo/Framework/build/CMakeFiles/rebuild_cache.dir

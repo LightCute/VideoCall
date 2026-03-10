@@ -1,0 +1,1 @@
+/usr/bin/clang++-18 -DQT_QML_DEBUG -g -Xlinker --dependency-file=CMakeFiles/datachannel-benchmark.dir/link.d "CMakeFiles/datachannel-benchmark.dir/test/benchmark.cpp.o" -o benchmark-0.24.1  -Wl,-rpath,/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel libdatachannel.so.0.24.1

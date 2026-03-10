@@ -1,0 +1,121 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"3rdparty/libdatachannel/deps/libsrtp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 301,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 305,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 479,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 509,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 9
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"3rdparty/libdatachannel/deps/libsrtp/libsrtp2.a"
+			],
+			"targetId" : "srtp2::@00b9c186a284f0f740c4",
+			"targetIndex" : 23,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"cxxModuleBmiTarget" : 
+			{
+				"id" : "srtp2::@00b9c186a284f0f740c4",
+				"index" : 23
+			},
+			"destination" : "lib",
+			"type" : "cxxModuleBmi"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "include/srtp2",
+			"paths" : 
+			[
+				"3rdparty/libdatachannel/deps/libsrtp/include/srtp.h",
+				"3rdparty/libdatachannel/deps/libsrtp/crypto/include/auth.h",
+				"3rdparty/libdatachannel/deps/libsrtp/crypto/include/cipher.h",
+				"3rdparty/libdatachannel/deps/libsrtp/crypto/include/crypto_types.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/libSRTP",
+			"exportName" : "libSRTPTargets",
+			"exportTargets" : 
+			[
+				{
+					"id" : "srtp2::@00b9c186a284f0f740c4",
+					"index" : 23
+				}
+			],
+			"paths" : 
+			[
+				"3rdparty/libdatachannel/deps/libsrtp/CMakeFiles/Export/4057af6c16ac9b4df3236859d5c9bdc7/libSRTPTargets.cmake"
+			],
+			"type" : "export"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/libSRTP",
+			"paths" : 
+			[
+				"build/Desktop-Debug/3rdparty/libdatachannel/deps/libsrtp/libSRTPConfig.cmake",
+				"build/Desktop-Debug/3rdparty/libdatachannel/deps/libsrtp/libSRTPConfigVersion.cmake"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "3rdparty/libdatachannel/deps/libsrtp",
+		"source" : "3rdparty/libdatachannel/deps/libsrtp"
+	}
+}

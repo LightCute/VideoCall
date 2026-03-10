@@ -1,0 +1,58 @@
+[2026-03-10 21:43:42.955] [201939] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
+[2026-03-10 21:43:42.955] [201939] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
+[2026-03-10 21:43:42.957] [201948] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
+[2026-03-10 21:43:42.957] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@188: Entering poll
+[2026-03-10 21:43:42.964] [201939] [trace] [RTC] rtc::impl::WebSocket::WebSocket@42: Creating WebSocket
+[2026-03-10 21:43:42.964] [201939] [trace] [RTC] rtc::impl::WebSocket::open@72: Opening WebSocket to URL: ws://120.79.210.6:8000/abcd
+[2026-03-10 21:43:42.967] [201939] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
+[2026-03-10 21:43:42.967] [201939] [trace] [RTC] rtc::impl::WebSocket::setTcpTransport@225: Starting TCP transport
+[2026-03-10 21:43:42.967] [201939] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
+[2026-03-10 21:43:42.967] [201941] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
+[2026-03-10 21:43:42.968] [201941] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
+[2026-03-10 21:43:42.968] [201941] [trace] [RTC] rtc::impl::TcpTransport::createSocket@245: Creating TCP socket
+[2026-03-10 21:43:42.968] [201941] [trace] [RTC] rtc::impl::PollService::add@59: Registering socket in poll service, direction=out
+[2026-03-10 21:43:42.968] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@194: Exiting poll
+[2026-03-10 21:43:42.969] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@185: Entering poll, timeout=10000ms
+[2026-03-10 21:43:42.991] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@194: Exiting poll
+[2026-03-10 21:43:42.991] [201948] [trace] [RTC] rtc::impl::PollService::process@142: Poll out event
+[2026-03-10 21:43:42.991] [201948] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
+[2026-03-10 21:43:42.991] [201948] [trace] [RTC] rtc::impl::WebSocket::initWsTransport@399: Starting WebSocket transport
+[2026-03-10 21:43:42.992] [201948] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
+[2026-03-10 21:43:42.992] [201948] [trace] [RTC] rtc::impl::Transport::registerIncoming@27: Registering incoming callback
+[2026-03-10 21:43:42.992] [201948] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
+[2026-03-10 21:43:42.992] [201948] [trace] [RTC] rtc::impl::TcpTransport::send@115: Send size=160
+[2026-03-10 21:43:42.992] [201948] [trace] [RTC] rtc::impl::PollService::add@59: Registering socket in poll service, direction=in
+[2026-03-10 21:43:42.992] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@185: Entering poll, timeout=10000ms
+[2026-03-10 21:43:42.992] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@194: Exiting poll
+[2026-03-10 21:43:42.992] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@185: Entering poll, timeout=10000ms
+[2026-03-10 21:43:43.017] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@194: Exiting poll
+[2026-03-10 21:43:43.017] [201948] [trace] [RTC] rtc::impl::PollService::process@138: Poll in event
+[2026-03-10 21:43:43.017] [201948] [trace] [RTC] rtc::impl::TcpTransport::incoming@123: Incoming size=203
+[2026-03-10 21:43:43.017] [201948] [trace] [RTC] rtc::impl::WsTransport::incoming@119: Incoming size=203
+[2026-03-10 21:43:43.017] [201948] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
+[2026-03-10 21:43:43.017] [201948] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
+[2026-03-10 21:43:43.017] [201948] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
+[2026-03-10 21:43:43.017] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@185: Entering poll, timeout=10000ms
+[2026-03-10 21:43:50.848] [201857] [trace] [RTC] rtc::impl::WebSocket::close@144: Closing WebSocket
+[2026-03-10 21:43:50.848] [201857] [info] [RTC] rtc::impl::WsTransport::close@95: WebSocket closing
+[2026-03-10 21:43:50.848] [201857] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=8, length=0
+[2026-03-10 21:43:50.848] [201857] [trace] [RTC] rtc::impl::TcpTransport::send@115: Send size=6
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@194: Exiting poll
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::PollService::process@138: Poll in event
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::TcpTransport::incoming@123: Incoming size=2
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::WsTransport::incoming@119: Incoming size=2
+[2026-03-10 21:43:50.868] [201948] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=8, length=0
+[2026-03-10 21:43:50.868] [201948] [info] [RTC] rtc::impl::WsTransport::recvFrame@358: WebSocket closed
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::WebSocket::closeTransports@485: Closing transports
+[2026-03-10 21:43:50.868] [201948] [info] [RTC] rtc::impl::TcpTransport::process@433: TCP disconnected
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::PollService::remove@72: Unregistering socket in poll service
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@188: Entering poll
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@194: Exiting poll
+[2026-03-10 21:43:50.868] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@188: Entering poll
+[2026-03-10 21:43:50.869] [201944] [trace] [RTC] rtc::impl::Transport::unregisterIncoming@34: Unregistering incoming callback
+[2026-03-10 21:43:50.869] [201944] [trace] [RTC] rtc::impl::Transport::unregisterIncoming@34: Unregistering incoming callback
+[2026-03-10 21:43:50.869] [201944] [debug] [RTC] rtc::impl::TcpTransport::close@300: Closing TCP socket
+[2026-03-10 21:43:50.869] [201944] [trace] [RTC] rtc::impl::PollService::remove@72: Unregistering socket in poll service
+[2026-03-10 21:43:50.869] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@194: Exiting poll
+[2026-03-10 21:43:50.869] [201948] [trace] [RTC] rtc::impl::PollService::runLoop@188: Entering poll
+[2026-03-10 21:43:50.906] [201857] [trace] [RTC] rtc::impl::WebSocket::~WebSocket@69: Destroying WebSocket

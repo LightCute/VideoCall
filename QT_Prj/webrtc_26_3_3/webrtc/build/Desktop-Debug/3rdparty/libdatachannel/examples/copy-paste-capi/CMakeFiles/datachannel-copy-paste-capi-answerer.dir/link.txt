@@ -1,0 +1,1 @@
+/bin/clang-18 -g -Xlinker --dependency-file=CMakeFiles/datachannel-copy-paste-capi-answerer.dir/link.d "CMakeFiles/datachannel-copy-paste-capi-answerer.dir/answerer.c.o" -o answerer-capi  -Wl,-rpath,/home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/build/Desktop-Debug/3rdparty/libdatachannel ../../libdatachannel.so.0.24.1
