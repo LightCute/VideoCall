@@ -553,6 +553,90 @@ CMakeFiles/webrtc.dir/src/ui/widget.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/libdatachannel/deps/json/include/nlohmann/detail/macro_unscope.hpp \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/libdatachannel/deps/json/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/../core/core.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/../core/../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/spdlog.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/common.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/null_mutex.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/tweakme.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/fmt/fmt.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/fmt/bundled/format.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/fmt/bundled/base.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/fmt/bundled/format-inl.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/climits \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/common-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/registry.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/periodic_worker.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/periodic_worker-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/registry-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/logger.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/backtracer.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/circular_q.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/log_msg_buffer.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/log_msg.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/log_msg-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/os.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/os-inl.h \
+  /usr/include/x86_64-linux-gnu/sys/stat.h \
+  /usr/include/x86_64-linux-gnu/bits/stat.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
+  /usr/include/x86_64-linux-gnu/bits/statx.h /usr/include/linux/stat.h \
+  /usr/include/linux/types.h /usr/include/x86_64-linux-gnu/asm/types.h \
+  /usr/include/asm-generic/types.h /usr/include/asm-generic/int-ll64.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
+  /usr/include/asm-generic/bitsperlong.h \
+  /usr/include/linux/posix_types.h /usr/include/linux/stddef.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
+  /usr/include/fcntl.h /usr/include/x86_64-linux-gnu/bits/fcntl.h \
+  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+  /usr/include/linux/falloc.h /usr/include/unistd.h \
+  /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+  /usr/include/x86_64-linux-gnu/bits/environments.h \
+  /usr/include/x86_64-linux-gnu/bits/confname.h \
+  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+  /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
+  /usr/include/linux/close_range.h \
+  /usr/include/x86_64-linux-gnu/sys/syscall.h \
+  /usr/include/x86_64-linux-gnu/asm/unistd.h \
+  /usr/include/x86_64-linux-gnu/asm/unistd_64.h \
+  /usr/include/x86_64-linux-gnu/bits/syscall.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/log_msg_buffer-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/backtracer-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/logger-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/pattern_formatter.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/formatter.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/pattern_formatter-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/fmt_helper.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/mdc.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/sink.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/ansicolor_sink.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/console_globals.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/ansicolor_sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/synchronous_factory.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/version.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/spdlog-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/basic_file_sink.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/file_helper.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/file_helper-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/base_sink.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/base_sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/basic_file_sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/stdout_color_sinks.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/sinks/stdout_color_sinks-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/async.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/async_logger.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/async_logger-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/thread_pool.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/mpmc_blocking_q.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/thread_pool-inl.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/../ui/IUI.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/../core/ConnectEvent.h \
-  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/../core/IEventData.h
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/../core/IEventData.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/ui/../utilities/log.h

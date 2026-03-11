@@ -28,7 +28,7 @@
 
 
 ========== ./main.cpp ==========
-Lines: 53
+Lines: 58
 
 #include "src/ui/widget.h"
 
@@ -40,28 +40,27 @@ Lines: 53
 #include "./src/core/core.h"
 #include "src/utilities/log.h"
 
-
-void myLogCallback(rtcLogLevel level, const char* message) {
+void myCppLogCallback(rtc::LogLevel level, std::string message) {
     switch (level) {
-        case RTC_LOG_FATAL:
-        case RTC_LOG_ERROR:
-            Log::error("[RTC] {}", message);
-            break;
-        case RTC_LOG_WARNING:
-            Log::warn("[RTC] {}", message);
-            break;
-        case RTC_LOG_INFO:
-            Log::info("[RTC] {}", message);
-            break;
-        case RTC_LOG_DEBUG:
-            Log::debug("[RTC] {}", message);
-            break;
-        case RTC_LOG_VERBOSE:
-            Log::trace("[RTC] {}", message);
-            break;
-        default:
-            Log::info("[RTC] {}", message);
-            break;
+    case rtc::LogLevel::Fatal:
+    case rtc::LogLevel::Error:
+        Log::error("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Warning:
+        Log::warn("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Info:
+        Log::info("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Debug:
+        Log::debug("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Verbose:
+        Log::trace("[RTC] {}", message);
+        break;
+    default:
+        Log::info("[RTC] {}", message);
+        break;
     }
 }
 
@@ -70,16 +69,22 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Log::init("webrtc.log", Log::Mode::Async, spdlog::level::trace);
+    Log::info("[APP] Application starting");
 
-    rtcInitLogger(RTC_LOG_DEBUG, myLogCallback);
+    rtc::InitLogger(rtc::LogLevel::Verbose, myCppLogCallback);
+    Log::info("[APP] RTC logger initialized");
 
     Core core;
+    Log::info("[APP] Core created");
 
     WebSocketClient net(&core);
+    Log::info("[APP] WebSocketClient created");
 
     Widget w(&core);
+    Log::info("[APP] Widget created");
 
     w.show();
+    Log::info("[APP] Entering Qt event loop");
 
     return a.exec();
 }
@@ -188,7 +193,7 @@ public:
     static void critical(const char* fmt, Args&&... args) { spdlog::critical(fmt, std::forward<Args>(args)...); }
 };
 ========== ./src/core/ConnectEvent.h ==========
-Lines: 13
+Lines: 14
 
 #pragma once
 #include <string>
@@ -199,6 +204,7 @@ public:
     MessageEvent(const std::string& msg, bool u) : message(msg), urgent(u) {}
 
     std::string getURL() {return message;}
+    std::string getEventName() const override { return "MessageEvent"; }
 private:
     std::string message;
     bool urgent;
@@ -231,12 +237,13 @@ public:
 };
 
 ========== ./src/core/core.h ==========
-Lines: 29
+Lines: 33
 
 #pragma once
 #include <eventpp/eventqueue.h>
 #include <string>
 #include "IEventQueue.h"
+#include "../utilities/log.h"
 
 class Core : public IEventQueue {
 public:
@@ -244,6 +251,7 @@ public:
     void enqueue(EventType event,
                  std::shared_ptr<IEventData> data) override
     {
+        Log::debug("[CORE] enqueue event {}", data->getEventName());
         queue.enqueue(event, data);
     }
 
@@ -251,11 +259,13 @@ public:
         EventType event,
         std::function<void(std::shared_ptr<IEventData>)> cb) override
     {
+        Log::debug("[CORE] appendListener event {}", (int)event);
         queue.appendListener(event, cb);
     }
 
     bool process() override
     {
+        Log::trace("[CORE] processing events");
         return queue.process();
     }
 
@@ -264,7 +274,7 @@ private:
 };
 
 ========== ./src/core/IEventData.h ==========
-Lines: 11
+Lines: 12
 
 #pragma once
 enum class EventType {
@@ -276,28 +286,35 @@ enum class EventType {
 class IEventData {
 public:
     virtual ~IEventData() = default;
+    virtual std::string getEventName() const = 0;
 };
 
 ========== ./src/net/Websocket.cpp ==========
-Lines: 87
+Lines: 99
 
 #include "Websocket.h"
 #include <iostream>
 #include "../core/ConnectEvent.h"
+#include "../utilities/log.h"
+
 WebSocketClient::WebSocketClient(IEventQueue* queue)
     : m_queue( queue)
 {
-    //rtc::InitLogger(rtc::LogLevel::Debug);
+    Log::info("[NET] WebSocketClient constructed");
 
     m_queue->appendListener(
         EventType::UI_NetConnectServer,
         [this](std::shared_ptr<IEventData> data)
         {
+            Log::debug("[NET] received UI_NetConnectServer event");
             auto msg = std::dynamic_pointer_cast<MessageEvent>(data);
             if(msg)
+            {                
+                Log::info("[NET] connecting to {}", msg->getURL());
                 connect(msg->getURL());
+            }                
         }
-        );
+    );
 }
 
 WebSocketClient::~WebSocketClient()
@@ -307,67 +324,73 @@ WebSocketClient::~WebSocketClient()
 
 void WebSocketClient::connect(const std::string& url)
 {
+    Log::info("[NET] connect {}", url);
     running = true;
 
     networkThread = std::thread([this, url]()
     {
+        Log::info("[NET] network thread started");
         ws = std::make_shared<rtc::WebSocket>();
-
+        Log::debug("[NET] rtc::WebSocket created");
         ws->onOpen([]()
         {
-            std::cout << "WebSocket connected\n";
+            Log::info("[NET] WebSocket onOpen");
         });
 
         ws->onClosed([]()
         {
-            std::cout << "WebSocket closed\n";
+            Log::info("[NET] WebSocket onClosed");
         });
 
         ws->onMessage([this](rtc::message_variant msg)
         {
+            Log::debug("[NET] WebSocket onMessage");
 
+            if(auto str = std::get_if<std::string>(&msg))
+            {
+                Log::info("[NET] received message {}", *str);
+            }
         });
-
+        Log::info("[NET] opening websocket {}", url);
         ws->open(url);
 
         while(running)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        Log::info("[NET] network thread exiting");
     });
 }
 
 void WebSocketClient::send(const std::string& msg)
 {
+    Log::debug("[NET] send {}", msg);
     if(ws)
         ws->send(msg);
 }
 
 void WebSocketClient::close()
 {
+    Log::info("[NET] closing websocket client");
     running = false;
 
     if(ws)
+    {
+        Log::debug("[NET] closing websocket");
         ws->close();
+    }
 
     if(networkThread.joinable())
+    {
+        Log::debug("[NET] joining network thread");
         networkThread.join();
+    }
+
+    Log::info("[NET] websocket client closed");
 }
 
 
-// void WebSocketClient::onMessage(MessageCallback cb)
-// {
-//     ws->onMessage([this](rtc::message_variant msg)
-//                   {
-//                       if(auto str = std::get_if<std::string>(&msg))
-//                       {
-//                           m_queue->enqueue(
-//                               EventType::Net_RecvMessage,
-//                               std::make_shared<MessageEvent>(*str,false)
-//                               );
-//                       }
-//                   });
-// }
+
 
 ========== ./src/net/INet.h ==========
 Lines: 17
@@ -424,7 +447,7 @@ private:
 };
 
 ========== ./src/ui/widget.cpp ==========
-Lines: 47
+Lines: 53
 
 #include "widget.h"
 #include "ui_widget.h"
@@ -434,6 +457,7 @@ Lines: 47
 #include "../ui/IUI.h"
 #include <iostream>
 #include "../core/ConnectEvent.h"
+#include "../utilities/log.h"
 
 Widget::Widget(IEventQueue* queue, QWidget *parent)
     : QWidget(parent)
@@ -441,10 +465,12 @@ Widget::Widget(IEventQueue* queue, QWidget *parent)
     , m_timer(new QTimer(this))
     , m_queue(queue)
 {
+    Log::info("[UI] Widget constructed");
     ui->setupUi(this);
     
 
     connect(m_timer, &QTimer::timeout, [this]() {
+        Log::trace("[UI] timer tick -> process events");
         m_queue->process();
     });
     m_timer->start(10);
@@ -453,13 +479,16 @@ Widget::Widget(IEventQueue* queue, QWidget *parent)
 Widget::~Widget()
 {
     delete ui;
+    Log::info("[UI] Widget destroyed");
 }
+
 
 
 
 
 void Widget::on_bt_connect_clicked()
 {
+    Log::trace("[UI] timer tick -> process events");
     m_queue->enqueue(
         EventType::UI_NetConnectServer,
         std::make_shared<MessageEvent>(
@@ -491,7 +520,7 @@ public:
 };
 
 ========== ./src/ui/widget.h ==========
-Lines: 33
+Lines: 35
 
 #ifndef WIDGET_H
 #define WIDGET_H
@@ -499,9 +528,11 @@ Lines: 33
 #include <QWidget>
 #include <memory>
 #include <QTimer>
-#include "../net/Websocket.h"       // ✅ 正确：src/ui/ → src/ → src/net/
-#include "IUI.h"                    // ✅ 正确：IUI.h 和 widget.h 在同一目录
-#include "../core/IEventQueue.h"    // ✅ 正确：src/ui/ → src/ → src/core/
+#include "../net/Websocket.h"       
+#include "IUI.h"                    
+#include "../core/IEventQueue.h"   
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class Widget;
@@ -530,4 +561,4 @@ private:
 
 =====================================
 Total files: 13
-Total lines: 449
+Total lines: 480

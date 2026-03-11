@@ -1,39 +1,39 @@
-[2026-03-09 21:57:01.585] [1311310] [info] Main: Starting application, thread id: 129375193589632
-[2026-03-09 21:57:01.585] [1311310] [debug] EventBus: Router set
-[2026-03-09 21:57:01.586] [1311310] [info] EventBus: Logic thread started, id: 129375174186688
-[2026-03-09 21:57:01.586] [1311312] [debug] EventBus: Logic loop started
-[2026-03-09 21:57:01.586] [1311310] [info] Core: Background thread started, id: 129375085262528
-[2026-03-09 21:57:01.586] [1311310] [debug] SessionManager: Created
-[2026-03-09 21:57:01.586] [1311310] [debug] LoginSession: Created
-[2026-03-09 21:57:01.586] [1311310] [info] SessionManager: Registering session for event type: 10LoginEvent
-[2026-03-09 21:57:01.586] [1311310] [debug] EventRouter: Listener registered for event type: 10LoginEvent, total listeners: 1
-[2026-03-09 21:57:01.586] [1311310] [info] LoginSession: Starting
-[2026-03-09 21:57:01.586] [1311310] [info] LoggedOutState: Entered logged out state.
-[2026-03-09 21:57:01.586] [1311310] [info] SessionManager: Session created, total sessions: 1
-[2026-03-09 21:57:01.586] [1311310] [info] UI: User click login
-[2026-03-09 21:57:01.586] [1311310] [trace] EventBus: Publishing event type: 10LoginEvent
-[2026-03-09 21:57:01.586] [1311313] [debug] Core: Command processing loop started
-[2026-03-09 21:57:01.586] [1311312] [trace] EventBus: Routing event type: 10LoginEvent
-[2026-03-09 21:57:01.586] [1311312] [trace] EventRouter: Routing event type: 10LoginEvent to 1 listeners
-[2026-03-09 21:57:01.586] [1311312] [debug] LoginSession: Handling event type: 10LoginEvent
-[2026-03-09 21:57:01.586] [1311312] [debug] LoggedOutState: Received event type: 10LoginEvent
-[2026-03-09 21:57:01.586] [1311312] [info] LoggedOutState: Processing login event, user: user, success: true
-[2026-03-09 21:57:01.586] [1311312] [debug] Core: Posting command type: LoginCommand
-[2026-03-09 21:57:01.586] [1311312] [info] LoggedOutState: Transitioning to LoggedInState
-[2026-03-09 21:57:01.586] [1311312] [info] LoginSession: State transition triggered
-[2026-03-09 21:57:01.586] [1311312] [info] LoggedOutState: Exited logged out state.
-[2026-03-09 21:57:01.586] [1311312] [info] LoggedInState: Entered logged in state.
-[2026-03-09 21:57:01.586] [1311313] [trace] Core: Executing command type: LoginCommand
-[2026-03-09 21:57:01.586] [1311313] [info] LoginReceiver: Processing login - user = user, token = 123456, timestamp = 1773064621586
-[2026-03-09 21:57:02.586] [1311310] [info] SessionManager: Destroying, cleaning up 1 sessions
-[2026-03-09 21:57:02.586] [1311310] [debug] SessionManager: Unregistering listener for event type: 10LoginEvent
-[2026-03-09 21:57:02.586] [1311310] [debug] EventRouter: Unregistering listener for event type: 10LoginEvent
-[2026-03-09 21:57:02.586] [1311310] [info] LoginSession: Stopping
-[2026-03-09 21:57:02.586] [1311310] [info] LoggedInState: Exited logged in state.
-[2026-03-09 21:57:02.586] [1311310] [info] Core: Destroying, stopping background thread
-[2026-03-09 21:57:02.587] [1311313] [info] LoginReceiver: Login completed for user: user
-[2026-03-09 21:57:02.587] [1311313] [debug] Core: Command[LoginCommand] executed successfully
-[2026-03-09 21:57:02.587] [1311313] [debug] Core: Command processing loop exited
-[2026-03-09 21:57:02.587] [1311312] [debug] EventBus: Logic loop exited
-[2026-03-09 21:57:02.588] [1311310] [info] EventBus: Logic thread exited.
-[2026-03-09 21:57:02.588] [1311310] [info] Main: Exiting application
+[2026-03-11 22:03:10.513] [432479] [info] Main: Starting application, thread id: 130945014245248
+[2026-03-11 22:03:10.514] [432479] [debug] [EventBus] Router set
+[2026-03-11 22:03:10.514] [432479] [info] [EventBus] Logic thread started, id: [130944995219136]
+[2026-03-11 22:03:10.514] [432481] [debug] [EventBus] Logic loop started
+[2026-03-11 22:03:10.514] [432479] [info] [Core] Background thread started, id: [130944851769024]
+[2026-03-11 22:03:10.514] [432479] [debug] [SessionManager] Created
+[2026-03-11 22:03:10.514] [432479] [debug] [LoginSession] Created
+[2026-03-11 22:03:10.514] [432479] [info] [SessionManager] Registering session for event type: [10LoginEvent]
+[2026-03-11 22:03:10.514] [432479] [debug] [EventRouter] Listener registered for event type: [10LoginEvent], total listeners: [1]
+[2026-03-11 22:03:10.514] [432479] [info] [LoginSession] Starting
+[2026-03-11 22:03:10.514] [432479] [info] LoggedOutState: Entered logged out state.
+[2026-03-11 22:03:10.514] [432479] [info] [SessionManager] Session created, total sessions: [1]
+[2026-03-11 22:03:10.514] [432482] [debug] [Core] Command processing loop started
+[2026-03-11 22:03:11.515] [432483] [info] UI: User click login
+[2026-03-11 22:03:11.515] [432483] [trace] [EventBus] Publishing event type: [10LoginEvent]
+[2026-03-11 22:03:11.515] [432481] [trace] [EventBus] Routing event type: [10LoginEvent]
+[2026-03-11 22:03:11.515] [432481] [trace] [EventRouter] Routing event type: [10LoginEvent] to [1] listeners
+[2026-03-11 22:03:11.515] [432481] [debug] [LoginSession] Handling event type: [10LoginEvent]
+[2026-03-11 22:03:11.515] [432481] [debug] LoggedOutState: Received event type: 10LoginEvent
+[2026-03-11 22:03:11.515] [432481] [info] LoggedOutState: Processing login event, user: user, success: true
+[2026-03-11 22:03:11.515] [432481] [debug] [Core] Posting command type: [LoginCommand]
+[2026-03-11 22:03:11.515] [432481] [info] LoggedOutState: Transitioning to LoggedInState
+[2026-03-11 22:03:11.515] [432481] [info] [LoginSession] State transition triggered
+[2026-03-11 22:03:11.515] [432481] [info] LoggedOutState: Exited logged out state.
+[2026-03-11 22:03:11.515] [432481] [info] [LoggedInState] Entered logged in state.
+[2026-03-11 22:03:11.515] [432482] [trace] [Core] Executing command type: [LoginCommand]
+[2026-03-11 22:03:11.515] [432482] [info] [LoginReceiver] Processing login - user = [user], token = [123456], timestamp = [1773237791515]
+[2026-03-11 22:03:12.516] [432482] [info] [LoginReceiver] Login completed for user: [user]
+[2026-03-11 22:03:12.516] [432482] [debug] [Core] Command[LoginCommand] executed successfully
+[2026-03-11 22:03:13.515] [432479] [info] [SessionManager] Destroying, cleaning up [1] sessions
+[2026-03-11 22:03:13.515] [432479] [debug] [SessionManager] Unregistering listener for event type: [10LoginEvent]
+[2026-03-11 22:03:13.515] [432479] [debug] [EventRouter] Unregistering listener for event type: [10LoginEvent]
+[2026-03-11 22:03:13.515] [432479] [info] [LoginSession] Stopping
+[2026-03-11 22:03:13.515] [432479] [info] [LoggedInState] Exited logged in state.
+[2026-03-11 22:03:13.515] [432479] [info] [Core] Destroying, stopping background thread
+[2026-03-11 22:03:13.515] [432482] [debug] [Core] Command processing loop exited
+[2026-03-11 22:03:13.515] [432481] [debug] [EventBus] Logic loop exited
+[2026-03-11 22:03:13.515] [432479] [info] [EventBus] Logic thread exited.
+[2026-03-11 22:03:13.515] [432479] [info] Main: Exiting application

@@ -37,16 +37,22 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     Log::init("webrtc.log", Log::Mode::Async, spdlog::level::trace);
+    Log::info("[APP] Application starting");
 
     rtc::InitLogger(rtc::LogLevel::Verbose, myCppLogCallback);
+    Log::info("[APP] RTC logger initialized");
 
     Core core;
+    Log::info("[APP] Core created");
 
     WebSocketClient net(&core);
+    Log::info("[APP] WebSocketClient created");
 
     Widget w(&core);
+    Log::info("[APP] Widget created");
 
     w.show();
+    Log::info("[APP] Entering Qt event loop");
 
     return a.exec();
 }

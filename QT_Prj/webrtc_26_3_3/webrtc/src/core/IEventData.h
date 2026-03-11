@@ -8,4 +8,5 @@ enum class EventType {
 class IEventData {
 public:
     virtual ~IEventData() = default;
+    virtual std::string getEventName() const = 0;
 };

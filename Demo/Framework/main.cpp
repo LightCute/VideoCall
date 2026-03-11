@@ -2,15 +2,14 @@
 #include <memory>
 #include <thread>
 #include <chrono>
-#include "core.h"
-#include "event_bus.h"
-#include "session_manager.h"
-#include "login_session.h"
-#include "event_router.h" // 新增：引入路由
-#include "log.h"
+#include "src/framework/core/core.h"
+#include "src/framework/event/event_bus.h"
+#include "src/framework/session/session_manager.h"
+#include "src/business/login/login_session.h"
+#include "src/framework/event/event_router.h" 
+#include "src/utilities/log.h"
 void simulateUI() {
     Log::info("UI: User click login");
-    auto event = std::make_unique<LoginEvent>("user", "123456", true);
     EventBus::GetInstance().publish(
             std::make_unique<LoginEvent>("user", "123456", true)
         );
@@ -18,7 +17,7 @@ void simulateUI() {
 
 int main() {
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
-    Log::info("Main: Starting application, thread id: {}", Log::threadIdToString(std::this_thread::get_id()));
+    Log::info("Main: Starting application, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
     // 重构后初始化流程：EventRouter → EventBus → Core → SessionManager → Session
     // 核心逻辑：依赖注入，解耦各模块
     EventRouter router; // 1. 创建路由核心
@@ -31,8 +30,11 @@ int main() {
 
     sessionManager->createSession<LoginSession>(dispatcher.get()); // 5. 创建会话（自动注册到路由）
 
-    simulateUI(); // 触发登录事件
-    std::this_thread::sleep_for(std::chrono::seconds(1)); // 等待命令执行
+    std::thread simUiThread([]() {
+        std::this_thread::sleep_for(std::chrono::seconds(1)); // 模拟用户操作延迟
+        simulateUI(); // 触发登录事件
+    });
+    std::this_thread::sleep_for(std::chrono::seconds(3)); // 等待命令执行
 
     // 优雅退出（SessionManager析构时自动注销监听者+停止会话）
     sessionManager.reset(); // 注销Session监听者

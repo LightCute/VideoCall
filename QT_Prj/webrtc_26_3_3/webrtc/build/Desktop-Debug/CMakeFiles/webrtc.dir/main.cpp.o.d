@@ -436,7 +436,7 @@ CMakeFiles/webrtc.dir/main.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/./src/net/Websocket.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/./src/core/core.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/./src/core/IEventQueue.h \
-  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/./src/core/../utilities/log.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/spdlog.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/common.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/null_mutex.h \
@@ -552,4 +552,5 @@ CMakeFiles/webrtc.dir/main.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/mpmc_blocking_q.h \
   /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/3rdparty/spdlog/include/spdlog/details/thread_pool-inl.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/sstream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/sstream.tcc
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/sstream.tcc \
+  /home/light/work/Video_Prj/QT_Prj/webrtc_26_3_3/webrtc/src/utilities/log.h

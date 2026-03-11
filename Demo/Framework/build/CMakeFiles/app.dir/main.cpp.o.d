@@ -175,20 +175,25 @@ CMakeFiles/app.dir/main.cpp.o: \
  /usr/include/c++/13/cstdint /usr/include/c++/13/limits \
  /usr/include/c++/13/ctime /usr/include/c++/13/bits/parse_numbers.h \
  /usr/include/c++/13/chrono \
- /home/light/work/Video_Prj/Demo/Framework/core.h \
- /usr/include/c++/13/atomic /usr/include/c++/13/condition_variable \
- /usr/include/c++/13/bits/std_mutex.h \
- /usr/include/c++/13/bits/unique_lock.h \
- /home/light/work/Video_Prj/Demo/Framework/abstract_command.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/core/core.h \
+ /usr/include/c++/13/atomic \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/core/../command/abstract_command_dispatcher.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/core/../command/abstract_command.h \
  /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_vector.h \
  /usr/include/c++/13/bits/stl_bvector.h \
- /usr/include/c++/13/bits/vector.tcc /usr/include/c++/13/any \
- /home/light/work/Video_Prj/Demo/Framework/blocking_queue.h \
+ /usr/include/c++/13/bits/vector.tcc \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/core/../command/abstract_receiver.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/core/../command/command_context.h \
+ /usr/include/c++/13/any \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/core/../../utilities/blocking_queue.h \
  /usr/include/c++/13/queue /usr/include/c++/13/deque \
  /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \
  /usr/include/c++/13/bits/stl_heap.h /usr/include/c++/13/bits/stl_queue.h \
- /usr/include/c++/13/mutex \
- /home/light/work/Video_Prj/Demo/Framework/log.h \
+ /usr/include/c++/13/mutex /usr/include/c++/13/bits/std_mutex.h \
+ /usr/include/c++/13/bits/unique_lock.h \
+ /usr/include/c++/13/condition_variable \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/core/../../utilities/log.h \
+ /usr/include/c++/13/sstream /usr/include/c++/13/bits/sstream.tcc \
  /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/spdlog.h \
  /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/common.h \
  /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/null_mutex.h \
@@ -328,18 +333,20 @@ CMakeFiles/app.dir/main.cpp.o: \
  /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/thread_pool.h \
  /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/mpmc_blocking_q.h \
  /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/thread_pool-inl.h \
- /usr/include/c++/13/sstream /usr/include/c++/13/bits/sstream.tcc \
- /home/light/work/Video_Prj/Demo/Framework/event_bus.h \
- /home/light/work/Video_Prj/Demo/Framework/abstract_event.h \
- /home/light/work/Video_Prj/Demo/Framework/event_router.h \
- /usr/include/c++/13/shared_mutex /usr/include/c++/13/typeindex \
- /home/light/work/Video_Prj/Demo/Framework/abstract_event_listener.h \
- /home/light/work/Video_Prj/Demo/Framework/session_manager.h \
- /home/light/work/Video_Prj/Demo/Framework/abstract_session.h \
- /home/light/work/Video_Prj/Demo/Framework/abstract_state.h \
- /home/light/work/Video_Prj/Demo/Framework/login_session.h \
- /home/light/work/Video_Prj/Demo/Framework/logged_in_state.h \
- /home/light/work/Video_Prj/Demo/Framework/abstract_login_state.h \
- /home/light/work/Video_Prj/Demo/Framework/login_event.h \
- /home/light/work/Video_Prj/Demo/Framework/login_command.h \
- /home/light/work/Video_Prj/Demo/Framework/login_receiver.h
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/event/event_bus.h \
+ /usr/include/c++/13/shared_mutex \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/event/abstract_event.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/event/event_router.h \
+ /usr/include/c++/13/typeindex \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/event/abstract_event_listener.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/session/session_manager.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/session/abstract_session.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/framework/session/../state/abstract_state.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_session.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_event.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/logged_in_state.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/../../framework/state/abstract_login_state.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_payload.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_command.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_receiver.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/logged_out_state.h
