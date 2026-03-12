@@ -1,0 +1,1 @@
+/bin/clang-18 -g -Xlinker --dependency-file=CMakeFiles/rtpw.dir/link.d CMakeFiles/rtpw.dir/test/rtpw.c.o CMakeFiles/rtpw.dir/test/rtp.c.o CMakeFiles/rtpw.dir/test/util.c.o CMakeFiles/rtpw.dir/test/getopt_s.c.o -o rtpw  libsrtp2.a /usr/lib/x86_64-linux-gnu/libcrypto.so

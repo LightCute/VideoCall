@@ -16,6 +16,14 @@
   └─ blocking_queue.h
   └─ log.h
 
+📂 ./src/adapter:
+  └─ qt_ui.h
+  └─ websocket.h
+
+📂 ./src/service:
+  └─ abstract_net.h
+  └─ abstract_ui.h
+
 📂 ./src/framework/state:
   └─ abstract_call_state.h
   └─ abstract_login_state.h
@@ -40,12 +48,15 @@
   └─ event_bus.h
   └─ event_router.h
 
+📂 ./src/application:
+  └─ app_context.h
+
 ==================================================
 ========== 所有.h/.cpp文件内容 ==========
 
 
 ========== ./main.cpp ==========
-Lines: 47
+Lines: 49
 
 #include <iostream>
 #include <memory>
@@ -56,9 +67,11 @@ Lines: 47
 #include "src/framework/session/session_manager.h"
 #include "src/business/login/login_session.h"
 #include "src/framework/event/event_router.h" 
+#include "src/adapter/qt_ui.h"
+#include "src/adapter/websocket.h"
 #include "src/utilities/log.h"
 void simulateUI() {
-    Log::info("UI: User click login");
+    Log::info("[UI] User click login");
     EventBus::GetInstance().publish(
             std::make_unique<LoginEvent>("user", "123456", true)
         );
@@ -66,7 +79,7 @@ void simulateUI() {
 
 int main() {
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
-    Log::info("Main: Starting application, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
+    Log::info("[Main] Starting application, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
     // 重构后初始化流程：EventRouter → EventBus → Core → SessionManager → Session
     // 核心逻辑：依赖注入，解耦各模块
     EventRouter router; // 1. 创建路由核心
@@ -228,16 +241,16 @@ Lines: 53
 class LoggedOutState : public AbstractLoginState{
     void onEnter(AbstractSession* session) override {
         // 进入登录成功状态，发布状态变更事件
-        Log::info("LoggedOutState: Entered logged out state.");
+        Log::info("[LoggedOutState] Entered logged out state.");
     }
 
     std::unique_ptr<AbstractState> handleEvent(
         AbstractSession* session, const AbstractEvent& event) override {
         if(typeid(event) == typeid(LoginEvent))
         {
-            Log::debug("LoggedOutState: Received event type: {}", typeid(event).name());
+            Log::debug("[LoggedOutState] Received event type: [{}]", typeid(event).name());
             auto& loginEvent = static_cast<const LoginEvent&>(event);
-            Log::info("LoggedOutState: Processing login event, user: {}, success: {}", 
+            Log::info("[LoggedOutState] Processing login event, user: [{}], success: [{}]", 
                       loginEvent.getUserId(), loginEvent.isSuccess());
             if (loginEvent.isSuccess())
             {
@@ -254,7 +267,7 @@ class LoggedOutState : public AbstractLoginState{
                 auto cmd = std::make_unique<LoginCommand>(ctx);
                 cmd->addReceiver(std::make_shared<LoginReceiver>());
                 session->getDispatcher()->postCommand(std::move(cmd));
-                Log::info("LoggedOutState: Transitioning to LoggedInState");
+                Log::info("[LoggedOutState] Transitioning to LoggedInState");
                 return std::make_unique<LoggedInState>();            
             };
         }
@@ -263,7 +276,7 @@ class LoggedOutState : public AbstractLoginState{
 
     void onExit(AbstractSession* session) override {
         // 退出登录状态的清理逻辑
-        Log::info("LoggedOutState: Exited logged out state.");
+        Log::info("[LoggedOutState] Exited logged out state.");
     }    
 };
 ========== ./src/business/login/login_command.h ==========
@@ -298,7 +311,7 @@ public:
 
 };
 ========== ./src/business/login/login_receiver.h ==========
-Lines: 20
+Lines: 26
 
 #pragma once
 #include <thread>
@@ -306,6 +319,8 @@ Lines: 20
 #include "../../framework/command/command_context.h"
 #include "login_payload.h"
 #include "../../utilities/log.h"
+#include "../../service/abstract_ui.h"
+#include "../../service/abstract_net.h"
 
 class LoginReceiver : public AbstractReceiver {
 public:
@@ -319,6 +334,10 @@ public:
 
         Log::info("[LoginReceiver] Login completed for user: [{}]", login.user);
     }
+
+private:
+    AbstractUI* m_ui;
+    AbstractNet* m_net;
 };
 ========== ./src/business/login/login_payload.h ==========
 Lines: 7
@@ -494,6 +513,64 @@ public:
 
     template<typename... Args>
     static void critical(const char* fmt, Args&&... args) { spdlog::critical(fmt, std::forward<Args>(args)...); }
+};
+========== ./src/adapter/qt_ui.h ==========
+Lines: 11
+
+#pragma once
+#include "../service/abstract_ui.h"
+#include "../utilities/log.h"
+class QtUI : public AbstractUI {
+public:
+    void showMessage(const std::string& message) override {
+        // Qt特定的UI显示逻辑
+        // 这里仅模拟输出，实际应调用Qt的API显示消息
+        Log::info("[QtUI] Displaying message: [{}]", message);
+    }
+};
+========== ./src/adapter/websocket.h ==========
+Lines: 16
+
+#pragma once 
+#include "../service/abstract_net.h"
+#include "../utilities/log.h"
+class WebSocket : public AbstractNet {
+public:
+    void send(const std::string& msg) override {
+        // WebSocket特定的发送逻辑
+        // 这里仅模拟输出，实际应调用WebSocket的API发送消息  
+        Log::info("[WebSocket] Sending message: [{}]", msg);       
+    }
+    void connect(const std::string& address) override {     
+        // WebSocket特定的连接逻辑
+        // 这里仅模拟输出，实际应调用WebSocket的API连接服务器
+        Log::info("[WebSocket] Connecting to address: [{}]", address);
+    }
+};
+========== ./src/service/abstract_net.h ==========
+Lines: 10
+
+#pragma once
+#include <string>
+
+class AbstractNet {
+public:
+    virtual ~AbstractNet() = default;
+    virtual void send(const std::string& msg) = 0;
+    virtual void connect(const std::string& address) = 0;
+
+};
+========== ./src/service/abstract_ui.h ==========
+Lines: 9
+
+#pragma once 
+#include <string>
+
+class AbstractUI {
+public:
+    virtual ~AbstractUI() = default;
+    virtual void showMessage(const std::string& message) = 0;
+
 };
 ========== ./src/framework/state/abstract_login_state.h ==========
 Lines: 10
@@ -1002,7 +1079,20 @@ class AbstractEvent {
 public:
     virtual ~AbstractEvent() = default;
 };
+========== ./src/application/app_context.h ==========
+Lines: 10
+
+#pragma once
+
+#include "../service/abstract_ui.h"
+#include "../service/abstract_net.h"
+
+class AppContext {
+public:
+    AbstractUI* ui{};
+    AbstractNet* net{};
+};
 
 =====================================
-Total files: 24
-Total lines: 880
+Total files: 29
+Total lines: 944

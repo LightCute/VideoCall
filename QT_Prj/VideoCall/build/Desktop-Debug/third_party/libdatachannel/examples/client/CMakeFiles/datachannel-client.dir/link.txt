@@ -1,0 +1,1 @@
+/usr/bin/clang++-18 -DQT_QML_DEBUG -g -Xlinker --dependency-file=CMakeFiles/datachannel-client.dir/link.d "CMakeFiles/datachannel-client.dir/main.cpp.o" "CMakeFiles/datachannel-client.dir/parse_cl.cpp.o" -o client  -Wl,-rpath,/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/third_party/libdatachannel ../../libdatachannel.so.0.24.1

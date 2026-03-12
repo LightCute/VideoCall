@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+48833b417808a6cea79f1d2e978324b0 CMakeFiles/VideoCall_autogen
+c71aaaaf009f3bebbde8215f4f34a5e4 VideoCall_autogen/timestamp

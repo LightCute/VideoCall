@@ -1,0 +1,1 @@
+/bin/clang-18 -g -Xlinker --dependency-file=CMakeFiles/replay_driver.dir/link.d CMakeFiles/replay_driver.dir/test/replay_driver.c.o CMakeFiles/replay_driver.dir/test/ut_sim.c.o -o replay_driver  libsrtp2.a /usr/lib/x86_64-linux-gnu/libcrypto.so
