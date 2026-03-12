@@ -15,7 +15,7 @@ public:
             EventBus::GetInstance().publish(
                 std::make_unique<LoginEvent>("user", "123456", true)
             );
-        }).join();
+        }).detach();
     }
     void showMessage(const std::string& message) override {
         // Qt特定的UI显示逻辑

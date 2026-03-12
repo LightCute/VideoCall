@@ -33,15 +33,17 @@ int main() {
     std::unique_ptr<AbstractCommandDispatcher> dispatcher = std::make_unique<Core>(); // 3. 创建命令执行核心
     auto sessionManager = std::make_unique<SessionManager>(&router); // 4. 创建会话管理器（注入路由）
 
+    std::unique_ptr<AbstractUI> ui = std::make_unique<QtUI>();
+    std::unique_ptr<AbstractNet> net = std::make_unique<WebSocket>();
+    AppContext::instance().ui = ui.get();
+    AppContext::instance().net = net.get();
+
     sessionManager->createSession<LoginSession>(dispatcher.get()); // 5. 创建会话（自动注册到路由）
 
 
     std::this_thread::sleep_for(std::chrono::seconds(1)); // 等待命令执行
 
-    std::unique_ptr<AbstractUI> ui = std::make_unique<QtUI>();
-    std::unique_ptr<AbstractNet> net = std::make_unique<WebSocket>();
-    AppContext::instance().ui = ui.get();
-    AppContext::instance().net = net.get();
+
 
     // std::thread simUiThread([]() {
     //     std::this_thread::sleep_for(std::chrono::seconds(1)); // 模拟用户操作延迟

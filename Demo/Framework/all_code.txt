@@ -6,11 +6,14 @@
 📂 ./src/business/login:
   └─ logged_in_state.h
   └─ logged_out_state.h
+  └─ logging_in_state.h
   └─ login_command.h
   └─ login_event.h
+  └─ login_failed_event.h
   └─ login_payload.h
   └─ login_receiver.h
   └─ login_session.h
+  └─ login_success_event.h
 
 📂 ./src/utilities:
   └─ blocking_queue.h
@@ -56,7 +59,7 @@
 
 
 ========== ./main.cpp ==========
-Lines: 49
+Lines: 62
 
 #include <iostream>
 #include <memory>
@@ -69,6 +72,7 @@ Lines: 49
 #include "src/framework/event/event_router.h" 
 #include "src/adapter/qt_ui.h"
 #include "src/adapter/websocket.h"
+#include "src/application/app_context.h"
 #include "src/utilities/log.h"
 void simulateUI() {
     Log::info("[UI] User click login");
@@ -80,6 +84,8 @@ void simulateUI() {
 int main() {
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
     Log::info("[Main] Starting application, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
+    
+    
     // 重构后初始化流程：EventRouter → EventBus → Core → SessionManager → Session
     // 核心逻辑：依赖注入，解耦各模块
     EventRouter router; // 1. 创建路由核心
@@ -90,12 +96,22 @@ int main() {
     std::unique_ptr<AbstractCommandDispatcher> dispatcher = std::make_unique<Core>(); // 3. 创建命令执行核心
     auto sessionManager = std::make_unique<SessionManager>(&router); // 4. 创建会话管理器（注入路由）
 
+    std::unique_ptr<AbstractUI> ui = std::make_unique<QtUI>();
+    std::unique_ptr<AbstractNet> net = std::make_unique<WebSocket>();
+    AppContext::instance().ui = ui.get();
+    AppContext::instance().net = net.get();
+
     sessionManager->createSession<LoginSession>(dispatcher.get()); // 5. 创建会话（自动注册到路由）
 
-    std::thread simUiThread([]() {
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // 模拟用户操作延迟
-        simulateUI(); // 触发登录事件
-    });
+
+    std::this_thread::sleep_for(std::chrono::seconds(1)); // 等待命令执行
+
+
+
+    // std::thread simUiThread([]() {
+    //     std::this_thread::sleep_for(std::chrono::seconds(1)); // 模拟用户操作延迟
+    //     simulateUI(); // 触发登录事件
+    // });
     std::this_thread::sleep_for(std::chrono::seconds(3)); // 等待命令执行
 
     // 优雅退出（SessionManager析构时自动注销监听者+停止会话）
@@ -108,7 +124,7 @@ int main() {
     return 0;
 }
 ========== ./src/business/login/login_event.h ==========
-Lines: 21
+Lines: 22
 
 #pragma once
 #include "../../framework/event/abstract_event.h"
@@ -120,7 +136,6 @@ public:
     LoginEvent(const std::string& user_id, const std::string& token, bool is_success)
         : m_user_id(user_id), m_token(token), m_is_success(is_success) {}
 
-
     // 只读getter，保证事件数据不可变，线程安全
     const std::string& getUserId() const { return m_user_id; }
     const std::string& getToken() const { return m_token; }
@@ -131,6 +146,99 @@ private:
     const std::string m_token;
     const bool m_is_success;
 };
+
+
+
+========== ./src/business/login/logging_in_state.h ==========
+Lines: 47
+
+// src/business/login/logging_in_state.h
+#pragma once
+#include "../../framework/state/abstract_login_state.h"
+#include "../../utilities/log.h"
+#include "login_success_event.h"
+#include "login_failed_event.h"
+// 前向声明（仅声明，不定义）
+class LoggedOutState;
+class LoggedInState;
+class AbstractSession; // 补充前向声明（用到了AbstractSession*）
+
+class LoggingInState : public AbstractLoginState {
+public:
+    void onEnter(AbstractSession* session) override {
+        Log::info("[LoggingInState] Entered logging in state... (waiting for network)");
+    }
+
+    // 仅声明，实现移到类外（避免循环包含）
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override;
+
+    void onExit(AbstractSession* session) override {
+        Log::info("[LoggingInState] Exited logging in state.");
+    }
+};
+
+
+#include "logged_out_state.h"
+#include "logged_in_state.h"
+
+inline std::unique_ptr<AbstractState> LoggingInState::handleEvent(
+    AbstractSession* session, const AbstractEvent& event) {
+
+    if (typeid(event) == typeid(LoginSuccessEvent)) {
+        auto& successEvent = static_cast<const LoginSuccessEvent&>(event);
+        Log::info("[LoggingInState] Login success for user: [{}]", successEvent.getUserId());
+        return std::make_unique<LoggedInState>();
+    }
+
+    if (typeid(event) == typeid(LoginFailedEvent)) {
+        auto& failedEvent = static_cast<const LoginFailedEvent&>(event);
+        Log::warn("[LoggingInState] Login failed: [{}]", failedEvent.getErrorMsg());
+        return std::make_unique<LoggedOutState>(); // 此时LoggedOutState已完整定义
+    }
+
+    return nullptr; // 其他事件返回空
+}
+
+========== ./src/business/login/login_success_event.h ==========
+Lines: 16
+
+#pragma once
+#include <string>
+#include "../../framework/event/abstract_event.h"
+
+class LoginSuccessEvent : public AbstractEvent {
+public:
+    explicit LoginSuccessEvent(const std::string& user_id, const std::string& token)
+        : m_user_id(user_id), m_token(token) {}
+
+    const std::string& getUserId() const { return m_user_id; }
+    const std::string& getToken() const { return m_token; }
+
+private:
+    const std::string m_user_id;
+    const std::string m_token;
+};
+========== ./src/business/login/login_failed_event.h ==========
+Lines: 16
+
+#pragma once
+#include <string>
+#include "../../framework/event/abstract_event.h"
+
+class LoginFailedEvent : public AbstractEvent {
+public:
+    explicit LoginFailedEvent(const std::string& user_id, const std::string& error_msg)
+        : m_user_id(user_id), m_error_msg(error_msg) {}
+
+    const std::string& getUserId() const { return m_user_id; }
+    const std::string& getErrorMsg() const { return m_error_msg; }
+
+private:
+    const std::string m_user_id;
+    const std::string m_error_msg;
+};
+
 ========== ./src/business/login/logged_in_state.h ==========
 Lines: 32
 
@@ -168,9 +276,10 @@ public:
 
 
 ========== ./src/business/login/login_session.h ==========
-Lines: 53
+Lines: 58
 
 #pragma once
+#include <vector>
 #include "../../framework/session/abstract_session.h"
 #include "login_event.h"
 #include "logged_in_state.h"
@@ -184,8 +293,12 @@ public:
     }
 
     // 核心：声明我只关心 LoginEvent
-    std::type_index eventType() const override {
-        return typeid(LoginEvent);
+    std::vector<std::type_index> eventTypes() const override {
+        return {
+            typeid(LoginEvent),          
+            typeid(LoginSuccessEvent),   
+            typeid(LoginFailedEvent)                
+        };
     }
 
     // 实现IEventListener：处理LoginEvent（原有逻辑迁移）
@@ -224,7 +337,7 @@ public:
     }
 };
 ========== ./src/business/login/logged_out_state.h ==========
-Lines: 53
+Lines: 60
 
 #pragma once
 #include "../../framework/state/abstract_login_state.h"
@@ -237,48 +350,55 @@ Lines: 53
 #include "../../framework/session/abstract_session.h"
 #include "../../framework/event/abstract_event.h"
 
+// 核心：前向声明，替代直接#include "logging_in_state.h"
+class LoggingInState;
 
 class LoggedOutState : public AbstractLoginState{
+public:
     void onEnter(AbstractSession* session) override {
         // 进入登录成功状态，发布状态变更事件
         Log::info("[LoggedOutState] Entered logged out state.");
     }
 
     std::unique_ptr<AbstractState> handleEvent(
-        AbstractSession* session, const AbstractEvent& event) override {
-        if(typeid(event) == typeid(LoginEvent))
-        {
-            Log::debug("[LoggedOutState] Received event type: [{}]", typeid(event).name());
-            auto& loginEvent = static_cast<const LoginEvent&>(event);
-            Log::info("[LoggedOutState] Processing login event, user: [{}], success: [{}]", 
-                      loginEvent.getUserId(), loginEvent.isSuccess());
-            if (loginEvent.isSuccess())
-            {
-
-                CommandContext ctx;
-                //ctx.session_id = session->id();
-                auto now_timepoint = std::chrono::system_clock::now();
-                auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
-                ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
-                ctx.set(LoginPayload{
-                    loginEvent.getUserId(),
-                    loginEvent.getToken()
-                });
-                auto cmd = std::make_unique<LoginCommand>(ctx);
-                cmd->addReceiver(std::make_shared<LoginReceiver>());
-                session->getDispatcher()->postCommand(std::move(cmd));
-                Log::info("[LoggedOutState] Transitioning to LoggedInState");
-                return std::make_unique<LoggedInState>();            
-            };
-        }
-        return nullptr;
-    }
+        AbstractSession* session, const AbstractEvent& event) override;
 
     void onExit(AbstractSession* session) override {
         // 退出登录状态的清理逻辑
         Log::info("[LoggedOutState] Exited logged out state.");
     }    
 };
+
+
+#include "logging_in_state.h"
+
+inline std::unique_ptr<AbstractState> LoggedOutState::handleEvent(
+    AbstractSession* session, const AbstractEvent& event) {
+    if(typeid(event) == typeid(LoginEvent))
+    {
+        Log::debug("[LoggedOutState] Received event type: [{}]", typeid(event).name());
+        auto& loginEvent = static_cast<const LoginEvent&>(event);
+        Log::info("[LoggedOutState] Processing login event, user: [{}], success: [{}]", 
+                  loginEvent.getUserId(), loginEvent.isSuccess());
+        if (loginEvent.isSuccess())
+        {
+            CommandContext ctx;
+            auto now_timepoint = std::chrono::system_clock::now();
+            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+            ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+            ctx.set(LoginPayload{
+                loginEvent.getUserId(),
+                loginEvent.getToken()
+            });
+            auto cmd = std::make_unique<LoginCommand>(ctx);
+            cmd->addReceiver(std::make_shared<LoginReceiver>());
+            session->getDispatcher()->postCommand(std::move(cmd));
+            Log::info("[LoggedOutState] Transitioning to LoggingInState");
+            return std::make_unique<LoggingInState>(); // 此时LoggingInState已完整定义
+        }
+    }
+    return nullptr;
+}
 ========== ./src/business/login/login_command.h ==========
 Lines: 28
 
@@ -311,7 +431,7 @@ public:
 
 };
 ========== ./src/business/login/login_receiver.h ==========
-Lines: 26
+Lines: 52
 
 #pragma once
 #include <thread>
@@ -321,23 +441,49 @@ Lines: 26
 #include "../../utilities/log.h"
 #include "../../service/abstract_ui.h"
 #include "../../service/abstract_net.h"
+#include "../../application/app_context.h"
+#include "../../framework/event/event_bus.h"
+#include "login_success_event.h"
+#include "login_failed_event.h"
 
 class LoginReceiver : public AbstractReceiver {
 public:
     void performAction(const CommandContext& context) override {
-
         auto& login = context.get<LoginPayload>();
+        Log::info("[LoginReceiver] Processing login - user = [{}], token = [{}]", 
+                  login.user, login.token);
 
-        Log::info("[LoginReceiver] Processing login - user = [{}], token = [{}], timestamp = [{}]", 
-                  login.user, login.token, context.timestamp);
+        auto* ui = AppContext::instance().ui;
+        auto* net = AppContext::instance().net;
+
+        if(ui) ui->showMessage("[System] Logging in...");
+        if(net) {
+            net->connect("server.example.com");
+            net->send("Login request for " + login.user);
+        }
+
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        Log::info("[LoginReceiver] Login completed for user: [{}]", login.user);
+        // 模拟业务逻辑判断
+        bool is_success = (login.user == "user" && login.token == "123456");
+        
+        if (is_success) {
+            Log::info("[LoginReceiver] Login successful.");
+            if(ui) ui->showMessage("[System] Login successful!");
+            // 【重要】发布成功事件，驱动状态机从 LoggingIn -> LoggedIn
+            EventBus::GetInstance().publish(
+                std::make_unique<LoginSuccessEvent>(login.user, login.token)
+            );
+        } else {
+            Log::warn("[LoginReceiver] Login failed.");
+            if(ui) ui->showMessage("[System] Login failed! Wrong password.");
+            // 【重要】发布失败事件，驱动状态机从 LoggingIn -> LoggedOut
+            EventBus::GetInstance().publish(
+                std::make_unique<LoginFailedEvent>(login.user, "Invalid credentials")
+            );
+        }
     }
 
-private:
-    AbstractUI* m_ui;
-    AbstractNet* m_net;
 };
 ========== ./src/business/login/login_payload.h ==========
 Lines: 7
@@ -515,13 +661,27 @@ public:
     static void critical(const char* fmt, Args&&... args) { spdlog::critical(fmt, std::forward<Args>(args)...); }
 };
 ========== ./src/adapter/qt_ui.h ==========
-Lines: 11
+Lines: 25
 
 #pragma once
+#include <chrono>
+#include <thread>
+#include "../framework/event/event_bus.h"
 #include "../service/abstract_ui.h"
 #include "../utilities/log.h"
+#include "../business/login/login_event.h"
 class QtUI : public AbstractUI {
 public:
+    QtUI() {
+        std::thread([]() {
+            std::this_thread::sleep_for(std::chrono::seconds(1)); // 模拟用户操作延迟
+            Log::info("[QtUI] QtUI constructor running in thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
+
+            EventBus::GetInstance().publish(
+                std::make_unique<LoginEvent>("user", "123456", true)
+            );
+        }).detach();
+    }
     void showMessage(const std::string& message) override {
         // Qt特定的UI显示逻辑
         // 这里仅模拟输出，实际应调用Qt的API显示消息
@@ -722,7 +882,7 @@ protected:
     AbstractCommandDispatcher* m_cmd_dispatcher = nullptr;
 };
 ========== ./src/framework/session/session_manager.h ==========
-Lines: 56
+Lines: 62
 
 #pragma once
 #include <vector>
@@ -743,13 +903,16 @@ public:
     ~SessionManager() {
         Log::info("[SessionManager] Destroying, cleaning up [{}] sessions",
              m_sessions.size());
-        // 优雅销毁：注销所有会话的监听者 + 停止会话
         std::lock_guard<std::mutex> lock(m_mutex);
         for (auto& session : m_sessions) {
             if (m_router) {
-                Log::debug("[SessionManager] Unregistering listener for event type: [{}]", 
-                    session->eventType().name());
-                m_router->unregisterListener(session->eventType(), session.get());
+                // 遍历事件类型列表，逐个注销
+                auto event_types = session->eventTypes();
+                for (auto& event_type : event_types) {
+                    Log::debug("[SessionManager] Unregistering listener for event type: [{}]", 
+                        event_type.name());
+                    m_router->unregisterListener(event_type, session.get());
+                }
             }
             session->stop();
         }
@@ -764,9 +927,12 @@ public:
         
         // 核心：会话创建后自动注册到路由（无需硬编码事件类型）
         if (m_router) {
-            Log::info("[SessionManager] Registering session for event type: [{}]", 
-                session->eventType().name());
-            m_router->registerListener(session->eventType(), session.get());
+            auto event_types = session->eventTypes();
+            for (auto& event_type : event_types) {
+                Log::info("[SessionManager] Registering session for event type: [{}]", 
+                    event_type.name());
+                m_router->registerListener(event_type, session.get());
+            }
         }
         
         session->start();
@@ -981,9 +1147,10 @@ private:
     std::atomic<bool> m_running;                    // 线程运行标志（原子变量，线程安全）
 };
 ========== ./src/framework/event/abstract_event_listener.h ==========
-Lines: 12
+Lines: 13
 
 #pragma once
+#include <vector>
 #include <typeindex>
 #include "abstract_event.h"
 
@@ -991,7 +1158,7 @@ class AbstractEventListener {
 public:
     virtual ~AbstractEventListener() = default;
 
-    virtual std::type_index eventType() const = 0;
+    virtual std::vector<std::type_index> eventTypes() const = 0;
 
     virtual void handleEvent(const AbstractEvent& event) = 0;
 };
@@ -1080,19 +1247,29 @@ public:
     virtual ~AbstractEvent() = default;
 };
 ========== ./src/application/app_context.h ==========
-Lines: 10
+Lines: 20
 
 #pragma once
-
 #include "../service/abstract_ui.h"
 #include "../service/abstract_net.h"
 
 class AppContext {
 public:
-    AbstractUI* ui{};
-    AbstractNet* net{};
+    static AppContext& instance() {
+        static AppContext ctx;
+        return ctx;
+    }
+
+    AbstractUI* ui{};   // 仅 Receiver 访问
+    AbstractNet* net{}; // 仅 Receiver 访问
+
+private:
+    AppContext() = default;
+    ~AppContext() = default;
+    AppContext(const AppContext&) = delete;
+    AppContext& operator=(const AppContext&) = delete;
 };
 
 =====================================
-Total files: 29
-Total lines: 944
+Total files: 32
+Total lines: 1106

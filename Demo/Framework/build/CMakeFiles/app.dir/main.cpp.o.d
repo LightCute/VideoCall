@@ -352,6 +352,9 @@ CMakeFiles/app.dir/main.cpp.o: \
  /home/light/work/Video_Prj/Demo/Framework/src/business/login/../../service/abstract_ui.h \
  /home/light/work/Video_Prj/Demo/Framework/src/business/login/../../service/abstract_net.h \
  /home/light/work/Video_Prj/Demo/Framework/src/business/login/../../application/app_context.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_success_event.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_failed_event.h \
  /home/light/work/Video_Prj/Demo/Framework/src/business/login/logged_out_state.h \
+ /home/light/work/Video_Prj/Demo/Framework/src/business/login/logging_in_state.h \
  /home/light/work/Video_Prj/Demo/Framework/src/adapter/qt_ui.h \
  /home/light/work/Video_Prj/Demo/Framework/src/adapter/websocket.h

@@ -10,11 +10,14 @@ CMakeFiles/app.dir/main.cpp.o: /home/light/work/Video_Prj/Demo/Framework/main.cp
   /home/light/work/Video_Prj/Demo/Framework/src/service/abstract_ui.h \
   /home/light/work/Video_Prj/Demo/Framework/src/business/login/logged_in_state.h \
   /home/light/work/Video_Prj/Demo/Framework/src/business/login/logged_out_state.h \
+  /home/light/work/Video_Prj/Demo/Framework/src/business/login/logging_in_state.h \
   /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_command.h \
   /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_event.h \
+  /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_failed_event.h \
   /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_payload.h \
   /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_receiver.h \
   /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_session.h \
+  /home/light/work/Video_Prj/Demo/Framework/src/business/login/login_success_event.h \
   /home/light/work/Video_Prj/Demo/Framework/src/utilities/blocking_queue.h \
   /home/light/work/Video_Prj/Demo/Framework/src/utilities/log.h \
   /home/light/work/Video_Prj/Demo/Framework/src/framework/command/abstract_command.h \
@@ -678,7 +681,7 @@ CMakeFiles/app.dir/main.cpp.o:
 
 /usr/include/c++/13/tr1/modified_bessel_func.tcc:
 
-/usr/include/c++/13/bits/invoke.h:
+/usr/include/c++/13/tr1/gamma.tcc:
 
 /usr/include/c++/13/bits/functexcept.h:
 
@@ -731,10 +734,6 @@ CMakeFiles/app.dir/main.cpp.o:
 /usr/include/c++/13/backward/auto_ptr.h:
 
 /usr/include/asm-generic/posix_types.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
-
-/usr/include/asm-generic/errno.h:
 
 /usr/include/c++/13/bits/basic_string.tcc:
 
@@ -816,11 +815,25 @@ CMakeFiles/app.dir/main.cpp.o:
 
 /usr/include/c++/13/bits/refwrap.h:
 
-/usr/include/stdint.h:
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/fmt/bundled/format.h:
 
-/usr/include/endian.h:
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
 
-/home/light/work/Video_Prj/Demo/Framework/src/framework/session/abstract_session.h:
+/usr/include/asm-generic/types.h:
+
+/usr/include/asm-generic/bitsperlong.h:
+
+/usr/include/c++/13/cctype:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/usr/include/c++/13/ext/atomicity.h:
+
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/fmt/fmt.h:
+
+/usr/include/ctype.h:
+
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/fmt/bundled/format-inl.h:
 
 /home/light/work/Video_Prj/Demo/Framework/src/framework/state/abstract_state.h:
 
@@ -850,22 +863,6 @@ CMakeFiles/app.dir/main.cpp.o:
 
 /usr/include/c++/13/cstdlib:
 
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
-
-/usr/include/asm-generic/types.h:
-
-/usr/include/asm-generic/bitsperlong.h:
-
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/fmt/bundled/format.h:
-
-/usr/include/c++/13/cctype:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
-
-/usr/include/c++/13/ext/atomicity.h:
-
-/usr/include/c++/13/tr1/gamma.tcc:
-
 /usr/include/assert.h:
 
 /home/light/work/Video_Prj/Demo/Framework/src/framework/command/abstract_command.h:
@@ -875,6 +872,12 @@ CMakeFiles/app.dir/main.cpp.o:
 /usr/include/x86_64-linux-gnu/bits/types/error_t.h:
 
 /usr/include/c++/13/bits/hashtable.h:
+
+/usr/include/stdint.h:
+
+/usr/include/endian.h:
+
+/home/light/work/Video_Prj/Demo/Framework/src/framework/session/abstract_session.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
@@ -902,15 +905,61 @@ CMakeFiles/app.dir/main.cpp.o:
 
 /usr/include/c++/13/bits/stl_queue.h:
 
+/home/light/work/Video_Prj/Demo/Framework/src/business/login/login_success_event.h:
+
+/usr/include/c++/13/tr1/legendre_function.tcc:
+
+/home/light/work/Video_Prj/Demo/Framework/src/service/abstract_net.h:
+
+/home/light/work/Video_Prj/Demo/Framework/src/framework/event/abstract_event_listener.h:
+
+/usr/include/c++/13/chrono:
+
+/usr/include/c++/13/backward/binders.h:
+
+/usr/include/x86_64-linux-gnu/sys/syscall.h:
+
+/usr/include/c++/13/clocale:
+
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/async_logger-inl.h:
+
+/usr/lib/x86_64-linux-gnu/libc.so:
+
+/home/light/work/Video_Prj/Demo/Framework/src/framework/event/event_router.h:
+
+/usr/include/c++/13/bits/concept_check.h:
+
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/log_msg_buffer-inl.h:
+
+/usr/include/c++/13/bits/alloc_traits.h:
+
+/usr/include/c++/13/bits/atomic_base.h:
+
+/usr/include/c++/13/bits/stl_uninitialized.h:
+
+/usr/include/c++/13/bits/new_allocator.h:
+
+/usr/include/c++/13/bits/uses_allocator_args.h:
+
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/mdc.h:
+
+/usr/include/x86_64-linux-gnu/bits/confname.h:
+
+/usr/include/c++/13/bits/locale_facets_nonio.h:
+
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/fmt_helper.h:
+
+/usr/include/c++/13/bits/hash_bytes.h:
+
+/usr/include/c++/13/array:
+
+/home/light/work/Video_Prj/Demo/Framework/src/business/login/login_event.h:
+
 /usr/lib/x86_64-linux-gnu/libc_nonshared.a:
 
 /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/sinks/base_sink.h:
 
 /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/file_helper-inl.h:
-
-/usr/include/x86_64-linux-gnu/asm/types.h:
-
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/async.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -927,20 +976,6 @@ CMakeFiles/app.dir/main.cpp.o:
 /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/backtracer-inl.h:
 
 /usr/include/c++/13/atomic:
-
-/usr/include/c++/13/backward/binders.h:
-
-/usr/include/x86_64-linux-gnu/sys/syscall.h:
-
-/usr/include/c++/13/clocale:
-
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/async_logger-inl.h:
-
-/home/light/work/Video_Prj/Demo/Framework/src/framework/event/abstract_event_listener.h:
-
-/usr/include/c++/13/chrono:
-
-/home/light/work/Video_Prj/Demo/Framework/src/business/login/login_event.h:
 
 /usr/include/c++/13/ext/aligned_buffer.h:
 
@@ -986,37 +1021,19 @@ CMakeFiles/app.dir/main.cpp.o:
 
 /usr/include/c++/13/bits/unordered_map.h:
 
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/log_msg_buffer-inl.h:
-
-/usr/include/c++/13/bits/alloc_traits.h:
-
-/usr/include/c++/13/bits/concept_check.h:
-
 /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/file_helper.h:
 
-/usr/lib/x86_64-linux-gnu/libc.so:
+/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
 
-/home/light/work/Video_Prj/Demo/Framework/src/framework/event/event_router.h:
+/usr/include/asm-generic/errno.h:
 
-/usr/include/c++/13/bits/atomic_base.h:
+/home/light/work/Video_Prj/Demo/Framework/src/business/login/logging_in_state.h:
 
-/usr/include/c++/13/bits/stl_uninitialized.h:
+/usr/include/c++/13/bits/ostream.tcc:
 
-/usr/include/c++/13/bits/new_allocator.h:
+/usr/include/x86_64-linux-gnu/asm/types.h:
 
-/usr/include/c++/13/bits/uses_allocator_args.h:
-
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/mdc.h:
-
-/usr/include/x86_64-linux-gnu/bits/confname.h:
-
-/usr/include/c++/13/bits/locale_facets_nonio.h:
-
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/details/fmt_helper.h:
-
-/usr/include/c++/13/bits/hash_bytes.h:
-
-/usr/include/c++/13/array:
+/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/async.h:
 
 /usr/include/c++/13/bits/deque.tcc:
 
@@ -1062,11 +1079,7 @@ CMakeFiles/app.dir/main.cpp.o:
 
 /usr/include/c++/13/cstring:
 
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/fmt/fmt.h:
-
-/usr/include/ctype.h:
-
-/home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/fmt/bundled/format-inl.h:
+/usr/include/c++/13/bits/invoke.h:
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
 
@@ -1094,6 +1107,8 @@ CMakeFiles/app.dir/main.cpp.o:
 
 /usr/include/c++/13/bits/memoryfwd.h:
 
+/home/light/work/Video_Prj/Demo/Framework/src/business/login/login_failed_event.h:
+
 /usr/include/c++/13/bits/move.h:
 
 /usr/include/c++/13/tuple:
@@ -1103,8 +1118,6 @@ CMakeFiles/app.dir/main.cpp.o:
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
 
 /usr/include/c++/13/bits/node_handle.h:
-
-/usr/include/c++/13/bits/ostream.tcc:
 
 /home/light/work/Video_Prj/Demo/Framework/src/framework/command/command_context.h:
 
@@ -1127,6 +1140,10 @@ CMakeFiles/app.dir/main.cpp.o:
 /usr/include/c++/13/condition_variable:
 
 /usr/include/c++/13/iosfwd:
+
+/usr/include/c++/13/tr1/hypergeometric.tcc:
+
+/usr/include/c++/13/bits/range_access.h:
 
 /usr/include/c++/13/bits/shared_ptr.h:
 
@@ -1315,11 +1332,3 @@ CMakeFiles/app.dir/main.cpp.o:
 /home/light/work/Video_Prj/Demo/Framework/third_party/spdlog/include/spdlog/fmt/bundled/base.h:
 
 /usr/include/c++/13/tr1/exp_integral.tcc:
-
-/usr/include/c++/13/bits/range_access.h:
-
-/usr/include/c++/13/tr1/hypergeometric.tcc:
-
-/home/light/work/Video_Prj/Demo/Framework/src/service/abstract_net.h:
-
-/usr/include/c++/13/tr1/legendre_function.tcc:

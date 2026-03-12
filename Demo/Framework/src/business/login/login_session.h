@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "../../framework/session/abstract_session.h"
 #include "login_event.h"
 #include "logged_in_state.h"
@@ -12,8 +13,12 @@ public:
     }
 
     // 核心：声明我只关心 LoginEvent
-    std::type_index eventType() const override {
-        return typeid(LoginEvent);
+    std::vector<std::type_index> eventTypes() const override {
+        return {
+            typeid(LoginEvent),          
+            typeid(LoginSuccessEvent),   
+            typeid(LoginFailedEvent)                
+        };
     }
 
     // 实现IEventListener：处理LoginEvent（原有逻辑迁移）
