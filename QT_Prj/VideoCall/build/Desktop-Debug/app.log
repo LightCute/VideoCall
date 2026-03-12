@@ -1,0 +1,55 @@
+[2026-03-12 21:10:01.463] [1578385] [info] [Main] Starting application, thread id: [136724046376768]
+[2026-03-12 21:10:01.617] [1578385] [debug] [EventBus] Router set
+[2026-03-12 21:10:01.617] [1578385] [info] [EventBus] Logic thread started, id: [136723563054784]
+[2026-03-12 21:10:01.617] [1578393] [debug] [EventBus] Logic loop started
+[2026-03-12 21:10:01.617] [1578385] [info] [Core] Background thread started, id: [136723554662080]
+[2026-03-12 21:10:01.617] [1578385] [debug] [SessionManager] Created
+[2026-03-12 21:10:01.617] [1578394] [debug] [Core] Command processing loop started
+[2026-03-12 21:10:01.684] [1578385] [debug] [LoginSession] Created
+[2026-03-12 21:10:01.684] [1578385] [info] [SessionManager] Registering session for event type: [10LoginEvent]
+[2026-03-12 21:10:01.684] [1578385] [debug] [EventRouter] Listener registered for event type: [10LoginEvent], total listeners: [1]
+[2026-03-12 21:10:01.684] [1578385] [info] [SessionManager] Registering session for event type: [17LoginSuccessEvent]
+[2026-03-12 21:10:01.684] [1578385] [debug] [EventRouter] Listener registered for event type: [17LoginSuccessEvent], total listeners: [1]
+[2026-03-12 21:10:01.684] [1578385] [info] [SessionManager] Registering session for event type: [16LoginFailedEvent]
+[2026-03-12 21:10:01.684] [1578385] [debug] [EventRouter] Listener registered for event type: [16LoginFailedEvent], total listeners: [1]
+[2026-03-12 21:10:01.684] [1578385] [info] [LoginSession] Starting
+[2026-03-12 21:10:01.684] [1578385] [info] [LoggedOutState] Entered logged out state.
+[2026-03-12 21:10:01.684] [1578385] [info] [SessionManager] Session created, total sessions: [1]
+[2026-03-12 21:10:06.129] [1578385] [trace] [EventBus] Publishing event type: [10LoginEvent]
+[2026-03-12 21:10:06.129] [1578393] [trace] [EventBus] Routing event type: [10LoginEvent]
+[2026-03-12 21:10:06.129] [1578393] [trace] [EventRouter] Routing event type: [10LoginEvent] to [1] listeners
+[2026-03-12 21:10:06.129] [1578393] [debug] [LoginSession] Handling event type: [10LoginEvent]
+[2026-03-12 21:10:06.129] [1578393] [debug] [LoggedOutState] Received event type: [10LoginEvent]
+[2026-03-12 21:10:06.130] [1578393] [info] [LoggedOutState] Processing login event, user: [user], success: [true]
+[2026-03-12 21:10:06.130] [1578393] [debug] [Core] Posting command type: [LoginCommand]
+[2026-03-12 21:10:06.130] [1578393] [info] [LoggedOutState] Transitioning to LoggingInState
+[2026-03-12 21:10:06.130] [1578393] [info] [LoginSession] State transition triggered
+[2026-03-12 21:10:06.130] [1578393] [info] [LoggedOutState] Exited logged out state.
+[2026-03-12 21:10:06.130] [1578393] [info] [LoggingInState] Entered logging in state... (waiting for network)
+[2026-03-12 21:10:06.130] [1578394] [trace] [Core] Executing command type: [LoginCommand]
+[2026-03-12 21:10:06.130] [1578394] [info] [LoginReceiver] Processing login - user = [user], token = [123456]
+[2026-03-12 21:10:06.130] [1578394] [info] [WebSocket] Connecting to address: [server.example.com]
+[2026-03-12 21:10:06.130] [1578394] [info] [WebSocket] Sending message: [Login request for user]
+[2026-03-12 21:10:07.130] [1578394] [info] [LoginReceiver] Login successful.
+[2026-03-12 21:10:07.130] [1578394] [trace] [EventBus] Publishing event type: [17LoginSuccessEvent]
+[2026-03-12 21:10:07.130] [1578394] [debug] [Core] Command[LoginCommand] executed successfully
+[2026-03-12 21:10:07.130] [1578393] [trace] [EventBus] Routing event type: [17LoginSuccessEvent]
+[2026-03-12 21:10:07.130] [1578393] [trace] [EventRouter] Routing event type: [17LoginSuccessEvent] to [1] listeners
+[2026-03-12 21:10:07.130] [1578393] [debug] [LoginSession] Handling event type: [17LoginSuccessEvent]
+[2026-03-12 21:10:07.130] [1578393] [info] [LoggingInState] Login success for user: [user]
+[2026-03-12 21:10:07.130] [1578393] [info] [LoginSession] State transition triggered
+[2026-03-12 21:10:07.130] [1578393] [info] [LoggingInState] Exited logging in state.
+[2026-03-12 21:10:07.130] [1578393] [info] [LoggedInState] Entered logged in state.
+[2026-03-12 21:10:16.475] [1578385] [info] [SessionManager] Destroying, cleaning up [1] sessions
+[2026-03-12 21:10:16.475] [1578385] [debug] [SessionManager] Unregistering listener for event type: [10LoginEvent]
+[2026-03-12 21:10:16.475] [1578385] [debug] [EventRouter] Unregistering listener for event type: [10LoginEvent]
+[2026-03-12 21:10:16.475] [1578385] [debug] [SessionManager] Unregistering listener for event type: [17LoginSuccessEvent]
+[2026-03-12 21:10:16.475] [1578385] [debug] [EventRouter] Unregistering listener for event type: [17LoginSuccessEvent]
+[2026-03-12 21:10:16.475] [1578385] [debug] [SessionManager] Unregistering listener for event type: [16LoginFailedEvent]
+[2026-03-12 21:10:16.475] [1578385] [debug] [EventRouter] Unregistering listener for event type: [16LoginFailedEvent]
+[2026-03-12 21:10:16.475] [1578385] [info] [LoginSession] Stopping
+[2026-03-12 21:10:16.475] [1578385] [info] [LoggedInState] Exited logged in state.
+[2026-03-12 21:10:16.475] [1578385] [info] [Core] Destroying, stopping background thread
+[2026-03-12 21:10:16.475] [1578394] [debug] [Core] Command processing loop exited
+[2026-03-12 21:10:16.485] [1578393] [debug] [EventBus] Logic loop exited
+[2026-03-12 21:10:16.486] [1578385] [info] [EventBus] Logic thread exited.

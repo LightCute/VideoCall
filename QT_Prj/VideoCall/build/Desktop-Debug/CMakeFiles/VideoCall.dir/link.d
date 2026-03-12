@@ -4,7 +4,7 @@ VideoCall: \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/crtbeginS.o \
   CMakeFiles/VideoCall.dir/VideoCall_autogen/mocs_compilation.cpp.o \
   CMakeFiles/VideoCall.dir/main.cpp.o \
-  CMakeFiles/VideoCall.dir/widget.cpp.o \
+  CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o \
   /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13 \
   third_party/libdatachannel/libdatachannel.so.0.24.1 \
   /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.15.13 \
@@ -37,7 +37,6 @@ VideoCall: \
   /lib/x86_64-linux-gnu/crtn.o \
   /lib/x86_64-linux-gnu/libssl.so.3 \
   /lib/x86_64-linux-gnu/libcrypto.so.3 \
-  /lib64/ld-linux-x86-64.so.2 \
   /lib/x86_64-linux-gnu/libGL.so.1 \
   /lib/x86_64-linux-gnu/libpng16.so.16 \
   /lib/x86_64-linux-gnu/libz.so.1 \
@@ -75,7 +74,7 @@ CMakeFiles/VideoCall.dir/VideoCall_autogen/mocs_compilation.cpp.o:
 
 CMakeFiles/VideoCall.dir/main.cpp.o:
 
-CMakeFiles/VideoCall.dir/widget.cpp.o:
+CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o:
 
 /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13:
 
@@ -140,8 +139,6 @@ third_party/libdatachannel/libdatachannel.so.0.24.1:
 /lib/x86_64-linux-gnu/libssl.so.3:
 
 /lib/x86_64-linux-gnu/libcrypto.so.3:
-
-/lib64/ld-linux-x86-64.so.2:
 
 /lib/x86_64-linux-gnu/libGL.so.1:
 

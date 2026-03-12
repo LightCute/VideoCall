@@ -7,6 +7,7 @@
 class Core : public IEventQueue {
 public:
 
+
     void enqueue(EventType event,
                  std::shared_ptr<IEventData> data) override
     {

@@ -3,17 +3,27 @@
 📂 .:
   └─ main.cpp
 
-📂 ./src/business/login:
+📂 ./src/business/login/receiver:
+  └─ login_receiver.h
+
+📂 ./src/business/login/state:
   └─ logged_in_state.h
   └─ logged_out_state.h
   └─ logging_in_state.h
+
+📂 ./src/business/login/session:
+  └─ login_session.h
+
+📂 ./src/business/login/command:
   └─ login_command.h
+
+📂 ./src/business/login/event:
   └─ login_event.h
   └─ login_failed_event.h
-  └─ login_payload.h
-  └─ login_receiver.h
-  └─ login_session.h
   └─ login_success_event.h
+
+📂 ./src/business/login/model:
+  └─ login_payload.h
 
 📂 ./src/utilities:
   └─ blocking_queue.h
@@ -68,7 +78,7 @@ Lines: 62
 #include "src/framework/core/core.h"
 #include "src/framework/event/event_bus.h"
 #include "src/framework/session/session_manager.h"
-#include "src/business/login/login_session.h"
+#include "src/business/login/session/login_session.h"
 #include "src/framework/event/event_router.h" 
 #include "src/adapter/qt_ui.h"
 #include "src/adapter/websocket.h"
@@ -123,41 +133,70 @@ int main() {
     spdlog::shutdown();
     return 0;
 }
-========== ./src/business/login/login_event.h ==========
-Lines: 22
+========== ./src/business/login/receiver/login_receiver.h ==========
+Lines: 52
 
 #pragma once
-#include "../../framework/event/abstract_event.h"
-#include <string>
+#include <thread>
+#include "../../../framework/command/abstract_receiver.h"
+#include "../../../framework/command/command_context.h"
+#include "../model/login_payload.h"
+#include "../../../utilities/log.h"
+#include "../../../service/abstract_ui.h"
+#include "../../../service/abstract_net.h"
+#include "../../../application/app_context.h"
+#include "../../../framework/event/event_bus.h"
+#include "../event/login_success_event.h"
+#include "../event/login_failed_event.h"
 
-class LoginEvent : public AbstractEvent {
+class LoginReceiver : public AbstractReceiver {
 public:
+    void performAction(const CommandContext& context) override {
+        auto& login = context.get<LoginPayload>();
+        Log::info("[LoginReceiver] Processing login - user = [{}], token = [{}]", 
+                  login.user, login.token);
 
-    LoginEvent(const std::string& user_id, const std::string& token, bool is_success)
-        : m_user_id(user_id), m_token(token), m_is_success(is_success) {}
+        auto* ui = AppContext::instance().ui;
+        auto* net = AppContext::instance().net;
 
-    // 只读getter，保证事件数据不可变，线程安全
-    const std::string& getUserId() const { return m_user_id; }
-    const std::string& getToken() const { return m_token; }
-    bool isSuccess() const { return m_is_success; }
+        if(ui) ui->showMessage("[System] Logging in...");
+        if(net) {
+            net->connect("server.example.com");
+            net->send("Login request for " + login.user);
+        }
 
-private:
-    const std::string m_user_id;
-    const std::string m_token;
-    const bool m_is_success;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        // 模拟业务逻辑判断
+        bool is_success = (login.user == "user" && login.token == "123456");
+        
+        if (is_success) {
+            Log::info("[LoginReceiver] Login successful.");
+            if(ui) ui->showMessage("[System] Login successful!");
+            // 【重要】发布成功事件，驱动状态机从 LoggingIn -> LoggedIn
+            EventBus::GetInstance().publish(
+                std::make_unique<LoginSuccessEvent>(login.user, login.token)
+            );
+        } else {
+            Log::warn("[LoginReceiver] Login failed.");
+            if(ui) ui->showMessage("[System] Login failed! Wrong password.");
+            // 【重要】发布失败事件，驱动状态机从 LoggingIn -> LoggedOut
+            EventBus::GetInstance().publish(
+                std::make_unique<LoginFailedEvent>(login.user, "Invalid credentials")
+            );
+        }
+    }
+
 };
-
-
-
-========== ./src/business/login/logging_in_state.h ==========
+========== ./src/business/login/state/logging_in_state.h ==========
 Lines: 47
 
 // src/business/login/logging_in_state.h
 #pragma once
-#include "../../framework/state/abstract_login_state.h"
-#include "../../utilities/log.h"
-#include "login_success_event.h"
-#include "login_failed_event.h"
+#include "../../../framework/state/abstract_login_state.h"
+#include "../../../utilities/log.h"
+#include "../event/login_success_event.h"
+#include "../event/login_failed_event.h"
 // 前向声明（仅声明，不定义）
 class LoggedOutState;
 class LoggedInState;
@@ -179,8 +218,8 @@ public:
 };
 
 
-#include "logged_out_state.h"
-#include "logged_in_state.h"
+#include "../state/logged_out_state.h"
+#include "../state/logged_in_state.h"
 
 inline std::unique_ptr<AbstractState> LoggingInState::handleEvent(
     AbstractSession* session, const AbstractEvent& event) {
@@ -200,46 +239,7 @@ inline std::unique_ptr<AbstractState> LoggingInState::handleEvent(
     return nullptr; // 其他事件返回空
 }
 
-========== ./src/business/login/login_success_event.h ==========
-Lines: 16
-
-#pragma once
-#include <string>
-#include "../../framework/event/abstract_event.h"
-
-class LoginSuccessEvent : public AbstractEvent {
-public:
-    explicit LoginSuccessEvent(const std::string& user_id, const std::string& token)
-        : m_user_id(user_id), m_token(token) {}
-
-    const std::string& getUserId() const { return m_user_id; }
-    const std::string& getToken() const { return m_token; }
-
-private:
-    const std::string m_user_id;
-    const std::string m_token;
-};
-========== ./src/business/login/login_failed_event.h ==========
-Lines: 16
-
-#pragma once
-#include <string>
-#include "../../framework/event/abstract_event.h"
-
-class LoginFailedEvent : public AbstractEvent {
-public:
-    explicit LoginFailedEvent(const std::string& user_id, const std::string& error_msg)
-        : m_user_id(user_id), m_error_msg(error_msg) {}
-
-    const std::string& getUserId() const { return m_user_id; }
-    const std::string& getErrorMsg() const { return m_error_msg; }
-
-private:
-    const std::string m_user_id;
-    const std::string m_error_msg;
-};
-
-========== ./src/business/login/logged_in_state.h ==========
+========== ./src/business/login/state/logged_in_state.h ==========
 Lines: 32
 
 #pragma once
@@ -275,16 +275,79 @@ public:
 };
 
 
-========== ./src/business/login/login_session.h ==========
+========== ./src/business/login/state/logged_out_state.h ==========
+Lines: 60
+
+#pragma once
+#include "../../../framework/state/abstract_login_state.h"
+#include "../event/login_event.h"
+#include "../../../utilities/log.h"
+#include "../../../framework/command/command_context.h"
+#include "../model/login_payload.h"
+#include "../command/login_command.h"
+#include "../receiver/login_receiver.h"
+#include "../../../framework/session/abstract_session.h"
+#include "../../../framework/event/abstract_event.h"
+
+// 核心：前向声明，替代直接#include "logging_in_state.h"
+class LoggingInState;
+
+class LoggedOutState : public AbstractLoginState{
+public:
+    void onEnter(AbstractSession* session) override {
+        // 进入登录成功状态，发布状态变更事件
+        Log::info("[LoggedOutState] Entered logged out state.");
+    }
+
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override;
+
+    void onExit(AbstractSession* session) override {
+        // 退出登录状态的清理逻辑
+        Log::info("[LoggedOutState] Exited logged out state.");
+    }    
+};
+
+
+#include "logging_in_state.h"
+
+inline std::unique_ptr<AbstractState> LoggedOutState::handleEvent(
+    AbstractSession* session, const AbstractEvent& event) {
+    if(typeid(event) == typeid(LoginEvent))
+    {
+        Log::debug("[LoggedOutState] Received event type: [{}]", typeid(event).name());
+        auto& loginEvent = static_cast<const LoginEvent&>(event);
+        Log::info("[LoggedOutState] Processing login event, user: [{}], success: [{}]", 
+                  loginEvent.getUserId(), loginEvent.isSuccess());
+        if (loginEvent.isSuccess())
+        {
+            CommandContext ctx;
+            auto now_timepoint = std::chrono::system_clock::now();
+            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+            ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+            ctx.set(LoginPayload{
+                loginEvent.getUserId(),
+                loginEvent.getToken()
+            });
+            auto cmd = std::make_unique<LoginCommand>(ctx);
+            cmd->addReceiver(std::make_shared<LoginReceiver>());
+            session->getDispatcher()->postCommand(std::move(cmd));
+            Log::info("[LoggedOutState] Transitioning to LoggingInState");
+            return std::make_unique<LoggingInState>(); // 此时LoggingInState已完整定义
+        }
+    }
+    return nullptr;
+}
+========== ./src/business/login/session/login_session.h ==========
 Lines: 58
 
 #pragma once
 #include <vector>
-#include "../../framework/session/abstract_session.h"
-#include "login_event.h"
-#include "logged_in_state.h"
-#include "logged_out_state.h"
-#include "../../utilities/log.h"
+#include "../../../framework/session/abstract_session.h"
+#include "../event/login_event.h"
+#include "../state/logged_in_state.h"
+#include "../state/logged_out_state.h"
+#include "../../../utilities/log.h"
 class LoginSession : public AbstractSession {
 public:
     explicit LoginSession(AbstractCommandDispatcher* dispatcher) {
@@ -336,76 +399,14 @@ public:
         }
     }
 };
-========== ./src/business/login/logged_out_state.h ==========
-Lines: 60
+========== ./src/business/login/command/login_command.h ==========
+Lines: 29
 
 #pragma once
-#include "../../framework/state/abstract_login_state.h"
-#include "login_event.h"
-#include "../../utilities/log.h"
-#include "../../framework/command/command_context.h"
-#include "login_payload.h"
-#include "login_command.h"
-#include "login_receiver.h"
-#include "../../framework/session/abstract_session.h"
-#include "../../framework/event/abstract_event.h"
-
-// 核心：前向声明，替代直接#include "logging_in_state.h"
-class LoggingInState;
-
-class LoggedOutState : public AbstractLoginState{
-public:
-    void onEnter(AbstractSession* session) override {
-        // 进入登录成功状态，发布状态变更事件
-        Log::info("[LoggedOutState] Entered logged out state.");
-    }
-
-    std::unique_ptr<AbstractState> handleEvent(
-        AbstractSession* session, const AbstractEvent& event) override;
-
-    void onExit(AbstractSession* session) override {
-        // 退出登录状态的清理逻辑
-        Log::info("[LoggedOutState] Exited logged out state.");
-    }    
-};
-
-
-#include "logging_in_state.h"
-
-inline std::unique_ptr<AbstractState> LoggedOutState::handleEvent(
-    AbstractSession* session, const AbstractEvent& event) {
-    if(typeid(event) == typeid(LoginEvent))
-    {
-        Log::debug("[LoggedOutState] Received event type: [{}]", typeid(event).name());
-        auto& loginEvent = static_cast<const LoginEvent&>(event);
-        Log::info("[LoggedOutState] Processing login event, user: [{}], success: [{}]", 
-                  loginEvent.getUserId(), loginEvent.isSuccess());
-        if (loginEvent.isSuccess())
-        {
-            CommandContext ctx;
-            auto now_timepoint = std::chrono::system_clock::now();
-            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
-            ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
-            ctx.set(LoginPayload{
-                loginEvent.getUserId(),
-                loginEvent.getToken()
-            });
-            auto cmd = std::make_unique<LoginCommand>(ctx);
-            cmd->addReceiver(std::make_shared<LoginReceiver>());
-            session->getDispatcher()->postCommand(std::move(cmd));
-            Log::info("[LoggedOutState] Transitioning to LoggingInState");
-            return std::make_unique<LoggingInState>(); // 此时LoggingInState已完整定义
-        }
-    }
-    return nullptr;
-}
-========== ./src/business/login/login_command.h ==========
-Lines: 28
-
-#pragma once
-#include "../../framework/command/abstract_command.h"
 #include <thread>
 #include <iostream>
+#include "../../../framework/command/abstract_command.h"
+
 
 class LoginCommand : public AbstractCommand
 {
@@ -430,62 +431,73 @@ public:
     };
 
 };
-========== ./src/business/login/login_receiver.h ==========
-Lines: 52
+========== ./src/business/login/event/login_event.h ==========
+Lines: 23
 
 #pragma once
-#include <thread>
-#include "../../framework/command/abstract_receiver.h"
-#include "../../framework/command/command_context.h"
-#include "login_payload.h"
-#include "../../utilities/log.h"
-#include "../../service/abstract_ui.h"
-#include "../../service/abstract_net.h"
-#include "../../application/app_context.h"
-#include "../../framework/event/event_bus.h"
-#include "login_success_event.h"
-#include "login_failed_event.h"
+#include <string>
+#include "../../../framework/event/abstract_event.h"
 
-class LoginReceiver : public AbstractReceiver {
+
+class LoginEvent : public AbstractEvent {
 public:
-    void performAction(const CommandContext& context) override {
-        auto& login = context.get<LoginPayload>();
-        Log::info("[LoginReceiver] Processing login - user = [{}], token = [{}]", 
-                  login.user, login.token);
 
-        auto* ui = AppContext::instance().ui;
-        auto* net = AppContext::instance().net;
+    LoginEvent(const std::string& user_id, const std::string& token, bool is_success)
+        : m_user_id(user_id), m_token(token), m_is_success(is_success) {}
 
-        if(ui) ui->showMessage("[System] Logging in...");
-        if(net) {
-            net->connect("server.example.com");
-            net->send("Login request for " + login.user);
-        }
+    // 只读getter，保证事件数据不可变，线程安全
+    const std::string& getUserId() const { return m_user_id; }
+    const std::string& getToken() const { return m_token; }
+    bool isSuccess() const { return m_is_success; }
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-
-        // 模拟业务逻辑判断
-        bool is_success = (login.user == "user" && login.token == "123456");
-        
-        if (is_success) {
-            Log::info("[LoginReceiver] Login successful.");
-            if(ui) ui->showMessage("[System] Login successful!");
-            // 【重要】发布成功事件，驱动状态机从 LoggingIn -> LoggedIn
-            EventBus::GetInstance().publish(
-                std::make_unique<LoginSuccessEvent>(login.user, login.token)
-            );
-        } else {
-            Log::warn("[LoginReceiver] Login failed.");
-            if(ui) ui->showMessage("[System] Login failed! Wrong password.");
-            // 【重要】发布失败事件，驱动状态机从 LoggingIn -> LoggedOut
-            EventBus::GetInstance().publish(
-                std::make_unique<LoginFailedEvent>(login.user, "Invalid credentials")
-            );
-        }
-    }
-
+private:
+    const std::string m_user_id;
+    const std::string m_token;
+    const bool m_is_success;
 };
-========== ./src/business/login/login_payload.h ==========
+
+
+
+========== ./src/business/login/event/login_success_event.h ==========
+Lines: 16
+
+#pragma once
+#include <string>
+#include "../../../framework/event/abstract_event.h"
+
+class LoginSuccessEvent : public AbstractEvent {
+public:
+    explicit LoginSuccessEvent(const std::string& user_id, const std::string& token)
+        : m_user_id(user_id), m_token(token) {}
+
+    const std::string& getUserId() const { return m_user_id; }
+    const std::string& getToken() const { return m_token; }
+
+private:
+    const std::string m_user_id;
+    const std::string m_token;
+};
+========== ./src/business/login/event/login_failed_event.h ==========
+Lines: 16
+
+#pragma once
+#include <string>
+#include "../../../framework/event/abstract_event.h"
+
+class LoginFailedEvent : public AbstractEvent {
+public:
+    explicit LoginFailedEvent(const std::string& user_id, const std::string& error_msg)
+        : m_user_id(user_id), m_error_msg(error_msg) {}
+
+    const std::string& getUserId() const { return m_user_id; }
+    const std::string& getErrorMsg() const { return m_error_msg; }
+
+private:
+    const std::string m_user_id;
+    const std::string m_error_msg;
+};
+
+========== ./src/business/login/model/login_payload.h ==========
 Lines: 7
 
 #pragma once
@@ -669,7 +681,7 @@ Lines: 25
 #include "../framework/event/event_bus.h"
 #include "../service/abstract_ui.h"
 #include "../utilities/log.h"
-#include "../business/login/login_event.h"
+#include "../business/login/event/login_event.h"
 class QtUI : public AbstractUI {
 public:
     QtUI() {
@@ -1272,4 +1284,4 @@ private:
 
 =====================================
 Total files: 32
-Total lines: 1106
+Total lines: 1108

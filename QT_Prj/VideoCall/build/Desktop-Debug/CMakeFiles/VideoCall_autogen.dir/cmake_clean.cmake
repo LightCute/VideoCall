@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/VideoCall_autogen"
-  "VideoCall_autogen/include/ui_widget.h"
+  "VideoCall_autogen/include/src/adapter/ui_qt_ui.h"
   "VideoCall_autogen/mocs_compilation.cpp"
   "VideoCall_autogen/timestamp"
 )

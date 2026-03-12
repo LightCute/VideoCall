@@ -4,7 +4,7 @@
 #include "../framework/event/event_bus.h"
 #include "../service/abstract_ui.h"
 #include "../utilities/log.h"
-#include "../business/login/login_event.h"
+#include "../business/login/event/login_event.h"
 class QtUI : public AbstractUI {
 public:
     QtUI() {

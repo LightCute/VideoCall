@@ -17,13 +17,16 @@ public:
     ~SessionManager() {
         Log::info("[SessionManager] Destroying, cleaning up [{}] sessions",
              m_sessions.size());
-        // 优雅销毁：注销所有会话的监听者 + 停止会话
         std::lock_guard<std::mutex> lock(m_mutex);
         for (auto& session : m_sessions) {
             if (m_router) {
-                Log::debug("[SessionManager] Unregistering listener for event type: [{}]", 
-                    session->eventType().name());
-                m_router->unregisterListener(session->eventType(), session.get());
+                // 遍历事件类型列表，逐个注销
+                auto event_types = session->eventTypes();
+                for (auto& event_type : event_types) {
+                    Log::debug("[SessionManager] Unregistering listener for event type: [{}]", 
+                        event_type.name());
+                    m_router->unregisterListener(event_type, session.get());
+                }
             }
             session->stop();
         }
@@ -38,9 +41,12 @@ public:
         
         // 核心：会话创建后自动注册到路由（无需硬编码事件类型）
         if (m_router) {
-            Log::info("[SessionManager] Registering session for event type: [{}]", 
-                session->eventType().name());
-            m_router->registerListener(session->eventType(), session.get());
+            auto event_types = session->eventTypes();
+            for (auto& event_type : event_types) {
+                Log::info("[SessionManager] Registering session for event type: [{}]", 
+                    event_type.name());
+                m_router->registerListener(event_type, session.get());
+            }
         }
         
         session->start();

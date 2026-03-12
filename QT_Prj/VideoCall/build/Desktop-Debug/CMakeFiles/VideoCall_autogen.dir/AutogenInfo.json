@@ -93,9 +93,189 @@
 	"HEADERS" : 
 	[
 		[
-			"/home/light/work/Video_Prj/QT_Prj/VideoCall/widget.h",
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.h",
 			"MU",
-			"EWIEGA46WW/moc_widget.cpp",
+			"EHZJ7QDSWJ/moc_qt_ui.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h",
+			"MU",
+			"EHZJ7QDSWJ/moc_websocket.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h",
+			"MU",
+			"GVIIGZR2OP/moc_app_context.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/command/login_command.h",
+			"MU",
+			"BIGDVO5DCV/moc_login_command.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_event.h",
+			"MU",
+			"N3GPB43ZPK/moc_login_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_failed_event.h",
+			"MU",
+			"N3GPB43ZPK/moc_login_failed_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_success_event.h",
+			"MU",
+			"N3GPB43ZPK/moc_login_success_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/model/login_payload.h",
+			"MU",
+			"FI5RA5OXE6/moc_login_payload.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/receiver/login_receiver.h",
+			"MU",
+			"FZY2HREKH4/moc_login_receiver.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/login_session.h",
+			"MU",
+			"BEU7QFGIRW/moc_login_session.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/state/logged_in_state.h",
+			"MU",
+			"XYVH3BDWHR/moc_logged_in_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/state/logged_out_state.h",
+			"MU",
+			"XYVH3BDWHR/moc_logged_out_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/state/logging_in_state.h",
+			"MU",
+			"XYVH3BDWHR/moc_logging_in_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_command.h",
+			"MU",
+			"ZNG35QEVS3/moc_abstract_command.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_command_dispatcher.h",
+			"MU",
+			"ZNG35QEVS3/moc_abstract_command_dispatcher.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_receiver.h",
+			"MU",
+			"ZNG35QEVS3/moc_abstract_receiver.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/command_context.h",
+			"MU",
+			"ZNG35QEVS3/moc_command_context.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/core.h",
+			"MU",
+			"ICIDJ76OQ7/moc_core.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h",
+			"MU",
+			"GKWJ6QAAAE/moc_abstract_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event_listener.h",
+			"MU",
+			"GKWJ6QAAAE/moc_abstract_event_listener.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_bus.h",
+			"MU",
+			"GKWJ6QAAAE/moc_event_bus.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_router.h",
+			"MU",
+			"GKWJ6QAAAE/moc_event_router.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h",
+			"MU",
+			"ETRYCCMC5P/moc_abstract_session.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/session_manager.h",
+			"MU",
+			"ETRYCCMC5P/moc_session_manager.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_call_state.h",
+			"MU",
+			"GKD7T7DLHD/moc_abstract_call_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_login_state.h",
+			"MU",
+			"GKD7T7DLHD/moc_abstract_login_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_state.h",
+			"MU",
+			"GKD7T7DLHD/moc_abstract_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_net.h",
+			"MU",
+			"RIEQWACMR2/moc_abstract_net.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_ui.h",
+			"MU",
+			"RIEQWACMR2/moc_abstract_ui.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/blocking_queue.h",
+			"MU",
+			"JLQFWLRVOM/moc_blocking_queue.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h",
+			"MU",
+			"JLQFWLRVOM/moc_log.cpp",
 			null
 		]
 	],
@@ -119,8 +299,10 @@
 	],
 	"MOC_INCLUDES" : 
 	[
+		"/home/light/work/Video_Prj/QT_Prj/VideoCall/src",
 		"/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include",
 		"/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include",
+		"/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include",
 		"/usr/include/x86_64-linux-gnu/qt5",
 		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
 		"/usr/include/x86_64-linux-gnu/qt5/QtGui",
@@ -160,7 +342,11 @@
 	"SOURCES" : 
 	[
 		[ "/home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp", "MU", null ],
-		[ "/home/light/work/Video_Prj/QT_Prj/VideoCall/widget.cpp", "MU", null ]
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp",
+			"MU",
+			null
+		]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

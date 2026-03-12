@@ -5,8 +5,38 @@ VideoCall_autogen/timestamp: \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/CMakeFiles/4.2.0-rc4/CMakeSystem.cmake \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/VideoCall_autogen/moc_predefs.h \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp \
-	/home/light/work/Video_Prj/QT_Prj/VideoCall/widget.cpp \
-	/home/light/work/Video_Prj/QT_Prj/VideoCall/widget.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/command/login_command.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_event.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_failed_event.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_success_event.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/model/login_payload.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/receiver/login_receiver.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/login_session.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/state/logged_in_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/state/logged_out_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/state/logging_in_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_command.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_command_dispatcher.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_receiver.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/command_context.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/core.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event_listener.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_bus.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_router.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/session_manager.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_call_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_login_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_net.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_ui.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/blocking_queue.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h \
 	/usr/include/asm-generic/errno-base.h \
 	/usr/include/asm-generic/errno.h \
 	/usr/include/assert.h \
@@ -411,5 +441,5 @@ VideoCall_autogen/timestamp: \
 	/usr/local/share/cmake-4.2/Modules/Platform/Linux-Initialize.cmake \
 	/usr/local/share/cmake-4.2/Modules/Platform/Linux.cmake \
 	/usr/local/share/cmake-4.2/Modules/Platform/UnixPaths.cmake \
-	/home/light/work/Video_Prj/QT_Prj/VideoCall/widget.ui \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.ui \
 	/usr/local/bin/cmake

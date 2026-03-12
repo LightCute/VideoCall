@@ -1,8 +1,7 @@
 CMakeFiles/VideoCall.dir/main.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/widget.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget \
-  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidget.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
+  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
   /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtguiglobal.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qglobal.h \
@@ -123,15 +122,12 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qtgui-config.h \
   /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgets-config.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtGui/qwindowdefs.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qnamespace.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qstring.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qchar.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qrefcount.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qnamespace.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h \
   /usr/include/string.h /usr/include/strings.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/stdlib.h \
@@ -231,6 +227,9 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringliteral.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringalgorithms.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qstringview.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobjectdefs_impl.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qlist.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qiterator.h \
@@ -289,11 +288,238 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/limits \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ctime \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/parse_numbers.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qwindowdefs.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qsize.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qmargins.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qcursor.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qlocale.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvariant.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qmap.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qhash.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/variant \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qshareddata.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/iostream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ostream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ios \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_ios.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cwctype \
+  /usr/include/wctype.h \
+  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/ctype_base.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_ios.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/ostream.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/istream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/istream.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/memory \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_raw_storage_iter.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/align.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/unique_ptr.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/shared_ptr.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/shared_ptr_base.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ext/concurrence.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/shared_ptr_atomic.h \
+  /usr/lib/llvm-18/lib/clang/18/include/sanitizer/tsan_interface.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/backward/auto_ptr.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/pstl/glue_memory_defs.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/thread \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/std_thread.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/this_thread_sleep.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/core.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/../command/abstract_command_dispatcher.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/../command/abstract_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/../command/abstract_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/../command/command_context.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/any \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/../../utilities/blocking_queue.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/queue \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/deque \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_deque.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/deque.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_queue.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/mutex \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/std_mutex.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/unique_lock.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/condition_variable \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/core/../../utilities/log.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/sstream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/sstream.tcc \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/spdlog.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/common.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/null_mutex.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/tweakme.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/fmt/fmt.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/fmt/bundled/format.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/fmt/bundled/base.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cmath \
+  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/specfun.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/gamma.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/special_function_util.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/bessel_function.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/beta_function.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/ell_integral.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/exp_integral.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/hypergeometric.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/legendre_function.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/modified_bessel_func.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/poly_hermite.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/poly_laguerre.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/riemann_zeta.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstring \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/fmt/bundled/format-inl.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/climits \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/locale \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets_nonio.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/time_members.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/messages_members.h \
+  /usr/include/libintl.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/codecvt.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets_nonio.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_conv.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/common-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/registry.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/periodic_worker.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/periodic_worker-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/registry-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/logger.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/backtracer.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/circular_q.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cassert \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/log_msg_buffer.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/log_msg.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/log_msg-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/os.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/os-inl.h \
+  /usr/include/x86_64-linux-gnu/sys/stat.h \
+  /usr/include/x86_64-linux-gnu/bits/stat.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
+  /usr/include/x86_64-linux-gnu/bits/statx.h /usr/include/linux/stat.h \
+  /usr/include/linux/types.h /usr/include/x86_64-linux-gnu/asm/types.h \
+  /usr/include/asm-generic/types.h /usr/include/asm-generic/int-ll64.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
+  /usr/include/asm-generic/bitsperlong.h \
+  /usr/include/linux/posix_types.h /usr/include/linux/stddef.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
+  /usr/include/fcntl.h /usr/include/x86_64-linux-gnu/bits/fcntl.h \
+  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+  /usr/include/linux/falloc.h /usr/include/unistd.h \
+  /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+  /usr/include/x86_64-linux-gnu/bits/environments.h \
+  /usr/include/x86_64-linux-gnu/bits/confname.h \
+  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+  /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
+  /usr/include/linux/close_range.h \
+  /usr/include/x86_64-linux-gnu/sys/syscall.h \
+  /usr/include/x86_64-linux-gnu/asm/unistd.h \
+  /usr/include/x86_64-linux-gnu/asm/unistd_64.h \
+  /usr/include/x86_64-linux-gnu/bits/syscall.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/log_msg_buffer-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/backtracer-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/logger-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/pattern_formatter.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/formatter.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/pattern_formatter-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/fmt_helper.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/mdc.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/sink.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/ansicolor_sink.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/console_globals.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/ansicolor_sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/synchronous_factory.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/version.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/spdlog-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/basic_file_sink.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/file_helper.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/file_helper-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/base_sink.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/base_sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/basic_file_sink-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/stdout_color_sinks.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/sinks/stdout_color_sinks-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/async.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/async_logger.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/async_logger-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/thread_pool.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/mpmc_blocking_q.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/thread_pool-inl.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_bus.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/shared_mutex \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/../../utilities/blocking_queue.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_router.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/typeindex \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event_listener.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/session_manager.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../state/abstract_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../state/../event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../command/abstract_command_dispatcher.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../event/abstract_event_listener.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../event/event_router.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/login_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../../../framework/session/abstract_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../event/login_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../event/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/logged_in_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/state/abstract_login_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/state/abstract_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../event/login_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/command/command_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../model/login_payload.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../command/login_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../command/../../../framework/command/abstract_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/login_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../framework/command/abstract_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../framework/command/command_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../model/login_payload.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../service/abstract_ui.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../service/abstract_net.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../application/app_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../application/../service/abstract_ui.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../application/../service/abstract_net.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../framework/event/event_bus.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../event/login_success_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../event/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../event/login_failed_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/session/abstract_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/logged_out_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/logging_in_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../event/login_success_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../event/login_failed_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget \
+  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidget.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qrect.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qsize.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qpalette.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qrgb.h \
@@ -310,34 +536,15 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qpixelformat.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qpixmap.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qshareddata.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qhash.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qsharedpointer_impl.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/memory \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_raw_storage_iter.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/align.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/unique_ptr.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/shared_ptr.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/shared_ptr_base.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ext/concurrence.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/shared_ptr_atomic.h \
-  /usr/lib/llvm-18/lib/clang/18/include/sanitizer/tsan_interface.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/backward/auto_ptr.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/pstl/glue_memory_defs.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qfont.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qfontmetrics.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qfontinfo.h \
   /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qsizepolicy.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtGui/qcursor.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qkeysequence.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
-  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qlocale.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvariant.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qmap.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/variant
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../service/abstract_ui.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../service/abstract_net.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
