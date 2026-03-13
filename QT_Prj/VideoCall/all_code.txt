@@ -28,8 +28,19 @@
 📂 ./src/business/login/model:
   └─ login_payload.h
 
+📂 ./src/business/call/state:
+  └─ call_idle_state.h
+  └─ calling_state.h
+
+📂 ./src/business/call/session:
+  └─ call_session.h
+
+📂 ./src/business/call/event:
+  └─ call_event.h
+
 📂 ./src/business/connect/receiver:
   └─ connect_receiver.h
+  └─ connected_receiver.h
 
 📂 ./src/business/connect/state:
   └─ connected_state.h
@@ -41,6 +52,7 @@
 
 📂 ./src/business/connect/command:
   └─ connect_command.h
+  └─ connected_command.h
 
 📂 ./src/business/connect/event:
   └─ connect_failed_event.h
@@ -98,7 +110,7 @@
 
 
 ========== ./main.cpp ==========
-Lines: 47
+Lines: 54
 
 
 #include <QApplication>
@@ -115,6 +127,7 @@ Lines: 47
 #include "src/adapter/websocket.h"
 #include "src/application/app_context.h"
 #include "src/utilities/log.h"
+#include "src/business/call/session/call_session.h"
 int main(int argc, char *argv[])
 {
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
@@ -137,8 +150,14 @@ int main(int argc, char *argv[])
 
     sessionManager->createSession<ConnectSession>(dispatcher.get());
 
+
     ui -> showUI();
 
+    EventBus::GetInstance().publish(
+        std::make_unique<ConnectServerEvent>("ws://120.79.210.6:8000/abcd")
+    );
+
+    sessionManager->createSession<CallSession>(dispatcher.get());
     // sessionManager.reset(); // 注销Session监听者
     // dispatcher.reset();     // 停止Core线程
     // eventBus.stop();        // 停止EventBus逻辑线程
@@ -456,11 +475,9 @@ public:
     }
 };
 ========== ./src/business/login/command/login_command.h ==========
-Lines: 29
+Lines: 27
 
 #pragma once
-#include <thread>
-#include <iostream>
 #include "../../../framework/command/abstract_command.h"
 
 
@@ -564,11 +581,218 @@ struct LoginPayload
     std::string token;
 };
 
-========== ./src/business/connect/receiver/connect_receiver.h ==========
-Lines: 30
+========== ./src/business/call/state/calling_state.h ==========
+Lines: 49
+
+// src/business/connect/state/connecting_state.h
+#pragma once
+// 仅包含必要的抽象类（abstract_call_state.h已包含abstract_state.h，无需重复包含）
+#include "../../../framework/state/abstract_call_state.h"
+#include "../../../utilities/log.h"
+#include "../event/call_event.h"
+
+// // 前向声明
+// class AbstractSession;
+// // 前向声明，避免直接包含
+// class DisconnectedState;
+// class ConnectedState;
+
+class CallingState : public AbstractCallState {
+public:
+    void onEnter(AbstractSession* session) override {
+        Log::info("[CallingState] Entered calling state... (waiting for network)");
+    }
+
+    // 仅声明，实现移到类外
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override{}
+
+    void onExit(AbstractSession* session) override {
+        Log::info("[CallingState] Exited calling state.");
+    }
+};
+
+// 类外实现，确保子类完整定义可见
+// #include "disconnected_state.h"
+// #include "connected_state.h"
+// inline std::unique_ptr<AbstractState> ConnectingState::handleEvent(
+//     AbstractSession* session, const AbstractEvent& event) {
+//     if (typeid(event) == typeid(ConnectSuccessEvent))
+//     {
+//         Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
+//         Log::info("[ConnectingState] Processing connect success event");
+//         Log::info("[ConnectingState] Transitioning to [ConnectedState]");
+//         return std::make_unique<ConnectedState>(); 
+//     }
+//     else if (typeid(event) == typeid(ConnectFailedEvent))
+//     {
+//         Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
+//         Log::info("[ConnectingState] Processing connect failed event");
+//         Log::info("[ConnectingState] Transitioning back to [DisconnectedState]");
+//         return std::make_unique<DisconnectedState>(); 
+//     }
+//     return nullptr;
+// }
+========== ./src/business/call/state/call_idle_state.h ==========
+Lines: 40
+
+// src/business/connect/state/disconnected_state.h
+#pragma once
+#include "../../../framework/state/abstract_connect_state.h"
+#include "../../../utilities/log.h"
+#include "../../../framework/command/command_context.h"
+#include "../../../framework/session/abstract_session.h"
+#include "../../../framework/event/abstract_event.h"
+#include "../event/call_event.h"
+
+class CallIdleState : public AbstractConnectState{
+public:
+    void onEnter(AbstractSession* session) override {
+        Log::info("[CallIdleState] Entered call idle state.");
+    }
+
+    // 仅声明，实现移到类外（确保ConnectingState完整定义可见）
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override{}
+
+    void onExit(AbstractSession* session) override {
+        Log::info("[CallIdleState] Exited call idle state.");
+    }    
+};
+
+// 类外实现，此时包含ConnectingState完整定义
+#include "calling_state.h"
+inline std::unique_ptr<AbstractState> CallIdleState::handleEvent(
+    AbstractSession* session, const AbstractEvent& event) {
+    if(typeid(event) == typeid(CallEvent))
+    {
+        Log::debug("[CallIdleState] Received event type: [{}]", typeid(event).name());
+        auto& callEvent = static_cast<const CallEvent&>(event);
+        Log::info("[CallIdleState] Processing call event, peer_id: [{}]", 
+                    callEvent.getPeerid());
+
+        Log::info("[CallIdleState] Transitioning to [CallingState]");
+        return std::make_unique<CallingState>(); 
+    }
+    return nullptr;
+}
+========== ./src/business/call/session/call_session.h ==========
+Lines: 56
 
 #pragma once
-#include <thread>
+#include <vector>
+#include "../../../framework/session/abstract_session.h"
+#include "../../../utilities/log.h"
+#include "../state/call_idle_state.h"
+class CallSession : public AbstractSession {
+public:
+    explicit CallSession(AbstractCommandDispatcher* dispatcher) {
+        m_cmd_dispatcher = dispatcher;
+        Log::debug("[CallSession] Created");
+    }
+
+    // 核心：声明我只关心 LoginEvent
+    std::vector<std::type_index> eventTypes() const override {
+        return {
+            // typeid(ConnectServerEvent),  
+            // typeid(ConnectSuccessEvent),
+            // typeid(ConnectFailedEvent)
+        };
+    }
+
+    // 实现IEventListener：处理LoginEvent（原有逻辑迁移）
+    void handleEvent(const AbstractEvent& event) override {
+        Log::debug("[CallSession] Handling event type: [{}]", typeid(event).name());
+        if (!m_current_state) {
+            Log::warn("[CallSession] No current state to handle event");
+            return;
+        }
+
+        auto new_state = m_current_state->handleEvent(this, event);
+        if (new_state) {
+            Log::info("[CallSession] State transition triggered");
+            m_current_state->onExit(this);
+            m_current_state = std::move(new_state);
+            m_current_state->onEnter(this);
+        }
+    }
+
+    // 保留原有生命周期接口（仅修正状态初始化逻辑）
+    void start() override {
+        Log::info("[CallSession] Starting");
+        if (m_current_state) {
+            m_current_state->onExit(this);
+        }
+        m_current_state = std::make_unique<CallIdleState>();
+        m_current_state->onEnter(this);
+    }
+
+    void stop() override {
+        Log::info("[CallSession] Stopping");
+        if (m_current_state) {
+            m_current_state->onExit(this);
+            m_current_state.reset();
+        }
+    }
+};
+
+========== ./src/business/call/event/call_event.h ==========
+Lines: 19
+
+#pragma once
+#include <string>
+#include "../../../framework/event/abstract_event.h"
+
+
+class CallEvent : public AbstractCallState {
+public:
+
+    CallEvent(const std::string& peer_id)
+        : m_peer_id(peer_id) {}
+
+    // 只读getter，保证事件数据不可变，线程安全
+    const std::string& getPeerid() const { return m_peer_id; }
+
+private:
+    const std::string m_peer_id;
+};
+
+
+
+========== ./src/business/connect/receiver/connected_receiver.h ==========
+Lines: 27
+
+#pragma once
+#include "../../../framework/command/abstract_receiver.h"
+#include "../../../framework/command/command_context.h"
+#include "../model/connect_payload.h"
+#include "../../../utilities/log.h"
+#include "../../../service/abstract_ui.h"
+#include "../../../service/abstract_net.h"
+#include "../../../application/app_context.h"
+#include "../../../framework/event/event_bus.h"
+
+class ConnectedReceiver : public AbstractReceiver {
+public:
+    void performAction(const CommandContext& context) override {
+        Log::info("[ConnectedReceiver] Processing connected ");
+
+        auto* ui = AppContext::instance().ui;
+        auto* net = AppContext::instance().net;
+
+        if(ui) ui->showMessage("[System] Connected!");
+        if(net) {
+            
+        }
+
+
+    }
+
+};
+========== ./src/business/connect/receiver/connect_receiver.h ==========
+Lines: 29
+
+#pragma once
 #include "../../../framework/command/abstract_receiver.h"
 #include "../../../framework/command/command_context.h"
 #include "../model/connect_payload.h"
@@ -598,7 +822,7 @@ public:
 
 };
 ========== ./src/business/connect/state/connected_state.h ==========
-Lines: 29
+Lines: 48
 
 #pragma once
 #include <chrono>
@@ -607,12 +831,24 @@ Lines: 29
 #include "../../../framework/state/abstract_connect_state.h"
 #include "../../../framework/command/command_context.h"
 #include "../../../framework/session/abstract_session.h"
-
+#include "../command/connected_command.h"
+#include "../receiver/connected_receiver.h"
 class ConnectedState : public AbstractConnectState  {
 public:
     void onEnter(AbstractSession* session) override {
         // 进入登录成功状态，发布状态变更事件
         Log::info("[ConnectedState] Entered connected state.");
+        CommandContext ctx;
+        auto now_timepoint = std::chrono::system_clock::now();
+        auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+        ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+        ctx.set(ConnectPayload{
+            
+        });
+        auto cmd = std::make_unique<ConnectedCommand>(ctx);
+        cmd->addReceiver(std::make_shared<ConnectedReceiver>());
+        session->getDispatcher()->postCommand(std::move(cmd));
+        
     }
 
     std::unique_ptr<AbstractState> handleEvent(
@@ -630,8 +866,15 @@ public:
 };
 
 
+
+
+
+
+
+
+
 ========== ./src/business/connect/state/disconnected_state.h ==========
-Lines: 53
+Lines: 55
 
 // src/business/connect/state/disconnected_state.h
 #pragma once
@@ -645,7 +888,7 @@ Lines: 53
 #include "../command/connect_command.h"
 #include "../receiver/connect_receiver.h"
 
-// 核心修改：将 #include "../state/connecting_state.h" 替换为前向声明
+// 前向声明，打破循环包含
 class ConnectingState;
 
 class DisconnectedState : public AbstractConnectState{
@@ -654,56 +897,56 @@ public:
         Log::info("[DisconnectedState] Entered disconnected state.");
     }
 
+    // 仅声明，实现移到类外（确保ConnectingState完整定义可见）
     std::unique_ptr<AbstractState> handleEvent(
-        AbstractSession* session, const AbstractEvent& event) override{
-        if(typeid(event) == typeid(ConnectServerEvent))
-        {
-            Log::debug("[DisconnectedState] Received event type: [{}]", typeid(event).name());
-            auto& loginEvent = static_cast<const ConnectServerEvent&>(event);
-            Log::info("[DisconnectedState] Processing connect event, url: [{}]", 
-                        loginEvent.getUrl());
-            CommandContext ctx;
-            auto now_timepoint = std::chrono::system_clock::now();
-            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
-            ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
-            ctx.set(ConnectPayload{
-                loginEvent.getUrl()
-            });
-            auto cmd = std::make_unique<ConnectCommand>(ctx);
-            cmd->addReceiver(std::make_shared<ConnectReceiver>());
-            session->getDispatcher()->postCommand(std::move(cmd));
-            Log::info("[DisconnectedState] Transitioning to [ConnectingState]");
-            // 此处需要确保 ConnectingState 的完整定义可见，因此在类外实现（可选）
-            return std::make_unique<ConnectingState>(); 
-        }
-        return nullptr;
-    }
+        AbstractSession* session, const AbstractEvent& event) override;
 
     void onExit(AbstractSession* session) override {
         Log::info("[DisconnectedState] Exited disconnected state.");
     }    
 };
 
-// 可选：若上面 return std::make_unique<ConnectingState>() 仍报错，补充包含头文件
+// 类外实现，此时包含ConnectingState完整定义
 #include "connecting_state.h"
+inline std::unique_ptr<AbstractState> DisconnectedState::handleEvent(
+    AbstractSession* session, const AbstractEvent& event) {
+    if(typeid(event) == typeid(ConnectServerEvent))
+    {
+        Log::debug("[DisconnectedState] Received event type: [{}]", typeid(event).name());
+        auto& connectEvent = static_cast<const ConnectServerEvent&>(event);
+        Log::info("[DisconnectedState] Processing connect event, url: [{}]", 
+                    connectEvent.getUrl());
+        CommandContext ctx;
+        auto now_timepoint = std::chrono::system_clock::now();
+        auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+        ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+        ctx.set(ConnectPayload{
+            connectEvent.getUrl()
+        });
+        auto cmd = std::make_unique<ConnectCommand>(ctx);
+        cmd->addReceiver(std::make_shared<ConnectReceiver>());
+        session->getDispatcher()->postCommand(std::move(cmd));
+        Log::info("[DisconnectedState] Transitioning to [ConnectingState]");
+        return std::make_unique<ConnectingState>(); 
+    }
+    return nullptr;
+}
 ========== ./src/business/connect/state/connecting_state.h ==========
-Lines: 48
+Lines: 50
 
 // src/business/connect/state/connecting_state.h
 #pragma once
-// 1. 先包含基础抽象类（确保继承链可见）
+// 仅包含必要的抽象类（abstract_connect_state.h已包含abstract_state.h，无需重复包含）
 #include "../../../framework/state/abstract_connect_state.h"
-#include "../../../framework/state/abstract_state.h"
 #include "../../../utilities/log.h"
 #include "../event/connect_success_event.h"
 #include "../event/connect_failed_event.h"
 
-// 2. 前向声明（仅用于类内声明，不用于实现）
+// 前向声明
 class AbstractSession;
-
-// 3. 先包含依赖的完整头文件（核心：让继承关系可见）
-#include "disconnected_state.h"
-#include "connected_state.h"
+// 前向声明，避免直接包含
+class DisconnectedState;
+class ConnectedState;
 
 class ConnectingState : public AbstractConnectState {
 public:
@@ -711,34 +954,38 @@ public:
         Log::info("[ConnectingState] Entered connecting state... (waiting for network)");
     }
 
-    // 直接在类内实现（此时已包含完整头文件，继承关系可见）
+    // 仅声明，实现移到类外
     std::unique_ptr<AbstractState> handleEvent(
-        AbstractSession* session, const AbstractEvent& event) override {
-        if (typeid(event) == typeid(ConnectSuccessEvent))
-        {
-            Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
-            Log::info("[ConnectingState] Processing connect success event");
-            Log::info("[ConnectingState] Transitioning to [ConnectedState]");
-            // 此时编译器能识别 ConnectedState 继承 AbstractConnectState → AbstractState
-            return std::make_unique<ConnectedState>(); 
-        }
-        else if (typeid(event) == typeid(ConnectFailedEvent))
-        {
-            Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
-            Log::info("[ConnectingState] Processing connect failed event");
-            Log::info("[ConnectingState] Transitioning back to [DisconnectedState]");
-            // 此时编译器能识别 DisconnectedState 继承 AbstractConnectState → AbstractState
-            return std::make_unique<DisconnectedState>(); 
-        }
-        return nullptr;
-    }
+        AbstractSession* session, const AbstractEvent& event) override;
 
     void onExit(AbstractSession* session) override {
         Log::info("[ConnectingState] Exited connecting state.");
     }
 };
+
+// 类外实现，确保子类完整定义可见
+#include "disconnected_state.h"
+#include "connected_state.h"
+inline std::unique_ptr<AbstractState> ConnectingState::handleEvent(
+    AbstractSession* session, const AbstractEvent& event) {
+    if (typeid(event) == typeid(ConnectSuccessEvent))
+    {
+        Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
+        Log::info("[ConnectingState] Processing connect success event");
+        Log::info("[ConnectingState] Transitioning to [ConnectedState]");
+        return std::make_unique<ConnectedState>(); 
+    }
+    else if (typeid(event) == typeid(ConnectFailedEvent))
+    {
+        Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
+        Log::info("[ConnectingState] Processing connect failed event");
+        Log::info("[ConnectingState] Transitioning back to [DisconnectedState]");
+        return std::make_unique<DisconnectedState>(); 
+    }
+    return nullptr;
+}
 ========== ./src/business/connect/session/connect_session.h ==========
-Lines: 57
+Lines: 59
 
 #pragma once
 #include <vector>
@@ -746,6 +993,8 @@ Lines: 57
 #include "../../../framework/session/abstract_session.h"
 #include "../../../utilities/log.h"
 #include "../event/connect_server_event.h"
+#include "../event/connect_success_event.h"
+#include "../event/connect_failed_event.h"
 class ConnectSession : public AbstractSession {
 public:
     explicit ConnectSession(AbstractCommandDispatcher* dispatcher) {
@@ -756,9 +1005,9 @@ public:
     // 核心：声明我只关心 LoginEvent
     std::vector<std::type_index> eventTypes() const override {
         return {
-            typeid(ConnectServerEvent) // 仅监听连接事件，其他事件不处理     
-            // typeid(LoginSuccessEvent),   
-            // typeid(LoginFailedEvent)                
+            typeid(ConnectServerEvent),  
+            typeid(ConnectSuccessEvent),
+            typeid(ConnectFailedEvent)
         };
     }
 
@@ -799,11 +1048,9 @@ public:
 };
 
 ========== ./src/business/connect/command/connect_command.h ==========
-Lines: 29
+Lines: 27
 
 #pragma once
-#include <thread>
-#include <iostream>
 #include "../../../framework/command/abstract_command.h"
 
 
@@ -811,6 +1058,36 @@ class ConnectCommand : public AbstractCommand
 {
 public:
     explicit ConnectCommand(CommandContext ctx)
+    {
+        m_context = std::move(ctx);
+    }
+
+    bool execute() override
+    {
+        for (auto& r : m_receivers)
+        {
+            r->performAction(m_context);
+        }
+        return true;
+    }
+
+    std::string getCommandType() const override
+    {
+        return "ConnectCommand";
+    };
+
+};
+========== ./src/business/connect/command/connected_command.h ==========
+Lines: 27
+
+#pragma once
+#include "../../../framework/command/abstract_command.h"
+
+
+class ConnectedCommand : public AbstractCommand
+{
+public:
+    explicit ConnectedCommand(CommandContext ctx)
     {
         m_context = std::move(ctx);
     }
@@ -1057,14 +1334,20 @@ public:
 };
 
 ========== ./src/adapter/websocket.cpp ==========
-Lines: 67
+Lines: 164
 
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <string>
 #include "websocket.h"
 #include "../framework/event/event_bus.h"
 #include "../business/connect/event/connect_success_event.h"
 #include "../business/connect/event/connect_failed_event.h"
 
+
 WebSocket::WebSocket() {
+    localId = "abcd";
+    rtc::Configuration config;
     ws = std::make_shared<rtc::WebSocket>();
     initCallbacks();
 }
@@ -1089,14 +1372,44 @@ void WebSocket::initCallbacks() {
             );
     });
 
-    ws->onMessage([this](auto data) {
+    ws->onMessage([this, wws = make_weak_ptr(ws)](auto data) {
+		// data holds either std::string or rtc::binary
+		if (!std::holds_alternative<std::string>(data))
+			return;
 
-        if (!std::holds_alternative<std::string>(data))
-            return;
+		nlohmann::json message = nlohmann::json::parse(std::get<std::string>(data));
 
-        if (messageCallback)
-            messageCallback(std::get<std::string>(data));
-    });
+		auto it = message.find("id");
+		if (it == message.end())
+			return;
+
+		auto id = it->get<std::string>();
+
+		it = message.find("type");
+		if (it == message.end())
+			return;
+
+		auto type = it->get<std::string>();
+
+		std::shared_ptr<rtc::PeerConnection> pc;
+		if (auto jt = peerConnectionMap.find(id); jt != peerConnectionMap.end()) {
+			pc = jt->second;
+		} else if (type == "offer") {
+			std::cout << "Answering to " + id << std::endl;
+			pc = createPeerConnection(config, wws, id);
+		} else {
+			return;
+		}
+
+		if (type == "offer" || type == "answer") {
+			auto sdp = message["description"].get<std::string>();
+			pc->setRemoteDescription(rtc::Description(sdp, type));
+		} else if (type == "candidate") {
+			auto sdp = message["candidate"].get<std::string>();
+			auto mid = message["mid"].get<std::string>();
+			pc->addRemoteCandidate(rtc::Candidate(sdp, mid));
+		}
+	});
 }
 
 void WebSocket::connect(const std::string& url) {
@@ -1126,8 +1439,70 @@ void WebSocket::onClose(CloseCallback cb) {
 void WebSocket::onError(ErrorCallback cb) {
     errorCallback = cb;
 }
+
+
+// Create and setup a PeerConnection
+std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::Configuration &config,
+                                                     std::weak_ptr<rtc::WebSocket> wws, std::string id) {
+	auto pc = std::make_shared<rtc::PeerConnection>(config);
+
+	pc->onStateChange(
+	    [](rtc::PeerConnection::State state) { std::cout << "State: " << state << std::endl; });
+
+	pc->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+		std::cout << "Gathering State: " << state << std::endl;
+	});
+
+	pc->onLocalDescription([wws, id](rtc::Description description) {
+		nlohmann::json message = {{"id", id},
+		                {"type", description.typeString()},
+		                {"description", std::string(description)}};
+
+		if (auto ws = wws.lock())
+			ws->send(message.dump());
+	});
+
+	pc->onLocalCandidate([wws, id](rtc::Candidate candidate) {
+		nlohmann::json message = {{"id", id},
+		                {"type", "candidate"},
+		                {"candidate", std::string(candidate)},
+		                {"mid", candidate.mid()}};
+
+		if (auto ws = wws.lock())
+			ws->send(message.dump());
+	});
+
+	pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
+		std::cout << "DataChannel from " << id << " received with label \"" << dc->label() << "\""
+		          << std::endl;
+
+		dc->onOpen([this, wdc = make_weak_ptr(dc)]() {
+			if (auto dc = wdc.lock())
+				dc->send("Hello from " + localId);
+		});
+
+		dc->onClosed([this, id]() { std::cout << "DataChannel from " << id << " closed" << std::endl; });
+
+		dc->onMessage([this, id](auto data) {
+			// data holds either std::string or rtc::binary
+			if (std::holds_alternative<std::string>(data))
+				std::cout << "Message from " << id << " received: " << std::get<std::string>(data)
+				          << std::endl;
+			else
+				std::cout << "Binary message from " << id
+				          << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+		});
+
+		dataChannelMap.emplace(id, dc);
+	});
+
+	peerConnectionMap.emplace(id, pc);
+	return pc;
+};
+
+
 ========== ./src/adapter/qt_ui.cpp ==========
-Lines: 39
+Lines: 42
 
 #include <string>
 #include "qt_ui.h"
@@ -1163,9 +1538,12 @@ void Qt_UI::showUI() {
 }
 void Qt_UI::on_bt_connect_clicked()
 {
-    EventBus::GetInstance().publish(
-        std::make_unique<ConnectServerEvent>("ws://120.79.210.6:8000/abcd")
-        );
+    // EventBus::GetInstance().publish(
+    //     std::make_unique<ConnectServerEvent>("ws://120.79.210.6:8000/abcd")
+    //     );
+    QString qstr = ui->TxEd_peerId->toPlainText();
+    ui->TxEd_peerId->clear();
+
 }
 
 
@@ -1205,7 +1583,7 @@ private:
 #endif // QT_UI_H
 
 ========== ./src/adapter/websocket.h ==========
-Lines: 29
+Lines: 35
 
 #pragma once
 #include <memory>
@@ -1227,8 +1605,14 @@ public:
     void onError(ErrorCallback cb) override;
 
 private:
+    std::shared_ptr<rtc::PeerConnection> createPeerConnection(const rtc::Configuration &config,
+                                                                    std::weak_ptr<rtc::WebSocket> wws, std::string id);
+    std::string localId;
+    template <class T> std::weak_ptr<T> make_weak_ptr(std::shared_ptr<T> ptr) { return ptr; }
+    std::unordered_map<std::string, std::shared_ptr<rtc::PeerConnection>> peerConnectionMap;
+    std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> dataChannelMap;
     std::shared_ptr<rtc::WebSocket> ws;
-
+    rtc::Configuration config;
     MessageCallback messageCallback;
     OpenCallback openCallback;
     CloseCallback closeCallback;
@@ -1236,6 +1620,7 @@ private:
 
     void initCallbacks();
 };
+
 ========== ./src/service/abstract_net.h ==========
 Lines: 24
 
@@ -1364,7 +1749,7 @@ public:
         if (m_worker_thread.joinable()) {
             m_worker_thread.join(); // 等待线程退出
         }
-        std::cout << "[Core] Background thread exited." << std::endl;
+        Log::info("[Core] Background thread exited.");
     }
 
     // 提交命令（对外接口，和main.cpp匹配）
@@ -1828,5 +2213,5 @@ private:
 };
 
 =====================================
-Total files: 46
-Total lines: 1573
+Total files: 52
+Total lines: 1924

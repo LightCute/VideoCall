@@ -92,11 +92,20 @@ set(BUSINESS_CONNECT_SOURCES
     src/business/connect/model/connect_payload.h
 )
 
+set(BUSINESS_CALL_SOURCES
+    # 业务层 - 通话
+    src/business/call/state/call_idle_state.h
+    src/business/call/state/calling_state.h
+    src/business/call/session/call_session.h
+    src/business/call/event/call_event.h
+)
+
 set(PROJECT_SOURCES
         main.cpp
         ${EVENT_DRIVEN_SOURCES}
         ${BUSINESS_LOGIN_SOURCES}
         ${BUSINESS_CONNECT_SOURCES}
+        ${BUSINESS_CALL_SOURCES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

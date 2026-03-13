@@ -595,4 +595,30 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtcpreceivingsession.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtcpsrreporter.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../../../framework/session/abstract_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/call_idle_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/state/abstract_connect_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/command/command_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/session/abstract_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../event/call_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../event/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../model/call_payload.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../command/call_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../command/../../../framework/command/abstract_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/call_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../framework/command/abstract_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../framework/command/command_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../model/call_payload.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../service/abstract_ui.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../service/abstract_net.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../application/app_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../framework/event/event_bus.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/calling_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/state/abstract_call_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/state/abstract_state.h

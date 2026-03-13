@@ -13,6 +13,10 @@ VideoCall_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/VideoCall/CMakeLi
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h \
@@ -708,19 +712,7 @@ VideoCall_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/VideoCall/CMakeLi
 
 /usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
 
-/usr/include/c++/13/bits/stl_construct.h:
-
-/usr/include/c++/13/bits/std_mutex.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h:
-
-/usr/include/c++/13/bits/stl_bvector.h:
-
-/usr/include/c++/13/bits/stl_algobase.h:
-
-/usr/include/c++/13/bits/stl_algo.h:
-
-/usr/include/c++/13/cstddef:
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
 /usr/include/c++/13/bits/std_abs.h:
 
@@ -736,8 +728,6 @@ VideoCall_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/VideoCall/CMakeLi
 
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
-/usr/include/c++/13/bits/refwrap.h:
-
 /usr/lib/llvm-18/lib/clang/18/include/stddef.h:
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h:
@@ -747,6 +737,10 @@ VideoCall_autogen/timestamp: /home/light/work/Video_Prj/QT_Prj/VideoCall/CMakeLi
 /usr/include/c++/13/bits/ranges_algobase.h:
 
 /usr/include/c++/13/bits/ostream_insert.h:
+
+/usr/include/c++/13/bits/std_mutex.h:
+
+/usr/include/c++/13/bits/stl_construct.h:
 
 /usr/include/c++/13/bits/range_access.h:
 
@@ -805,6 +799,12 @@ VideoCall_autogen/moc_predefs.h:
 /usr/local/share/cmake-4.2/Modules/Internal/CMakeCXXLinkerInformation.cmake:
 
 /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_receiver.h:
+
+/usr/local/share/cmake-4.2/Modules/Platform/Linker/GNU.cmake:
+
+/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/usr/include/c++/13/bits/stl_multimap.h:
 
 /usr/include/c++/13/bits/exception_defines.h:
 
@@ -888,15 +888,17 @@ VideoCall_autogen/moc_predefs.h:
 
 /usr/include/c++/13/bits/unique_ptr.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qcursor.h:
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/model/login_payload.h:
+/usr/include/c++/13/bits/charconv.h:
 
-/usr/include/c++/13/bits/max_size_type.h:
+/usr/include/c++/13/bits/allocated_ptr.h:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject_impl.h:
+/usr/include/c++/13/bit:
 
-/usr/include/c++/13/bits/streambuf.tcc:
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp:
+
+/usr/include/c++/13/backward/binders.h:
 
 /usr/include/c++/13/bits/exception_ptr.h:
 
@@ -905,6 +907,10 @@ VideoCall_autogen/moc_predefs.h:
 /usr/include/x86_64-linux-gnu/c++/13/bits/ctype_base.h:
 
 /usr/include/c++/13/bits/ranges_util.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qsysinfo.h:
+
+/usr/include/c++/13/backward/auto_ptr.h:
 
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake:
 
@@ -916,13 +922,15 @@ VideoCall_autogen/moc_predefs.h:
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connected_state.h:
-
 /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/model/connect_payload.h:
 
 /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/receiver/login_receiver.h:
 
 CMakeFiles/4.2.0-rc4/CMakeSystem.cmake:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h:
+
+/usr/include/c++/13/bits/stl_bvector.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
 
@@ -942,11 +950,45 @@ CMakeFiles/4.2.0-rc4/CMakeSystem.cmake:
 
 /home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_net.h:
 
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/login_session.h:
+/usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h:
 
-/usr/include/c++/13/bits/enable_special_members.h:
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h:
 
-/usr/include/c++/13/bits/stream_iterator.h:
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qregion.h:
+
+/usr/include/c++/13/bits/basic_ios.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h:
+
+/usr/include/c++/13/bits/cxxabi_forced.h:
+
+/usr/local/share/cmake-4.2/Modules/Linker/GNU.cmake:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringliteral.h:
+
+CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
+
+/usr/include/x86_64-linux-gnu/bits/sched.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/command_context.h:
+
+/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfig.cmake:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/c++/13/bits/stl_iterator_base_funcs.h:
+
+/usr/include/syscall.h:
+
+/usr/include/c++/13/bits/refwrap.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connected_state.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h:
 
 /usr/lib/llvm-18/lib/clang/18/include/__stddef_wchar_t.h:
 
@@ -968,59 +1010,37 @@ CMakeFiles/4.2.0-rc4/CMakeSystem.cmake:
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
+/usr/include/c++/13/bits/enable_special_members.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/login_session.h:
+
+/usr/include/c++/13/bits/stream_iterator.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h:
+
+/usr/include/c++/13/bits/max_size_type.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qcursor.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/model/login_payload.h:
+
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qobject_impl.h:
+
+/usr/include/c++/13/bits/streambuf.tcc:
+
 /usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake:
 
 .qtc/package-manager/auto-setup.cmake:
 
-/home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp:
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qpixelformat.h:
-
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_success_event.h:
 
 /usr/include/c++/13/bits/basic_string.tcc:
 
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp:
-
-/usr/include/c++/13/bits/allocated_ptr.h:
-
-/usr/include/c++/13/bit:
-
-/usr/include/c++/13/backward/binders.h:
-
-/usr/local/share/cmake-4.2/Modules/Linker/GNU.cmake:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qstringliteral.h:
-
-CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
-
-/usr/include/x86_64-linux-gnu/bits/sched.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h:
-
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qregion.h:
-
-/usr/include/c++/13/bits/basic_ios.h:
-
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h:
-
-/usr/include/c++/13/bits/cxxabi_forced.h:
-
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/command_context.h:
-
-/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfig.cmake:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
-
-/usr/include/asm-generic/errno.h:
-
-/usr/include/asm-generic/errno-base.h:
-
-/usr/include/c++/13/bits/stl_iterator_base_funcs.h:
-
-/usr/include/syscall.h:
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_success_event.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
@@ -1051,10 +1071,6 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 /usr/include/c++/13/bits/move.h:
 
 /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event_listener.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qsysinfo.h:
-
-/usr/include/c++/13/backward/auto_ptr.h:
 
 /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_router.h:
 
@@ -1116,9 +1132,11 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 
 /usr/include/c++/13/array:
 
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+/usr/include/c++/13/bits/stl_algo.h:
 
-/usr/include/c++/13/bits/charconv.h:
+/usr/include/c++/13/cstddef:
+
+/usr/include/c++/13/bits/stl_algobase.h:
 
 /usr/include/c++/13/bits/stl_function.h:
 
@@ -1127,6 +1145,8 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 /usr/local/share/cmake-4.2/Modules/Platform/Linux.cmake:
 
 /usr/include/c++/13/bits/erase_if.h:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h:
 
 /usr/include/c++/13/bits/stl_list.h:
 
@@ -1169,6 +1189,8 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 /usr/include/c++/13/optional:
 
 /usr/include/c++/13/bits/vector.tcc:
+
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h:
 
 /usr/include/c++/13/cctype:
 
@@ -1298,6 +1320,8 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 
 /usr/include/c++/13/unordered_map:
 
+/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h:
+
 /usr/include/c++/13/bits/stl_heap.h:
 
 /usr/include/c++/13/utility:
@@ -1355,15 +1379,3 @@ CMakeFiles/4.2.0-rc4/CMakeCXXCompiler.cmake:
 /usr/include/x86_64-linux-gnu/bits/timex.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/FILE.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
-/usr/local/share/cmake-4.2/Modules/Platform/Linker/GNU.cmake:
-
-/usr/include/c++/13/bits/stl_multimap.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
-
-/home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:

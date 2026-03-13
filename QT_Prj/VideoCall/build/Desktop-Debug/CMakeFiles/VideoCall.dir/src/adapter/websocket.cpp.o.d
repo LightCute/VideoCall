@@ -1,6 +1,5 @@
 CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/memory \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/memoryfwd.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/c++config.h \
@@ -136,29 +135,11 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/backward/auto_ptr.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/pstl/glue_memory_defs.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/pstl/execution_defs.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../service/abstract_net.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/functional \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/std_function.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/unordered_map \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/initializer_list \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/unordered_map.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/hashtable.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/hashtable_policy.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/enable_special_members.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/node_handle.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/range_access.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/erase_if.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/memory_resource.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstddef \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/uses_allocator_args.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/vector \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_vector.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_bvector.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/vector.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/array \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/compare \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/json.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/algorithm \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_algo.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/algorithmfwd.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/initializer_list \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_heap.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/uniform_int_dist.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstdlib \
@@ -173,14 +154,40 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /usr/include/alloca.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/std_abs.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/string \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/char_traits.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/pstl/glue_algorithm_defs.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstddef \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/functional \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/std_function.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/unordered_map \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/unordered_map.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/hashtable.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/hashtable_policy.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/enable_special_members.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/node_handle.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/range_access.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/erase_if.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/memory_resource.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/uses_allocator_args.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/vector \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_vector.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_bvector.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/vector.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/array \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/compare \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/iterator \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stream_iterator.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/streambuf_iterator.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/streambuf \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/localefwd.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/c++locale.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/clocale \
   /usr/include/locale.h /usr/include/x86_64-linux-gnu/bits/locale.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cctype \
   /usr/include/ctype.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/ios_base.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_classes.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/string \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/char_traits.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/ostream_insert.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/cxxabi_forced.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_string.h \
@@ -201,6 +208,148 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/charconv.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_string.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_classes.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/system_error \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/error_constants.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/stdexcept \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/streambuf.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/utility \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_relops.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/adl_serializer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/abi_macros.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/conversions/from_json.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/forward_list \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/forward_list.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/forward_list.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/map \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_tree.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_map.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_multimap.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/valarray \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cmath \
+  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/specfun.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/limits \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/gamma.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/special_function_util.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/bessel_function.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/beta_function.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/ell_integral.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/exp_integral.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/hypergeometric.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/legendre_function.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/modified_bessel_func.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/poly_hermite.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/poly_laguerre.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/riemann_zeta.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/valarray_array.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/valarray_array.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/valarray_before.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/slice_array.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/valarray_after.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/gslice.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/gslice_array.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/mask_array.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/indirect_array.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/exceptions.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/value_t.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstdint \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/macro_scope.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/detected.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/void_t.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/thirdparty/hedley/hedley.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/version \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cassert \
+  /usr/include/assert.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/string_escape.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/position_t.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/cpp_future.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/type_traits.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/iterator_traits.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/call_std/begin.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/call_std/end.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/json_fwd.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/string_concat.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstring \
+  /usr/include/string.h /usr/include/strings.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/identity_tag.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/std_fs.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/filesystem \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/fs_fwd.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/chrono.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ratio \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ctime \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/parse_numbers.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/fs_path.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/locale \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cwctype \
+  /usr/include/wctype.h \
+  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/ctype_base.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets_nonio.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/time_members.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/messages_members.h \
+  /usr/include/libintl.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/codecvt.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets_nonio.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_conv.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/iomanip \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/quoted_string.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/sstream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/istream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ios \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_ios.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_ios.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ostream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/ostream.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/istream.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/sstream.tcc \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/codecvt \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/fs_dir.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/fs_ops.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/conversions/to_json.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/optional \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/iteration_proxy.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/string_utils.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/byte_container_with_subtype.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/hash.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/binary_reader.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/input_adapters.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/numeric \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_numeric.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/pstl/glue_numeric_defs.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/json_sax.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/lexer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/is_sax.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/parser.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/internal_iterator.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/primitive_iterator.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/iter_impl.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/json_reverse_iterator.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/json_custom_base_class.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/json_pointer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/json_ref.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/output/binary_writer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/output/output_adapters.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/output/serializer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/conversions/to_chars.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/ordered_map.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/any \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/macro_unscope.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../service/abstract_net.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtc.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtc.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/version.h \
@@ -208,49 +357,17 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/common.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/utils.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/mutex \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/chrono.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ratio \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstdint \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/limits \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ctime \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/parse_numbers.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/error_constants.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/std_mutex.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/unique_lock.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/optional \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/utility \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_relops.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/variant \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/global.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/chrono \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/future \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/condition_variable \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/system_error \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/stdexcept \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/atomic_futex.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/atomic \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/std_thread.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/iostream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ostream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/ios \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/ios_base.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_classes.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_classes.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/streambuf \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/streambuf.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_ios.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cwctype \
-  /usr/include/wctype.h \
-  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/ctype_base.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/streambuf_iterator.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/basic_ios.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/ostream.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/istream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/istream.tcc \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/datachannel.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/channel.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/reliability.hpp \
@@ -259,10 +376,6 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/candidate.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/configuration.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/description.hpp \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/map \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_tree.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_map.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_multimap.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/track.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/mediahandler.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/message.hpp \
@@ -271,8 +384,6 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/websocketserver.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/av1rtppacketizer.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/nalunit.hpp \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cassert \
-  /usr/include/assert.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtppacketizer.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtppacketizationconfig.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/dependencydescriptor.hpp \
@@ -306,8 +417,6 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/this_thread_sleep.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../framework/event/../../utilities/blocking_queue.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../framework/event/../../utilities/log.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/sstream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/sstream.tcc \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/spdlog.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/common.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/null_mutex.h \
@@ -321,48 +430,11 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /usr/include/linux/limits.h \
   /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
   /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
-  /usr/include/x86_64-linux-gnu/bits/uio_lim.h /usr/include/string.h \
-  /usr/include/strings.h \
+  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/stdlib.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cmath \
-  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
-  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
-  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
-  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
-  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
-  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
-  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
-  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
-  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/specfun.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/gamma.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/special_function_util.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/bessel_function.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/beta_function.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/ell_integral.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/exp_integral.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/hypergeometric.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/legendre_function.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/modified_bessel_func.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/poly_hermite.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/poly_laguerre.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/tr1/riemann_zeta.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/cstring \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/fmt/bundled/format-inl.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/algorithm \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/pstl/glue_algorithm_defs.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/climits \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/locale \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets_nonio.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/time_members.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/x86_64-linux-gnu/c++/13/bits/messages_members.h \
-  /usr/include/libintl.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/codecvt.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_facets_nonio.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/locale_conv.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/common-inl.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/iterator \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stream_iterator.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/registry.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/periodic_worker.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/details/periodic_worker-inl.h \
@@ -441,4 +513,5 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../framework/event/abstract_event_listener.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/connect_success_event.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/../../../framework/event/abstract_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/connect_failed_event.h
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/connect_failed_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h

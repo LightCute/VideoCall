@@ -13,6 +13,7 @@
 #include "src/adapter/websocket.h"
 #include "src/application/app_context.h"
 #include "src/utilities/log.h"
+#include "src/business/call/session/call_session.h"
 int main(int argc, char *argv[])
 {
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
@@ -35,8 +36,14 @@ int main(int argc, char *argv[])
 
     sessionManager->createSession<ConnectSession>(dispatcher.get());
 
+
     ui -> showUI();
 
+    EventBus::GetInstance().publish(
+        std::make_unique<ConnectServerEvent>("ws://120.79.210.6:8000/abcd")
+    );
+
+    sessionManager->createSession<CallSession>(dispatcher.get());
     // sessionManager.reset(); // 注销Session监听者
     // dispatcher.reset();     // 停止Core线程
     // eventBus.stop();        // 停止EventBus逻辑线程

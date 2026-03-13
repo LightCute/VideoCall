@@ -111,6 +111,30 @@
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h",
+			"MU",
+			"L5KISFULMH/moc_call_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h",
+			"MU",
+			"3IQHWLTNUI/moc_call_session.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h",
+			"MU",
+			"XFAGN6NCA5/moc_call_idle_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h",
+			"MU",
+			"XFAGN6NCA5/moc_calling_state.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h",
 			"MU",
 			"625HUM2PM5/moc_connect_command.cpp",

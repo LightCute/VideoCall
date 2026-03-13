@@ -1,59 +1,41 @@
-[2026-03-13 17:03:28.293] [2564207] [info] [Main] Starting application, thread id: [135624597663552]
-[2026-03-13 17:03:28.474] [2564207] [debug] [EventBus] Router set
-[2026-03-13 17:03:28.474] [2564207] [info] [EventBus] Logic thread started, id: [135624245892800]
-[2026-03-13 17:03:28.474] [2564215] [debug] [EventBus] Logic loop started
-[2026-03-13 17:03:28.474] [2564207] [info] [Core] Background thread started, id: [135624237500096]
-[2026-03-13 17:03:28.474] [2564207] [debug] [SessionManager] Created
-[2026-03-13 17:03:28.474] [2564216] [debug] [Core] Command processing loop started
-[2026-03-13 17:03:28.525] [2564207] [debug] [ConnectSession] Created
-[2026-03-13 17:03:28.525] [2564207] [info] [SessionManager] Registering session for event type: [18ConnectServerEvent]
-[2026-03-13 17:03:28.525] [2564207] [debug] [EventRouter] Listener registered for event type: [18ConnectServerEvent], total listeners: [1]
-[2026-03-13 17:03:28.525] [2564207] [info] [SessionManager] Registering session for event type: [19ConnectSuccessEvent]
-[2026-03-13 17:03:28.525] [2564207] [debug] [EventRouter] Listener registered for event type: [19ConnectSuccessEvent], total listeners: [1]
-[2026-03-13 17:03:28.525] [2564207] [info] [SessionManager] Registering session for event type: [18ConnectFailedEvent]
-[2026-03-13 17:03:28.525] [2564207] [debug] [EventRouter] Listener registered for event type: [18ConnectFailedEvent], total listeners: [1]
-[2026-03-13 17:03:28.525] [2564207] [info] [ConnectSession] Starting
-[2026-03-13 17:03:28.525] [2564207] [info] [DisconnectedState] Entered disconnected state.
-[2026-03-13 17:03:28.525] [2564207] [info] [SessionManager] Session created, total sessions: [1]
-[2026-03-13 17:03:32.424] [2564207] [trace] [EventBus] Publishing event type: [18ConnectServerEvent]
-[2026-03-13 17:03:32.424] [2564215] [trace] [EventBus] Routing event type: [18ConnectServerEvent]
-[2026-03-13 17:03:32.424] [2564215] [trace] [EventRouter] Routing event type: [18ConnectServerEvent] to [1] listeners
-[2026-03-13 17:03:32.424] [2564215] [debug] [ConnectSession] Handling event type: [18ConnectServerEvent]
-[2026-03-13 17:03:32.424] [2564215] [debug] [DisconnectedState] Received event type: [18ConnectServerEvent]
-[2026-03-13 17:03:32.424] [2564215] [info] [DisconnectedState] Processing connect event, url: [ws://120.79.210.6:8000/abcd]
-[2026-03-13 17:03:32.424] [2564215] [debug] [Core] Posting command type: [ConnectCommand]
-[2026-03-13 17:03:32.424] [2564215] [info] [DisconnectedState] Transitioning to [ConnectingState]
-[2026-03-13 17:03:32.424] [2564215] [info] [ConnectSession] State transition triggered
-[2026-03-13 17:03:32.424] [2564215] [info] [DisconnectedState] Exited disconnected state.
-[2026-03-13 17:03:32.424] [2564215] [info] [ConnectingState] Entered connecting state... (waiting for network)
-[2026-03-13 17:03:32.424] [2564216] [trace] [Core] Executing command type: [ConnectCommand]
-[2026-03-13 17:03:32.424] [2564216] [info] [ConnectReceiver] Processing connect - url = [ws://120.79.210.6:8000/abcd]
-[2026-03-13 17:03:32.427] [2564216] [debug] [Core] Command[ConnectCommand] executed successfully
-[2026-03-13 17:03:32.464] [2564225] [trace] [EventBus] Publishing event type: [19ConnectSuccessEvent]
-[2026-03-13 17:03:32.464] [2564215] [trace] [EventBus] Routing event type: [19ConnectSuccessEvent]
-[2026-03-13 17:03:32.464] [2564215] [trace] [EventRouter] Routing event type: [19ConnectSuccessEvent] to [1] listeners
-[2026-03-13 17:03:32.464] [2564215] [debug] [ConnectSession] Handling event type: [19ConnectSuccessEvent]
-[2026-03-13 17:03:32.464] [2564215] [debug] [ConnectingState] Received event type: [19ConnectSuccessEvent]
-[2026-03-13 17:03:32.464] [2564215] [info] [ConnectingState] Processing connect success event
-[2026-03-13 17:03:32.464] [2564215] [info] [ConnectingState] Transitioning to [ConnectedState]
-[2026-03-13 17:03:32.464] [2564215] [info] [ConnectSession] State transition triggered
-[2026-03-13 17:03:32.464] [2564215] [info] [ConnectingState] Exited connecting state.
-[2026-03-13 17:03:32.464] [2564215] [info] [ConnectedState] Entered connected state.
-[2026-03-13 17:03:32.464] [2564215] [debug] [Core] Posting command type: [ConnectCommand]
-[2026-03-13 17:03:32.464] [2564216] [trace] [Core] Executing command type: [ConnectCommand]
-[2026-03-13 17:03:32.464] [2564216] [info] [ConnectedReceiver] Processing connected 
-[2026-03-13 17:03:32.464] [2564216] [debug] [Core] Command[ConnectCommand] executed successfully
-[2026-03-13 17:03:37.988] [2564207] [info] [SessionManager] Destroying, cleaning up [1] sessions
-[2026-03-13 17:03:37.988] [2564207] [debug] [SessionManager] Unregistering listener for event type: [18ConnectServerEvent]
-[2026-03-13 17:03:37.988] [2564207] [debug] [EventRouter] Unregistering listener for event type: [18ConnectServerEvent]
-[2026-03-13 17:03:37.988] [2564207] [debug] [SessionManager] Unregistering listener for event type: [19ConnectSuccessEvent]
-[2026-03-13 17:03:37.988] [2564207] [debug] [EventRouter] Unregistering listener for event type: [19ConnectSuccessEvent]
-[2026-03-13 17:03:37.988] [2564207] [debug] [SessionManager] Unregistering listener for event type: [18ConnectFailedEvent]
-[2026-03-13 17:03:37.988] [2564207] [debug] [EventRouter] Unregistering listener for event type: [18ConnectFailedEvent]
-[2026-03-13 17:03:37.988] [2564207] [info] [ConnectSession] Stopping
-[2026-03-13 17:03:37.988] [2564207] [info] [ConnectedState] Exited connected state.
-[2026-03-13 17:03:37.988] [2564207] [info] [Core] Destroying, stopping background thread
-[2026-03-13 17:03:37.988] [2564216] [debug] [Core] Command processing loop exited
-[2026-03-13 17:03:37.989] [2564207] [info] [Core] Background thread exited.
-[2026-03-13 17:03:38.012] [2564215] [debug] [EventBus] Logic loop exited
-[2026-03-13 17:03:38.012] [2564207] [info] [EventBus] Logic thread exited.
+[2026-03-13 22:42:02.084] [2848560] [info] [Main] Starting application, thread id: [132915176529728]
+[2026-03-13 22:42:02.255] [2848560] [debug] [EventBus] Router set
+[2026-03-13 22:42:02.256] [2848560] [info] [EventBus] Logic thread started, id: [132914972870336]
+[2026-03-13 22:42:02.256] [2848577] [debug] [EventBus] Logic loop started
+[2026-03-13 22:42:02.256] [2848560] [info] [Core] Background thread started, id: [132914964477632]
+[2026-03-13 22:42:02.256] [2848560] [debug] [SessionManager] Created
+[2026-03-13 22:42:02.256] [2848578] [debug] [Core] Command processing loop started
+[2026-03-13 22:42:02.293] [2848560] [debug] [ConnectSession] Created
+[2026-03-13 22:42:02.293] [2848560] [info] [SessionManager] Registering session for event type: [18ConnectServerEvent]
+[2026-03-13 22:42:02.293] [2848560] [debug] [EventRouter] Listener registered for event type: [18ConnectServerEvent], total listeners: [1]
+[2026-03-13 22:42:02.293] [2848560] [info] [SessionManager] Registering session for event type: [19ConnectSuccessEvent]
+[2026-03-13 22:42:02.293] [2848560] [debug] [EventRouter] Listener registered for event type: [19ConnectSuccessEvent], total listeners: [1]
+[2026-03-13 22:42:02.293] [2848560] [info] [SessionManager] Registering session for event type: [18ConnectFailedEvent]
+[2026-03-13 22:42:02.293] [2848560] [debug] [EventRouter] Listener registered for event type: [18ConnectFailedEvent], total listeners: [1]
+[2026-03-13 22:42:02.293] [2848560] [info] [ConnectSession] Starting
+[2026-03-13 22:42:02.293] [2848560] [info] [DisconnectedState] Entered disconnected state.
+[2026-03-13 22:42:02.293] [2848560] [info] [SessionManager] Session created, total sessions: [1]
+[2026-03-13 22:42:04.459] [2848560] [trace] [EventBus] Publishing event type: [18ConnectServerEvent]
+[2026-03-13 22:42:04.459] [2848560] [debug] [CallSession] Created
+[2026-03-13 22:42:04.459] [2848560] [info] [SessionManager] Registering session for event type: [9CallEvent]
+[2026-03-13 22:42:04.459] [2848560] [debug] [EventRouter] Listener registered for event type: [9CallEvent], total listeners: [1]
+[2026-03-13 22:42:04.459] [2848560] [info] [CallSession] Starting
+[2026-03-13 22:42:04.459] [2848560] [info] [CallIdleState] Entered call idle state.
+[2026-03-13 22:42:04.459] [2848560] [info] [SessionManager] Session created, total sessions: [2]
+[2026-03-13 22:42:04.459] [2848577] [trace] [EventBus] Routing event type: [18ConnectServerEvent]
+[2026-03-13 22:42:04.460] [2848577] [trace] [EventRouter] Routing event type: [18ConnectServerEvent] to [1] listeners
+[2026-03-13 22:42:04.460] [2848577] [debug] [ConnectSession] Handling event type: [18ConnectServerEvent]
+[2026-03-13 22:42:04.460] [2848577] [debug] [DisconnectedState] Received event type: [18ConnectServerEvent]
+[2026-03-13 22:42:04.460] [2848577] [info] [DisconnectedState] Processing connect event, url: [ws://120.79.210.6:8000/abcd]
+[2026-03-13 22:42:04.460] [2848577] [debug] [Core] Posting command type: [ConnectCommand]
+[2026-03-13 22:42:04.460] [2848578] [trace] [Core] Executing command type: [ConnectCommand]
+[2026-03-13 22:42:04.460] [2848577] [info] [DisconnectedState] Transitioning to [ConnectingState]
+[2026-03-13 22:42:04.460] [2848577] [info] [ConnectSession] State transition triggered
+[2026-03-13 22:42:04.460] [2848577] [info] [DisconnectedState] Exited disconnected state.
+[2026-03-13 22:42:04.460] [2848577] [info] [ConnectingState] Entered connecting state... (waiting for network)
+[2026-03-13 22:42:04.460] [2848578] [info] [ConnectReceiver] Processing connect - url = [ws://120.79.210.6:8000/abcd]
+[2026-03-13 22:42:04.464] [2848578] [debug] [Core] Command[ConnectCommand] executed successfully
+[2026-03-13 22:42:04.506] [2848587] [trace] [EventBus] Publishing event type: [19ConnectSuccessEvent]
+[2026-03-13 22:42:04.506] [2848577] [trace] [EventBus] Routing event type: [19ConnectSuccessEvent]
+[2026-03-13 22:42:04.506] [2848577] [trace] [EventRouter] Routing event type: [19ConnectSuccessEvent] to [1] listeners
+[2026-03-13 22:42:04.506] [2848577] [debug] [ConnectSession] Handling event type: [19ConnectSucc

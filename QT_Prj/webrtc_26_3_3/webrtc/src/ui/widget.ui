@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="bt_connect">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>190</y>
+     <x>30</x>
+     <y>280</y>
      <width>88</width>
      <height>26</height>
     </rect>
@@ -29,10 +29,20 @@
   <widget class="QTextEdit" name="recvEdit">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>180</x>
      <y>80</y>
-     <width>351</width>
-     <height>231</height>
+     <width>371</width>
+     <height>111</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="TxEd_peerId">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>269</y>
+     <width>341</width>
+     <height>81</height>
     </rect>
    </property>
   </widget>

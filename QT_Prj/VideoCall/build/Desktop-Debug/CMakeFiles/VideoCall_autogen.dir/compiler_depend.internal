@@ -14,6 +14,10 @@
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h

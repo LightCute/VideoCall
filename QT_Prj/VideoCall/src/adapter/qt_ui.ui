@@ -16,8 +16,8 @@
   <widget class="QTextEdit" name="text_edit_showMsg">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>150</y>
+     <x>180</x>
+     <y>30</y>
      <width>301</width>
      <height>181</height>
     </rect>
@@ -34,6 +34,16 @@
    </property>
    <property name="text">
     <string>PushButton</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="TxEd_peerId">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>250</y>
+     <width>301</width>
+     <height>91</height>
+    </rect>
    </property>
   </widget>
  </widget>

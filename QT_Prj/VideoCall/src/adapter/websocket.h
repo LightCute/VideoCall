@@ -17,9 +17,17 @@ public:
     void onClose(CloseCallback cb) override;
     void onError(ErrorCallback cb) override;
 
+    void connect2Peer(const std::string& peerId);
 private:
+    void myCppLogCallback(rtc::LogLevel level, std::string message);
+    std::shared_ptr<rtc::PeerConnection> createPeerConnection(const rtc::Configuration &config,
+                                                                    std::weak_ptr<rtc::WebSocket> wws, std::string id);
+    std::string localId;
+    template <class T> std::weak_ptr<T> make_weak_ptr(std::shared_ptr<T> ptr) { return ptr; }
+    std::unordered_map<std::string, std::shared_ptr<rtc::PeerConnection>> peerConnectionMap;
+    std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> dataChannelMap;
     std::shared_ptr<rtc::WebSocket> ws;
-
+    rtc::Configuration config;
     MessageCallback messageCallback;
     OpenCallback openCallback;
     CloseCallback closeCallback;

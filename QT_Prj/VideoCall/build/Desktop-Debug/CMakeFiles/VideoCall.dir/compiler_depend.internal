@@ -14,6 +14,10 @@
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h
@@ -815,6 +819,32 @@ CMakeFiles/VideoCall.dir/main.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/command_context.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_call_state.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_connect_state.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_state.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_command.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_command.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/call_payload.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_receiver.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/command_context.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_bus.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_net.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_ui.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/call_payload.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_receiver.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_success_event.h
@@ -826,6 +856,7 @@ CMakeFiles/VideoCall.dir/main.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_command.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connected_command.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h
@@ -842,6 +873,7 @@ CMakeFiles/VideoCall.dir/main.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/model/connect_payload.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/receiver/connect_receiver.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/receiver/connected_receiver.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connected_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connecting_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/disconnected_state.h
@@ -1427,6 +1459,8 @@ CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp
  /home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/VideoCall_autogen/include/ui_qt_ui.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/blocking_queue.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
@@ -1971,6 +2005,53 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_router.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_net.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/adl_serializer.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/byte_container_with_subtype.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/abi_macros.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/conversions/from_json.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/conversions/to_chars.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/conversions/to_json.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/exceptions.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/hash.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/binary_reader.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/input_adapters.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/json_sax.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/lexer.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/parser.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/input/position_t.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/internal_iterator.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/iter_impl.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/iteration_proxy.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/iterator_traits.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/json_reverse_iterator.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/iterators/primitive_iterator.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/json_custom_base_class.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/json_pointer.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/json_ref.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/macro_scope.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/macro_unscope.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/call_std/begin.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/call_std/end.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/cpp_future.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/detected.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/identity_tag.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/is_sax.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/std_fs.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/type_traits.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/meta/void_t.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/output/binary_writer.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/output/output_adapters.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/output/serializer.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/string_concat.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/string_escape.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/string_utils.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/detail/value_t.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/json.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/json_fwd.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/ordered_map.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/thirdparty/hedley/hedley.hpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include/nlohmann/thirdparty/hedley/hedley_undef.hpp
  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/av1rtppacketizer.hpp
  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/candidate.hpp
  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/channel.hpp
@@ -2063,6 +2144,7 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/tweakme.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/version.h
  /usr/include/c++/13/algorithm
+ /usr/include/c++/13/any
  /usr/include/c++/13/array
  /usr/include/c++/13/atomic
  /usr/include/c++/13/backward/auto_ptr.h
@@ -2094,11 +2176,20 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/bits/exception.h
  /usr/include/c++/13/bits/exception_defines.h
  /usr/include/c++/13/bits/exception_ptr.h
+ /usr/include/c++/13/bits/forward_list.h
+ /usr/include/c++/13/bits/forward_list.tcc
+ /usr/include/c++/13/bits/fs_dir.h
+ /usr/include/c++/13/bits/fs_fwd.h
+ /usr/include/c++/13/bits/fs_ops.h
+ /usr/include/c++/13/bits/fs_path.h
  /usr/include/c++/13/bits/functexcept.h
  /usr/include/c++/13/bits/functional_hash.h
+ /usr/include/c++/13/bits/gslice.h
+ /usr/include/c++/13/bits/gslice_array.h
  /usr/include/c++/13/bits/hash_bytes.h
  /usr/include/c++/13/bits/hashtable.h
  /usr/include/c++/13/bits/hashtable_policy.h
+ /usr/include/c++/13/bits/indirect_array.h
  /usr/include/c++/13/bits/invoke.h
  /usr/include/c++/13/bits/ios_base.h
  /usr/include/c++/13/bits/istream.tcc
@@ -2110,6 +2201,7 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/bits/locale_facets_nonio.h
  /usr/include/c++/13/bits/locale_facets_nonio.tcc
  /usr/include/c++/13/bits/localefwd.h
+ /usr/include/c++/13/bits/mask_array.h
  /usr/include/c++/13/bits/memory_resource.h
  /usr/include/c++/13/bits/memoryfwd.h
  /usr/include/c++/13/bits/move.h
@@ -2122,12 +2214,14 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/bits/postypes.h
  /usr/include/c++/13/bits/predefined_ops.h
  /usr/include/c++/13/bits/ptr_traits.h
+ /usr/include/c++/13/bits/quoted_string.h
  /usr/include/c++/13/bits/range_access.h
  /usr/include/c++/13/bits/refwrap.h
  /usr/include/c++/13/bits/requires_hosted.h
  /usr/include/c++/13/bits/shared_ptr.h
  /usr/include/c++/13/bits/shared_ptr_atomic.h
  /usr/include/c++/13/bits/shared_ptr_base.h
+ /usr/include/c++/13/bits/slice_array.h
  /usr/include/c++/13/bits/specfun.h
  /usr/include/c++/13/bits/sstream.tcc
  /usr/include/c++/13/bits/std_abs.h
@@ -2147,6 +2241,7 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/bits/stl_map.h
  /usr/include/c++/13/bits/stl_multimap.h
  /usr/include/c++/13/bits/stl_multiset.h
+ /usr/include/c++/13/bits/stl_numeric.h
  /usr/include/c++/13/bits/stl_pair.h
  /usr/include/c++/13/bits/stl_queue.h
  /usr/include/c++/13/bits/stl_raw_storage_iter.h
@@ -2169,6 +2264,10 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/bits/uses_allocator.h
  /usr/include/c++/13/bits/uses_allocator_args.h
  /usr/include/c++/13/bits/utility.h
+ /usr/include/c++/13/bits/valarray_after.h
+ /usr/include/c++/13/bits/valarray_array.h
+ /usr/include/c++/13/bits/valarray_array.tcc
+ /usr/include/c++/13/bits/valarray_before.h
  /usr/include/c++/13/bits/vector.tcc
  /usr/include/c++/13/bitset
  /usr/include/c++/13/cassert
@@ -2178,6 +2277,7 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/climits
  /usr/include/c++/13/clocale
  /usr/include/c++/13/cmath
+ /usr/include/c++/13/codecvt
  /usr/include/c++/13/compare
  /usr/include/c++/13/condition_variable
  /usr/include/c++/13/cstddef
@@ -2199,9 +2299,12 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/ext/numeric_traits.h
  /usr/include/c++/13/ext/string_conversions.h
  /usr/include/c++/13/ext/type_traits.h
+ /usr/include/c++/13/filesystem
+ /usr/include/c++/13/forward_list
  /usr/include/c++/13/functional
  /usr/include/c++/13/future
  /usr/include/c++/13/initializer_list
+ /usr/include/c++/13/iomanip
  /usr/include/c++/13/ios
  /usr/include/c++/13/iosfwd
  /usr/include/c++/13/iostream
@@ -2213,11 +2316,13 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/memory
  /usr/include/c++/13/mutex
  /usr/include/c++/13/new
+ /usr/include/c++/13/numeric
  /usr/include/c++/13/optional
  /usr/include/c++/13/ostream
  /usr/include/c++/13/pstl/execution_defs.h
  /usr/include/c++/13/pstl/glue_algorithm_defs.h
  /usr/include/c++/13/pstl/glue_memory_defs.h
+ /usr/include/c++/13/pstl/glue_numeric_defs.h
  /usr/include/c++/13/pstl/pstl_config.h
  /usr/include/c++/13/queue
  /usr/include/c++/13/ratio
@@ -2249,8 +2354,10 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /usr/include/c++/13/typeinfo
  /usr/include/c++/13/unordered_map
  /usr/include/c++/13/utility
+ /usr/include/c++/13/valarray
  /usr/include/c++/13/variant
  /usr/include/c++/13/vector
+ /usr/include/c++/13/version
  /usr/include/x86_64-linux-gnu/c++/13/bits/atomic_word.h
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h
