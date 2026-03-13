@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/VideoCall_autogen/mocs_compilation.cpp" "CMakeFiles/VideoCall.dir/VideoCall_autogen/mocs_compilation.cpp.o" "gcc" "CMakeFiles/VideoCall.dir/VideoCall_autogen/mocs_compilation.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp" "CMakeFiles/VideoCall.dir/main.cpp.o" "gcc" "CMakeFiles/VideoCall.dir/main.cpp.o.d"
   "/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp" "CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o" "gcc" "CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o.d"
+  "/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp" "CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o" "gcc" "CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o.d"
   "" "VideoCall" "gcc" "CMakeFiles/VideoCall.dir/link.d"
   )
 

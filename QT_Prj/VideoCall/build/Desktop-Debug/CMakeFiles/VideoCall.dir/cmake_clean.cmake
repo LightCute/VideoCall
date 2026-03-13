@@ -9,6 +9,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/VideoCall.dir/main.cpp.o.d"
   "CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o"
   "CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o.d"
+  "CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o"
+  "CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o.d"
   "VideoCall"
   "VideoCall.pdb"
   "VideoCall_autogen/mocs_compilation.cpp"

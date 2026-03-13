@@ -416,7 +416,7 @@
 						1
 					],
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-.-Debug-96118a3ab5c46b6ada51.json",
+					"jsonFile" : "directory-.-Debug-13eb8d0d546f6a58343d.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.5"
@@ -914,7 +914,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "VideoCall::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-VideoCall-Debug-a7dc3c4f4117d691d6e5.json",
+					"jsonFile" : "target-VideoCall-Debug-f280d1f22a953922b3e9.json",
 					"name" : "VideoCall",
 					"projectIndex" : 0
 				},

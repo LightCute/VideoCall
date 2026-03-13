@@ -7,7 +7,7 @@
 #include "src/framework/core/core.h"
 #include "src/framework/event/event_bus.h"
 #include "src/framework/session/session_manager.h"
-#include "src/business/login/session/login_session.h"
+#include "src/business/connect/session/connect_session.h"
 #include "src/framework/event/event_router.h" 
 #include "src/adapter/qt_ui.h"
 #include "src/adapter/websocket.h"
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     AppContext::instance().ui = ui.get();
     AppContext::instance().net = net.get();
 
-    sessionManager->createSession<LoginSession>(dispatcher.get());
+    sessionManager->createSession<ConnectSession>(dispatcher.get());
 
     ui -> showUI();
 

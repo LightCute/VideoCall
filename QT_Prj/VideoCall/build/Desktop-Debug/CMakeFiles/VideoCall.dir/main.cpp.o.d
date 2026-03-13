@@ -481,40 +481,41 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../command/abstract_command_dispatcher.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../event/abstract_event_listener.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/../event/event_router.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/login_session.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../../../framework/session/abstract_session.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../event/login_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../event/../../../framework/event/abstract_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/logged_in_state.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/state/abstract_login_state.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/state/abstract_state.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../event/login_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../utilities/log.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/command/command_context.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../model/login_payload.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../command/login_command.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../command/../../../framework/command/abstract_command.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/login_receiver.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../framework/command/abstract_receiver.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../framework/command/command_context.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../model/login_payload.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../utilities/log.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../service/abstract_ui.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../service/abstract_net.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../application/app_context.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../application/../service/abstract_ui.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../application/../service/abstract_net.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../../../framework/event/event_bus.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../event/login_success_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../event/../../../framework/event/abstract_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../receiver/../event/login_failed_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/session/abstract_session.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/logged_out_state.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../../../framework/event/abstract_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/logging_in_state.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../event/login_success_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../state/../event/login_failed_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/session/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/connect_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/disconnected_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../../../framework/state/abstract_connect_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../../../framework/state/abstract_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../../../framework/command/command_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../../../framework/session/abstract_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../event/connect_server_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../event/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../model/connect_payload.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../command/connect_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../command/../../../framework/command/abstract_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/connect_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../framework/command/abstract_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../framework/command/command_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../model/connect_payload.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../service/abstract_ui.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../service/abstract_net.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../application/app_context.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../application/../service/abstract_ui.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../application/../service/abstract_net.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/../../../framework/event/event_bus.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/connecting_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../event/connect_success_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../event/connect_failed_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/connected_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../command/connected_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../state/../receiver/connected_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../../../framework/session/abstract_session.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../../../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../event/connect_server_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../event/connect_success_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/../event/connect_failed_event.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.h \
   /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget \
   /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qwidget.h \
@@ -545,6 +546,53 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../service/abstract_ui.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../service/abstract_net.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../utilities/log.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtc.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtc.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/version.h \
+  /usr/lib/llvm-18/lib/clang/18/include/stdbool.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/common.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/utils.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/optional \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/global.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/future \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/atomic_futex.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/datachannel.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/channel.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/reliability.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/iceudpmuxlistener.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/peerconnection.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/candidate.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/configuration.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/description.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/track.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/mediahandler.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/message.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/frameinfo.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/websocket.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/websocketserver.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/av1rtppacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/nalunit.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtppacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtppacketizationconfig.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/dependencydescriptor.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bitset \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtp.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtpdepacketizer.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/set \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_set.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/bits/stl_multiset.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/h264rtppacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/h264rtpdepacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/h265rtppacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/h265nalunit.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/h265rtpdepacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/vp8rtppacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/vp8rtpdepacketizer.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/plihandler.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rembhandler.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/pacinghandler.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtcpnackresponder.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtcpreceivingsession.hpp \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include/rtc/rtcpsrreporter.hpp \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h

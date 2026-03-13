@@ -509,5 +509,5 @@ CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../framework/event/event_router.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/../../../../include/c++/13/typeindex \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../framework/event/abstract_event_listener.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/login/event/login_event.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/login/event/../../../framework/event/abstract_event.h
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/connect_server_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/../../../framework/event/abstract_event.h

@@ -111,6 +111,66 @@
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h",
+			"MU",
+			"625HUM2PM5/moc_connect_command.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h",
+			"MU",
+			"SEPUO42KLO/moc_connect_failed_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h",
+			"MU",
+			"SEPUO42KLO/moc_connect_server_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_success_event.h",
+			"MU",
+			"SEPUO42KLO/moc_connect_success_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/model/connect_payload.h",
+			"MU",
+			"GRJ2RLTBUJ/moc_connect_payload.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/receiver/connect_receiver.h",
+			"MU",
+			"KVLSSHLZED/moc_connect_receiver.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/connect_session.h",
+			"MU",
+			"3I6TCQED66/moc_connect_session.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connected_state.h",
+			"MU",
+			"5YHXXNIFVP/moc_connected_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connecting_state.h",
+			"MU",
+			"5YHXXNIFVP/moc_connecting_state.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/disconnected_state.h",
+			"MU",
+			"5YHXXNIFVP/moc_disconnected_state.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/command/login_command.h",
 			"MU",
 			"BIGDVO5DCV/moc_login_command.cpp",
@@ -344,6 +404,11 @@
 		[ "/home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp", "MU", null ],
 		[
 			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp",
 			"MU",
 			null
 		]

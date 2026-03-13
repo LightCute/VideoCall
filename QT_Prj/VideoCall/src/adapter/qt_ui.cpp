@@ -2,7 +2,7 @@
 #include "qt_ui.h"
 #include "ui_qt_ui.h"
 #include "../framework/event/event_bus.h"
-#include "../business/login/event/login_event.h"
+#include "../business/connect/event/connect_server_event.h"
 Qt_UI::Qt_UI(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Qt_UI)
@@ -33,7 +33,7 @@ void Qt_UI::showUI() {
 void Qt_UI::on_bt_connect_clicked()
 {
     EventBus::GetInstance().publish(
-        std::make_unique<LoginEvent>("user", "123456", true)
+        std::make_unique<ConnectServerEvent>("ws://120.79.210.6:8000/abcd")
         );
 }
 

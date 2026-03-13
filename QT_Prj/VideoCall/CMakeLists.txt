@@ -26,38 +26,39 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(EVENT_DRIVEN_SOURCES
     # 应用层
     src/application/app_context.h
-    
+
     # 适配层
     src/adapter/websocket.h
-    
+    src/adapter/websocket.cpp
+
     # 服务层抽象
     src/service/abstract_net.h
     src/service/abstract_ui.h
-    
+
     # 工具层
     src/utilities/blocking_queue.h
     src/utilities/log.h
-    
+
     # 框架层 - 核心
     src/framework/core/core.h
-    
+
     # 框架层 - 命令
     src/framework/command/abstract_command.h
     src/framework/command/abstract_command_dispatcher.h
     src/framework/command/abstract_receiver.h
     src/framework/command/command_context.h
-    
+
     # 框架层 - 事件
     src/framework/event/abstract_event.h
     src/framework/event/abstract_event_listener.h
     src/framework/event/event_bus.h
     src/framework/event/event_router.h
-    
+
     # 框架层 - 状态
     src/framework/state/abstract_call_state.h
     src/framework/state/abstract_login_state.h
     src/framework/state/abstract_state.h
-    
+
     # 框架层 - 会话
     src/framework/session/abstract_session.h
     src/framework/session/session_manager.h
@@ -77,10 +78,25 @@ set(BUSINESS_LOGIN_SOURCES
     src/business/login/model/login_payload.h
 )
 
+set(BUSINESS_CONNECT_SOURCES
+    # 业务层 - 连接
+    src/business/connect/receiver/connect_receiver.h
+    src/business/connect/state/connected_state.h       # 新增：已连接状态
+    src/business/connect/state/connecting_state.h      # 原有：连接中状态
+    src/business/connect/state/disconnected_state.h    # 原有：断开连接状态
+    src/business/connect/session/connect_session.h
+    src/business/connect/command/connect_command.h
+    src/business/connect/event/connect_failed_event.h  # 新增：连接失败事件
+    src/business/connect/event/connect_server_event.h  # 原有：连接请求事件
+    src/business/connect/event/connect_success_event.h # 新增：连接成功事件
+    src/business/connect/model/connect_payload.h
+)
+
 set(PROJECT_SOURCES
         main.cpp
         ${EVENT_DRIVEN_SOURCES}
         ${BUSINESS_LOGIN_SOURCES}
+        ${BUSINESS_CONNECT_SOURCES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

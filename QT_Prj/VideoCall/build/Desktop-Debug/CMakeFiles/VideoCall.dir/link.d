@@ -4,6 +4,7 @@ VideoCall: \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/13/crtbeginS.o \
   CMakeFiles/VideoCall.dir/VideoCall_autogen/mocs_compilation.cpp.o \
   CMakeFiles/VideoCall.dir/main.cpp.o \
+  CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o \
   CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o \
   /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.15.13 \
   third_party/libdatachannel/libdatachannel.so.0.24.1 \
@@ -73,6 +74,8 @@ VideoCall: \
 CMakeFiles/VideoCall.dir/VideoCall_autogen/mocs_compilation.cpp.o:
 
 CMakeFiles/VideoCall.dir/main.cpp.o:
+
+CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o:
 
 CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o:
 

@@ -403,6 +403,8 @@ JSON_MultipleHeaders:BOOL=ON
 //Include as system headers (skip for clang-tidy).
 JSON_SystemInclude:BOOL=OFF
 
+LIBDATACHANNEL_ENABLE_WEBSOCKET:BOOL=ON
+
 //Build libSRTP test applications
 LIBSRTP_TEST_APPS:BOOL=ON
 
@@ -624,6 +626,15 @@ usrsctplib_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
 usrsctplib_SOURCE_DIR:STATIC=/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/usrsctp
+
+//Value Computed by CMake
+websocket_test_BINARY_DIR:STATIC=/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug
+
+//Value Computed by CMake
+websocket_test_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+websocket_test_SOURCE_DIR:STATIC=/home/light/work/Video_Prj/QT_Prj/VideoCall
 
 
 ########################

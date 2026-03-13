@@ -1,6 +1,4 @@
 #pragma once
-#include <thread>
-#include <iostream>
 #include "../../../framework/command/abstract_command.h"
 
 

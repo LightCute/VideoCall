@@ -23,8 +23,8 @@ public:
 
         if(ui) ui->showMessage("[System] Logging in...");
         if(net) {
-            net->connect("server.example.com");
-            net->send("Login request for " + login.user);
+            net->connect("ws://120.79.210.6:8000/abcd");
+            //net->send("Login request for " + login.user);
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(1));

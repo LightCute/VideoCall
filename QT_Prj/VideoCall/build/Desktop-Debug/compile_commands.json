@@ -13,6 +13,12 @@
 },
 {
   "directory": "/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug",
+  "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1 -I/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/VideoCall_autogen/include -I/home/light/work/Video_Prj/QT_Prj/VideoCall/src -I/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include -I/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include -I/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -DQT_QML_DEBUG -g -std=gnu++17 -fcolor-diagnostics -fPIC -o CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o -c /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp",
+  "file": "/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp",
+  "output": "CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o"
+},
+{
+  "directory": "/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug",
   "command": "/usr/bin/clang++-18 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1 -I/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/VideoCall_autogen/include -I/home/light/work/Video_Prj/QT_Prj/VideoCall/src -I/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/include -I/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/json/include -I/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -DQT_QML_DEBUG -g -std=gnu++17 -fcolor-diagnostics -fPIC -o CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o -c /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp",
   "file": "/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp",
   "output": "CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o"

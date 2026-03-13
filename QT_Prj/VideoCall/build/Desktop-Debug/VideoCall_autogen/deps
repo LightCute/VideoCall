@@ -7,8 +7,19 @@ VideoCall_autogen/timestamp: \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/main.cpp \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.cpp \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_success_event.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/model/connect_payload.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/receiver/connect_receiver.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/session/connect_session.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connected_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/connecting_state.h \
+	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/state/disconnected_state.h \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/command/login_command.h \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_event.h \
 	/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/login/event/login_failed_event.h \

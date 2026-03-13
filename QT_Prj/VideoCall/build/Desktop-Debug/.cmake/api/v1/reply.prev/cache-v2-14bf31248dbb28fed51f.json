@@ -2374,6 +2374,18 @@
 			"value" : "OFF"
 		},
 		{
+			"name" : "LIBDATACHANNEL_ENABLE_WEBSOCKET",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : ""
+				}
+			],
+			"type" : "BOOL",
+			"value" : "ON"
+		},
+		{
 			"name" : "LIBSRTP_TEST_APPS",
 			"properties" : 
 			[
@@ -4104,6 +4116,42 @@
 			],
 			"type" : "STATIC",
 			"value" : "/home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/libdatachannel/deps/usrsctp"
+		},
+		{
+			"name" : "websocket_test_BINARY_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug"
+		},
+		{
+			"name" : "websocket_test_IS_TOP_LEVEL",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "ON"
+		},
+		{
+			"name" : "websocket_test_SOURCE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Value Computed by CMake"
+				}
+			],
+			"type" : "STATIC",
+			"value" : "/home/light/work/Video_Prj/QT_Prj/VideoCall"
 		}
 	],
 	"kind" : "cache",

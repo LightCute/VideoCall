@@ -22,7 +22,7 @@ public:
         if (m_worker_thread.joinable()) {
             m_worker_thread.join(); // 等待线程退出
         }
-        std::cout << "[Core] Background thread exited." << std::endl;
+        Log::info("[Core] Background thread exited.");
     }
 
     // 提交命令（对外接口，和main.cpp匹配）

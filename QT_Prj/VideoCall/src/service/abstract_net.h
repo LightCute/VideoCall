@@ -1,10 +1,24 @@
 #pragma once
+#include <functional>
 #include <string>
 
 class AbstractNet {
 public:
-    virtual ~AbstractNet() = default;
-    virtual void send(const std::string& msg) = 0;
-    virtual void connect(const std::string& address) = 0;
+    using MessageCallback = std::function<void(const std::string&)>;
+    using OpenCallback = std::function<void()>;
+    using CloseCallback = std::function<void()>;
+    using ErrorCallback = std::function<void(const std::string&)>;
 
+    virtual ~AbstractNet() = default;
+
+    // 生命周期
+    virtual void connect(const std::string& url) = 0;
+    virtual void send(const std::string& msg) = 0;
+    virtual void close() = 0;
+
+    // 回调注册
+    virtual void onMessage(MessageCallback cb) = 0;
+    virtual void onOpen(OpenCallback cb) = 0;
+    virtual void onClose(CloseCallback cb) = 0;
+    virtual void onError(ErrorCallback cb) = 0;
 };

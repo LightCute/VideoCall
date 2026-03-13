@@ -3,6 +3,9 @@
 📂 .:
   └─ main.cpp
 
+📂 ./Test/Websocket_Test:
+  └─ websocket_test.cpp
+
 📂 ./src/business/login/receiver:
   └─ login_receiver.h
 
@@ -25,6 +28,28 @@
 📂 ./src/business/login/model:
   └─ login_payload.h
 
+📂 ./src/business/connect/receiver:
+  └─ connect_receiver.h
+
+📂 ./src/business/connect/state:
+  └─ connected_state.h
+  └─ connecting_state.h
+  └─ disconnected_state.h
+
+📂 ./src/business/connect/session:
+  └─ connect_session.h
+
+📂 ./src/business/connect/command:
+  └─ connect_command.h
+
+📂 ./src/business/connect/event:
+  └─ connect_failed_event.h
+  └─ connect_server_event.h
+  └─ connect_success_event.h
+
+📂 ./src/business/connect/model:
+  └─ connect_payload.h
+
 📂 ./src/utilities:
   └─ blocking_queue.h
   └─ log.h
@@ -33,6 +58,7 @@
   └─ qt_ui.cpp
   └─ qt_ui.h
   └─ qt_ui.ui
+  └─ websocket.cpp
   └─ websocket.h
 
 📂 ./src/service:
@@ -41,6 +67,7 @@
 
 📂 ./src/framework/state:
   └─ abstract_call_state.h
+  └─ abstract_connect_state.h
   └─ abstract_login_state.h
   └─ abstract_state.h
 
@@ -82,7 +109,7 @@ Lines: 47
 #include "src/framework/core/core.h"
 #include "src/framework/event/event_bus.h"
 #include "src/framework/session/session_manager.h"
-#include "src/business/login/session/login_session.h"
+#include "src/business/connect/session/connect_session.h"
 #include "src/framework/event/event_router.h" 
 #include "src/adapter/qt_ui.h"
 #include "src/adapter/websocket.h"
@@ -108,7 +135,7 @@ int main(int argc, char *argv[])
     AppContext::instance().ui = ui.get();
     AppContext::instance().net = net.get();
 
-    sessionManager->createSession<LoginSession>(dispatcher.get());
+    sessionManager->createSession<ConnectSession>(dispatcher.get());
 
     ui -> showUI();
 
@@ -121,6 +148,47 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
+========== ./Test/Websocket_Test/websocket_test.cpp ==========
+Lines: 38
+
+#include "../../src/adapter/websocket.h"
+#include <iostream>
+#include <thread>
+
+int main() {
+
+    rtc::InitLogger(rtc::LogLevel::Verbose);
+
+    WebSocket ws;
+
+    ws.onOpen([](){
+        std::cout << "WebSocket connected" << std::endl;
+    });
+
+    ws.onMessage([](const std::string& msg){
+        std::cout << "Received: " << msg << std::endl;
+    });
+
+    ws.onClose([](){
+        std::cout << "WebSocket closed" << std::endl;
+    });
+
+    ws.onError([](const std::string& err){
+        std::cout << "Error: " << err << std::endl;
+    });
+
+    ws.connect("ws://localhost:8000");
+
+    std::cout << "Press enter to send message" << std::endl;
+    std::cin.get();
+
+    ws.send("Hello Server");
+
+    std::cout << "Press enter to exit" << std::endl;
+    std::cin.get();
+
+    return 0;
+}
 ========== ./src/business/login/receiver/login_receiver.h ==========
 Lines: 52
 
@@ -149,8 +217,8 @@ public:
 
         if(ui) ui->showMessage("[System] Logging in...");
         if(net) {
-            net->connect("server.example.com");
-            net->send("Login request for " + login.user);
+            net->connect("ws://120.79.210.6:8000/abcd");
+            //net->send("Login request for " + login.user);
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -496,6 +564,333 @@ struct LoginPayload
     std::string token;
 };
 
+========== ./src/business/connect/receiver/connect_receiver.h ==========
+Lines: 30
+
+#pragma once
+#include <thread>
+#include "../../../framework/command/abstract_receiver.h"
+#include "../../../framework/command/command_context.h"
+#include "../model/connect_payload.h"
+#include "../../../utilities/log.h"
+#include "../../../service/abstract_ui.h"
+#include "../../../service/abstract_net.h"
+#include "../../../application/app_context.h"
+#include "../../../framework/event/event_bus.h"
+
+class ConnectReceiver : public AbstractReceiver {
+public:
+    void performAction(const CommandContext& context) override {
+        auto& connect = context.get<ConnectPayload>();
+        Log::info("[ConnectReceiver] Processing connect - url = [{}]", 
+                  connect.url);
+
+        auto* ui = AppContext::instance().ui;
+        auto* net = AppContext::instance().net;
+
+        if(ui) ui->showMessage("[System] Connecting...");
+        if(net) {
+            net->connect(connect.url);
+        }
+
+
+    }
+
+};
+========== ./src/business/connect/state/connected_state.h ==========
+Lines: 29
+
+#pragma once
+#include <chrono>
+#include <cstdint>
+#include "../../../utilities/log.h"
+#include "../../../framework/state/abstract_connect_state.h"
+#include "../../../framework/command/command_context.h"
+#include "../../../framework/session/abstract_session.h"
+
+class ConnectedState : public AbstractConnectState  {
+public:
+    void onEnter(AbstractSession* session) override {
+        // 进入登录成功状态，发布状态变更事件
+        Log::info("[ConnectedState] Entered connected state.");
+    }
+
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override {
+        Log::debug("[ConnectedState] Received event type: [{}]", typeid(event).name());
+
+        return nullptr;
+        
+    }
+
+    void onExit(AbstractSession* session) override {
+        // 退出登录状态的清理逻辑
+        Log::info("[ConnectedState] Exited connected state.");
+    }
+};
+
+
+========== ./src/business/connect/state/disconnected_state.h ==========
+Lines: 53
+
+// src/business/connect/state/disconnected_state.h
+#pragma once
+#include "../../../framework/state/abstract_connect_state.h"
+#include "../../../utilities/log.h"
+#include "../../../framework/command/command_context.h"
+#include "../../../framework/session/abstract_session.h"
+#include "../../../framework/event/abstract_event.h"
+#include "../event/connect_server_event.h"
+#include "../model/connect_payload.h"
+#include "../command/connect_command.h"
+#include "../receiver/connect_receiver.h"
+
+// 核心修改：将 #include "../state/connecting_state.h" 替换为前向声明
+class ConnectingState;
+
+class DisconnectedState : public AbstractConnectState{
+public:
+    void onEnter(AbstractSession* session) override {
+        Log::info("[DisconnectedState] Entered disconnected state.");
+    }
+
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override{
+        if(typeid(event) == typeid(ConnectServerEvent))
+        {
+            Log::debug("[DisconnectedState] Received event type: [{}]", typeid(event).name());
+            auto& loginEvent = static_cast<const ConnectServerEvent&>(event);
+            Log::info("[DisconnectedState] Processing connect event, url: [{}]", 
+                        loginEvent.getUrl());
+            CommandContext ctx;
+            auto now_timepoint = std::chrono::system_clock::now();
+            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+            ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+            ctx.set(ConnectPayload{
+                loginEvent.getUrl()
+            });
+            auto cmd = std::make_unique<ConnectCommand>(ctx);
+            cmd->addReceiver(std::make_shared<ConnectReceiver>());
+            session->getDispatcher()->postCommand(std::move(cmd));
+            Log::info("[DisconnectedState] Transitioning to [ConnectingState]");
+            // 此处需要确保 ConnectingState 的完整定义可见，因此在类外实现（可选）
+            return std::make_unique<ConnectingState>(); 
+        }
+        return nullptr;
+    }
+
+    void onExit(AbstractSession* session) override {
+        Log::info("[DisconnectedState] Exited disconnected state.");
+    }    
+};
+
+// 可选：若上面 return std::make_unique<ConnectingState>() 仍报错，补充包含头文件
+#include "connecting_state.h"
+========== ./src/business/connect/state/connecting_state.h ==========
+Lines: 48
+
+// src/business/connect/state/connecting_state.h
+#pragma once
+// 1. 先包含基础抽象类（确保继承链可见）
+#include "../../../framework/state/abstract_connect_state.h"
+#include "../../../framework/state/abstract_state.h"
+#include "../../../utilities/log.h"
+#include "../event/connect_success_event.h"
+#include "../event/connect_failed_event.h"
+
+// 2. 前向声明（仅用于类内声明，不用于实现）
+class AbstractSession;
+
+// 3. 先包含依赖的完整头文件（核心：让继承关系可见）
+#include "disconnected_state.h"
+#include "connected_state.h"
+
+class ConnectingState : public AbstractConnectState {
+public:
+    void onEnter(AbstractSession* session) override {
+        Log::info("[ConnectingState] Entered connecting state... (waiting for network)");
+    }
+
+    // 直接在类内实现（此时已包含完整头文件，继承关系可见）
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override {
+        if (typeid(event) == typeid(ConnectSuccessEvent))
+        {
+            Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
+            Log::info("[ConnectingState] Processing connect success event");
+            Log::info("[ConnectingState] Transitioning to [ConnectedState]");
+            // 此时编译器能识别 ConnectedState 继承 AbstractConnectState → AbstractState
+            return std::make_unique<ConnectedState>(); 
+        }
+        else if (typeid(event) == typeid(ConnectFailedEvent))
+        {
+            Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
+            Log::info("[ConnectingState] Processing connect failed event");
+            Log::info("[ConnectingState] Transitioning back to [DisconnectedState]");
+            // 此时编译器能识别 DisconnectedState 继承 AbstractConnectState → AbstractState
+            return std::make_unique<DisconnectedState>(); 
+        }
+        return nullptr;
+    }
+
+    void onExit(AbstractSession* session) override {
+        Log::info("[ConnectingState] Exited connecting state.");
+    }
+};
+========== ./src/business/connect/session/connect_session.h ==========
+Lines: 57
+
+#pragma once
+#include <vector>
+#include "../state/disconnected_state.h"
+#include "../../../framework/session/abstract_session.h"
+#include "../../../utilities/log.h"
+#include "../event/connect_server_event.h"
+class ConnectSession : public AbstractSession {
+public:
+    explicit ConnectSession(AbstractCommandDispatcher* dispatcher) {
+        m_cmd_dispatcher = dispatcher;
+        Log::debug("[ConnectSession] Created");
+    }
+
+    // 核心：声明我只关心 LoginEvent
+    std::vector<std::type_index> eventTypes() const override {
+        return {
+            typeid(ConnectServerEvent) // 仅监听连接事件，其他事件不处理     
+            // typeid(LoginSuccessEvent),   
+            // typeid(LoginFailedEvent)                
+        };
+    }
+
+    // 实现IEventListener：处理LoginEvent（原有逻辑迁移）
+    void handleEvent(const AbstractEvent& event) override {
+        Log::debug("[ConnectSession] Handling event type: [{}]", typeid(event).name());
+        if (!m_current_state) {
+            Log::warn("[ConnectSession] No current state to handle event");
+            return;
+        }
+
+        auto new_state = m_current_state->handleEvent(this, event);
+        if (new_state) {
+            Log::info("[ConnectSession] State transition triggered");
+            m_current_state->onExit(this);
+            m_current_state = std::move(new_state);
+            m_current_state->onEnter(this);
+        }
+    }
+
+    // 保留原有生命周期接口（仅修正状态初始化逻辑）
+    void start() override {
+        Log::info("[ConnectSession] Starting");
+        if (m_current_state) {
+            m_current_state->onExit(this);
+        }
+        m_current_state = std::make_unique<DisconnectedState>();
+        m_current_state->onEnter(this);
+    }
+
+    void stop() override {
+        Log::info("[ConnectSession] Stopping");
+        if (m_current_state) {
+            m_current_state->onExit(this);
+            m_current_state.reset();
+        }
+    }
+};
+
+========== ./src/business/connect/command/connect_command.h ==========
+Lines: 29
+
+#pragma once
+#include <thread>
+#include <iostream>
+#include "../../../framework/command/abstract_command.h"
+
+
+class ConnectCommand : public AbstractCommand
+{
+public:
+    explicit ConnectCommand(CommandContext ctx)
+    {
+        m_context = std::move(ctx);
+    }
+
+    bool execute() override
+    {
+        for (auto& r : m_receivers)
+        {
+            r->performAction(m_context);
+        }
+        return true;
+    }
+
+    std::string getCommandType() const override
+    {
+        return "ConnectCommand";
+    };
+
+};
+========== ./src/business/connect/event/connect_failed_event.h ==========
+Lines: 11
+
+#pragma once
+#include "../../../framework/event/abstract_event.h"
+
+class ConnectFailedEvent : public AbstractEvent {
+public:
+    explicit ConnectFailedEvent()
+        {}
+
+
+private:
+};
+========== ./src/business/connect/event/connect_server_event.h ==========
+Lines: 19
+
+#pragma once
+#include <string>
+#include "../../../framework/event/abstract_event.h"
+
+
+class ConnectServerEvent : public AbstractEvent {
+public:
+
+    ConnectServerEvent(const std::string& url)
+        : m_url(url) {}
+
+    // 只读getter，保证事件数据不可变，线程安全
+    const std::string& getUrl() const { return m_url; }
+
+private:
+    const std::string m_url;
+};
+
+
+
+========== ./src/business/connect/event/connect_success_event.h ==========
+Lines: 11
+
+#pragma once
+#include "../../../framework/event/abstract_event.h"
+
+class ConnectSuccessEvent : public AbstractEvent {
+public:
+    explicit ConnectSuccessEvent()
+        {}
+
+
+private:
+};
+========== ./src/business/connect/model/connect_payload.h ==========
+Lines: 6
+
+#pragma once
+#include <string>
+struct ConnectPayload
+{
+    std::string url;
+};
+
 ========== ./src/utilities/blocking_queue.h ==========
 Lines: 57
 
@@ -661,6 +1056,76 @@ public:
     static void critical(const char* fmt, Args&&... args) { spdlog::critical(fmt, std::forward<Args>(args)...); }
 };
 
+========== ./src/adapter/websocket.cpp ==========
+Lines: 67
+
+#include "websocket.h"
+#include "../framework/event/event_bus.h"
+#include "../business/connect/event/connect_success_event.h"
+#include "../business/connect/event/connect_failed_event.h"
+
+WebSocket::WebSocket() {
+    ws = std::make_shared<rtc::WebSocket>();
+    initCallbacks();
+}
+
+void WebSocket::initCallbacks() {
+
+    ws->onOpen([this]() {
+        EventBus::GetInstance().publish(
+            std::make_unique<ConnectSuccessEvent>()
+            );
+    });
+
+    ws->onClosed([this]() {
+        // EventBus::GetInstance().publish(
+        //     std::make_unique<ConnectFailedEvent>()
+        //     );
+    });
+
+    ws->onError([this](std::string err) {
+        EventBus::GetInstance().publish(
+            std::make_unique<ConnectFailedEvent>()
+            );
+    });
+
+    ws->onMessage([this](auto data) {
+
+        if (!std::holds_alternative<std::string>(data))
+            return;
+
+        if (messageCallback)
+            messageCallback(std::get<std::string>(data));
+    });
+}
+
+void WebSocket::connect(const std::string& url) {
+    ws->open(url);
+}
+
+void WebSocket::send(const std::string& msg) {
+    ws->send(msg);
+}
+
+void WebSocket::close() {
+    ws->close();
+}
+
+void WebSocket::onMessage(MessageCallback cb) {
+    messageCallback = cb;
+}
+
+void WebSocket::onOpen(OpenCallback cb) {
+    openCallback = cb;
+}
+
+void WebSocket::onClose(CloseCallback cb) {
+    closeCallback = cb;
+}
+
+void WebSocket::onError(ErrorCallback cb) {
+    errorCallback = cb;
+}
 ========== ./src/adapter/qt_ui.cpp ==========
 Lines: 39
 
@@ -668,7 +1133,7 @@ Lines: 39
 #include "qt_ui.h"
 #include "ui_qt_ui.h"
 #include "../framework/event/event_bus.h"
-#include "../business/login/event/login_event.h"
+#include "../business/connect/event/connect_server_event.h"
 Qt_UI::Qt_UI(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Qt_UI)
@@ -699,7 +1164,7 @@ void Qt_UI::showUI() {
 void Qt_UI::on_bt_connect_clicked()
 {
     EventBus::GetInstance().publish(
-        std::make_unique<LoginEvent>("user", "123456", true)
+        std::make_unique<ConnectServerEvent>("ws://120.79.210.6:8000/abcd")
         );
 }
 
@@ -740,36 +1205,63 @@ private:
 #endif // QT_UI_H
 
 ========== ./src/adapter/websocket.h ==========
-Lines: 16
-
-#pragma once 
-#include "../service/abstract_net.h"
-#include "../utilities/log.h"
-class WebSocket : public AbstractNet {
-public:
-    void send(const std::string& msg) override {
-        // WebSocket特定的发送逻辑
-        // 这里仅模拟输出，实际应调用WebSocket的API发送消息  
-        Log::info("[WebSocket] Sending message: [{}]", msg);       
-    }
-    void connect(const std::string& address) override {     
-        // WebSocket特定的连接逻辑
-        // 这里仅模拟输出，实际应调用WebSocket的API连接服务器
-        Log::info("[WebSocket] Connecting to address: [{}]", address);
-    }
-};
-========== ./src/service/abstract_net.h ==========
-Lines: 10
+Lines: 29
 
 #pragma once
+#include <memory>
+
+#include "../service/abstract_net.h"
+#include <rtc/rtc.hpp>
+
+class WebSocket : public AbstractNet {
+public:
+    WebSocket();
+
+    void connect(const std::string& url) override;
+    void send(const std::string& msg) override;
+    void close() override;
+
+    void onMessage(MessageCallback cb) override;
+    void onOpen(OpenCallback cb) override;
+    void onClose(CloseCallback cb) override;
+    void onError(ErrorCallback cb) override;
+
+private:
+    std::shared_ptr<rtc::WebSocket> ws;
+
+    MessageCallback messageCallback;
+    OpenCallback openCallback;
+    CloseCallback closeCallback;
+    ErrorCallback errorCallback;
+
+    void initCallbacks();
+};
+========== ./src/service/abstract_net.h ==========
+Lines: 24
+
+#pragma once
+#include <functional>
 #include <string>
 
 class AbstractNet {
 public:
-    virtual ~AbstractNet() = default;
-    virtual void send(const std::string& msg) = 0;
-    virtual void connect(const std::string& address) = 0;
+    using MessageCallback = std::function<void(const std::string&)>;
+    using OpenCallback = std::function<void()>;
+    using CloseCallback = std::function<void()>;
+    using ErrorCallback = std::function<void(const std::string&)>;
 
+    virtual ~AbstractNet() = default;
+
+    // 生命周期
+    virtual void connect(const std::string& url) = 0;
+    virtual void send(const std::string& msg) = 0;
+    virtual void close() = 0;
+
+    // 回调注册
+    virtual void onMessage(MessageCallback cb) = 0;
+    virtual void onOpen(OpenCallback cb) = 0;
+    virtual void onClose(CloseCallback cb) = 0;
+    virtual void onError(ErrorCallback cb) = 0;
 };
 ========== ./src/service/abstract_ui.h ==========
 Lines: 9
@@ -831,6 +1323,20 @@ public:
     ~AbstractCallState() override = default;
     // 可扩展通话状态通用接口，不修改抽象核心逻辑
 };
+========== ./src/framework/state/abstract_connect_state.h ==========
+Lines: 10
+
+// abstract_connect_state.h
+#pragma once
+#include "abstract_state.h"
+
+class AbstractConnectState : public AbstractState {
+public:
+    ~AbstractConnectState() override = default;
+    // 可扩展连接状态通用接口，不修改抽象核心逻辑
+};
+
+
 ========== ./src/framework/core/core.h ==========
 Lines: 73
 
@@ -1322,5 +1828,5 @@ private:
 };
 
 =====================================
-Total files: 33
-Total lines: 1138
+Total files: 46
+Total lines: 1573
