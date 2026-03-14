@@ -111,15 +111,87 @@
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_built_command.h",
+			"MU",
+			"SETPCNCRW7/moc_call_built_command.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_command.h",
+			"MU",
+			"SETPCNCRW7/moc_call_command.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_send_command.h",
+			"MU",
+			"SETPCNCRW7/moc_call_send_command.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h",
 			"MU",
 			"L5KISFULMH/moc_call_event.cpp",
 			null
 		],
 		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_failed_event.h",
+			"MU",
+			"L5KISFULMH/moc_call_failed_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_send_event.h",
+			"MU",
+			"L5KISFULMH/moc_call_send_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_success_event.h",
+			"MU",
+			"L5KISFULMH/moc_call_success_event.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/call_payload.h",
+			"MU",
+			"EJJPXAZU2O/moc_call_payload.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/send_payload.h",
+			"MU",
+			"EJJPXAZU2O/moc_send_payload.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_built_receiver.h",
+			"MU",
+			"2ZR5DWWP46/moc_call_built_receiver.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_receiver.h",
+			"MU",
+			"2ZR5DWWP46/moc_call_receiver.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_send_receiver.h",
+			"MU",
+			"2ZR5DWWP46/moc_call_send_receiver.cpp",
+			null
+		],
+		[
 			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h",
 			"MU",
 			"3IQHWLTNUI/moc_call_session.cpp",
+			null
+		],
+		[
+			"/home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_built_state.h",
+			"MU",
+			"XFAGN6NCA5/moc_call_built_state.cpp",
 			null
 		],
 		[

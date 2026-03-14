@@ -1,0 +1,605 @@
+========== 工程目录结构（仅含.h/.cpp）==========
+
+📂 .:
+  └─ main.cpp
+  └─ socket.cpp
+  └─ socket.h
+  └─ widget.cpp
+  └─ widget.h
+
+📂 ./utilities:
+  └─ blocking_queue.h
+  └─ log.h
+
+==================================================
+========== 所有.h/.cpp文件内容 ==========
+
+
+========== ./main.cpp ==========
+Lines: 43
+
+#include <thread>
+#include <QApplication>
+#include <rtc/rtc.hpp>
+#include "widget.h"
+#include "utilities/log.h"
+#include "socket.h"
+void myCppLogCallback(rtc::LogLevel level, std::string message) {
+    switch (level) {
+    case rtc::LogLevel::Fatal:
+    case rtc::LogLevel::Error:
+        Log::error("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Warning:
+        Log::warn("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Info:
+        Log::info("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Debug:
+        Log::debug("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Verbose:
+        Log::trace("[RTC] {}", message);
+        break;
+    default:
+        Log::info("[RTC] {}", message);
+        break;
+    }
+}
+
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
+    Log::info("[Main] Starting application, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
+    rtc::InitLogger(rtc::LogLevel::Debug, myCppLogCallback);
+    WebSocket ws;
+    
+    Widget w(&ws);
+    w.show();
+    return a.exec();
+}
+
+========== ./widget.cpp ==========
+Lines: 102
+
+#include "widget.h"
+#include "./ui_widget.h"
+#include "utilities/log.h"
+#include "socket.h"
+#include <QRegularExpression>
+Widget::Widget(WebSocket* ws, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::Widget)
+    , m_ws(ws) // 初始化指针
+{
+    ui->setupUi(this);
+}
+
+Widget::~Widget()
+{
+    delete ui;
+}
+
+
+void Widget::on_bt_connect2Server_clicked()
+{
+    if (m_ws == nullptr) {
+        Log::error("[Widget] WebSocket pointer is null!");
+        return;
+    }
+
+    // ========== 步骤1：读取并校验4位字母用户名 ==========
+    QString username = ui->TxEd_bt_connect2Server->toPlainText(); // 去除首尾空格
+
+    // 校验1：用户名非空
+    if (username.isEmpty()) {
+        Log::warn("[Widget] Username is empty!");
+        return;
+    }
+
+    // 校验2：用户名长度必须为4
+    if (username.length() != 4) {
+        Log::warn("[Widget] Username length must be 4 characters! Current length: {}", username.length());
+        return;
+    }
+
+    // 校验3：用户名必须全为字母（大小写均可，如需仅小写可加.toLower()）
+    QRegularExpression letterRegex("^[A-Za-z]{4}$"); // 正则：仅4个字母
+    if (!letterRegex.match(username).hasMatch()) {
+        Log::warn("[Widget] Username must contain only 4 letters! Input: {}", username.toStdString());
+        return;
+    }
+
+    // ========== 步骤2：读取服务器IP（可选：固定/用户输入） ==========
+    // 方案A：服务器IP+端口固定（推荐，减少用户输入）
+    const QString server_ip_port = "120.79.210.6:8000";
+
+    // 方案B：用户输入IP+端口（如需此方案，新增QLineEdit：le_server_ip）
+    // QString server_ip_port = ui->le_server_ip->text().trimmed();
+    // if (server_ip_port.isEmpty()) {
+    //     Log::warn("[Widget] Server IP:Port is empty!");
+    //     return;
+    // }
+
+    // ========== 步骤3：拼接完整URL ==========
+    QString qt_url = QString("ws://%1/%2").arg(server_ip_port).arg(username);
+
+    // ========== 步骤4：转换并调用连接函数 ==========
+    std::string std_url = qt_url.toStdString();
+    std::string std_username = username.toStdString();
+    m_ws->connect2Server(std_url, std_username);
+
+    Log::info("[Widget] Connect to server with URL: {}", std_url);
+}
+
+void Widget::on_bt_call_clicked()
+{
+    if (m_ws == nullptr) {
+        Log::error("[Widget] WebSocket pointer is null!");
+        return;
+    }
+
+    // ========== 步骤1：读取并校验4位字母用户名 ==========
+    QString peerName = ui->TxEd_bt_connect2Server->toPlainText(); // 去除首尾空格
+
+    // 校验1：用户名非空
+    if (peerName.isEmpty()) {
+        Log::warn("[Widget] peerName is empty!");
+        return;
+    }
+
+    // 校验2：用户名长度必须为4
+    if (peerName.length() != 4) {
+        Log::warn("[Widget] peerName length must be 4 characters! Current length: {}", peerName.length());
+        return;
+    }
+
+    // 校验3：用户名必须全为字母（大小写均可，如需仅小写可加.toLower()）
+    QRegularExpression letterRegex("^[A-Za-z]{4}$"); // 正则：仅4个字母
+    if (!letterRegex.match(peerName).hasMatch()) {
+        Log::warn("[Widget] peerName must contain only 4 letters! Input: {}", peerName.toStdString());
+        return;
+    }
+
+    m_ws->connect2Peer(peerName.toStdString());
+}
+
+
+========== ./socket.cpp ==========
+Lines: 197
+
+#include "socket.h"
+#include <nlohmann/json.hpp>
+#include <string>
+#include "utilities/log.h"
+
+
+
+
+WebSocket::WebSocket() {
+    m_config = rtc::Configuration();
+    m_ws = std::make_shared<rtc::WebSocket>();
+    m_ws->onOpen([this]() {
+        
+    });
+
+    m_ws->onClosed([this]() {
+    });
+
+    m_ws->onError([this](std::string err) {
+    });
+
+    m_ws->onMessage([this, wws = make_weak_ptr(m_ws)](auto data) {
+		// data holds either std::string or rtc::binary
+		if (!std::holds_alternative<std::string>(data))
+			return;
+
+		nlohmann::json message = nlohmann::json::parse(std::get<std::string>(data));
+
+		auto it = message.find("id");
+		if (it == message.end())
+			return;
+
+		auto id = it->get<std::string>();
+
+		it = message.find("type");
+		if (it == message.end())
+			return;
+
+		auto type = it->get<std::string>();
+
+		std::shared_ptr<rtc::PeerConnection> pc;
+		if (auto jt = m_peerConnectionMap.find(id); jt != m_peerConnectionMap.end()) {
+			pc = jt->second;
+		} else if (type == "offer") {
+			std::cout << "Answering to " + id << std::endl;
+			pc = createPeerConnection(m_config, wws, id);
+		} else {
+			return;
+		}
+
+		if (type == "offer" || type == "answer") {
+			auto sdp = message["description"].get<std::string>();
+			pc->setRemoteDescription(rtc::Description(sdp, type));
+		} else if (type == "candidate") {
+			auto sdp = message["candidate"].get<std::string>();
+			auto mid = message["mid"].get<std::string>();
+			pc->addRemoteCandidate(rtc::Candidate(sdp, mid));
+		}
+	});
+}
+
+
+
+void WebSocket::connect2Peer(const std::string& peerId){
+    auto pc = createPeerConnection(m_config, m_ws, peerId);
+    auto dc = pc->createDataChannel("test");
+    dc->onOpen([this,peerId, wdc = make_weak_ptr(dc)]() {
+        Log::info("[WebSocket] DataChannel from [{}] open", peerId);
+        if (auto dc = wdc.lock())
+            dc->send("Hello from " + m_localId);
+    });
+
+    dc->onClosed([this,peerId]() { 
+        Log::info("[WebSocket] DataChannel from [{}] closed", peerId);
+        });
+
+    dc->onMessage([this,peerId, wdc = make_weak_ptr(dc)](auto data) {
+        // data holds either std::string or rtc::binary
+        if (std::holds_alternative<std::string>(data))
+        {            
+            Log::info("[WebSocket] Message from [{}] received: {}", peerId, std::get<std::string>(data));
+        }        
+        else
+        {   
+            Log::info("[WebSocket] Binary message from [{}] received, size={}", peerId, std::get<rtc::binary>(data).size());
+        }    
+    });
+
+    m_dataChannelMap.emplace(peerId, dc);
+    m_peer_id = peerId;
+}
+
+
+void WebSocket::send2Peer(const std::string& peerId, const std::string& msg) {
+    auto it = m_dataChannelMap.find(m_peer_id);
+    if (it != m_dataChannelMap.end()) {
+        it->second->send(msg);
+        Log::info("[WebSocket] Sent message to [{}]: {}", m_peer_id, msg);
+    } else {
+        Log::warn("[WebSocket] No data channel found for peer [{}]", m_peer_id);
+    }
+}
+
+
+// Create and setup a PeerConnection
+std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::Configuration &config,
+                                                     std::weak_ptr<rtc::WebSocket> wws, std::string id) {
+	auto pc = std::make_shared<rtc::PeerConnection>(config);
+
+	pc->onStateChange(
+	    [](rtc::PeerConnection::State state) { std::cout << "State: " << state << std::endl; });
+
+	pc->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+		std::cout << "Gathering State: " << state << std::endl;
+	});
+
+	pc->onLocalDescription([wws, id](rtc::Description description) {
+		nlohmann::json message = {{"id", id},
+		                {"type", description.typeString()},
+		                {"description", std::string(description)}};
+
+		if (auto ws = wws.lock())
+			ws->send(message.dump());
+	});
+
+	pc->onLocalCandidate([wws, id](rtc::Candidate candidate) {
+		nlohmann::json message = {{"id", id},
+		                {"type", "candidate"},
+		                {"candidate", std::string(candidate)},
+		                {"mid", candidate.mid()}};
+
+		if (auto ws = wws.lock())
+			ws->send(message.dump());
+	});
+
+	pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
+		std::cout << "DataChannel from " << id << " received with label \"" << dc->label() << "\""
+		          << std::endl;
+
+		dc->onOpen([this, wdc = make_weak_ptr(dc)]() {
+			if (auto dc = wdc.lock())
+				dc->send("Hello from " + m_localId);
+
+		});
+
+		dc->onClosed([this, id]() { std::cout << "DataChannel from " << id << " closed" << std::endl; });
+
+		dc->onMessage([this, id](auto data) {
+			// data holds either std::string or rtc::binary
+            if (std::holds_alternative<std::string>(data))
+            {            
+                std::cout << "Message from " << id << " received: " << std::get<std::string>(data)
+                        << std::endl;
+                Log::info("[WebSocket] Message from [{}] received: {}", id, std::get<std::string>(data));
+            }        
+            else
+            {   std::cout << "Binary message from " << id
+                                << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+                Log::info("[WebSocket] Binary message from [{}] received, size={}", id, std::get<rtc::binary>(data).size());
+            }   
+		});
+
+		m_dataChannelMap.emplace(id, dc);
+        m_peer_id = id;
+	});
+
+	m_peerConnectionMap.emplace(id, pc);
+	return pc;
+};
+
+// 补全WebSocket类的connect/send/close函数实现
+void WebSocket::connect2Server(const std::string& url, std::string& localId) {
+    if (m_ws) {
+        m_ws->open(url); // 调用rtc::WebSocket的open方法
+        m_localId = localId;
+    } else {
+        Log::error("[WebSocket] WebSocket is empty {}", url);
+    }
+}
+
+void WebSocket::send(const std::string& msg) {
+    if (m_ws && m_ws->isOpen()) {
+        m_ws->send(msg); // 调用rtc::WebSocket的send方法
+    } else {
+        Log::error("[WebSocket] WebSocket is not open {}", msg);
+    }
+}
+
+void WebSocket::close() {
+    if (m_ws) {
+        m_ws->close(); // 调用rtc::WebSocket的close方法
+    }
+    // 清理资源
+    m_peerConnectionMap.clear();
+    m_dataChannelMap.clear();
+    m_peer_id.clear();
+}
+========== ./socket.h ==========
+Lines: 29
+
+#pragma once
+#include <memory>
+
+#include <rtc/rtc.hpp>
+
+class WebSocket {
+public:
+    WebSocket();
+
+    void connect2Server (const std::string& url, std::string& localId) ;
+    void send(const std::string& msg) ;
+    void close() ;
+
+
+
+    void connect2Peer(const std::string& peerId) ;
+    void send2Peer(const std::string& peerId, const std::string& msg) ;
+private:
+    std::shared_ptr<rtc::WebSocket> m_ws;
+    std::shared_ptr<rtc::PeerConnection> createPeerConnection(const rtc::Configuration &config,
+                                                                    std::weak_ptr<rtc::WebSocket> wws, std::string id);
+    std::string m_localId;
+    template <class T> std::weak_ptr<T> make_weak_ptr(std::shared_ptr<T> ptr) { return ptr; }
+    std::unordered_map<std::string, std::shared_ptr<rtc::PeerConnection>> m_peerConnectionMap;
+    std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> m_dataChannelMap;
+    std::string m_peer_id;
+    rtc::Configuration m_config;
+
+};
+
+========== ./widget.h ==========
+Lines: 29
+
+#ifndef WIDGET_H
+#define WIDGET_H
+
+#include <QWidget>
+#include "socket.h"
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class Widget;
+}
+QT_END_NAMESPACE
+
+class Widget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit Widget(WebSocket* ws, QWidget *parent = nullptr);
+    ~Widget();
+
+private slots:
+    void on_bt_connect2Server_clicked();
+
+    void on_bt_call_clicked();
+
+private:
+    Ui::Widget *ui;
+    WebSocket* m_ws;
+};
+#endif // WIDGET_H
+
+========== ./utilities/blocking_queue.h ==========
+Lines: 57
+
+#pragma once
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
+template<typename T>
+class BlockingQueue {
+public:
+
+    BlockingQueue() : m_stop(false) {}
+    ~BlockingQueue() { stop(); }
+    
+    void stop()
+    {
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_stop = true;
+        }
+        m_cv.notify_all();
+    }
+
+    void push(T item)
+    {
+        if (m_stop) return;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_queue.push(std::move(item));
+        }
+        m_cv.notify_one();
+    }
+
+    T waitAndPop()
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        m_cv.wait(lock, [this] {
+            return m_stop || !m_queue.empty();
+        });
+
+        if (m_stop)
+        {
+            return T{};
+        }
+
+        T item = std::move(m_queue.front());
+        m_queue.pop();
+        return item;
+    }
+
+private:
+
+    std::queue<T> m_queue;
+    std::mutex m_mutex;
+    std::condition_variable m_cv;
+    std::atomic<bool> m_stop;
+};
+========== ./utilities/log.h ==========
+Lines: 101
+
+#pragma once
+#include <memory>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/async.h>
+
+
+class Log {
+public:
+    // 新增：日志模式枚举
+    enum class Mode {
+        Sync,   // 同步模式
+        Async   // 异步模式
+    };
+
+    // 统一初始化接口
+    // filename: 日志文件名
+    // mode: 同步或异步，默认异步
+    // level: 日志输出级别，默认 info (即 info/warn/error/critical 会输出，trace/debug 会被过滤)
+    static void init(const std::string& filename = "app.log", 
+                     Mode mode = Mode::Async,
+                     spdlog::level::level_enum level = spdlog::level::info) {
+        static bool initialized = false;
+        if (initialized) return;
+
+        try {
+            // 1. 创建 sinks (控制台 + 文件)
+            auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
+            
+            // 注意：sink 本身的级别设为最低，主要靠全局 logger 级别来过滤
+            console_sink->set_level(spdlog::level::trace);
+            file_sink->set_level(spdlog::level::trace);
+
+            std::vector<spdlog::sink_ptr> sinks { console_sink, file_sink };
+
+            // 2. 根据模式创建 logger
+            std::shared_ptr<spdlog::logger> logger;
+            
+            if (mode == Mode::Async) {
+                // 异步模式：初始化线程池
+                spdlog::init_thread_pool(8192, 1);
+                logger = std::make_shared<spdlog::async_logger>(
+                    "async_logger", 
+                    sinks.begin(), 
+                    sinks.end(),
+                    spdlog::thread_pool(), 
+                    spdlog::async_overflow_policy::block
+                );
+            } else {
+                // 同步模式
+                logger = std::make_shared<spdlog::logger>("sync_logger", sinks.begin(), sinks.end());
+            }
+
+            // 3. 设置默认 logger
+            spdlog::set_default_logger(logger);
+            
+            // 4. 设置格式
+            spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%t] [%l] %v");
+
+            // 5. 设置全局过滤级别 (核心改动在这里)
+            spdlog::set_level(level); 
+
+            initialized = true;
+            std::cout << "Log init success. Mode: " << (mode == Mode::Async ? "Async" : "Sync") 
+                      << ", Level: " << spdlog::level::to_string_view(level).data() << std::endl;
+        } catch (const spdlog::spdlog_ex &ex) {
+            std::cerr << "Log init failed: " << ex.what() << std::endl;
+        }
+    }
+
+    // 辅助函数：将 thread::id 转为 string
+    static std::string threadIdToString(const std::thread::id& id) {
+        std::ostringstream oss;
+        oss << id;
+        return oss.str();
+    }    
+
+    // 日志接口
+    template<typename... Args>
+    static void trace(const char* fmt, Args&&... args) { spdlog::trace(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void debug(const char* fmt, Args&&... args) { spdlog::debug(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void info(const char* fmt, Args&&... args) { spdlog::info(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void warn(const char* fmt, Args&&... args) { spdlog::warn(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void error(const char* fmt, Args&&... args) { spdlog::error(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void critical(const char* fmt, Args&&... args) { spdlog::critical(fmt, std::forward<Args>(args)...); }
+};
+
+
+=====================================
+Total files: 7
+Total lines: 558

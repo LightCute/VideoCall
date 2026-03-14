@@ -1,0 +1,22 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/deps/plog/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/deps/usrsctp/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/deps/usrsctp/usrsctplib/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/deps/libsrtp/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/deps/libjuice/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/deps/json/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/client/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/client-benchmark/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/media-receiver/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/media-sender/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/media-sfu/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/streamer/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/copy-paste/cmake_install.cmake",
+		"/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel/examples/copy-paste-capi/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

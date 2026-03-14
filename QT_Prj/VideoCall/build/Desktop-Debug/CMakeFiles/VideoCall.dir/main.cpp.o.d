@@ -621,4 +621,16 @@ CMakeFiles/VideoCall.dir/main.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../../../framework/event/event_bus.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/calling_state.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/state/abstract_call_state.h \
-  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/state/abstract_state.h
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../../../framework/state/abstract_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../event/call_success_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../event/call_failed_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/call_built_state.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../command/call_built_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/call_built_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../event/call_send_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../command/call_send_command.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/call_send_receiver.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../state/../receiver/../model/send_payload.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../event/call_success_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../event/call_failed_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/../event/call_send_event.h

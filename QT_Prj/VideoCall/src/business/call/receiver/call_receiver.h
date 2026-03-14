@@ -20,7 +20,7 @@ public:
 
         if(ui) ui->showMessage("[System] Calling...");
         if(net) {
-            
+            net->connect2Peer(call.peerId);
         }
 
 

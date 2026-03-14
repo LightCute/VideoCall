@@ -28,15 +28,33 @@
 📂 ./src/business/login/model:
   └─ login_payload.h
 
+📂 ./src/business/call/receiver:
+  └─ call_built_receiver.h
+  └─ call_receiver.h
+  └─ call_send_receiver.h
+
 📂 ./src/business/call/state:
+  └─ call_built_state.h
   └─ call_idle_state.h
   └─ calling_state.h
 
 📂 ./src/business/call/session:
   └─ call_session.h
 
+📂 ./src/business/call/command:
+  └─ call_built_command.h
+  └─ call_command.h
+  └─ call_send_command.h
+
 📂 ./src/business/call/event:
   └─ call_event.h
+  └─ call_failed_event.h
+  └─ call_send_event.h
+  └─ call_success_event.h
+
+📂 ./src/business/call/model:
+  └─ call_payload.h
+  └─ send_payload.h
 
 📂 ./src/business/connect/receiver:
   └─ connect_receiver.h
@@ -581,8 +599,175 @@ struct LoginPayload
     std::string token;
 };
 
+========== ./src/business/call/receiver/call_receiver.h ==========
+Lines: 29
+
+#pragma once
+#include "../../../framework/command/abstract_receiver.h"
+#include "../../../framework/command/command_context.h"
+#include "../model/call_payload.h"
+#include "../../../utilities/log.h"
+#include "../../../service/abstract_ui.h"
+#include "../../../service/abstract_net.h"
+#include "../../../application/app_context.h"
+#include "../../../framework/event/event_bus.h"
+
+class CallReceiver : public AbstractReceiver {
+public:
+    void performAction(const CommandContext& context) override {
+        auto& call = context.get<CallPayload>();
+        Log::info("[CallReceiver] Processing call peerId = [{}]", 
+                  call.peerId);
+
+        auto* ui = AppContext::instance().ui;
+        auto* net = AppContext::instance().net;
+
+        if(ui) ui->showMessage("[System] Calling...");
+        if(net) {
+            net->connect2Peer(call.peerId);
+        }
+
+
+    }
+
+};
+========== ./src/business/call/receiver/call_built_receiver.h ==========
+Lines: 26
+
+#pragma once
+#include "../../../framework/command/abstract_receiver.h"
+#include "../../../framework/command/command_context.h"
+#include "../../../utilities/log.h"
+#include "../../../service/abstract_ui.h"
+#include "../../../service/abstract_net.h"
+#include "../../../application/app_context.h"
+#include "../../../framework/event/event_bus.h"
+
+class CallBuiltReceiver : public AbstractReceiver {
+public:
+    void performAction(const CommandContext& context) override {
+        Log::info("[CallBuiltReceiver] Processing call built ");
+
+        auto* ui = AppContext::instance().ui;
+        auto* net = AppContext::instance().net;
+
+        if(ui) ui->showMessage("[System] Call built!");
+        if(net) {
+            
+        }
+
+
+    }
+
+};
+========== ./src/business/call/receiver/call_send_receiver.h ==========
+Lines: 29
+
+#pragma once
+#include "../../../framework/command/abstract_receiver.h"
+#include "../../../framework/command/command_context.h"
+#include "../model/send_payload.h"
+#include "../../../utilities/log.h"
+#include "../../../service/abstract_ui.h"
+#include "../../../service/abstract_net.h"
+#include "../../../application/app_context.h"
+#include "../../../framework/event/event_bus.h"
+
+class CallSendReceiver : public AbstractReceiver {
+public:
+    void performAction(const CommandContext& context) override {
+        auto& call = context.get<SendPayload>();
+        Log::info("[CallSendReceiver] Processing call send msg = [{}]", 
+                  call.msg);
+
+        auto* ui = AppContext::instance().ui;
+        auto* net = AppContext::instance().net;
+
+        if(ui) ui->showMessage("[System] Sending message...");
+        if(net) {
+            net->send2Peer("", call.msg); // 目前peerId未使用，后续可根据实际需求调整CallSendEvent和SendPayload结构
+        }
+
+
+    }
+
+};
+========== ./src/business/call/state/call_built_state.h ==========
+Lines: 70
+
+#pragma once
+#include <chrono>
+#include <cstdint>
+#include "../../../utilities/log.h"
+#include "../../../framework/state/abstract_connect_state.h"
+#include "../../../framework/command/command_context.h"
+#include "../../../framework/session/abstract_session.h"
+#include "../command/call_built_command.h"
+#include "../receiver/call_built_receiver.h"
+#include "../event/call_send_event.h"
+#include "../command/call_send_command.h"
+#include "../receiver/call_send_receiver.h"
+class CallBuiltState : public AbstractConnectState  {
+public:
+    void onEnter(AbstractSession* session) override {
+        // 进入登录成功状态，发布状态变更事件
+        Log::info("[CallBuiltState] Entered call built state.");
+        CommandContext ctx;
+        auto now_timepoint = std::chrono::system_clock::now();
+        auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+        ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+        ctx.set(ConnectPayload{
+            
+        });
+        auto cmd = std::make_unique<CallBuiltCommand>(ctx);
+        cmd->addReceiver(std::make_shared<CallBuiltReceiver>());
+        session->getDispatcher()->postCommand(std::move(cmd));
+        
+    }
+
+    std::unique_ptr<AbstractState> handleEvent(
+        AbstractSession* session, const AbstractEvent& event) override {
+        Log::debug("[CallBuiltState] Received event type: [{}]", typeid(event).name());
+        if(typeid(event) == typeid(CallSendEvent))
+        {
+            Log::debug("[CallBuiltState] Received event type: [{}]", typeid(event).name());
+            auto& sendEvent = static_cast<const CallSendEvent&>(event);
+            Log::info("[CallBuiltState] Processing call event, msg: [{}]", 
+                         sendEvent.getMsg());
+            CommandContext ctx;
+            auto now_timepoint = std::chrono::system_clock::now();
+            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+            ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+            ctx.set(SendPayload{
+                
+                sendEvent.getMsg()
+            });
+            auto cmd = std::make_unique<CallSendCommand>(ctx);
+            cmd->addReceiver(std::make_shared<CallSendReceiver>());
+            session->getDispatcher()->postCommand(std::move(cmd));
+
+            
+        }
+        return nullptr;
+        
+    }
+
+    void onExit(AbstractSession* session) override {
+        // 退出登录状态的清理逻辑
+        Log::info("[CallBuiltState] Exited call built state.");
+    }
+};
+
+
+
+
+
+
+
+
+
 ========== ./src/business/call/state/calling_state.h ==========
-Lines: 49
+Lines: 52
 
 // src/business/connect/state/connecting_state.h
 #pragma once
@@ -590,13 +775,15 @@ Lines: 49
 #include "../../../framework/state/abstract_call_state.h"
 #include "../../../utilities/log.h"
 #include "../event/call_event.h"
-
+#include "../event/call_success_event.h"
+#include "../event/call_failed_event.h"
 // // 前向声明
 // class AbstractSession;
 // // 前向声明，避免直接包含
 // class DisconnectedState;
 // class ConnectedState;
-
+class CallBuiltState; // 前向声明，替代直接包含
+class CallIdleState; // 前向声明，替代直接包含
 class CallingState : public AbstractCallState {
 public:
     void onEnter(AbstractSession* session) override {
@@ -605,7 +792,7 @@ public:
 
     // 仅声明，实现移到类外
     std::unique_ptr<AbstractState> handleEvent(
-        AbstractSession* session, const AbstractEvent& event) override{}
+        AbstractSession* session, const AbstractEvent& event) override;
 
     void onExit(AbstractSession* session) override {
         Log::info("[CallingState] Exited calling state.");
@@ -614,27 +801,28 @@ public:
 
 // 类外实现，确保子类完整定义可见
 // #include "disconnected_state.h"
-// #include "connected_state.h"
-// inline std::unique_ptr<AbstractState> ConnectingState::handleEvent(
-//     AbstractSession* session, const AbstractEvent& event) {
-//     if (typeid(event) == typeid(ConnectSuccessEvent))
-//     {
-//         Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
-//         Log::info("[ConnectingState] Processing connect success event");
-//         Log::info("[ConnectingState] Transitioning to [ConnectedState]");
-//         return std::make_unique<ConnectedState>(); 
-//     }
-//     else if (typeid(event) == typeid(ConnectFailedEvent))
-//     {
-//         Log::debug("[ConnectingState] Received event type: [{}]", typeid(event).name());
-//         Log::info("[ConnectingState] Processing connect failed event");
-//         Log::info("[ConnectingState] Transitioning back to [DisconnectedState]");
-//         return std::make_unique<DisconnectedState>(); 
-//     }
-//     return nullptr;
-// }
+#include "call_idle_state.h"
+#include "call_built_state.h"
+inline std::unique_ptr<AbstractState> CallingState::handleEvent(
+    AbstractSession* session, const AbstractEvent& event) {
+    if (typeid(event) == typeid(CallSuccessEvent))
+    {
+        Log::debug("[CallingState] Received event type: [{}]", typeid(event).name());
+        Log::info("[CallingState] Processing call success event");
+        Log::info("[CallingState] Transitioning to [CallBuiltState]");
+        return std::make_unique<CallBuiltState>(); 
+    }
+    else if (typeid(event) == typeid(CallFailedEvent))
+    {
+        Log::debug("[CallingState] Received event type: [{}]", typeid(event).name());
+        Log::info("[CallingState] Processing call failed event");
+        Log::info("[CallingState] Transitioning back to [CallIdleState]");
+        return std::make_unique<CallIdleState>(); 
+    }
+    return nullptr;
+}
 ========== ./src/business/call/state/call_idle_state.h ==========
-Lines: 40
+Lines: 53
 
 // src/business/connect/state/disconnected_state.h
 #pragma once
@@ -644,6 +832,9 @@ Lines: 40
 #include "../../../framework/session/abstract_session.h"
 #include "../../../framework/event/abstract_event.h"
 #include "../event/call_event.h"
+#include "../model/call_payload.h"
+#include "../command/call_command.h"
+#include "../receiver/call_receiver.h"
 
 class CallIdleState : public AbstractConnectState{
 public:
@@ -653,7 +844,7 @@ public:
 
     // 仅声明，实现移到类外（确保ConnectingState完整定义可见）
     std::unique_ptr<AbstractState> handleEvent(
-        AbstractSession* session, const AbstractEvent& event) override{}
+        AbstractSession* session, const AbstractEvent& event) override;
 
     void onExit(AbstractSession* session) override {
         Log::info("[CallIdleState] Exited call idle state.");
@@ -670,20 +861,34 @@ inline std::unique_ptr<AbstractState> CallIdleState::handleEvent(
         auto& callEvent = static_cast<const CallEvent&>(event);
         Log::info("[CallIdleState] Processing call event, peer_id: [{}]", 
                     callEvent.getPeerid());
+        CommandContext ctx;
+        auto now_timepoint = std::chrono::system_clock::now();
+        auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now_timepoint);
+        ctx.timestamp = static_cast<uint64_t>(now_ms.time_since_epoch().count());
+        ctx.set(CallPayload{
+            callEvent.getPeerid()
+        });
+        auto cmd = std::make_unique<CallCommand>(ctx);
+        cmd->addReceiver(std::make_shared<CallReceiver>());
+        session->getDispatcher()->postCommand(std::move(cmd));
 
         Log::info("[CallIdleState] Transitioning to [CallingState]");
         return std::make_unique<CallingState>(); 
     }
     return nullptr;
 }
+
 ========== ./src/business/call/session/call_session.h ==========
-Lines: 56
+Lines: 62
 
 #pragma once
 #include <vector>
 #include "../../../framework/session/abstract_session.h"
 #include "../../../utilities/log.h"
 #include "../state/call_idle_state.h"
+#include "../event/call_success_event.h"
+#include "../event/call_failed_event.h"
+#include "../event/call_send_event.h"
 class CallSession : public AbstractSession {
 public:
     explicit CallSession(AbstractCommandDispatcher* dispatcher) {
@@ -694,7 +899,10 @@ public:
     // 核心：声明我只关心 LoginEvent
     std::vector<std::type_index> eventTypes() const override {
         return {
-            // typeid(ConnectServerEvent),  
+            typeid(CallEvent),
+            typeid(CallSuccessEvent),
+            typeid(CallFailedEvent),
+            typeid(CallSendEvent)
             // typeid(ConnectSuccessEvent),
             // typeid(ConnectFailedEvent)
         };
@@ -736,6 +944,161 @@ public:
     }
 };
 
+========== ./src/business/call/command/call_built_command.h ==========
+Lines: 27
+
+#pragma once
+#include "../../../framework/command/abstract_command.h"
+
+
+class CallBuiltCommand : public AbstractCommand
+{
+public:
+    explicit CallBuiltCommand(CommandContext ctx)
+    {
+        m_context = std::move(ctx);
+    }
+
+    bool execute() override
+    {
+        for (auto& r : m_receivers)
+        {
+            r->performAction(m_context);
+        }
+        return true;
+    }
+
+    std::string getCommandType() const override
+    {
+        return "CallBuiltCommand";
+    };
+
+};
+========== ./src/business/call/command/call_send_command.h ==========
+Lines: 27
+
+#pragma once
+#include "../../../framework/command/abstract_command.h"
+
+
+class CallSendCommand : public AbstractCommand
+{
+public:
+    explicit CallSendCommand(CommandContext ctx)
+    {
+        m_context = std::move(ctx);
+    }
+
+    bool execute() override
+    {
+        for (auto& r : m_receivers)
+        {
+            r->performAction(m_context);
+        }
+        return true;
+    }
+
+    std::string getCommandType() const override
+    {
+        return "CallBuiltCommand";
+    };
+
+};
+========== ./src/business/call/command/call_command.h ==========
+Lines: 27
+
+#pragma once
+#include "../../../framework/command/abstract_command.h"
+
+
+class CallCommand : public AbstractCommand
+{
+public:
+    explicit CallCommand(CommandContext ctx)
+    {
+        m_context = std::move(ctx);
+    }
+
+    bool execute() override
+    {
+        for (auto& r : m_receivers)
+        {
+            r->performAction(m_context);
+        }
+        return true;
+    }
+
+    std::string getCommandType() const override
+    {
+        return "CallCommand";
+    };
+
+};
+========== ./src/business/call/event/call_success_event.h ==========
+Lines: 16
+
+#pragma once
+#include "../../../framework/event/abstract_event.h"
+
+
+class CallSuccessEvent : public AbstractEvent {
+public:
+
+    CallSuccessEvent()
+        {}
+
+
+private:
+
+};
+
+
+
+========== ./src/business/call/event/call_failed_event.h ==========
+Lines: 16
+
+#pragma once
+#include "../../../framework/event/abstract_event.h"
+
+
+class CallFailedEvent : public AbstractEvent {
+public:
+
+    CallFailedEvent(const std::string& peer_id)
+        {}
+
+
+private:
+
+};
+
+
+
+========== ./src/business/call/event/call_send_event.h ==========
+Lines: 21
+
+#pragma once
+#include <string>
+#include "../../../framework/event/abstract_event.h"
+
+
+class CallSendEvent : public AbstractEvent {
+public:
+
+    CallSendEvent(const std::string& msg)
+        :  m_msg(msg) {}
+
+    // 只读getter，保证事件数据不可变，线程安全
+    const std::string& getPeerid() const { return m_peer_id; }
+    const std::string& getMsg() const { return m_msg; }
+
+private:
+    const std::string m_peer_id;
+    const std::string m_msg;
+};
+
+
+
 ========== ./src/business/call/event/call_event.h ==========
 Lines: 19
 
@@ -744,7 +1107,7 @@ Lines: 19
 #include "../../../framework/event/abstract_event.h"
 
 
-class CallEvent : public AbstractCallState {
+class CallEvent : public AbstractEvent {
 public:
 
     CallEvent(const std::string& peer_id)
@@ -758,6 +1121,26 @@ private:
 };
 
 
+
+========== ./src/business/call/model/send_payload.h ==========
+Lines: 6
+
+#pragma once
+#include <string>
+struct SendPayload
+{
+    std::string msg;
+};
+
+========== ./src/business/call/model/call_payload.h ==========
+Lines: 6
+
+#pragma once
+#include <string>
+struct CallPayload
+{
+    std::string peerId;
+};
 
 ========== ./src/business/connect/receiver/connected_receiver.h ==========
 Lines: 27
@@ -1334,7 +1717,7 @@ public:
 };
 
 ========== ./src/adapter/websocket.cpp ==========
-Lines: 164
+Lines: 246
 
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -1343,10 +1726,38 @@ Lines: 164
 #include "../framework/event/event_bus.h"
 #include "../business/connect/event/connect_success_event.h"
 #include "../business/connect/event/connect_failed_event.h"
+#include "../business/call/event/call_success_event.h"
+#include "../business/call/event/call_failed_event.h"
+#include "utilities/log.h"
+
+void myCppLogCallback(rtc::LogLevel level, std::string message) {
+    switch (level) {
+    case rtc::LogLevel::Fatal:
+    case rtc::LogLevel::Error:
+        Log::error("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Warning:
+        Log::warn("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Info:
+        Log::info("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Debug:
+        Log::debug("[RTC] {}", message);
+        break;
+    case rtc::LogLevel::Verbose:
+        Log::trace("[RTC] {}", message);
+        break;
+    default:
+        Log::info("[RTC] {}", message);
+        break;
+    }
+}
 
 
 WebSocket::WebSocket() {
-    localId = "abcd";
+    rtc::InitLogger(rtc::LogLevel::Debug, myCppLogCallback);
+    localId = "abc1";
     rtc::Configuration config;
     ws = std::make_shared<rtc::WebSocket>();
     initCallbacks();
@@ -1440,6 +1851,50 @@ void WebSocket::onError(ErrorCallback cb) {
     errorCallback = cb;
 }
 
+void WebSocket::connect2Peer(const std::string& peerId){
+    auto pc = createPeerConnection(config, ws, peerId);
+    auto dc = pc->createDataChannel("test");
+    dc->onOpen([this,peerId, wdc = make_weak_ptr(dc)]() {
+    std::cout << "DataChannel from " << peerId << " open" << std::endl;
+        if (auto dc = wdc.lock())
+            dc->send("Hello from " + localId);
+            EventBus::GetInstance().publish(
+                std::make_unique<CallSuccessEvent>()
+                );
+    });
+
+    dc->onClosed([this,peerId]() { std::cout << "DataChannel from " << peerId << " closed" << std::endl; });
+
+    dc->onMessage([this,peerId, wdc = make_weak_ptr(dc)](auto data) {
+        // data holds either std::string or rtc::binary
+        if (std::holds_alternative<std::string>(data))
+        {            
+            std::cout << "Message from " << peerId << " received: " << std::get<std::string>(data)
+                    << std::endl;
+            Log::info("[WebSocket] Message from [{}] received: {}", peerId, std::get<std::string>(data));
+        }        
+        else
+        {   std::cout << "Binary message from " << peerId
+                            << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+            Log::info("[WebSocket] Binary message from [{}] received, size={}", peerId, std::get<rtc::binary>(data).size());
+        }    
+    });
+
+    dataChannelMap.emplace(peerId, dc);
+    m_peer_id = peerId;
+}
+
+
+void WebSocket::send2Peer(const std::string& peerId, const std::string& msg) {
+    auto it = dataChannelMap.find(m_peer_id);
+    if (it != dataChannelMap.end()) {
+        it->second->send(msg);
+        Log::info("[WebSocket] Sent message to [{}]: {}", m_peer_id, msg);
+    } else {
+        Log::warn("[WebSocket] No data channel found for peer [{}]", m_peer_id);
+    }
+}
+
 
 // Create and setup a PeerConnection
 std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::Configuration &config,
@@ -1479,21 +1934,31 @@ std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::
 		dc->onOpen([this, wdc = make_weak_ptr(dc)]() {
 			if (auto dc = wdc.lock())
 				dc->send("Hello from " + localId);
+            EventBus::GetInstance().publish(
+            std::make_unique<CallSuccessEvent>()
+            );
+
 		});
 
 		dc->onClosed([this, id]() { std::cout << "DataChannel from " << id << " closed" << std::endl; });
 
 		dc->onMessage([this, id](auto data) {
 			// data holds either std::string or rtc::binary
-			if (std::holds_alternative<std::string>(data))
-				std::cout << "Message from " << id << " received: " << std::get<std::string>(data)
-				          << std::endl;
-			else
-				std::cout << "Binary message from " << id
-				          << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+            if (std::holds_alternative<std::string>(data))
+            {            
+                std::cout << "Message from " << id << " received: " << std::get<std::string>(data)
+                        << std::endl;
+                Log::info("[WebSocket] Message from [{}] received: {}", id, std::get<std::string>(data));
+            }        
+            else
+            {   std::cout << "Binary message from " << id
+                                << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+                Log::info("[WebSocket] Binary message from [{}] received, size={}", id, std::get<rtc::binary>(data).size());
+            }   
 		});
 
 		dataChannelMap.emplace(id, dc);
+        m_peer_id = id;
 	});
 
 	peerConnectionMap.emplace(id, pc);
@@ -1502,13 +1967,16 @@ std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::
 
 
 ========== ./src/adapter/qt_ui.cpp ==========
-Lines: 42
+Lines: 72
 
 #include <string>
 #include "qt_ui.h"
 #include "ui_qt_ui.h"
 #include "../framework/event/event_bus.h"
 #include "../business/connect/event/connect_server_event.h"
+#include "../business/call/event/call_event.h"
+#include "../business/call/event/call_send_event.h"
+#include "../utilities/log.h"
 Qt_UI::Qt_UI(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Qt_UI)
@@ -1536,19 +2004,46 @@ void Qt_UI::slot_updateMessage(const QString &msg) {
 void Qt_UI::showUI() {
     this->show(); // 调用 QWidget 自带的 show() 方法
 }
-void Qt_UI::on_bt_connect_clicked()
-{
-    // EventBus::GetInstance().publish(
-    //     std::make_unique<ConnectServerEvent>("ws://120.79.210.6:8000/abcd")
-    //     );
-    QString qstr = ui->TxEd_peerId->toPlainText();
+void Qt_UI::on_bt_connect_clicked() {
+    // 1. 获取输入并转换
+    QString qstr = ui->TxEd_peerId->toPlainText().trimmed();
+    if (qstr.isEmpty()) {
+        showMessage("Error: Peer ID cannot be empty!");
+        return;
+    }
+    std::string peer_id = qstr.toStdString();
+
+    // 2. 清空输入框
     ui->TxEd_peerId->clear();
 
+    // 3. 发布CallEvent（传入实际的peerId）
+    Log::info("[Qt_UI] Start call to peer: [{}]", peer_id);
+    EventBus::GetInstance().publish(
+        std::make_unique<CallEvent>(peer_id) // 替换硬编码的URL
+    );
+}
+
+
+void Qt_UI::on_bt_send_clicked()
+{
+    QString qstr = ui->TxEdSendCtx->toPlainText().trimmed();
+    if (qstr.isEmpty()) {
+        showMessage("Error: Send content cannot be empty!");
+        return;
+    }
+    std::string msg = qstr.toStdString();
+
+    // 2. 清空输入框
+    ui->TxEd_peerId->clear();
+
+    EventBus::GetInstance().publish(
+        std::make_unique<CallSendEvent>( msg) // 替换硬编码的URL
+    );
 }
 
 
 ========== ./src/adapter/qt_ui.h ==========
-Lines: 31
+Lines: 33
 
 #ifndef QT_UI_H
 #define QT_UI_H
@@ -1576,6 +2071,8 @@ public:
 private slots:
     void on_bt_connect_clicked();
     void slot_updateMessage(const QString& msg);
+    void on_bt_send_clicked();
+
 private:
     Ui::Qt_UI *ui;
 };
@@ -1583,7 +2080,7 @@ private:
 #endif // QT_UI_H
 
 ========== ./src/adapter/websocket.h ==========
-Lines: 35
+Lines: 38
 
 #pragma once
 #include <memory>
@@ -1604,6 +2101,8 @@ public:
     void onClose(CloseCallback cb) override;
     void onError(ErrorCallback cb) override;
 
+    void connect2Peer(const std::string& peerId) override;
+    void send2Peer(const std::string& peerId, const std::string& msg) override;
 private:
     std::shared_ptr<rtc::PeerConnection> createPeerConnection(const rtc::Configuration &config,
                                                                     std::weak_ptr<rtc::WebSocket> wws, std::string id);
@@ -1611,6 +2110,7 @@ private:
     template <class T> std::weak_ptr<T> make_weak_ptr(std::shared_ptr<T> ptr) { return ptr; }
     std::unordered_map<std::string, std::shared_ptr<rtc::PeerConnection>> peerConnectionMap;
     std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> dataChannelMap;
+    std::string m_peer_id;
     std::shared_ptr<rtc::WebSocket> ws;
     rtc::Configuration config;
     MessageCallback messageCallback;
@@ -1622,7 +2122,7 @@ private:
 };
 
 ========== ./src/service/abstract_net.h ==========
-Lines: 24
+Lines: 27
 
 #pragma once
 #include <functional>
@@ -1647,6 +2147,9 @@ public:
     virtual void onOpen(OpenCallback cb) = 0;
     virtual void onClose(CloseCallback cb) = 0;
     virtual void onError(ErrorCallback cb) = 0;
+
+    virtual void connect2Peer(const std::string& peerId) =0;
+    virtual void send2Peer(const std::string& peerId, const std::string& msg) =0;
 };
 ========== ./src/service/abstract_ui.h ==========
 Lines: 9
@@ -2213,5 +2716,5 @@ private:
 };
 
 =====================================
-Total files: 52
-Total lines: 1924
+Total files: 64
+Total lines: 2366

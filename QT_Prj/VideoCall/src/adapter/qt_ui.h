@@ -24,6 +24,8 @@ public:
 private slots:
     void on_bt_connect_clicked();
     void slot_updateMessage(const QString& msg);
+    void on_bt_send_clicked();
+
 private:
     Ui::Qt_UI *ui;
 };

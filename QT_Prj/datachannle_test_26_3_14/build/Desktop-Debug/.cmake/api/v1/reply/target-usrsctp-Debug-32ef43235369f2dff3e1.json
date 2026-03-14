@@ -1,0 +1,645 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/libusrsctp.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"install",
+			"add_definitions",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"third_party/libdatachannel/deps/usrsctp/usrsctplib/CMakeLists.txt",
+			"third_party/libdatachannel/deps/usrsctp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 185,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 212,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 100,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 105,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 110,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 115,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 120,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 95,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 59,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 60,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 59,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 83,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 58,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 104,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 9
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -std=c99 -pedantic -Wall -Wextra -Wfloat-equal -Wshadow -Wpointer-arith -Wunreachable-code -Winit-self -Wno-unused-function -Wno-unused-parameter -Wno-unreachable-code -Wstrict-prototypes -Wno-address-of-packed-member -Wno-deprecated-declarations -g -fPIC -fcolor-diagnostics"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 4,
+					"define" : "HAVE_LINUX_IF_ADDR_H"
+				},
+				{
+					"backtrace" : 5,
+					"define" : "HAVE_LINUX_RTNETLINK_H"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "HAVE_NETINET_IP_ICMP_H"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "HAVE_NET_ROUTE_H"
+				},
+				{
+					"backtrace" : 8,
+					"define" : "HAVE_STDATOMIC_H"
+				},
+				{
+					"backtrace" : 9,
+					"define" : "HAVE_SYS_QUEUE_H"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "SCTP_DEBUG"
+				},
+				{
+					"backtrace" : 11,
+					"define" : "SCTP_PROCESS_LEVEL_LOCKS"
+				},
+				{
+					"backtrace" : 12,
+					"define" : "SCTP_SIMPLE_ALLOCATOR"
+				},
+				{
+					"backtrace" : 13,
+					"define" : "_GNU_SOURCE"
+				},
+				{
+					"backtrace" : 14,
+					"define" : "__Userspace__"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 15,
+					"path" : "/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/third_party/libdatachannel/deps/usrsctp/usrsctplib"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22
+			]
+		}
+	],
+	"id" : "usrsctp::@3f62a8bf8e3e6892184e",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 2,
+				"path" : "lib"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "/usr/local"
+		}
+	},
+	"name" : "usrsctp",
+	"nameOnDisk" : "libusrsctp.a",
+	"paths" : 
+	{
+		"build" : "third_party/libdatachannel/deps/usrsctp/usrsctplib",
+		"source" : "third_party/libdatachannel/deps/usrsctp/usrsctplib"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				56,
+				57,
+				58,
+				59,
+				60
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_asconf.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_auth.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_bsd_addr.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_callout.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_cc_functions.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_crc32.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_indata.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_input.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_output.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_pcb.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_peeloff.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_sha1.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_ss_functions.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_sysctl.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_timer.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_userspace.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_usrreq.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctputil.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet6/sctp6_usrreq.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_environment.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_mbuf.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_recv_thread.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_socket.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_atomic.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_environment.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_inpcb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_ip_icmp.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_ip6_var.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_malloc.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_mbuf.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_queue.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_recv_thread.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_route.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_socketvar.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/user_uma.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/usrsctp.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_asconf.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_auth.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_bsd_addr.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_callout.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_constants.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_crc32.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_header.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_indata.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_input.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_lock_userspace.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_os_userspace.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_os.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_output.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_pcb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_peeloff.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_process_lock.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_sha1.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_structs.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_sysctl.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_timer.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_uio.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp_var.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctputil.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet/sctp.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "third_party/libdatachannel/deps/usrsctp/usrsctplib/netinet6/sctp6_var.h",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

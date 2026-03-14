@@ -21,4 +21,7 @@ public:
     virtual void onOpen(OpenCallback cb) = 0;
     virtual void onClose(CloseCallback cb) = 0;
     virtual void onError(ErrorCallback cb) = 0;
+
+    virtual void connect2Peer(const std::string& peerId) =0;
+    virtual void send2Peer(const std::string& peerId, const std::string& msg) =0;
 };

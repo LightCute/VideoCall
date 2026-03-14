@@ -3,6 +3,9 @@
 #include "../../../framework/session/abstract_session.h"
 #include "../../../utilities/log.h"
 #include "../state/call_idle_state.h"
+#include "../event/call_success_event.h"
+#include "../event/call_failed_event.h"
+#include "../event/call_send_event.h"
 class CallSession : public AbstractSession {
 public:
     explicit CallSession(AbstractCommandDispatcher* dispatcher) {
@@ -13,7 +16,10 @@ public:
     // 核心：声明我只关心 LoginEvent
     std::vector<std::type_index> eventTypes() const override {
         return {
-            typeid(CallEvent)
+            typeid(CallEvent),
+            typeid(CallSuccessEvent),
+            typeid(CallFailedEvent),
+            typeid(CallSendEvent)
             // typeid(ConnectSuccessEvent),
             // typeid(ConnectFailedEvent)
         };

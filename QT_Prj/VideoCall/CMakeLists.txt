@@ -94,10 +94,22 @@ set(BUSINESS_CONNECT_SOURCES
 
 set(BUSINESS_CALL_SOURCES
     # 业务层 - 通话
+    src/business/call/receiver/call_built_receiver.h
+    src/business/call/receiver/call_receiver.h
+    src/business/call/receiver/call_send_receiver.h     # 新增
+    src/business/call/state/call_built_state.h
     src/business/call/state/call_idle_state.h
     src/business/call/state/calling_state.h
     src/business/call/session/call_session.h
+    src/business/call/command/call_built_command.h
+    src/business/call/command/call_command.h
+    src/business/call/command/call_send_command.h       # 新增
     src/business/call/event/call_event.h
+    src/business/call/event/call_failed_event.h
+    src/business/call/event/call_send_event.h           # 新增
+    src/business/call/event/call_success_event.h
+    src/business/call/model/call_payload.h
+    src/business/call/model/send_payload.h              # 新增
 )
 
 set(PROJECT_SOURCES

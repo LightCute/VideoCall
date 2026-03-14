@@ -5,9 +5,11 @@
 #include "../framework/event/event_bus.h"
 #include "../business/connect/event/connect_success_event.h"
 #include "../business/connect/event/connect_failed_event.h"
+#include "../business/call/event/call_success_event.h"
+#include "../business/call/event/call_failed_event.h"
 #include "utilities/log.h"
 
-void WebSocket::myCppLogCallback(rtc::LogLevel level, std::string message) {
+void myCppLogCallback(rtc::LogLevel level, std::string message) {
     switch (level) {
     case rtc::LogLevel::Fatal:
     case rtc::LogLevel::Error:
@@ -33,8 +35,8 @@ void WebSocket::myCppLogCallback(rtc::LogLevel level, std::string message) {
 
 
 WebSocket::WebSocket() {
-    //rtc::InitLogger(rtc::LogLevel::Verbose, this->myCppLogCallback);
-    localId = "abcd";
+    rtc::InitLogger(rtc::LogLevel::Debug, myCppLogCallback);
+    localId = "abc1";
     rtc::Configuration config;
     ws = std::make_shared<rtc::WebSocket>();
     initCallbacks();
@@ -130,7 +132,48 @@ void WebSocket::onError(ErrorCallback cb) {
 
 void WebSocket::connect2Peer(const std::string& peerId){
     auto pc = createPeerConnection(config, ws, peerId);
+    auto dc = pc->createDataChannel("test");
+    dc->onOpen([this,peerId, wdc = make_weak_ptr(dc)]() {
+    std::cout << "DataChannel from " << peerId << " open" << std::endl;
+        if (auto dc = wdc.lock())
+            dc->send("Hello from " + localId);
+            EventBus::GetInstance().publish(
+                std::make_unique<CallSuccessEvent>()
+                );
+    });
+
+    dc->onClosed([this,peerId]() { std::cout << "DataChannel from " << peerId << " closed" << std::endl; });
+
+    dc->onMessage([this,peerId, wdc = make_weak_ptr(dc)](auto data) {
+        // data holds either std::string or rtc::binary
+        if (std::holds_alternative<std::string>(data))
+        {            
+            std::cout << "Message from " << peerId << " received: " << std::get<std::string>(data)
+                    << std::endl;
+            Log::info("[WebSocket] Message from [{}] received: {}", peerId, std::get<std::string>(data));
+        }        
+        else
+        {   std::cout << "Binary message from " << peerId
+                            << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+            Log::info("[WebSocket] Binary message from [{}] received, size={}", peerId, std::get<rtc::binary>(data).size());
+        }    
+    });
+
+    dataChannelMap.emplace(peerId, dc);
+    m_peer_id = peerId;
 }
+
+
+void WebSocket::send2Peer(const std::string& peerId, const std::string& msg) {
+    auto it = dataChannelMap.find(m_peer_id);
+    if (it != dataChannelMap.end()) {
+        it->second->send(msg);
+        Log::info("[WebSocket] Sent message to [{}]: {}", m_peer_id, msg);
+    } else {
+        Log::warn("[WebSocket] No data channel found for peer [{}]", m_peer_id);
+    }
+}
+
 
 // Create and setup a PeerConnection
 std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::Configuration &config,
@@ -170,21 +213,31 @@ std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::
 		dc->onOpen([this, wdc = make_weak_ptr(dc)]() {
 			if (auto dc = wdc.lock())
 				dc->send("Hello from " + localId);
+            EventBus::GetInstance().publish(
+            std::make_unique<CallSuccessEvent>()
+            );
+
 		});
 
 		dc->onClosed([this, id]() { std::cout << "DataChannel from " << id << " closed" << std::endl; });
 
 		dc->onMessage([this, id](auto data) {
 			// data holds either std::string or rtc::binary
-			if (std::holds_alternative<std::string>(data))
-				std::cout << "Message from " << id << " received: " << std::get<std::string>(data)
-				          << std::endl;
-			else
-				std::cout << "Binary message from " << id
-				          << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+            if (std::holds_alternative<std::string>(data))
+            {            
+                std::cout << "Message from " << id << " received: " << std::get<std::string>(data)
+                        << std::endl;
+                Log::info("[WebSocket] Message from [{}] received: {}", id, std::get<std::string>(data));
+            }        
+            else
+            {   std::cout << "Binary message from " << id
+                                << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
+                Log::info("[WebSocket] Binary message from [{}] received, size={}", id, std::get<rtc::binary>(data).size());
+            }   
 		});
 
 		dataChannelMap.emplace(id, dc);
+        m_peer_id = id;
 	});
 
 	peerConnectionMap.emplace(id, pc);

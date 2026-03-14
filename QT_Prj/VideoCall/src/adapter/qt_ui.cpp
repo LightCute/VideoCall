@@ -4,6 +4,8 @@
 #include "../framework/event/event_bus.h"
 #include "../business/connect/event/connect_server_event.h"
 #include "../business/call/event/call_event.h"
+#include "../business/call/event/call_send_event.h"
+#include "../utilities/log.h"
 Qt_UI::Qt_UI(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Qt_UI)
@@ -47,6 +49,24 @@ void Qt_UI::on_bt_connect_clicked() {
     Log::info("[Qt_UI] Start call to peer: [{}]", peer_id);
     EventBus::GetInstance().publish(
         std::make_unique<CallEvent>(peer_id) // 替换硬编码的URL
+    );
+}
+
+
+void Qt_UI::on_bt_send_clicked()
+{
+    QString qstr = ui->TxEdSendCtx->toPlainText().trimmed();
+    if (qstr.isEmpty()) {
+        showMessage("Error: Send content cannot be empty!");
+        return;
+    }
+    std::string msg = qstr.toStdString();
+
+    // 2. 清空输入框
+    ui->TxEd_peerId->clear();
+
+    EventBus::GetInstance().publish(
+        std::make_unique<CallSendEvent>( msg) // 替换硬编码的URL
     );
 }
 

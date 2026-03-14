@@ -1,0 +1,1 @@
+/usr/bin/clang++-18 -DQT_QML_DEBUG -g -Xlinker --dependency-file=CMakeFiles/datachannel-copy-paste-answerer.dir/link.d "CMakeFiles/datachannel-copy-paste-answerer.dir/answerer.cpp.o" -o answerer  -Wl,-rpath,/home/light/work/Video_Prj/QT_Prj/datachannle_test_26_3_14/build/Desktop-Debug/third_party/libdatachannel ../../libdatachannel.so.0.24.1

@@ -514,4 +514,7 @@ CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o: \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/connect_success_event.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/../../../framework/event/abstract_event.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/connect/event/connect_failed_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/call/event/call_success_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/call/event/../../../framework/event/abstract_event.h \
+  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/../business/call/event/call_failed_event.h \
   /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h

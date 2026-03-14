@@ -14,8 +14,20 @@
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_built_command.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_command.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_send_command.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_failed_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_send_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_success_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/call_payload.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/send_payload.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_built_receiver.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_receiver.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_send_receiver.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_built_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/command/connect_command.h
@@ -819,6 +831,9 @@ CMakeFiles/VideoCall.dir/main.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_failed_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_send_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_success_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/command_context.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/session/abstract_session.h
@@ -827,9 +842,14 @@ CMakeFiles/VideoCall.dir/main.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/state/abstract_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_command.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_built_command.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_command.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/command/call_send_command.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_failed_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_send_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_success_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/call_payload.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/application/app_context.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/command/abstract_receiver.h
@@ -839,7 +859,11 @@ CMakeFiles/VideoCall.dir/main.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_ui.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/call_payload.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/model/send_payload.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_built_receiver.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_receiver.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/receiver/call_send_receiver.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_built_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/call_idle_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/state/calling_state.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/session/call_session.h
@@ -1460,6 +1484,7 @@ CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/build/Desktop-Debug/VideoCall_autogen/include/ui_qt_ui.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_send_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_server_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/blocking_queue.h
@@ -1469,6 +1494,7 @@ CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_bus.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/event_router.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/service/abstract_ui.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/utilities/log.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/qt_ui.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/async.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/third_party/spdlog/include/spdlog/async_logger-inl.h
@@ -1994,6 +2020,9 @@ CMakeFiles/VideoCall.dir/src/adapter/qt_ui.cpp.o
 
 CMakeFiles/VideoCall.dir/src/adapter/websocket.cpp.o
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/adapter/websocket.cpp
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_failed_event.h
+ /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/call/event/call_success_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/framework/event/abstract_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_failed_event.h
  /home/light/work/Video_Prj/QT_Prj/VideoCall/src/business/connect/event/connect_success_event.h
