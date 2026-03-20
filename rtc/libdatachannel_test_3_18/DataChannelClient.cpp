@@ -103,8 +103,26 @@ void DataChannelClient::callPeer(const std::string& peerId) {
     Log::info("[DataChannelClient] Offering to {}", peerId);
     auto pc = createPeerConnection(m_ws, peerId);
 
-    auto video = rtc::Description::Video("video-stream", rtc::Description::Direction::SendRecv);
-    auto track = pc->addTrack(video);
+    auto it_client = m_clients.find(peerId);
+    if (it_client == m_clients.end()) {
+        Log::error("[DataChannelClient] Failed to find or create Client for peer {}", peerId);
+        return;
+    }
+    auto client = it_client->second;
+    // 生成唯一 SSRC（可以用你的 generateUniqueSSRC 函数）
+    uint32_t videoSsrc = generateUniqueSSRC(peerId + "_video");
+    uint32_t audioSsrc = generateUniqueSSRC(peerId + "_audio");
+
+    
+    auto videoTrackData = addVideo(pc, 102, videoSsrc, "video-stream", "stream-" + peerId, 
+    [this, peerId, wc = make_weak_ptr(client)]() {
+        m_MainThread.dispatch([this, wc, peerId]() {
+            if (auto c = wc.lock()) {
+                addToStream(c, true); // 复用 Example 的状态管理
+            }
+        });
+        Log::info("[DataChannelClient] Video track for {} is open", peerId);
+    });
 
     const std::string label = "test";
     Log::info("[DataChannelClient] Creating DataChannel with label \"{}\"", label);
@@ -138,16 +156,12 @@ void DataChannelClient::callPeer(const std::string& peerId) {
         }
     });
 
-    auto it = m_clients.find(peerId);
-    if (it != m_clients.end()) {
-        it->second->dataChannel = dc; // 直接设置已有 Client 的 dataChannel
-    } else {
-        // 理论上不应该走到这里，因为 createPeerConnection 已经创建了
-        auto client = std::make_shared<Client>(pc);
+    {
+        client->video = videoTrackData;
         client->dataChannel = dc;
-        m_clients.emplace(peerId, client);
     }
 }
+
 
 void DataChannelClient::sendMessage(const std::string& peerId, const std::string& message) {
     auto it = m_clients.find(peerId);
@@ -251,14 +265,48 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         if (auto ws = wws.lock()) ws->send(message.dump());
     });
 
-    pc->onTrack([this, id](std::shared_ptr<rtc::Track> track) {
-        Log::info("[PeerConnection] [{}] Received track: {}", 
-            id, track->mid());        
-                  
-        // track->receive([this, id](rtc::binary data, uint32_t timestamp) {
-        //     Log::info("[DataChannelClient] Received video frame from {}, size: {}, timestamp: {}", id, data.size(), timestamp);
-        //     // 在此添加解码和显示逻辑（如FFmpeg/Qt渲染）
-        // });
+    pc->onTrack([this, id, weak_pc = std::weak_ptr<rtc::PeerConnection>(pc)](std::shared_ptr<rtc::Track> track) {
+        Log::info("[PeerConnection] [{}] Received track, mid: {}", 
+            id, track->mid());
+
+        // 2. 线程安全地保存 Track 到 Client
+        auto it_client = m_clients.find(id);
+        if (it_client == m_clients.end()) {
+            Log::error("[PeerConnection] [{}] Client not found for incoming track", id);
+            return;
+        }
+        auto client = it_client->second;
+
+        client->recvVideo = track;
+        Log::info("[PeerConnection] [{}] Saved incoming VIDEO track to Client", id);
+
+        // 3. 设置 Track 的回调（关键！）
+        // 3.1 Track 打开回调
+        track->onOpen([this, id, weak_client = std::weak_ptr<Client>(client)]() {
+            Log::info("[PeerConnection] [{}] Incoming track opened", id);            
+            // (可选) 在这里可以通知 UI 或更新状态
+            m_MainThread.dispatch([weak_client]() {
+                if (auto c = weak_client.lock()) {
+                    // 例如：更新 Client 状态或触发 UI 刷新
+                }
+            });
+        });
+
+        // 3.2 Track 关闭回调
+        track->onClosed([this, id]() {
+            Log::info("[PeerConnection] [{}] Incoming track closed", id);
+            // (可选) 在这里可以通知 UI 或更新状态
+        });
+
+        // 3.3 ✅ 核心：媒体数据接收回调（在这里处理解码/渲染）
+        track->onFrame([this, id, weak_client = std::weak_ptr<Client>(client)]
+                      (rtc::binary data, rtc::FrameInfo info) {
+            Log::debug("[PeerConnection] [{}] Received frame, size: {}, timestamp: {}", 
+                       id, data.size(), info.timestamp);
+
+        });
+
+
     });
 
     pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {

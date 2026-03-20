@@ -34,8 +34,14 @@ struct Client {
     explicit Client(std::shared_ptr<rtc::PeerConnection> pc) 
         : peerConnection(std::move(pc)) {}
     
+
+    // ------------------- 发送用（原有，保持不变）-------------------
     std::optional<std::shared_ptr<ClientTrackData>> video;
     std::optional<std::shared_ptr<ClientTrackData>> audio;
+    
+    // ------------------- 接收用（新增）-------------------
+    std::optional<std::shared_ptr<rtc::Track>> recvVideo;
+    std::optional<std::shared_ptr<rtc::Track>> recvAudio;
     std::optional<std::shared_ptr<rtc::DataChannel>> dataChannel;
 
     void setState(State state);
