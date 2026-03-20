@@ -1,0 +1,32 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  )
+
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/ArgParser.cpp" "CMakeFiles/datachannel_test_3_18.dir/ArgParser.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/ArgParser.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/DataChannelClient.cpp" "CMakeFiles/datachannel_test_3_18.dir/DataChannelClient.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/DataChannelClient.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/dispatchqueue.cpp" "CMakeFiles/datachannel_test_3_18.dir/dispatchqueue.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/dispatchqueue.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/fileparser.cpp" "CMakeFiles/datachannel_test_3_18.dir/fileparser.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/fileparser.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/h264fileparser.cpp" "CMakeFiles/datachannel_test_3_18.dir/h264fileparser.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/h264fileparser.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/helpers.cpp" "CMakeFiles/datachannel_test_3_18.dir/helpers.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/helpers.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/main.cpp" "CMakeFiles/datachannel_test_3_18.dir/main.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/main.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/opusfileparser.cpp" "CMakeFiles/datachannel_test_3_18.dir/opusfileparser.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/opusfileparser.cpp.o.d"
+  "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_18/stream.cpp" "CMakeFiles/datachannel_test_3_18.dir/stream.cpp.o" "gcc" "CMakeFiles/datachannel_test_3_18.dir/stream.cpp.o.d"
+  "" "datachannel_test_3_18" "gcc" "CMakeFiles/datachannel_test_3_18.dir/link.d"
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

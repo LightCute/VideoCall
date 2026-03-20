@@ -1,0 +1,68 @@
+[2026-03-20 10:11:15.853] [814280] [info] [DataChannelClient] Starting, thread id: [136507007881856]
+[2026-03-20 10:11:15.853] [814280] [info] [DataChannelClient] Local ID generated: wPR5
+[2026-03-20 10:11:15.856] [814280] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
+[2026-03-20 10:11:15.856] [814280] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
+[2026-03-20 10:11:15.857] [814291] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
+[2026-03-20 10:11:15.865] [814280] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
+[2026-03-20 10:11:15.865] [814280] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
+[2026-03-20 10:11:15.865] [814280] [info] [WebSocket] Waiting for signaling connection...
+[2026-03-20 10:11:15.866] [814284] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
+[2026-03-20 10:11:15.866] [814284] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
+[2026-03-20 10:11:15.942] [814291] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
+[2026-03-20 10:11:15.943] [814291] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
+[2026-03-20 10:11:15.943] [814291] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
+[2026-03-20 10:11:15.977] [814291] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
+[2026-03-20 10:11:15.978] [814291] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
+[2026-03-20 10:11:15.978] [814291] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
+[2026-03-20 10:11:15.978] [814291] [info] [WebSocket] WebSocket connected, signaling ready
+[2026-03-20 10:11:15.978] [814280] [info] [WebSocket] Waiting for signaling connected...
+[2026-03-20 10:11:15.978] [814280] [info] [Main] Local ID: wPR5
+[2026-03-20 10:11:15.978] [814280] [info] [Main] You can enter a peer ID to call, or wait for incoming connections.
+[2026-03-20 10:11:25.633] [814280] [info] [DataChannelClient] Offering to NW9i
+[2026-03-20 10:11:25.633] [814286] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
+[2026-03-20 10:11:25.633] [814280] [info] [PeerConnection] Created PC for peer: NW9i
+[2026-03-20 10:11:25.634] [814280] [info] [DataChannelClient] Creating DataChannel with label "test"
+[2026-03-20 10:11:25.634] [814280] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
+[2026-03-20 10:11:25.634] [814280] [info] [RTC] rtc::impl::IceTransport::IceTransport@109: Using STUN server "stun.l.google.com:19302"
+[2026-03-20 10:11:25.635] [814280] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@1026: Adding application to local description, mid="0"
+[2026-03-20 10:11:25.636] [814280] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-local-offer
+[2026-03-20 10:11:25.636] [814280] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to in-progress
+[2026-03-20 10:11:25.636] [814280] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to gathering
+[2026-03-20 10:11:25.636] [814289] [info] [PeerConnection] [NW9i] Generated local offer: 445 bytes
+[2026-03-20 10:11:25.636] [814289] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=524
+[2026-03-20 10:11:25.637] [814289] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 2890659301 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 18:84:17:61:DA:CA:70:C2:1C:81:5F:7C:E1:18:BA:B0:E6:34:23:A9:0B:E9:DD:45:6D:A4:67:34:D2:BE:33:A7\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:actpass\r\na=ice-ufrag:plEz[2026-03-20 10:11:09.178] [814214] [info] [DataChannelClient] Starting, thread id: [125903763317376]
+[2026-03-20 10:11:09.178] [814214] [info] [DataChannelClient] Local ID generated: NW9i
+[2026-03-20 10:11:09.181] [814214] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
+[2026-03-20 10:11:09.181] [814214] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
+[2026-03-20 10:11:09.183] [814227] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
+[2026-03-20 10:11:09.190] [814214] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
+[2026-03-20 10:11:09.190] [814214] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
+[2026-03-20 10:11:09.190] [814214] [info] [WebSocket] Waiting for signaling connection...
+[2026-03-20 10:11:09.191] [814221] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
+[2026-03-20 10:11:09.191] [814221] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
+[2026-03-20 10:11:09.212] [814227] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
+[2026-03-20 10:11:09.212] [814227] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
+[2026-03-20 10:11:09.212] [814227] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
+[2026-03-20 10:11:09.234] [814227] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
+[2026-03-20 10:11:09.234] [814227] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
+[2026-03-20 10:11:09.234] [814227] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
+[2026-03-20 10:11:09.234] [814227] [info] [WebSocket] WebSocket connected, signaling ready
+[2026-03-20 10:11:09.235] [814214] [info] [WebSocket] Waiting for signaling connected...
+[2026-03-20 10:11:09.235] [814214] [info] [Main] Local ID: NW9i
+[2026-03-20 10:11:09.235] [814214] [info] [Main] You can enter a peer ID to call, or wait for incoming connections.
+[2026-03-20 10:11:19.245] [814227] [debug] [RTC] rtc::impl::WsTransport::incoming@145: WebSocket sending ping
+[2026-03-20 10:11:19.245] [814227] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=9, length=4
+[2026-03-20 10:11:19.266] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=10, length=4
+[2026-03-20 10:11:19.266] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@353: WebSocket received pong
+[2026-03-20 10:11:25.673] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=529
+[2026-03-20 10:11:25.673] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=529
+[2026-03-20 10:11:25.674] [814227] [info] [WebSocket] Answering to wPR5
+[2026-03-20 10:11:25.675] [814227] [info] [PeerConnection] Created PC for peer: wPR5
+[2026-03-20 10:11:25.675] [814222] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
+[2026-03-20 10:11:25.676] [814227] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
+[2026-03-20 10:11:25.676] [814227] [info] [RTC] rtc::impl::IceTransport::IceTransport@109: Using STUN server "stun.l.google.com:19302"
+[2026-03-20 10:11:25.676] [814227] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-remote-offer
+[2026-03-20 10:11:25.741] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=125
+[2026-03-20 10:11:25.741] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=125
+[2026-03-20 10:11:25.742] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=120
+[2026-03-20 10:11:25.742] [814227] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text,
