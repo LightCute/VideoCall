@@ -266,6 +266,11 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         client->recvVideo = track;
         Log::info("[PeerConnection] [{}] Saved incoming VIDEO track to Client", id);
 
+
+        Log::warn("[PeerConnection] [{}] Setting up H264RtpDepacketizer...", id);
+        auto depacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
+        track->setMediaHandler(depacketizer);
+        Log::warn("[PeerConnection] [{}] Depacketizer is set.", id);
         // 3. 设置 Track 的回调（关键！）
         // 3.1 Track 打开回调
         track->onOpen([this, id, weak_client = std::weak_ptr<Client>(client)]() {
