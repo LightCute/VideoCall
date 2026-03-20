@@ -1,15 +1,15 @@
 #----------------------------------------------------------------
-# Generated CMake target import file.
+# Generated CMake target import file for configuration "Debug".
 #----------------------------------------------------------------
 
 # Commands may need to know the format version.
 set(CMAKE_IMPORT_FILE_VERSION 1)
 
-# Import target "LibDataChannel::LibDataChannel" for configuration ""
-set_property(TARGET LibDataChannel::LibDataChannel APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
+# Import target "LibDataChannel::LibDataChannel" for configuration "Debug"
+set_property(TARGET LibDataChannel::LibDataChannel APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
 set_target_properties(LibDataChannel::LibDataChannel PROPERTIES
-  IMPORTED_LOCATION_NOCONFIG "${_IMPORT_PREFIX}/lib/libdatachannel.so.0.24.1"
-  IMPORTED_SONAME_NOCONFIG "libdatachannel.so.0.24"
+  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/lib/libdatachannel.so.0.24.1"
+  IMPORTED_SONAME_DEBUG "libdatachannel.so.0.24"
   )
 
 list(APPEND _cmake_import_check_targets LibDataChannel::LibDataChannel )

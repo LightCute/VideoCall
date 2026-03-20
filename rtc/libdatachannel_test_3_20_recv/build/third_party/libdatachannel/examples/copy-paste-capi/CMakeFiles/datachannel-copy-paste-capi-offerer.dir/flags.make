@@ -6,5 +6,5 @@ C_DEFINES = -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1
 
 C_INCLUDES = -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include
 
-C_FLAGS = -std=gnu11 -fPIE
+C_FLAGS = -g -std=gnu11 -fPIE
 

@@ -64,12 +64,12 @@ set(STREAMER_UWP_RESOURCES
 
 # ===================== 可执行文件 =====================
 # 普通控制台可执行程序（无Qt的MACOSX/WIN32打包）
-add_executable(datachannel_test_3_18
+add_executable(datachannel_test_3_20_recv
     ${PROJECT_SOURCES}
 )
 
 # ===================== 链接依赖 =====================
-target_link_libraries(datachannel_test_3_18 PRIVATE
+target_link_libraries(datachannel_test_3_20_recv PRIVATE
     LibDataChannel::LibDataChannel  # LibDataChannel核心库
     Threads::Threads                # 线程库（必须）
     nlohmann_json::nlohmann_json    # JSON库（代码中用到，删除则注释）
@@ -78,7 +78,7 @@ target_link_libraries(datachannel_test_3_18 PRIVATE
 
 # ===================== 安装配置（可选精简） =====================
 include(GNUInstallDirs)
-install(TARGETS datachannel_test_3_18
+install(TARGETS datachannel_test_3_20_recv
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}  # 可执行文件安装路径
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}  # 库文件（若有）
 )

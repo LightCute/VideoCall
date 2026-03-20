@@ -1,15 +1,15 @@
 #----------------------------------------------------------------
-# Generated CMake target import file.
+# Generated CMake target import file for configuration "Debug".
 #----------------------------------------------------------------
 
 # Commands may need to know the format version.
 set(CMAKE_IMPORT_FILE_VERSION 1)
 
-# Import target "LibJuice::LibJuice" for configuration ""
-set_property(TARGET LibJuice::LibJuice APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
+# Import target "LibJuice::LibJuice" for configuration "Debug"
+set_property(TARGET LibJuice::LibJuice APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
 set_target_properties(LibJuice::LibJuice PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_NOCONFIG "C"
-  IMPORTED_LOCATION_NOCONFIG "${_IMPORT_PREFIX}/lib/libjuice.a"
+  IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
+  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/lib/libjuice.a"
   )
 
 list(APPEND _cmake_import_check_targets LibJuice::LibJuice )

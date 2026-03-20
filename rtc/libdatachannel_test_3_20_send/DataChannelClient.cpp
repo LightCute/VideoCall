@@ -404,7 +404,7 @@ std::shared_ptr<ClientTrackData> DataChannelClient::addVideo(const std::shared_p
     const std::string cname, 
     const std::string msid, 
     const std::function<void (void)> onOpen) {
-    auto video = rtc::Description::Video(cname, rtc::Description::Direction::SendRecv);
+    auto video = rtc::Description::Video(cname, rtc::Description::Direction::SendOnly);
     video.addH264Codec(payloadType);
     video.addSSRC(ssrc, cname, msid, cname);
     auto track = pc->addTrack(video);

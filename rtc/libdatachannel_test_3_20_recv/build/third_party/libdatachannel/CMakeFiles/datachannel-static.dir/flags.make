@@ -6,5 +6,5 @@ CXX_DEFINES = -DJUICE_STATIC -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1 -DRTC
 
 CXX_INCLUDES = -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include/rtc -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/src -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/usrsctp/usrsctplib -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/plog/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libsrtp/crypto/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libsrtp/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libjuice/include
 
-CXX_FLAGS = -std=gnu++17 -fPIC -Wall -Wextra
+CXX_FLAGS = -g -std=gnu++17 -fPIC -Wall -Wextra
 

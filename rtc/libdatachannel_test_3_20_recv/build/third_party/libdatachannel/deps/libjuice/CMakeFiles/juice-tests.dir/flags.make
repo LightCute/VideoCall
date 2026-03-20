@@ -6,5 +6,5 @@ C_DEFINES = -DJUICE_STATIC
 
 C_INCLUDES = -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libjuice/src -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libjuice/include/juice -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libjuice/include
 
-C_FLAGS = -std=gnu11 -fPIE
+C_FLAGS = -g -std=gnu11 -fPIE
 

@@ -1,1 +1,1 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/datachannel-media-sender.dir/link.d "CMakeFiles/datachannel-media-sender.dir/main.cpp.o" -o media-sender  -Wl,-rpath,/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/build/third_party/libdatachannel ../../libdatachannel.so.0.24.1
+/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/datachannel-media-sender.dir/link.d "CMakeFiles/datachannel-media-sender.dir/main.cpp.o" -o media-sender  -Wl,-rpath,/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/build/third_party/libdatachannel ../../libdatachannel.so.0.24.1

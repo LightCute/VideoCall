@@ -63,12 +63,12 @@ CMAKE_BINARY_DIR = /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/datachannel_test_3_18.dir/all
+all: CMakeFiles/datachannel_test_3_20_send.dir/all
 all: third_party/libdatachannel/all
 .PHONY : all
 
 # The main recursive "codegen" target.
-codegen: CMakeFiles/datachannel_test_3_18.dir/codegen
+codegen: CMakeFiles/datachannel_test_3_20_send.dir/codegen
 codegen: third_party/libdatachannel/codegen
 .PHONY : codegen
 
@@ -77,7 +77,7 @@ preinstall: third_party/libdatachannel/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/datachannel_test_3_18.dir/clean
+clean: CMakeFiles/datachannel_test_3_20_send.dir/clean
 clean: third_party/libdatachannel/clean
 .PHONY : clean
 
@@ -447,36 +447,36 @@ third_party/libdatachannel/examples/streamer/clean: third_party/libdatachannel/e
 .PHONY : third_party/libdatachannel/examples/streamer/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/datachannel_test_3_18.dir
+# Target rules for target CMakeFiles/datachannel_test_3_20_send.dir
 
 # All Build rule for target.
-CMakeFiles/datachannel_test_3_18.dir/all: third_party/libdatachannel/CMakeFiles/datachannel.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_18.dir/build.make CMakeFiles/datachannel_test_3_18.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_18.dir/build.make CMakeFiles/datachannel_test_3_18.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/build/CMakeFiles --progress-num=53,54,55 "Built target datachannel_test_3_18"
-.PHONY : CMakeFiles/datachannel_test_3_18.dir/all
+CMakeFiles/datachannel_test_3_20_send.dir/all: third_party/libdatachannel/CMakeFiles/datachannel.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_send.dir/build.make CMakeFiles/datachannel_test_3_20_send.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_send.dir/build.make CMakeFiles/datachannel_test_3_20_send.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/build/CMakeFiles --progress-num=53,54,55 "Built target datachannel_test_3_20_send"
+.PHONY : CMakeFiles/datachannel_test_3_20_send.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/datachannel_test_3_18.dir/rule: cmake_check_build_system
+CMakeFiles/datachannel_test_3_20_send.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/build/CMakeFiles 44
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/datachannel_test_3_18.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/datachannel_test_3_20_send.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/build/CMakeFiles 0
-.PHONY : CMakeFiles/datachannel_test_3_18.dir/rule
+.PHONY : CMakeFiles/datachannel_test_3_20_send.dir/rule
 
 # Convenience name for target.
-datachannel_test_3_18: CMakeFiles/datachannel_test_3_18.dir/rule
-.PHONY : datachannel_test_3_18
+datachannel_test_3_20_send: CMakeFiles/datachannel_test_3_20_send.dir/rule
+.PHONY : datachannel_test_3_20_send
 
 # codegen rule for target.
-CMakeFiles/datachannel_test_3_18.dir/codegen:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_18.dir/build.make CMakeFiles/datachannel_test_3_18.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/build/CMakeFiles --progress-num=53,54,55 "Finished codegen for target datachannel_test_3_18"
-.PHONY : CMakeFiles/datachannel_test_3_18.dir/codegen
+CMakeFiles/datachannel_test_3_20_send.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_send.dir/build.make CMakeFiles/datachannel_test_3_20_send.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/build/CMakeFiles --progress-num=53,54,55 "Finished codegen for target datachannel_test_3_20_send"
+.PHONY : CMakeFiles/datachannel_test_3_20_send.dir/codegen
 
 # clean rule for target.
-CMakeFiles/datachannel_test_3_18.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_18.dir/build.make CMakeFiles/datachannel_test_3_18.dir/clean
-.PHONY : CMakeFiles/datachannel_test_3_18.dir/clean
+CMakeFiles/datachannel_test_3_20_send.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_send.dir/build.make CMakeFiles/datachannel_test_3_20_send.dir/clean
+.PHONY : CMakeFiles/datachannel_test_3_20_send.dir/clean
 
 #=============================================================================
 # Target rules for target third_party/libdatachannel/CMakeFiles/datachannel.dir

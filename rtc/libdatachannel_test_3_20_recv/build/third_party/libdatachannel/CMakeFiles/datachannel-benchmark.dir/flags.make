@@ -6,5 +6,5 @@ CXX_DEFINES = -DBENCHMARK_MAIN=1 -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1
 
 CXX_INCLUDES = -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/src -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include
 
-CXX_FLAGS = -std=gnu++17 -fPIE
+CXX_FLAGS = -g -std=gnu++17 -fPIE
 
