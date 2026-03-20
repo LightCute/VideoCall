@@ -1,173 +1,171 @@
-[2026-03-20 14:09:10.294] [952123] [info] [DataChannelClient] Starting, thread id: [124281823904384]
-[2026-03-20 14:09:10.294] [952123] [info] [DataChannelClient] Local ID generated: gbsH
-[2026-03-20 14:09:10.296] [952123] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
-[2026-03-20 14:09:10.296] [952123] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
-[2026-03-20 14:09:10.298] [952133] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
-[2026-03-20 14:09:10.307] [952123] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
-[2026-03-20 14:09:10.307] [952123] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
-[2026-03-20 14:09:10.307] [952123] [info] [WebSocket] Waiting for signaling connection...
-[2026-03-20 14:09:10.308] [952126] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
-[2026-03-20 14:09:10.308] [952127] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
-[2026-03-20 14:09:10.329] [952133] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
-[2026-03-20 14:09:10.329] [952133] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
-[2026-03-20 14:09:10.329] [952133] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
-[2026-03-20 14:09:10.355] [952133] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
-[2026-03-20 14:09:10.355] [952133] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
-[2026-03-20 14:09:10.355] [952133] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
-[2026-03-20 14:09:10.355] [952133] [info] [WebSocket] WebSocket connected, signaling ready
-[2026-03-20 14:09:10.355] [952123] [info] [WebSocket] Waiting for signaling connected...
-[2026-03-20 14:09:10.355] [952123] [info] [Main] Local ID: gbsH
-[2026-03-20 14:09:10.355] [952123] [info] [Main] You can enter a peer ID to call, or wait for incoming connections.
-[2026-03-20 14:09:13.226] [952123] [info] [DataChannelClient] Offering to 8QIj
-[2026-03-20 14:09:13.227] [952123] [info] [PeerConnection] Created PC for peer: 8QIj
-[2026-03-20 14:09:13.227] [952128] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
-[2026-03-20 14:09:13.228] [952123] [info] [DataChannelClient] Creating DataChannel with label "test"
-[2026-03-20 14:09:13.228] [952123] [debug] [RTC] rtc::impl::PeerConnection::negotiationNeeded@1201: Negotiation needed for data channels
-[2026-03-20 14:09:13.228] [952123] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
-[2026-03-20 14:09:13.228] [952123] [info] [RTC] rtc::impl::IceTransport::IceTransport@109: Using STUN server "stun.l.google.com:19302"
-[2026-03-20 14:09:13.229] [952123] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@1006: Adding media to local description, mid="video-stream", removed=false
-[2026-03-20 14:09:13.229] [952123] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@1026: Adding application to local description, mid="0"
-[2026-03-20 14:09:13.238] [952123] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-local-offer
-[2026-03-20 14:09:13.238] [952123] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to in-progress
-[2026-03-20 14:09:13.238] [952123] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to gathering
-[2026-03-20 14:09:13.239] [952131] [info] [PeerConnection] [8QIj] Generated local offer: 644 bytes
-[2026-03-20 14:09:13.239] [952131] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=741
-[2026-03-20 14:09:13.239] [952131] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 1761718792 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE video-stream 0\r\na=group:LS video-stream\r\na=ms[2026-03-20 14:09:03.355] [952052] [info] [DataChannelClient] Starting, thread id: [137065435411072]
-[2026-03-20 14:09:03.355] [952052] [info] [DataChannelClient] Local ID generated: 8QIj
-[2026-03-20 14:09:03.360] [952052] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
-[2026-03-20 14:09:03.360] [952052] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
-[2026-03-20 14:09:03.362] [952062] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
-[2026-03-20 14:09:03.373] [952052] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
-[2026-03-20 14:09:03.374] [952052] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
-[2026-03-20 14:09:03.374] [952052] [info] [WebSocket] Waiting for signaling connection...
-[2026-03-20 14:09:03.374] [952055] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
-[2026-03-20 14:09:03.374] [952055] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
-[2026-03-20 14:09:03.392] [952062] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
-[2026-03-20 14:09:03.392] [952062] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
-[2026-03-20 14:09:03.392] [952062] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
-[2026-03-20 14:09:03.411] [952062] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
-[2026-03-20 14:09:03.411] [952062] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
-[2026-03-20 14:09:03.411] [952062] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
-[2026-03-20 14:09:03.411] [952062] [info] [WebSocket] WebSocket connected, signaling ready
-[2026-03-20 14:09:03.411] [952052] [info] [WebSocket] Waiting for signaling connected...
-[2026-03-20 14:09:03.411] [952052] [info] [Main] Local ID: 8QIj
-[2026-03-20 14:09:03.411] [952052] [info] [Main] You can enter a peer ID to call, or wait for incoming connections.
-[2026-03-20 14:09:13.260] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=746
-[2026-03-20 14:09:13.260] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=746
-[2026-03-20 14:09:13.261] [952062] [info] [WebSocket] Answering to gbsH
-[2026-03-20 14:09:13.261] [952062] [info] [PeerConnection] Created PC for peer: gbsH
-[2026-03-20 14:09:13.262] [952057] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
-[2026-03-20 14:09:13.262] [952062] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
-[2026-03-20 14:09:13.263] [952062] [info] [RTC] rtc::impl::IceTransport::IceTransport@109: Using STUN server "stun.l.google.com:19302"
-[2026-03-20 14:09:13.263] [952062] [debug] [RTC] rtc::impl::PeerConnection::processRemoteDescription@1095: New remote track, mid="video-stream"
-[2026-03-20 14:09:13.263] [952062] [info] [PeerConnection] [gbsH] Received track: video-stream
-[2026-03-20 14:09:13.264] [952062] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-remote-offer
-[2026-03-20 14:09:13.264] [952062] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@983: Adding media to local description, mid="video-stream", removed=true (track is destroyed)
-[2026-03-20 14:09:13.264] [952062] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@959: Reciprocating application in local description, mid="0"
-[2026-03-20 14:09:13.264] [952062] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
-[2026-03-20 14:09:13.264] [952062] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to in-progress
-[2026-03-20 14:09:13.264] [952057] [info] [PeerConnection] [gbsH] Generated local answer: 604 bytes
-[2026-03-20 14:09:13.264] [952062] [info] [RTC]id-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 53:95:A6:23:ED:35:4A:4E:2B:0F:F7:D0:89:32:89:CD:C1:A6:D1:82:DB:79:0A:3D:B0:77:5D:1C:09:92:08:74\r\nm=video 9 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:actpass\r\na=ice-ufrag:uaOU\r\na=ice-pwd:sbhPHOuuzBK2gb9fjs0CMw\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:actpass\r\na=ice-ufrag:uaOU\r\na=ice-pwd:sbhPHOuuzBK2gb9fjs0CMw\r\n","id":"8QIj","type":"offer"}] Sent local description to signaling server
-[2026-03-20 14:09:13.240] [952132] [info] [PeerConnection] Gathering State: InProgress
-[2026-03-20 14:09:13.242] [952123] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connecting
-[2026-03-20 14:09:13.242] [952126] [debug] [PeerConnection] [8QIj] ICE Candidate: a=candidate:1 1 UDP 2114977791 192.168.172.129 57176 typ host (mid=video-stream)
-[2026-03-20 14:09:13.242] [952123] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to checking
-[2026-03-20 14:09:13.242] [952123] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connecting
-[2026-03-20 14:09:13.242] [952126] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=129
-[2026-03-20 14:09:13.242] [952127] [debug] [PeerConnection] [8QIj] ICE Candidate: a=candidate:2 1 UDP 2114977535 172.18.0.1 57176 typ host (mid=video-stream)
-[2026-03-20 14:09:13.242] [952127] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=124
-[2026-03-20 14:09:13.243] [952123] [info] [Main] Called 8QIj, waiting for connection...
-[2026-03-20 14:09:13.243] [952127] [info] [PeerConnection] State: Connecting
-[2026-03-20 14:09:13.286] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=705
-[2026-03-20 14:09:13.286] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=705
-[2026-03-20 14:09:13.287] [952133] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
-[2026-03-20 14:09:13.287] [952133] [debug] [RTC] rtc::impl::PeerConnection::negotiationNeeded@1222: Negotiation needed to remove track, mid=video-stream
-[2026-03-20 14:09:13.288] [952133] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@983: Adding media to local description, mid="video-stream", removed=true (track is destroyed)
-[2026-03-20 14:09:13.288] [952133] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@949: Adding application to local description, mid="0"
-[2026-03-20 14:09:13.288] [952133] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-local-offer
-[2026-03-20 14:09:13.288] [952132] [info] [PeerConnection] [8QIj] Generated local offer: 727 bytes
-[2026-03-20 14:09:13.288] [952132] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=826
-[2026-03-20 14:09:13.289] [952132] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 1003122586 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 53:95:A6:23:ED:35:4A:4E:2B:0F:F7:D0:89:32:89:CD:C1:A6:D1:82:DB:79:0A:3D:B0:77:5D:1C:09:92:08:74\r\nm=video 0 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:actpass\r\na=ice-ufrag:uaOU\r\na=ice-pwd:sbhPHOuuzBK2gb9fjs0CMw\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:actpass\r\na=ice-ufrag:uaOU\r\na=ice-pwd:sbhPHOuuzBK2gb9fjs0CMw\r\na=candidate:1 1 UDP 2114977791 192.168.172.129 57176 typ host\r\na=candidate:2 1 UDP 2114977535 172.18.0.1 57176 typ host\r\n","id":"8QIj","type":"offer"}] Sent local description to signaling server
-[202 rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to gathering
-[2026-03-20 14:09:13.264] [952057] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=700
-[2026-03-20 14:09:13.265] [952057] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 4010480785 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 F4:90:4B:58:01:EB:E5:33:78:A8:6D:CA:CC:0F:80:EA:12:5F:1A:B9:9B:E4:BF:99:72:66:62:8C:A8:81:58:26\r\nm=video 0 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:active\r\na=ice-ufrag:FXKW\r\na=ice-pwd:fXYoNXe+CDLP9CpZKFDjtB\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:active\r\na=ice-ufrag:FXKW\r\na=ice-pwd:fXYoNXe+CDLP9CpZKFDjtB\r\n","id":"gbsH","type":"answer"}] Sent local description to signaling server
-[2026-03-20 14:09:13.265] [952057] [info] [PeerConnection] Gathering State: InProgress
-[2026-03-20 14:09:13.267] [952062] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connecting
-[2026-03-20 14:09:13.267] [952055] [debug] [PeerConnection] [gbsH] ICE Candidate: a=candidate:1 1 UDP 2114977791 192.168.172.129 43144 typ host (mid=0)
-[2026-03-20 14:09:13.267] [952062] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to checking
-[2026-03-20 14:09:13.267] [952062] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connecting
-[2026-03-20 14:09:13.267] [952055] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=118
-[2026-03-20 14:09:13.268] [952059] [debug] [PeerConnection] [gbsH] ICE Candidate: a=candidate:2 1 UDP 2114977535 172.18.0.1 43144 typ host (mid=0)
-[2026-03-20 14:09:13.268] [952059] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=113
-[2026-03-20 14:09:13.269] [952059] [info] [PeerConnection] State: Connecting
-[2026-03-20 14:09:13.303] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=136
-[2026-03-20 14:09:13.303] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=136
-[2026-03-20 14:09:13.304] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=131
-[2026-03-20 14:09:13.304] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=131
-[2026-03-20 14:09:13.305] [952158] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connected
-[2026-03-20 14:09:13.305] [952158] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to connected
-[2026-03-20 14:09:13.305] [952158] [debug] [RTC] rtc::impl::DtlsTransport::DtlsTransport@739: Initializing DTLS transport (OpenSSL)
-[2026-03-20 14:09:13.310] [952158] [debug] [RTC] rtc::impl::DtlsTransport::start@842: Starting DTLS transport
-[2026-03-20 14:09:13.343] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=831
-[2026-03-20 14:09:13.343] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=831
-[2026-03-20 14:09:13.344] [952062] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-remote-offer
-[2026-03-20 14:09:13.344] [952062] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@983: Adding media to local description, mid="video-stream", removed=true (track is destroyed)
-[2026-03-20 14:09:13.344] [952062] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@959: Reciprocating application in local description, mid="0"
-[2026-03-20 14:09:13.344] [952062] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling st6-03-20 14:09:13.322] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=125
-[2026-03-20 14:09:13.322] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=125
-[2026-03-20 14:09:13.323] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=120
-[2026-03-20 14:09:13.323] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=120
-[2026-03-20 14:09:13.357] [952155] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connected
-[2026-03-20 14:09:13.358] [952155] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to connected
-[2026-03-20 14:09:13.358] [952155] [debug] [RTC] rtc::impl::DtlsTransport::DtlsTransport@739: Initializing DTLS transport (OpenSSL)
-[2026-03-20 14:09:13.359] [952155] [debug] [RTC] rtc::impl::DtlsTransport::start@842: Starting DTLS transport
-[2026-03-20 14:09:13.365] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=830
-[2026-03-20 14:09:13.365] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=830
-[2026-03-20 14:09:13.365] [952133] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
-[2026-03-20 14:09:13.408] [952155] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to completed
-[2026-03-20 14:09:13.408] [952155] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to completed
-[2026-03-20 14:09:13.440] [952156] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:466: Using STUN server stun.l.google.com:19302
-[2026-03-20 14:09:13.708] [952155] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1524: STUN server binding successful
-[2026-03-20 14:09:13.708] [952155] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1543: Got STUN mapped address 27.39.88.5:15296 from server
-[2026-03-20 14:09:13.708] [952155] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2612: Candidate gathering done
-[2026-03-20 14:09:13.708] [952155] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2596: Connectivity timer started
-[2026-03-20 14:09:13.708] [952130] [debug] [PeerConnection] [8QIj] ICE Candidate: a=candidate:4 1 UDP 1678769407 27.39.88.5 15296 typ srflx raddr 0.0.0.0 rport 0 (mid=0)
-[2026-03-20 14:09:13.708] [952155] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to complete
-[2026-03-20 14:09:13.708] [952130] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=136
-[2026-03-20 14:09:13.709] [952130] [info] [PeerConnection] Gathering State: Complete
-[2026-03-20 14:09:13.741] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=143
-[2026-03-20 14:09:13.741] [952133] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=143
-[2026-03-20 14:09:14.318] [952131] [info] [RTC] rtc::impl::DtlsTransport::doRecv@965: DTLS handshake finished
-[2026-03-20 14:09:14.318] [952131] [debug] [RTC] rtc::impl::SctpTransport::SctpTransport@167: Initializing SCTP transport
-[2026-03-20 14:09:14.319] [952131] [debug] [RTC] rtc::impl::SctpTransport::connect@357: SCTP connecting (local port=5000, remote port=5000)
-[2026-03-20 14:09:14.321] [952129] [debug] [RTC] rtc::impl::SctpTransport::processNotification@867: SCTP negotiated streams: incoming=1024, outgoing=1024
-[2026-03-20 14:09:14.321] [952129] [info] [RTC] rtc::impl::SctpTransport::processNotification@872: SCTP connected
-[2026-03-20 14:09:14.321] [952129] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connected
-[2026-03-20 14:09:14.321] [952129] [debug] [RTC] rtc::impl::PeerConnection::assignDataCate to stable
-[2026-03-20 14:09:13.345] [952056] [info] [PeerConnection] [gbsH] Generated local answer: 725 bytes
-[2026-03-20 14:09:13.345] [952056] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=825
-[2026-03-20 14:09:13.346] [952056] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 3641014657 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 F4:90:4B:58:01:EB:E5:33:78:A8:6D:CA:CC:0F:80:EA:12:5F:1A:B9:9B:E4:BF:99:72:66:62:8C:A8:81:58:26\r\nm=video 0 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:active\r\na=ice-ufrag:FXKW\r\na=ice-pwd:fXYoNXe+CDLP9CpZKFDjtB\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:active\r\na=ice-ufrag:FXKW\r\na=ice-pwd:fXYoNXe+CDLP9CpZKFDjtB\r\na=candidate:1 1 UDP 2114977791 192.168.172.129 43144 typ host\r\na=candidate:2 1 UDP 2114977535 172.18.0.1 43144 typ host\r\n","id":"gbsH","type":"answer"}] Sent local description to signaling server
-[2026-03-20 14:09:13.407] [952158] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to completed
-[2026-03-20 14:09:13.408] [952158] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to completed
-[2026-03-20 14:09:13.455] [952159] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:466: Using STUN server stun.l.google.com:19302
-[2026-03-20 14:09:13.720] [952158] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1524: STUN server binding successful
-[2026-03-20 14:09:13.720] [952158] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1543: Got STUN mapped address 27.39.88.5:15297 from server
-[2026-03-20 14:09:13.720] [952158] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2612: Candidate gathering done
-[2026-03-20 14:09:13.720] [952158] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2596: Connectivity timer started
-[2026-03-20 14:09:13.721] [952158] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to complete
-[2026-03-20 14:09:13.721] [952059] [debug] [PeerConnection] [gbsH] ICE Candidate: a=candidate:4 1 UDP 1678769407 27.39.88.5 15297 typ srflx raddr 0.0.0.0 rport 0 (mid=0)
-[2026-03-20 14:09:13.721] [952059] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=136
-[2026-03-20 14:09:13.721] [952059] [info] [PeerConnection] Gathering State: Complete
-[2026-03-20 14:09:13.727] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=143
-[2026-03-20 14:09:13.727] [952062] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=143
-[2026-03-20 14:09:14.319] [952057] [info] [RTC] rtc::impl::DtlsTransport::doRecv@965: DTLS handshake finished
-[2026-03-20 14:09:14.319] [952057] [debug] [RTC] rtc::impl::SctpTransport::SctpTransport@167: Initializing SCTP transport
-[2026-03-20 14:09:14.319] [952057] [debug] [RTC] rtc::impl::SctpTransport::connect@357: SCTP connecting (local port=5000, remote port=5000)
-[2026-03-20 14:09:14.321] [952059] [debug] [RTC] rtc::impl::SctpTransport::processNotification@867: SCTP negotiated streams: incoming=1024, outgoing=1024
-[2026-03-20 14:09:14.321] [952059] [info] [RTC] rtc::impl::SctpTransport::processNotification@872: SCTP connected
-[2026-03-20 14:09:14.321] [952059] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connected
-[2026-03-20 14:09:14.322] [952056] [info] [PeerConnection] State: Connected
-[2026-03-20 14:09:14.322] [952059] [info] [PeerConnection] DataChannel from gbsH received: test
-[2026-03-20 14:09:14.322] [952059] [info] [PeerConnection] DataChannel from gbsH open
-[2026-03-20 14:09:14.324] [952060] [info] [PeerConnection] Message from gbsH: Hello from gbsH
-[2026-03-2
+[2026-03-20 14:17:31.674] [958343] [info] [DataChannelClient] Starting, thread id: [139499876201088]
+[2026-03-20 14:17:31.674] [958343] [info] [DataChannelClient] Local ID generated: HXru
+[2026-03-20 14:17:31.677] [958343] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
+[2026-03-20 14:17:31.677] [958343] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
+[2026-03-20 14:17:31.678] [958354] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
+[2026-03-20 14:17:31.686] [958343] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
+[2026-03-20 14:17:31.686] [958343] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
+[2026-03-20 14:17:31.687] [958343] [info] [WebSocket] Waiting for signaling connection...
+[2026-03-20 14:17:31.687] [958347] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
+[2026-03-20 14:17:31.687] [958347] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
+[2026-03-20 14:17:31.703] [958354] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
+[2026-03-20 14:17:31.704] [958354] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
+[2026-03-20 14:17:31.704] [958354] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
+[2026-03-20 14:17:31.721] [958354] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
+[2026-03-20 14:17:31.721] [958354] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
+[2026-03-20 14:17:31.721] [958354] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
+[2026-03-20 14:17:31.721] [958354] [info] [WebSocket] WebSocket connected, signaling ready
+[2026-03-20 14:17:31.722] [958343] [info] [WebSocket] Waiting for signaling connected...
+[2026-03-20 14:17:31.722] [958343] [info] [Main] Local ID: HXru
+[2026-03-20 14:17:31.722] [958343] [info] [Main] You can enter a peer ID to call, or wait for incoming connections.
+[2026-03-20 14:17:38.629] [958343] [info] [DataChannelClient] Offering to Rwu7
+[2026-03-20 14:17:38.629] [958343] [info] [PeerConnection] Created PC for peer: Rwu7
+[2026-03-20 14:17:38.629] [958349] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
+[2026-03-20 14:17:38.630] [958343] [info] [DataChannelClient] Creating DataChannel with label "test"
+[2026-03-20 14:17:38.630] [958343] [debug] [RTC] rtc::impl::PeerConnection::negotiationNeeded@1201: Negotiation needed for data channels
+[2026-03-20 14:17:38.630] [958343] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
+[2026-03-20 14:17:38.631] [958343] [info] [RTC] rtc::impl::IceTransport::IceTransport@109: Using STUN server "stun.l.google.com:19302"
+[2026-03-20 14:17:38.631] [958343] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@1006: Adding media to local description, mid="video-stream", removed=false
+[2026-03-20 14:17:38.631] [958343] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@1026: Adding application to local description, mid="0"
+[2026-03-20 14:17:38.633] [958343] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-local-offer
+[2026-03-20 14:17:38.633] [958343] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to in-progress
+[2026-03-20 14:17:38.633] [958343] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to gathering
+[2026-03-20 14:17:38.634] [958352] [info] [PeerConnection] [Rwu7] Generated local offer: 644 bytes
+[2026-03-20 14:17:38.634] [958352] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=741
+[2026-03-20 14:17:38.634] [958352] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 1038052819 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE video-stream 0\r\na=group:LS video-stream\r\na=ms[2026-03-20 14:17:27.981] [958294] [info] [DataChannelClient] Starting, thread id: [127238518768256]
+[2026-03-20 14:17:27.981] [958294] [info] [DataChannelClient] Local ID generated: Rwu7
+[2026-03-20 14:17:27.984] [958294] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
+[2026-03-20 14:17:27.984] [958294] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
+[2026-03-20 14:17:27.986] [958305] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
+[2026-03-20 14:17:27.994] [958294] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
+[2026-03-20 14:17:27.994] [958294] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
+[2026-03-20 14:17:27.995] [958294] [info] [WebSocket] Waiting for signaling connection...
+[2026-03-20 14:17:27.995] [958298] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
+[2026-03-20 14:17:27.995] [958298] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
+[2026-03-20 14:17:28.015] [958305] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
+[2026-03-20 14:17:28.015] [958305] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
+[2026-03-20 14:17:28.016] [958305] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
+[2026-03-20 14:17:28.037] [958305] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
+[2026-03-20 14:17:28.037] [958305] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
+[2026-03-20 14:17:28.037] [958305] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
+[2026-03-20 14:17:28.037] [958305] [info] [WebSocket] WebSocket connected, signaling ready
+[2026-03-20 14:17:28.037] [958294] [info] [WebSocket] Waiting for signaling connected...
+[2026-03-20 14:17:28.037] [958294] [info] [Main] Local ID: Rwu7
+[2026-03-20 14:17:28.037] [958294] [info] [Main] You can enter a peer ID to call, or wait for incoming connections.
+[2026-03-20 14:17:38.048] [958305] [debug] [RTC] rtc::impl::WsTransport::incoming@145: WebSocket sending ping
+[2026-03-20 14:17:38.048] [958305] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=9, length=4
+[2026-03-20 14:17:38.068] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=10, length=4
+[2026-03-20 14:17:38.068] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@353: WebSocket received pong
+[2026-03-20 14:17:38.652] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=746
+[2026-03-20 14:17:38.653] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=746
+[2026-03-20 14:17:38.653] [958305] [info] [WebSocket] Answering to HXru
+[2026-03-20 14:17:38.654] [958305] [info] [PeerConnection] Created PC for peer: HXru
+[2026-03-20 14:17:38.654] [958300] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
+[2026-03-20 14:17:38.655] [958305] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
+[2026-03-20 14:17:38.655] [958305] [info] [RTC] rtc::impl::IceTransport::IceTransport@109: Using STUN server "stun.l.google.com:19302"
+[2026-03-20 14:17:38.655] [958305] [debug] [RTC] rtc::impl::PeerConnection::processRemoteDescription@1095: New remote track, mid="video-stream"
+[2026-03-20 14:17:38.656] [958305] [info] [PeerConnection] [HXru] Received track: video-stream
+[2026-03-20 14:17:38.656] [958305] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-remote-offer
+[2026-03-20 14:17:38.656] [958305] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@983: Adding media to local description, mid="video-stream", removed=true (track is destroyed)
+[2026-03-20 14:17:38.656] [958305] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescriptiid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 53:9C:37:2D:7D:FB:FC:3D:49:8D:85:08:DD:2C:23:6E:CD:24:D0:CB:22:24:5A:A4:BF:A4:8A:94:36:29:7E:19\r\nm=video 9 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:actpass\r\na=ice-ufrag:PMwP\r\na=ice-pwd:PKE4me7XYD78kND38iqYYX\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:actpass\r\na=ice-ufrag:PMwP\r\na=ice-pwd:PKE4me7XYD78kND38iqYYX\r\n","id":"Rwu7","type":"offer"}] Sent local description to signaling server
+[2026-03-20 14:17:38.635] [958352] [info] [PeerConnection] Gathering State: InProgress
+[2026-03-20 14:17:38.636] [958343] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connecting
+[2026-03-20 14:17:38.636] [958348] [debug] [PeerConnection] [Rwu7] ICE Candidate: a=candidate:1 1 UDP 2114977791 192.168.172.129 37165 typ host (mid=video-stream)
+[2026-03-20 14:17:38.636] [958343] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to checking
+[2026-03-20 14:17:38.636] [958348] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=129
+[2026-03-20 14:17:38.636] [958343] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connecting
+[2026-03-20 14:17:38.637] [958348] [debug] [PeerConnection] [Rwu7] ICE Candidate: a=candidate:2 1 UDP 2114977535 172.18.0.1 37165 typ host (mid=video-stream)
+[2026-03-20 14:17:38.637] [958343] [info] [Main] Called Rwu7, waiting for connection...
+[2026-03-20 14:17:38.637] [958348] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=124
+[2026-03-20 14:17:38.637] [958348] [info] [PeerConnection] State: Connecting
+[2026-03-20 14:17:38.676] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=705
+[2026-03-20 14:17:38.676] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=705
+[2026-03-20 14:17:38.677] [958354] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
+[2026-03-20 14:17:38.678] [958354] [debug] [RTC] rtc::impl::PeerConnection::negotiationNeeded@1222: Negotiation needed to remove track, mid=video-stream
+[2026-03-20 14:17:38.678] [958354] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@983: Adding media to local description, mid="video-stream", removed=true (track is destroyed)
+[2026-03-20 14:17:38.679] [958354] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@949: Adding application to local description, mid="0"
+[2026-03-20 14:17:38.679] [958354] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-local-offer
+[2026-03-20 14:17:38.679] [958346] [info] [PeerConnection] [Rwu7] Generated local offer: 727 bytes
+[2026-03-20 14:17:38.679] [958346] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=826
+[2026-03-20 14:17:38.680] [958346] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 2201996049 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 53:9C:37:2D:7D:FB:FC:3D:49:8D:85:08:DD:2C:23:6E:CD:24:D0:CB:22:24:5A:A4:BF:A4:8A:94:36:29:7E:19\r\nm=video 0 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:actpass\r\na=ice-ufrag:PMwP\r\na=ice-pwd:PKE4me7XYD78kND38iqYYX\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:actpass\r\na=ice-ufrag:PMwP\r\na=ice-pwd:PKE4me7XYD78kND38iqYYX\r\na=candidate:1 1 UDP 2114977791 192.168.172.129 37165 typ host\r\na=candidate:2 1 UDP 2114977535 172.18.0.1 37165 typ host\r\n","id":"Rwu7","type":"offer"}] Sent local description to signaling server
+[202on@959: Reciprocating application in local description, mid="0"
+[2026-03-20 14:17:38.657] [958305] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
+[2026-03-20 14:17:38.657] [958305] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to in-progress
+[2026-03-20 14:17:38.657] [958305] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to gathering
+[2026-03-20 14:17:38.657] [958304] [info] [PeerConnection] [HXru] Generated local answer: 604 bytes
+[2026-03-20 14:17:38.657] [958304] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=700
+[2026-03-20 14:17:38.658] [958304] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 3737374330 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 E7:0E:91:A7:C7:9A:45:26:DD:80:6F:36:7E:64:0F:0C:3F:4A:F4:89:6E:61:6B:FD:EE:7D:CF:F8:94:5F:6A:BE\r\nm=video 0 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:active\r\na=ice-ufrag:Ci3g\r\na=ice-pwd:5QIgEMEvBjZ3c4C60SizoI\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:active\r\na=ice-ufrag:Ci3g\r\na=ice-pwd:5QIgEMEvBjZ3c4C60SizoI\r\n","id":"HXru","type":"answer"}] Sent local description to signaling server
+[2026-03-20 14:17:38.658] [958297] [info] [PeerConnection] Gathering State: InProgress
+[2026-03-20 14:17:38.660] [958305] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connecting
+[2026-03-20 14:17:38.660] [958298] [debug] [PeerConnection] [HXru] ICE Candidate: a=candidate:1 1 UDP 2114977791 192.168.172.129 37898 typ host (mid=0)
+[2026-03-20 14:17:38.660] [958305] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to checking
+[2026-03-20 14:17:38.660] [958298] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=118
+[2026-03-20 14:17:38.660] [958305] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connecting
+[2026-03-20 14:17:38.660] [958298] [debug] [PeerConnection] [HXru] ICE Candidate: a=candidate:2 1 UDP 2114977535 172.18.0.1 37898 typ host (mid=0)
+[2026-03-20 14:17:38.661] [958298] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=113
+[2026-03-20 14:17:38.661] [958298] [info] [PeerConnection] State: Connecting
+[2026-03-20 14:17:38.694] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=136
+[2026-03-20 14:17:38.694] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=136
+[2026-03-20 14:17:38.695] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=131
+[2026-03-20 14:17:38.695] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=131
+[2026-03-20 14:17:38.696] [958423] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connected
+[2026-03-20 14:17:38.696] [958423] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to connected
+[2026-03-20 14:17:38.696] [958423] [debug] [RTC] rtc::impl::DtlsTransport::DtlsTransport@739: Initializing DTLS transport (OpenSSL)
+[2026-03-20 14:17:38.697] [958423] [debug] [RTC] rtc::impl::DtlsTransport::start@842: Starting DTLS transport
+[2026-03-20 14:17:38.732] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=831
+[2026-03-20 14:17:38.732] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=831
+[2026-03-20 14:17:38.732] [958305] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-remote-offer
+[2026-03-20 14:17:38.733] [958305] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@983: Adding media to local description, mid="video-stream", removed=true (track is destroyed)
+[2026-03-20 14:17:38.733] [958305] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@959: Reciprocating application in local description, mid="0"
+[2026-03-20 14:17:38.733] [958305] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
+[2026-03-20 14:17:38.733] [958299] [info] [PeerConnection] [HXru] Generated local answer: 725 bytes
+[2026-03-20 14:17:38.733] [958299] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=825
+[2026-03-20 14:17:38.734] [958299] [info] [PeerConnection] [{"description":"v=0\r\no=rtc 1355892136 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 E7:0E:91:A7:C7:9A:45:26:DD:80:6F:36:7E:64:0F:0C:3F:4A:F4:89:6E:61:6B:FD:EE:7D:CF:F8:94:5F:6A:BE\r\nm=video 0 UDP/TLS/RTP/SAVPF \r\nc=IN IP4 0.0.0.0\r\na=mid:video-stream\r\na=sendrecv\r\na=rtcp-mux\r\na=setup:active\r\na=ice-ufrag:Ci3g\r\na=ice-pwd:5QIgEMEvBjZ3c4C60SizoI\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:active\r\na=ice-ufrag:Ci3g\r\na=ice-pwd:5QIgEMEvBjZ3c4C60SizoI\r\na=candidate:1 1 UDP 2114977791 192.168.172.129 37898 typ host\r\na=candidate:2 1 UDP 2114977535 172.18.0.1 37898 typ host\r\n","id":"HXru","type":"answer"}] Sent local description to signaling server
+[2026-03-20 14:17:38.797] [958423] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to completed
+[2026-03-20 14:17:38.797] [958423] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to completed
+[2026-03-20 14:17:38.902] [958424] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:466: Using STUN server stun.l.google.com:19302
+[2026-03-20 14:17:39.144] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=143
+[2026-03-20 14:17:39.144] [958305] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=143
+[2026-03-20 14:17:39.187] [958423] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1524: STUN server binding successful
+[2026-03-20 14:17:39.187] [958423] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1543: Got STUN mapped address 27.39.88.5:15093 from server
+[2026-03-20 14:17:39.187] [958423] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2612: Candidate gathering done
+[2026-03-20 14:17:39.187] [958423] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2596: Connectivity timer started
+[2026-03-20 14:17:39.187] [958423] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to complete
+[2026-03-20 14:17:39.187] [958300] [debug] [PeerConnection] [HXru] ICE Candidate: a=candidate:4 1 UDP 1678769407 27.39.88.5 15093 typ srflx raddr 0.0.0.0 rport 0 (mid=0)
+[2026-03-20 14:17:39.187] [958300] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=136
+[2026-03-20 14:17:39.188] [958300] [info] [PeerConnection] Gathering State: Complete
+[2026-03-20 14:17:39.701] [958298] [info] [RTC] rtc::impl::DtlsTransport::doRecv@965: DTLS handshake finished
+[2026-03-20 14:17:39.702] [958298] [debug] [RTC] rtc::impl::SctpTransport::SctpTransport@167: Initializing SCTP transport
+[2026-03-20 14:17:39.702] [958298] [debug] [RTC] rtc::impl::SctpTransport::connect@357: SCTP connecting (local port=5000, remote port=5000)
+[2026-03-20 14:17:39.704] [958300] [debug] [RTC] rtc::impl::SctpTransport::processNotification@867: SCTP negotiated streams: incoming=1024, outgoing=1024
+[2026-03-20 14:17:39.704] [958300] [info] [RTC] rtc::impl::SctpTransport::processNotification@872: SCTP conn6-03-20 14:17:38.712] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=125
+[2026-03-20 14:17:38.712] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=125
+[2026-03-20 14:17:38.713] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=120
+[2026-03-20 14:17:38.713] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=120
+[2026-03-20 14:17:38.747] [958421] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connected
+[2026-03-20 14:17:38.747] [958421] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to connected
+[2026-03-20 14:17:38.747] [958421] [debug] [RTC] rtc::impl::DtlsTransport::DtlsTransport@739: Initializing DTLS transport (OpenSSL)
+[2026-03-20 14:17:38.748] [958421] [debug] [RTC] rtc::impl::DtlsTransport::start@842: Starting DTLS transport
+[2026-03-20 14:17:38.751] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=830
+[2026-03-20 14:17:38.751] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=830
+[2026-03-20 14:17:38.752] [958354] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
+[2026-03-20 14:17:38.797] [958421] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to completed
+[2026-03-20 14:17:38.797] [958421] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to completed
+[2026-03-20 14:17:38.847] [958422] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:466: Using STUN server stun.l.google.com:19302
+[2026-03-20 14:17:39.117] [958421] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1524: STUN server binding successful
+[2026-03-20 14:17:39.117] [958421] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1543: Got STUN mapped address 27.39.88.5:15092 from server
+[2026-03-20 14:17:39.118] [958421] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2612: Candidate gathering done
+[2026-03-20 14:17:39.118] [958421] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2596: Connectivity timer started
+[2026-03-20 14:17:39.118] [958421] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to complete
+[2026-03-20 14:17:39.118] [958348] [debug] [PeerConnection] [Rwu7] ICE Candidate: a=candidate:4 1 UDP 1678769407 27.39.88.5 15092 typ srflx raddr 0.0.0.0 rport 0 (mid=0)
+[2026-03-20 14:17:39.118] [958348] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=136
+[2026-03-20 14:17:39.118] [958348] [info] [PeerConnection] Gathering State: Complete
+[2026-03-20 14:17:39.205] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=143
+[2026-03-20 14:17:39.205] [958354] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=143
+[2026-03-20 14:17:39.701] [958353] [info] [RTC] rtc::impl::DtlsTransport::doRecv@965: DTLS handshake finished
+[2026-03-20 14:17:39.701] [958353] [debug] [RTC] rtc::impl::SctpTransport::SctpTransport@167: Initializing SCTP transport
+[2026-03-20 14:17:39.702] [958353] [debug] [RTC] rtc::impl::SctpTransport::connect@357: SCTP connecting (local port=5000, remote port=5000)
+[2026-03-20 14:17:39.704] [958350] [debug] [RTC] rtc::impl::SctpTransport::processNotification@867: SCTP negotiated streams: incoming=1024, outgoing=1024
+[2026-03-20 14:17:39.704] [958350] [info] [RTC] rtc::impl::SctpTransport::processNotification@872: SCTP connected
+[2026-03-20 14:17:39.704] [958350] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connected
+[2026-03-20 14:17:39.705] [958350] [debug] [RTC] rtc::impl::PeerConnection::assignDataC
