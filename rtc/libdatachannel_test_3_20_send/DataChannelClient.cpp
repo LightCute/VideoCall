@@ -444,7 +444,7 @@ void DataChannelClient::startStream() {
             return;
         }
     } else {
-        stream = createStream("samples/h264", 30, "samples/opus");
+        stream = createStream("../samples/h264", 30, "../samples/opus");
         m_avStream = stream;
     }
     stream->start();
@@ -453,28 +453,53 @@ void DataChannelClient::startStream() {
 /// Add client to stream
 /// @param client Client
 /// @param adding_video True if adding video
-void DataChannelClient::addToStream(std::shared_ptr<Client> client, bool isAddingVideo) {
-    if (client->getState() == Client::State::Waiting) {
-        client->setState(isAddingVideo ? Client::State::WaitingForAudio : Client::State::WaitingForVideo);
-    } else if ((client->getState() == Client::State::WaitingForAudio && !isAddingVideo)
-               || (client->getState() == Client::State::WaitingForVideo && isAddingVideo)) {
+// void DataChannelClient::addToStream(std::shared_ptr<Client> client, bool isAddingVideo) {
+//     if (client->getState() == Client::State::Waiting) {
+//         client->setState(isAddingVideo ? Client::State::WaitingForAudio : Client::State::WaitingForVideo);
+//     } else if ((client->getState() == Client::State::WaitingForAudio && !isAddingVideo)
+//                || (client->getState() == Client::State::WaitingForVideo && isAddingVideo)) {
 
-        // Audio and video tracks are collected now
-        assert(client->video.has_value() && client->audio.has_value());
+//         // Audio and video tracks are collected now
+//         assert(client->video.has_value() && client->audio.has_value());
+//         auto video = client->video.value();
+
+//         if (m_avStream.has_value()) {
+//             sendInitialNalus(m_avStream.value(), video);
+//         }
+
+//         client->setState(Client::State::Ready);
+//     }
+//     if (client->getState() == Client::State::Ready) {
+//         startStream();
+//     }
+// }
+
+void DataChannelClient::addToStream(std::shared_ptr<Client> client, bool isAddingVideo) {
+    // -------------------------------------------------------------------------
+    // ✅ 修改点1：只要是添加视频，就直接进入 Ready 状态
+    // -------------------------------------------------------------------------
+    if (isAddingVideo) {
+        // 确保视频 Track 存在
+        assert(client->video.has_value());
         auto video = client->video.value();
 
+        // 发送关键帧（如果流已创建）
         if (m_avStream.has_value()) {
             sendInitialNalus(m_avStream.value(), video);
         }
 
+        // 直接设置为 Ready 状态
         client->setState(Client::State::Ready);
+        Log::info("[DataChannelClient] Video track added, state set to Ready (audio optional)");
     }
+
+    // -------------------------------------------------------------------------
+    // ✅ 修改点2：只要状态是 Ready，就启动流
+    // -------------------------------------------------------------------------
     if (client->getState() == Client::State::Ready) {
         startStream();
     }
 }
-
-
 
 
 /// Create stream

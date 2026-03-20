@@ -291,7 +291,18 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
                        id, data.size(), info.timestamp);
 
         });
+        track->onMessage([this, id, mid = track->mid()](rtc::message_variant data) {
+            // 判断是二进制数据 (视频/音频帧都是二进制)
+            if (std::holds_alternative<rtc::binary>(data)) {
+                rtc::binary bin_data = std::get<rtc::binary>(data);
+                
+                Log::warn("[PeerConnection] [{}] 🟢 [onMessage] Received {} data! Size: {}", 
+                        id, mid, bin_data.size());
 
+                // 在这里处理数据 (送入解码器)
+                // processFrame(mid, bin_data);
+            }
+        });
 
     });
 
