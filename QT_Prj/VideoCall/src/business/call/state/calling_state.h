@@ -48,5 +48,6 @@ inline std::unique_ptr<AbstractState> CallingState::handleEvent(
         Log::info("[CallingState] Transitioning back to [CallIdleState]");
         return std::make_unique<CallIdleState>(); 
     }
+    
     return nullptr;
 }

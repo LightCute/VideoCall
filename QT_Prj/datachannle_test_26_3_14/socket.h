@@ -25,5 +25,5 @@ private:
     std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> m_dataChannelMap;
     std::string m_peer_id;
     rtc::Configuration m_config;
-
+    std::shared_ptr<rtc::PeerConnection> m_pc;
 };

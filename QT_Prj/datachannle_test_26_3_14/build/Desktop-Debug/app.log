@@ -1,226 +1,232 @@
-[2026-03-14 15:39:49.230] [3705614] [info] [Main] Starting application, thread id: [134102859763520]
-[2026-03-14 15:39:49.231] [3705614] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
-[2026-03-14 15:39:49.231] [3705614] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
-[2026-03-14 15:39:49.233] [3705630] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
-[2026-03-14 15:40:00.722] [3705614] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
-[2026-03-14 15:40:00.723] [3705614] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
-[2026-03-14 15:40:00.723] [3705614] [info] [Widget] Connect to server with URL: ws://120.79.210.6:8000/abcd
-[2026-03-14 15:40:00.723] [3705623] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
-[2026-03-14 15:40:00.724] [3705623] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
-[2026-03-14 15:40:00.740] [3705630] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
-[2026-03-14 15:40:00.740] [3705630] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
-[2026-03-14 15:40:00.740] [3705630] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
-[2026-03-14 15:40:00.758] [3705630] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
-[2026-03-14 15:40:00.759] [3705630] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
-[2026-03-14 15:40:00.759] [3705630] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
-[2026-03-14 15:40:08.126] [3705614] [debug] [RTC] rtc::impl::PeerConnection::negotiationNeeded@1201: Negotiation needed for data channels
-[2026-03-14 15:40:08.126] [3705625] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
-[2026-03-14 15:40:08.127] [3705614] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
-[2026-03-14 15:40:08.128] [3705614] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@1026: Adding application to local description, mid="0"
-[2026-03-14 15:40:08.129] [3705614] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-local-offer
-[2026-03-14 15:40:08.129] [3705614] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to in-progress
-[2026-03-14 15:40:08.129] [3705614] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to gathering
-[2026-03-14 15:40:08.129] [3705627] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=524
-[2026-03-14 15:40:08.135] [3705614] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connecting
-[2026-03-14 15:40:08.136] [3705614] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to checking
-[2026-03-14 15:40:08.136] [3705614] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connecting
-[2026-03-14 15:40:08.136] [3705614] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2612: Candidate gathering done
-[2026-03-14 15:40:08.136] [3705614] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to complete
-[2026-03-14 15:40:08.136] [3705622] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=118
-[2026-03-14 15:40:08.136] [3705622] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=113
-[2026-03-14 15:40:08.146] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=529
-[2026-03-14 15:40:08.146] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=529
-[2026-03-14 15:40:08.147] [3705630] [debug] [RTC] rtc::impl::PeerConnection::rollbackLocalDescription@428: Rolling back pending local description
-[2026-03-14 15:40:08.147] [3705630] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
-[2026-03-14 15:40:08.147] [3705630] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2596: Connectivity timer started
-[2026-03-14 15:40:08.147] [3705630] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-remote-offer
-[2026-03-14 15:40:08.148] [3705630] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@949: Adding application to local description, mid="0"
-[2026-03-14 15:40:08.148] [3705630] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
-[2026-03-14 15:40:08.149] [3705628] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=672
-[2026-03-14 15:40:08.163] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=125
-[2026-03-14 15:40:08.163] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=125
-[2026-03-14 15:40:08.164] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=120
-[2026-03-14 15:40:08.164] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=120
-[2026-03-14 15:40:08.164] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:08.165] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:08.165] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:08.165] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:08.165] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:08.165] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:08.165] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:08.165] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:08.180] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=677
-[2026-03-14 15:40:08.180] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=677
-[2026-03-14 15:40:08.181] [3705630] [warning] [RTC] rtc::impl::Channel::flushPendingMessages@76: Uncaught exception in callback: Unexpected remote answer description in signaling state stable
-[2026-03-14 15:40:08.666] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:08.666] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:08.666] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:08.666] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:08.666] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:08.666] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:09.167] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:09.167] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:09.167] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:09.167] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:09.666] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:09.667] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:09.667] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:09.668] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:09.718] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:09.718] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:09.718] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:09.718] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:10.219] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:10.219] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:10.219] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:10.219] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:10.669] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:10.669] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:10.669] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:10.669] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:10.720] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:10.720] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:10.720] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:10.720] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:11.170] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:11.170] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:11.170] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:11.170] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:11.221] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:11.221] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:11.221] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:11.221] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:11.671] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:11.671] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:11.671] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:11.671] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:11.722] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:11.722] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:11.722] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:11.722] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:12.172] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:12.172] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:12.172] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:12.172] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:12.223] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:12.223] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:12.223] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:12.223] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:12.675] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:12.675] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:12.675] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:12.724] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:12.774] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:12.774] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:12.774] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:12.774] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:13.275] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:13.275] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:13.275] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:13.275] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:13.724] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:13.725] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:13.725] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:13.725] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:13.776] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:13.776] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:13.776] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:13.776] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:14.225] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:14.225] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:14.225] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:14.225] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:14.277] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:14.277] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:14.277] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:14.277] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:14.727] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:14.727] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:14.727] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:14.727] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:14.778] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:14.778] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:14.778] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:14.778] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:15.228] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:15.228] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:15.228] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:15.228] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:15.279] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:15.279] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:15.279] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:15.279] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:15.729] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:15.729] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:15.729] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:15.730] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:15.780] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:15.780] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:15.780] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:15.781] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:16.230] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:16.230] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:16.230] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:16.230] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:16.281] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:16.281] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:16.281] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:16.281] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:16.731] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:16.731] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:16.731] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:16.731] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:16.783] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:16.783] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:16.783] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:16.783] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:17.232] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:17.232] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:17.232] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:17.232] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:17.284] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:17.284] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:17.284] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:17.284] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:17.733] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:17.733] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:17.733] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:17.733] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:17.785] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:17.785] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:17.785] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:17.785] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:18.191] [3705630] [debug] [RTC] rtc::impl::WsTransport::incoming@145: WebSocket sending ping
-[2026-03-14 15:40:18.191] [3705630] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=9, length=4
-[2026-03-14 15:40:18.207] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=10, length=4
-[2026-03-14 15:40:18.207] [3705630] [debug] [RTC] rtc::impl::WsTransport::recvFrame@353: WebSocket received pong
-[2026-03-14 15:40:18.234] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:18.234] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:18.234] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:18.234] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:18.286] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:18.286] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:18.286] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:18.286] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:18.735] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:18.735] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:18.735] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:18.735] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:18.787] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:18.787] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:18.787] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:18.787] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:19.237] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:19.237] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:19.237] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:19.287] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:19.337] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
-[2026-03-14 15:40:19.337] [3705879] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
-[2026-03-14 15:40:19.337] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
-[2026-03-14 15:40:19.337] [3705879] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
-[2026-03-14 15:40:19.740] [3705614] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to closed
-[2026-03-14 15:40:19.741] [3705614] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to closed
-[2026-03-14 15:40:19.741] [3705625] [debug] [RTC] rtc::impl::IceTransport::~IceTransport@183: Destroying ICE transport
-[2026-03-14 15:40:19.741] [3705614] [info] [RTC] rtc::impl::WsTransport::close@95: WebSocket closing
-[2026-03-14 15:40:19.741] [3705614] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=8, length=0
-[2026-03-14 15:40:19.742] [3705627] [debug] [RTC] rtc::impl::TcpTransport::close@300: Closing TCP socket
+[2026-03-17 21:09:09.351] [1010774] [info] [Main] Starting application, thread id: [140018576383808]
+[2026-03-17 21:09:09.352] [1010774] [debug] [RTC] rtc::impl::Init::doInit@119: Global initialization
+[2026-03-17 21:09:09.352] [1010774] [debug] [RTC] rtc::impl::Init::doInit@129: Spawning 8 threads
+[2026-03-17 21:09:09.353] [1010790] [debug] [RTC] rtc::impl::PollService::runLoop@170: Poll service started
+[2026-03-17 21:10:48.529] [1010774] [debug] [RTC] rtc::impl::TcpTransport::TcpTransport@57: Initializing TCP transport
+[2026-03-17 21:10:48.529] [1010774] [debug] [RTC] rtc::impl::TcpTransport::connect@150: Connecting to 120.79.210.6:8000
+[2026-03-17 21:10:48.529] [1010774] [info] [Widget] Connect to server with URL: ws://120.79.210.6:8000/abcd
+[2026-03-17 21:10:48.530] [1010783] [debug] [RTC] rtc::impl::TcpTransport::resolve@164: Resolving 120.79.210.6:8000
+[2026-03-17 21:10:48.530] [1010783] [debug] [RTC] rtc::impl::TcpTransport::createSocket@242: Trying address 120.79.210.6:8000
+[2026-03-17 21:10:48.555] [1010790] [info] [RTC] rtc::impl::TcpTransport::processConnect@463: TCP connected
+[2026-03-17 21:10:48.555] [1010790] [debug] [RTC] rtc::impl::WsTransport::WsTransport@61: Initializing WebSocket transport
+[2026-03-17 21:10:48.555] [1010790] [debug] [RTC] rtc::impl::WsTransport::sendHttpRequest@200: Sending WebSocket HTTP request
+[2026-03-17 21:10:48.580] [1010790] [debug] [RTC] rtc::impl::WsHandshake::parseHttpResponse@209: WebSocket response code=101
+[2026-03-17 21:10:48.580] [1010790] [info] [RTC] rtc::impl::WsTransport::incoming@128: WebSocket client-side open
+[2026-03-17 21:10:48.580] [1010790] [debug] [RTC] rtc::impl::WebSocket::initWsTransport@436: WebSocket open
+[2026-03-17 21:10:56.637] [1010784] [debug] [RTC] rtc::impl::Certificate::Generate@445: Generating certificate (OpenSSL)
+[2026-03-17 21:10:56.637] [1010774] [info] [PeerConnection] PeerConnection for [abcd] created and added to map
+[2026-03-17 21:10:56.638] [1010774] [debug] [RTC] rtc::impl::PeerConnection::negotiationNeeded@1201: Negotiation needed for data channels
+[2026-03-17 21:10:56.638] [1010774] [debug] [RTC] rtc::impl::IceTransport::IceTransport@58: Initializing ICE transport (libjuice)
+[2026-03-17 21:10:56.639] [1010774] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@1026: Adding application to local description, mid="0"
+[2026-03-17 21:10:56.640] [1010774] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-local-offer
+[2026-03-17 21:10:56.640] [1010774] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to in-progress
+[2026-03-17 21:10:56.640] [1010774] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to gathering
+[2026-03-17 21:10:56.640] [1010787] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=524
+[2026-03-17 21:10:56.641] [1010787] [info] [PeerConnection] Gathering State changed: InProgress
+[2026-03-17 21:10:56.643] [1010774] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1247: Changing state to connecting
+[2026-03-17 21:10:56.643] [1010774] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to checking
+[2026-03-17 21:10:56.643] [1010782] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=118
+[2026-03-17 21:10:56.643] [1010774] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to connecting
+[2026-03-17 21:10:56.643] [1010774] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2612: Candidate gathering done
+[2026-03-17 21:10:56.643] [1010774] [info] [RTC] rtc::impl::PeerConnection::changeGatheringState@1354: Changed gathering state to complete
+[2026-03-17 21:10:56.643] [1010782] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=113
+[2026-03-17 21:10:56.644] [1010782] [info] [PeerConnection] State changed: Connecting
+[2026-03-17 21:10:56.644] [1010782] [info] [PeerConnection] Gathering State changed: Complete
+[2026-03-17 21:10:56.665] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=529
+[2026-03-17 21:10:56.665] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=529
+[2026-03-17 21:10:56.665] [1010790] [info] [WebSocket] Message received: {"description": "v=0\r\no=rtc 3003194909 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 8C:E2:1F:3F:93:5A:63:CA:F0:62:BD:BE:9D:39:23:12:22:8A:22:9D:B1:F1:19:E4:A0:9E:BB:1E:3D:65:98:B1\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:actpass\r\na=ice-ufrag:CNdp\r\na=ice-pwd:SuOzg7N59JQ+6cMwgp+sm6\r\n", "id": "abcd", "type": "offer"}
+[2026-03-17 21:10:56.666] [1010790] [debug] [RTC] rtc::impl::PeerConnection::rollbackLocalDescription@428: Rolling back pending local description
+[2026-03-17 21:10:56.666] [1010790] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
+[2026-03-17 21:10:56.666] [1010790] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:2596: Connectivity timer started
+[2026-03-17 21:10:56.666] [1010790] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to have-remote-offer
+[2026-03-17 21:10:56.667] [1010790] [debug] [RTC] rtc::impl::PeerConnection::populateLocalDescription@949: Adding application to local description, mid="0"
+[2026-03-17 21:10:56.667] [1010790] [info] [RTC] rtc::impl::PeerConnection::changeSignalingState@1367: Changed signaling state to stable
+[2026-03-17 21:10:56.667] [1010788] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=1, length=672
+[2026-03-17 21:10:56.687] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=125
+[2026-03-17 21:10:56.687] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=125
+[2026-03-17 21:10:56.687] [1010790] [info] [WebSocket] Message received: {"candidate": "a=candidate:1 1 UDP 2114977791 192.168.172.129 59777 typ host", "id": "abcd", "mid": "0", "type": "candidate"}
+[2026-03-17 21:10:56.688] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=120
+[2026-03-17 21:10:56.688] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=120
+[2026-03-17 21:10:56.688] [1010790] [info] [WebSocket] Message received: {"candidate": "a=candidate:2 1 UDP 2114977535 172.18.0.1 59777 typ host", "id": "abcd", "mid": "0", "type": "candidate"}
+[2026-03-17 21:10:56.689] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:56.689] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:56.689] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:56.689] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:10:56.689] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:56.690] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:56.690] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:56.690] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:10:56.712] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=1, length=677
+[2026-03-17 21:10:56.712] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@322: WebSocket finished message: type=text, size=677
+[2026-03-17 21:10:56.712] [1010790] [info] [WebSocket] Message received: {"description": "v=0\r\no=rtc 1762019266 0 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic:WMS *\r\na=ice-options:ice2,trickle\r\na=fingerprint:sha-256 8C:E2:1F:3F:93:5A:63:CA:F0:62:BD:BE:9D:39:23:12:22:8A:22:9D:B1:F1:19:E4:A0:9E:BB:1E:3D:65:98:B1\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=max-message-size:262144\r\na=setup:active\r\na=ice-ufrag:CNdp\r\na=ice-pwd:SuOzg7N59JQ+6cMwgp+sm6\r\na=candidate:1 1 UDP 2114977791 192.168.172.129 59777 typ host\r\na=candidate:2 1 UDP 2114977535 172.18.0.1 59777 typ host\r\na=end-of-candidates\r\n", "id": "abcd", "type": "answer"}
+[2026-03-17 21:10:56.712] [1010790] [warning] [RTC] rtc::impl::Channel::flushPendingMessages@76: Uncaught exception in callback: Unexpected remote answer description in signaling state stable
+[2026-03-17 21:10:57.190] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:57.190] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:57.190] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:57.190] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:57.190] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:57.190] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:10:57.691] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:57.691] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:57.691] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:57.691] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:10:58.191] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:58.192] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:58.192] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:58.192] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:58.192] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:58.192] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:10:58.693] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:58.693] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:58.693] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:58.693] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:10:59.194] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:59.195] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:59.195] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:59.195] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:10:59.694] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:10:59.694] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:10:59.694] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:10:59.694] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:00.193] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:00.193] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:00.193] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:00.194] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:00.245] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:00.245] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:00.245] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:00.245] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:00.746] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:00.746] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:00.746] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:00.746] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:01.195] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:01.195] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:01.195] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:01.196] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:01.247] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:01.247] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:01.247] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:01.247] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:01.696] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:01.696] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:01.696] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:01.696] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:01.748] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:01.748] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:01.748] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:01.748] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:02.197] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:02.197] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:02.197] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:02.197] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:02.249] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:02.249] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:02.249] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:02.249] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:02.698] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:02.698] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:02.698] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:02.698] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:02.750] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:02.750] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:02.750] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:02.750] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:03.199] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:03.199] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:03.199] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:03.199] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:03.251] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:03.251] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:03.251] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:03.251] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:03.700] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:03.700] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:03.700] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:03.700] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:03.752] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:03.752] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:03.752] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:03.752] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:04.201] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:04.202] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:04.202] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:04.202] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:04.252] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:04.252] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:04.253] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:04.253] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:04.703] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:04.703] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:04.703] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:04.752] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:04.803] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:04.803] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:04.803] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:04.803] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:05.304] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:05.304] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:05.304] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:05.304] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:05.754] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:05.754] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:05.754] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:05.754] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:05.804] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:05.804] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:05.804] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:05.804] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:06.255] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:06.256] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:06.256] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:06.305] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:06.355] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:06.355] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:06.355] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:06.355] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:06.722] [1010790] [debug] [RTC] rtc::impl::WsTransport::incoming@145: WebSocket sending ping
+[2026-03-17 21:11:06.722] [1010790] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=9, length=4
+[2026-03-17 21:11:06.744] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=10, length=4
+[2026-03-17 21:11:06.745] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@353: WebSocket received pong
+[2026-03-17 21:11:06.856] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:06.856] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:06.856] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:06.857] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:07.306] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:07.307] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:07.307] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:07.307] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:07.356] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:07.356] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:07.356] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:07.356] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:07.808] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:07.808] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:07.808] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:07.856] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:07.907] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:07.907] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:07.907] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:07.907] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:08.408] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:08.408] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:08.408] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:08.408] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:08.583] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@301: WebSocket received frame: opcode=9, length=4
+[2026-03-17 21:11:08.583] [1010790] [debug] [RTC] rtc::impl::WsTransport::recvFrame@348: WebSocket received ping, sending pong
+[2026-03-17 21:11:08.583] [1010790] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=10, length=4
+[2026-03-17 21:11:08.857] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:08.858] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:08.858] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:08.858] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:08.908] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1449: ICE role conflict (both controlling)
+[2026-03-17 21:11:08.909] [1011820] [info] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: stun.c:692: Got STUN error code 487, reason "Error"
+[2026-03-17 21:11:08.909] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1619: ICE role conflict
+[2026-03-17 21:11:08.909] [1011820] [warning] [RTC] rtc::impl::IceTransport::LogCallback@390: juice: agent.c:1469: ICE role conflict (both controlled)
+[2026-03-17 21:11:09.213] [1010774] [info] [RTC] rtc::impl::PeerConnection::changeIceState@1336: Changed ICE state to closed
+[2026-03-17 21:11:09.214] [1010774] [info] [RTC] rtc::impl::PeerConnection::changeState@1318: Changed state to closed
+[2026-03-17 21:11:09.214] [1010774] [info] [PeerConnection] State changed: Closed
+[2026-03-17 21:11:09.214] [1010783] [debug] [RTC] rtc::impl::IceTransport::~IceTransport@183: Destroying ICE transport
+[2026-03-17 21:11:09.214] [1010774] [info] [RTC] rtc::impl::WsTransport::close@95: WebSocket closing
+[2026-03-17 21:11:09.214] [1010774] [debug] [RTC] rtc::impl::WsTransport::sendFrame@374: WebSocket sending frame: opcode=8, length=0
+[2026-03-17 21:11:09.215] [1010787] [debug] [RTC] rtc::impl::TcpTransport::close@300: Closing TCP socket

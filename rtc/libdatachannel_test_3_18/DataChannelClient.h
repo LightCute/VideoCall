@@ -13,7 +13,6 @@
 #include "utilities/log.h"
 #include "h264fileparser.hpp"
 #include "helpers.hpp"
-#include "stream.hpp"
 class DataChannelClient {
 public:
     using OnConnectedCallback = std::function<void(const std::string& peerId)>;
@@ -48,22 +47,7 @@ private:
     static std::string peerConnectionStateToString(rtc::PeerConnection::State state);
     static std::string gatheringStateToString(rtc::PeerConnection::GatheringState state);
     static void myCppLogCallback(rtc::LogLevel level, std::string message);
-    void addToStream(std::shared_ptr<Client> client, bool isAddingVideo);
-    void startStream();
-    template <class T> std::weak_ptr<T> make_weak_ptr(std::shared_ptr<T> ptr) { return ptr; }
-    void sendInitialNalus(std::shared_ptr<Stream> stream, std::shared_ptr<ClientTrackData> video);
-    std::shared_ptr<ClientTrackData> addVideo(const std::shared_ptr<rtc::PeerConnection> pc, 
-    const uint8_t payloadType, 
-    const uint32_t ssrc, 
-    const std::string cname, 
-    const std::string msid, 
-    const std::function<void (void)> onOpen);
 
-    uint32_t generateUniqueSSRC(const std::string& clientId);
-    std::shared_ptr<Stream> createStream(
-    const std::string h264Samples, 
-    const unsigned fps, 
-    const std::string opusSamples);
 
     OnConnectedCallback m_onConnectedCallback;
     std::shared_ptr<std::promise<void>> m_connectionPromisePtr;
@@ -83,6 +67,4 @@ private:
     std::atomic<bool> sendingVideo{false};
 
     std::unordered_map<std::string, std::shared_ptr<Client>> m_clients;
-    std::optional<std::shared_ptr<Stream>> m_avStream;
-    DispatchQueue m_MainThread;
 };

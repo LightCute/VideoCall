@@ -1,13 +1,35 @@
 #include "socket.h"
 #include <nlohmann/json.hpp>
 #include <string>
+#include <memory>
 #include "utilities/log.h"
 
+// 辅助函数：将 PeerConnection::State 转为字符串
+std::string peerConnectionStateToString(rtc::PeerConnection::State state) {
+    switch (state) {
+        case rtc::PeerConnection::State::New: return "New";
+        case rtc::PeerConnection::State::Connecting: return "Connecting";
+        case rtc::PeerConnection::State::Connected: return "Connected";
+        case rtc::PeerConnection::State::Disconnected: return "Disconnected";
+        case rtc::PeerConnection::State::Failed: return "Failed";
+        case rtc::PeerConnection::State::Closed: return "Closed";
+        default: return "Unknown State";
+    }
+}
 
+// 辅助函数：将 PeerConnection::GatheringState 转为字符串
+std::string gatheringStateToString(rtc::PeerConnection::GatheringState state) {
+    switch (state) {
+        case rtc::PeerConnection::GatheringState::New: return "New";
+        case rtc::PeerConnection::GatheringState::InProgress: return "InProgress";
+        case rtc::PeerConnection::GatheringState::Complete: return "Complete";
+        default: return "Unknown GatheringState";
+    }
+}
 
 
 WebSocket::WebSocket() {
-    m_config = rtc::Configuration();
+    rtc::Configuration m_config;
     m_ws = std::make_shared<rtc::WebSocket>();
     m_ws->onOpen([this]() {
         
@@ -19,11 +41,12 @@ WebSocket::WebSocket() {
     m_ws->onError([this](std::string err) {
     });
 
-    m_ws->onMessage([this, wws = make_weak_ptr(m_ws)](auto data) {
+    m_ws->onMessage([this,&m_config, wws = make_weak_ptr(m_ws)](auto data) {
 		// data holds either std::string or rtc::binary
 		if (!std::holds_alternative<std::string>(data))
 			return;
 
+        Log::info("[WebSocket] Message received: {}", std::get<std::string>(data));
 		nlohmann::json message = nlohmann::json::parse(std::get<std::string>(data));
 
 		auto it = message.find("id");
@@ -38,23 +61,22 @@ WebSocket::WebSocket() {
 
 		auto type = it->get<std::string>();
 
-		std::shared_ptr<rtc::PeerConnection> pc;
 		if (auto jt = m_peerConnectionMap.find(id); jt != m_peerConnectionMap.end()) {
-			pc = jt->second;
+			m_pc = jt->second;
 		} else if (type == "offer") {
-			std::cout << "Answering to " + id << std::endl;
-			pc = createPeerConnection(m_config, wws, id);
+			Log::info("[WebSocket] Answering to [{}]", id);
+			m_pc = createPeerConnection(m_config, wws, id);
 		} else {
 			return;
 		}
 
 		if (type == "offer" || type == "answer") {
 			auto sdp = message["description"].get<std::string>();
-			pc->setRemoteDescription(rtc::Description(sdp, type));
+			m_pc->setRemoteDescription(rtc::Description(sdp, type));
 		} else if (type == "candidate") {
 			auto sdp = message["candidate"].get<std::string>();
 			auto mid = message["mid"].get<std::string>();
-			pc->addRemoteCandidate(rtc::Candidate(sdp, mid));
+			m_pc->addRemoteCandidate(rtc::Candidate(sdp, mid));
 		}
 	});
 }
@@ -108,13 +130,16 @@ std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::
 	auto pc = std::make_shared<rtc::PeerConnection>(config);
 
 	pc->onStateChange(
-	    [](rtc::PeerConnection::State state) { std::cout << "State: " << state << std::endl; });
+	    [](rtc::PeerConnection::State state) { 
+            
+            Log::info("[PeerConnection] State changed: {}", peerConnectionStateToString(state));
+        });
 
 	pc->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-		std::cout << "Gathering State: " << state << std::endl;
+		Log::info("[PeerConnection] Gathering State changed: {}", gatheringStateToString(state));
 	});
 
-	pc->onLocalDescription([wws, id](rtc::Description description) {
+	pc->onLocalDescription([ wws, id](rtc::Description description) {
 		nlohmann::json message = {{"id", id},
 		                {"type", description.typeString()},
 		                {"description", std::string(description)}};
@@ -123,7 +148,7 @@ std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::
 			ws->send(message.dump());
 	});
 
-	pc->onLocalCandidate([wws, id](rtc::Candidate candidate) {
+	pc->onLocalCandidate([ wws, id](rtc::Candidate candidate) {
 		nlohmann::json message = {{"id", id},
 		                {"type", "candidate"},
 		                {"candidate", std::string(candidate)},
@@ -134,37 +159,35 @@ std::shared_ptr<rtc::PeerConnection> WebSocket::createPeerConnection(const rtc::
 	});
 
 	pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
-		std::cout << "DataChannel from " << id << " received with label \"" << dc->label() << "\""
-		          << std::endl;
-
+        Log::info("[PeerConnection] DataChannel from [{}] received with label [{}]", id, dc->label());
 		dc->onOpen([this, wdc = make_weak_ptr(dc)]() {
 			if (auto dc = wdc.lock())
 				dc->send("Hello from " + m_localId);
 
 		});
 
-		dc->onClosed([this, id]() { std::cout << "DataChannel from " << id << " closed" << std::endl; });
+		dc->onClosed([id]() { 
+            Log::info("[PeerConnection] DataChannel from [{}] closed", id);
+        });
 
 		dc->onMessage([this, id](auto data) {
 			// data holds either std::string or rtc::binary
             if (std::holds_alternative<std::string>(data))
             {            
-                std::cout << "Message from " << id << " received: " << std::get<std::string>(data)
-                        << std::endl;
-                Log::info("[WebSocket] Message from [{}] received: {}", id, std::get<std::string>(data));
+                Log::info("[PeerConnection] Message from [{}] received: {}", id, std::get<std::string>(data));
             }        
             else
-            {   std::cout << "Binary message from " << id
-                                << " received, size=" << std::get<rtc::binary>(data).size() << std::endl;
-                Log::info("[WebSocket] Binary message from [{}] received, size={}", id, std::get<rtc::binary>(data).size());
+            {   
+                Log::info("[PeerConnection] Binary message from [{}] received, size={}", id, std::get<rtc::binary>(data).size());
             }   
 		});
 
 		m_dataChannelMap.emplace(id, dc);
-        m_peer_id = id;
+        Log::info("[PeerConnection] DataChannel from [{}] added to map", id);
 	});
 
 	m_peerConnectionMap.emplace(id, pc);
+    Log::info("[PeerConnection] PeerConnection for [{}] created and added to map", id);
 	return pc;
 };
 

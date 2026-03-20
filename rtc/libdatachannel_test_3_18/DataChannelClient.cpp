@@ -4,22 +4,18 @@
 #include <random>
 #include <stdexcept>
 #include <thread>
-#include "opusfileparser.hpp"
+
 
 using namespace std::chrono_literals;
 using nlohmann::json;
 
-DataChannelClient::DataChannelClient()
-    : m_MainThread("MainThread")
-{
+DataChannelClient::DataChannelClient() {
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
     Log::info("[DataChannelClient] Starting, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
     rtc::InitLogger(rtc::LogLevel::Debug, myCppLogCallback);
     m_localId = randomId(4);
     Log::info("[DataChannelClient] Local ID generated: {}", m_localId);
     m_config.iceServers.emplace_back("stun:stun.l.google.com:19302");
-    m_avStream = std::nullopt;
-    m_config.disableAutoNegotiation = true;
 }
 
 DataChannelClient::~DataChannelClient() {
@@ -104,17 +100,13 @@ void DataChannelClient::callPeer(const std::string& peerId) {
     m_connectedFlag = false;
     Log::info("[DataChannelClient] Offering to {}", peerId);
     auto pc = createPeerConnection(m_ws, peerId);
-    auto it = m_clients.find(peerId);
-    if (it == m_clients.end()) {
-        Log::error("[DataChannelClient] Client not found for {}", peerId);
-        return;
-    }
-    auto client = it->second;  // ← 使用已有的 Client
+
+    auto video = rtc::Description::Video("video-stream", rtc::Description::Direction::SendRecv);
+    auto track = pc->addTrack(video);
 
     const std::string label = "test";
     Log::info("[DataChannelClient] Creating DataChannel with label \"{}\"", label);
     auto dc = pc->createDataChannel(label);
-    client->dataChannel = dc;
 
 
 
@@ -145,17 +137,15 @@ void DataChannelClient::callPeer(const std::string& peerId) {
         }
     });
 
-    // auto it = m_clients.find(peerId);
-    // auto client = std::make_shared<Client>(pc);
-    // if (it != m_clients.end()) {
-    //     it->second->dataChannel = dc; // 直接设置已有 Client 的 dataChannel
-    // } else {
-    //     // 理论上不应该走到这里，因为 createPeerConnection 已经创建了
-    //     client->dataChannel = dc;
-    //     m_clients.emplace(peerId, client);
-    // }
-
-    pc->setLocalDescription();
+    auto it = m_clients.find(peerId);
+    if (it != m_clients.end()) {
+        it->second->dataChannel = dc; // 直接设置已有 Client 的 dataChannel
+    } else {
+        // 理论上不应该走到这里，因为 createPeerConnection 已经创建了
+        auto client = std::make_shared<Client>(pc);
+        client->dataChannel = dc;
+        m_clients.emplace(peerId, client);
+    }
 }
 
 void DataChannelClient::sendMessage(const std::string& peerId, const std::string& message) {
@@ -263,8 +253,6 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         if (auto ws = wws.lock()) ws->send(message.dump());
     });
 
-
-
     pc->onTrack([this, id](std::shared_ptr<rtc::Track> track) {
         Log::info("[PeerConnection] [{}] Received track: {}", 
             id, track->mid());        
@@ -275,21 +263,9 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         // });
     });
 
-    pc->onDataChannel([this, id, pc](std::shared_ptr<rtc::DataChannel> dc) {
+    pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
         Log::info("[PeerConnection] DataChannel from {} received: {}", id, dc->label());
-        // ✅ 1. 查找或创建 Client
-        auto it = m_clients.find(id);
-        std::shared_ptr<Client> client;
-        if (it != m_clients.end()) {
-            client = it->second;
-        } else {
-            // ✅ 如果不存在，创建新的 Client
-            
-            {
-                client = std::make_shared<Client>(pc);
-                m_clients.emplace(id, client);
-            }
-        }
+
 
         dc->onOpen([this, id, wdc = std::weak_ptr<rtc::DataChannel>(dc)]() {
             Log::info("[PeerConnection] DataChannel from {} open", id);
@@ -310,12 +286,12 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
             }
         });
 
-        if (client) {
-            client->dataChannel = dc;
+        auto it = m_clients.find(id);
+        if (it != m_clients.end()) {
+            it->second->dataChannel = dc;
         }
     });
 
-    // ✅ 3. 创建 Client 并放入 m_clients (如果不存在)
     auto it = m_clients.find(id);
     if (it == m_clients.end()) {
         auto client = std::make_shared<Client>(pc);
@@ -401,175 +377,4 @@ bool DataChannelClient::isDataChannelOpen(const std::string& peerId) const {
     return client->dataChannel.has_value() && 
            client->dataChannel.value() && 
            client->dataChannel.value()->isOpen();
-}
-
-
-//---------------------------------------------------------
-
-
-std::shared_ptr<ClientTrackData> DataChannelClient::addVideo(const std::shared_ptr<rtc::PeerConnection> pc, 
-    const uint8_t payloadType, 
-    const uint32_t ssrc, 
-    const std::string cname, 
-    const std::string msid, 
-    const std::function<void (void)> onOpen) {
-    auto video = rtc::Description::Video(cname, rtc::Description::Direction::SendRecv);
-    video.addH264Codec(payloadType);
-    video.addSSRC(ssrc, cname, msid, cname);
-    auto track = pc->addTrack(video);
-    // create RTP configuration
-    auto rtpConfig = std::make_shared<rtc::RtpPacketizationConfig>(ssrc, cname, payloadType, rtc::H264RtpPacketizer::ClockRate);
-    // create packetizer
-    auto packetizer = std::make_shared<rtc::H264RtpPacketizer>(rtc::NalUnit::Separator::Length, rtpConfig);
-    // add RTCP SR handler
-    auto srReporter = std::make_shared<rtc::RtcpSrReporter>(rtpConfig);
-    packetizer->addToChain(srReporter);
-    // add RTCP NACK handler
-    auto nackResponder = std::make_shared<rtc::RtcpNackResponder>();
-    packetizer->addToChain(nackResponder);
-    // set handler
-    track->setMediaHandler(packetizer);
-    track->onOpen(onOpen);
-    auto trackData = std::make_shared<ClientTrackData>(track, srReporter);
-    return trackData;
-}
-
-
-
-
-
-
-//----------------------------------------------------
-
-
-
-/// Start stream
-void DataChannelClient::startStream() {
-    std::shared_ptr<Stream> stream;
-    if (m_avStream.has_value()) {
-        stream = m_avStream.value();
-        if (stream->isRunning) {
-            // stream is already running
-            return;
-        }
-    } else {
-        stream = createStream("samples/h264", 30, "samples/opus");
-        m_avStream = stream;
-    }
-    stream->start();
-}
-
-/// Add client to stream
-/// @param client Client
-/// @param adding_video True if adding video
-void DataChannelClient::addToStream(std::shared_ptr<Client> client, bool isAddingVideo) {
-    if (client->getState() == Client::State::Waiting) {
-        client->setState(isAddingVideo ? Client::State::WaitingForAudio : Client::State::WaitingForVideo);
-    } else if ((client->getState() == Client::State::WaitingForAudio && !isAddingVideo)
-               || (client->getState() == Client::State::WaitingForVideo && isAddingVideo)) {
-
-        // Audio and video tracks are collected now
-        assert(client->video.has_value() && client->audio.has_value());
-        auto video = client->video.value();
-
-        if (m_avStream.has_value()) {
-            sendInitialNalus(m_avStream.value(), video);
-        }
-
-        client->setState(Client::State::Ready);
-    }
-    if (client->getState() == Client::State::Ready) {
-        startStream();
-    }
-}
-
-
-
-
-/// Create stream
-std::shared_ptr<Stream> DataChannelClient::createStream(
-    const std::string h264Samples, 
-    const unsigned fps, 
-    const std::string opusSamples) {
-    // video source
-    auto video = std::make_shared<H264FileParser>(h264Samples, fps, true);
-    // audio source
-    auto audio = std::make_shared<OPUSFileParser>(opusSamples, true);
-
-    auto stream = std::make_shared<Stream>(video, audio);
-    // set callback responsible for sample sending
-    stream->onSample([this, ws = make_weak_ptr(stream)](Stream::StreamSourceType type, uint64_t sampleTime, rtc::binary sample) {
-        std::vector<ClientTrack> tracks{};
-        std::string streamType = type == Stream::StreamSourceType::Video ? "video" : "audio";
-        // get track for given type
-        std::function<std::optional<std::shared_ptr<ClientTrackData>> (std::shared_ptr<Client>)> getTrackData = [type](std::shared_ptr<Client> client) {
-            return type == Stream::StreamSourceType::Video ? client->video : client->audio;
-        };
-        // get all clients with Ready state
-        for(auto id_client: m_clients) {
-            auto id = id_client.first;
-            auto client = id_client.second;
-            auto optTrackData = getTrackData(client);
-            if (client->getState() == Client::State::Ready && optTrackData.has_value()) {
-                auto trackData = optTrackData.value();
-                tracks.push_back(ClientTrack(id, trackData));
-            }
-        }
-        if (!tracks.empty()) {
-            for (auto clientTrack: tracks) {
-                auto client = clientTrack.id;
-                auto trackData = clientTrack.trackData;
-
-                std::cout << "Sending " << streamType << " sample with size: " << std::to_string(sample.size()) << " to " << client << std::endl;
-                try {
-                    // send sample
-                    trackData->track->sendFrame(sample, std::chrono::duration<double, std::micro>(sampleTime));
-                } catch (const std::exception &e) {
-                    std::cerr << "Unable to send "<< streamType << " packet: " << e.what() << std::endl;
-                }
-            }
-        }
-        m_MainThread.dispatch([this,ws]() {
-            if (m_clients.empty()) {
-                // we have no clients, stop the stream
-                if (auto stream = ws.lock()) {
-                    stream->stop();
-                }
-            }
-        });
-    });
-    return stream;
-}
-
-
-/// Send previous key frame so browser can show something to user
-/// @param stream Stream
-/// @param video Video track data
-void DataChannelClient::sendInitialNalus(std::shared_ptr<Stream> stream, std::shared_ptr<ClientTrackData> video) {
-    auto h264 = dynamic_cast<H264FileParser *>(stream->video.get());
-    auto initialNalus = h264->initialNALUS();
-
-    // send previous NALU key frame so users don't have to wait to see stream works
-    if (!initialNalus.empty()) {
-        const double frameDuration_s = double(h264->getSampleDuration_us()) / (1000 * 1000);
-        const uint32_t frameTimestampDuration = video->sender->rtpConfig->secondsToTimestamp(frameDuration_s);
-        video->sender->rtpConfig->timestamp = video->sender->rtpConfig->startTimestamp - frameTimestampDuration * 2;
-        video->track->send(initialNalus);
-        video->sender->rtpConfig->timestamp += frameTimestampDuration;
-        // Send initial NAL units again to start stream in firefox browser
-        video->track->send(initialNalus);
-    }
-}
-
-
-uint32_t DataChannelClient::generateUniqueSSRC(const std::string& clientId) {
-    // 方法 1: 基于客户端 ID 哈希
-    std::hash<std::string> hasher;
-    return hasher(clientId) & 0xFFFFFFFF;
-    
-    // 方法 2: 随机生成
-    // std::random_device rd;
-    // std::mt19937 gen(rd());
-    // std::uniform_int_distribution<uint32_t> dist(1, 0xFFFFFFFE);
-    // return dist(gen);
 }
