@@ -9,7 +9,9 @@
 using namespace std::chrono_literals;
 using nlohmann::json;
 
-DataChannelClient::DataChannelClient() {
+DataChannelClient::DataChannelClient() 
+    : m_MainThread("MainThread")
+{
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
     Log::info("[DataChannelClient] Starting, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
     rtc::InitLogger(rtc::LogLevel::Debug, myCppLogCallback);
@@ -121,7 +123,6 @@ void DataChannelClient::callPeer(const std::string& peerId) {
             }
         }
         
-        if (m_onConnectedCallback) m_onConnectedCallback(peerId);
         if (auto dc = wdc.lock()) dc->send("Hello from " + m_localId);
     });
 
@@ -191,9 +192,6 @@ std::string DataChannelClient::getLocalId() const {
     return m_localId;
 }
 
-void DataChannelClient::setOnConnectedCallback(OnConnectedCallback callback) {
-    m_onConnectedCallback = std::move(callback);
-}
 
 
 bool DataChannelClient::waitForConnection(std::chrono::milliseconds timeout) {
@@ -270,7 +268,6 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         dc->onOpen([this, id, wdc = std::weak_ptr<rtc::DataChannel>(dc)]() {
             Log::info("[PeerConnection] DataChannel from {} open", id);
             m_connectedFlag = true;
-            if (m_onConnectedCallback) m_onConnectedCallback(id);
             if (auto dc = wdc.lock()) dc->send("Hello from " + m_localId);
         });
 
