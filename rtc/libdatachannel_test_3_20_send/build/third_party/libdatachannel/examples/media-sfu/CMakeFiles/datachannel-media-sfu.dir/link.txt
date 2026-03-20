@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/datachannel-media-sfu.dir/link.d "CMakeFiles/datachannel-media-sfu.dir/main.cpp.o" -o media-sfu  -Wl,-rpath,/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_send/build/third_party/libdatachannel ../../libdatachannel.so.0.24.1

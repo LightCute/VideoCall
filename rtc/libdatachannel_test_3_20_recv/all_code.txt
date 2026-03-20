@@ -1,0 +1,644 @@
+========== 工程目录结构（仅含.h/.cpp）==========
+
+📂 .:
+  └─ DataChannelClient.cpp
+  └─ DataChannelClient.h
+  └─ main.cpp
+
+📂 ./utilities:
+  └─ blocking_queue.h
+  └─ log.h
+
+==================================================
+========== 所有.h/.cpp文件内容 ==========
+
+
+========== ./main.cpp ==========
+Lines: 81
+
+#include "DataChannelClient.h"
+#include <iostream>
+#include <string>
+#include <thread>
+#include <atomic>
+
+// 跨平台非阻塞输入检查（简化版）
+bool hasInput() {
+#ifdef _WIN32
+    return _kbhit() != 0;
+#else
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds);
+    timeval tv{0, 100000}; // 100ms 超时
+    return select(STDIN_FILENO + 1, &fds, nullptr, nullptr, &tv) > 0;
+#endif
+}
+
+int main() {
+    try {
+        DataChannelClient client;
+
+        // 连接信令服务器
+        client.connectToServer("ws://120.79.210.6:8000");
+        std::cout << "Local ID: " << client.getLocalId() << std::endl;
+        std::cout << "\nWaiting for connection... (You can also enter a peer ID to call)\n" << std::endl;
+
+        // 主循环：同时支持主动呼叫和被动接收
+        while (true) {
+            // 检查是否已经有连接（无论是主动还是被动）
+            if (auto activePeer = client.getActivePeerId()) {
+                std::cout << "\n--- Connected to " << *activePeer << " ---" << std::endl;
+                
+                // 消息发送循环
+                std::string msg;
+                while (true) {
+                    std::cout << "Enter message (empty to disconnect): ";
+                    std::getline(std::cin, msg);
+                    
+                    if (msg.empty()) {
+                        std::cout << "Disconnecting..." << std::endl;
+                        client.close();
+                        break;
+                    }
+                    
+                    client.sendMessage(*activePeer, msg);
+                }
+                
+                // 断开后重置状态，等待下一次连接
+                std::cout << "\nWaiting for new connection...\n" << std::endl;
+                continue;
+            }
+
+            // 检查是否有用户输入（主动呼叫）
+            if (hasInput()) {
+                std::string peerId;
+                std::cout << "Enter remote ID to call: ";
+                std::cin >> peerId;
+                std::cin.ignore(); // 忽略换行符
+                
+                if (peerId.empty()) {
+                    std::cout << "Exiting..." << std::endl;
+                    break;
+                }
+                
+                // 发起呼叫
+                client.callPeer(peerId);
+                std::cout << "Calling " << peerId << ", waiting for connection..." << std::endl;
+            }
+
+            // 短暂休眠，避免 CPU 占用过高
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        return 0;
+    } catch (const std::exception& e) {
+        Log::error("[Main] Exception: {}", e.what());
+        return -1;
+    }
+}
+========== ./DataChannelClient.h ==========
+Lines: 82
+
+#pragma once
+
+#include "rtc/rtc.hpp"
+#include <nlohmann/json.hpp>
+#include <string>
+#include <memory>
+#include <unordered_map>
+#include <future>
+#include <optional>
+#include <functional>
+#include "utilities/log.h"
+
+class DataChannelClient {
+public:
+    // 定义连接状态回调类型
+    using OnConnectedCallback = std::function<void(const std::string& peerId)>;
+
+    DataChannelClient();
+    ~DataChannelClient();
+
+    // 禁止拷贝和移动
+    DataChannelClient(const DataChannelClient&) = delete;
+    DataChannelClient& operator=(const DataChannelClient&) = delete;
+    DataChannelClient(DataChannelClient&&) = delete;
+    DataChannelClient& operator=(DataChannelClient&&) = delete;
+
+    // 连接信令服务器
+    void connectToServer(const std::string& serverUrl);
+
+    // 向指定 Peer 发送 Offer 并建立连接
+    void callPeer(const std::string& peerId);
+
+    // 向指定 Peer 发送文本消息
+    void sendMessage(const std::string& peerId, const std::string& message);
+
+    // 关闭所有连接并清理资源
+    void close();
+
+    // 获取本地生成的 ID
+    std::string getLocalId() const;
+
+    // ===================== 新增接口 =====================
+    // 设置连接成功回调（无论是主动还是被动连接）
+    void setOnConnectedCallback(OnConnectedCallback callback);
+
+    // 获取当前活跃的 Peer ID（如果有）
+    std::optional<std::string> getActivePeerId() const;
+
+    // 等待任意连接建立（超时返回）
+    bool waitForConnection(std::chrono::milliseconds timeout = std::chrono::milliseconds(100));
+
+private:
+    // 创建并配置 PeerConnection
+    std::shared_ptr<rtc::PeerConnection> createPeerConnection(
+        std::weak_ptr<rtc::WebSocket> wws, 
+        const std::string& id
+    );
+
+    // 生成随机 ID
+    static std::string randomId(size_t length);
+
+    // 枚举转字符串辅助函数
+    static std::string peerConnectionStateToString(rtc::PeerConnection::State state);
+    static std::string gatheringStateToString(rtc::PeerConnection::GatheringState state);
+
+    // RTC 日志回调
+    static void myCppLogCallback(rtc::LogLevel level, std::string message);
+
+    // ===================== 新增成员变量 =====================
+    OnConnectedCallback m_onConnectedCallback; // 连接成功回调
+    std::optional<std::string> m_activePeerId; // 当前活跃的 Peer ID
+    std::promise<void> m_connectionPromise;     // 用于等待连接建立
+    std::atomic<bool> m_connectedFlag{false};   // 连接状态标志
+
+    // 核心成员变量
+    std::string m_localId;
+    rtc::Configuration m_config;
+    std::shared_ptr<rtc::WebSocket> m_ws;
+    std::unordered_map<std::string, std::shared_ptr<rtc::PeerConnection>> m_peerConnectionMap;
+    std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> m_dataChannelMap;
+    std::promise<void> m_wsPromise;
+};
+========== ./DataChannelClient.cpp ==========
+Lines: 288
+
+#include "DataChannelClient.h"
+#include <algorithm>
+#include <chrono>
+#include <random>
+#include <stdexcept>
+#include <thread>
+#include <atomic>
+
+using namespace std::chrono_literals;
+using nlohmann::json;
+
+DataChannelClient::DataChannelClient() {
+    Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
+    Log::info("[DataChannelClient] Starting, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
+    rtc::InitLogger(rtc::LogLevel::Debug, myCppLogCallback);
+    m_localId = randomId(4);
+    Log::info("[DataChannelClient] Local ID generated: {}", m_localId);
+    m_config.iceServers.emplace_back("stun:stun.l.google.com:19302");
+}
+
+DataChannelClient::~DataChannelClient() {
+    close();
+}
+
+void DataChannelClient::connectToServer(const std::string& serverUrl) {
+    if (m_ws && m_ws->isOpen()) {
+        Log::warn("[DataChannelClient] WebSocket is already connected");
+        return;
+    }
+
+    m_ws = std::make_shared<rtc::WebSocket>();
+    m_wsPromise = std::promise<void>();
+    auto wsFuture = m_wsPromise.get_future();
+
+    m_ws->onOpen([this]() {
+        Log::info("[DataChannelClient] WebSocket connected, signaling ready");
+        m_wsPromise.set_value();
+    });
+
+    m_ws->onError([this](std::string s) {
+        Log::error("[DataChannelClient] WebSocket error: {}", s);
+        m_wsPromise.set_exception(std::make_exception_ptr(std::runtime_error(s)));
+    });
+
+    m_ws->onClosed([this]() {
+        Log::info("[DataChannelClient] WebSocket closed");
+    });
+
+    m_ws->onMessage([this, wws = std::weak_ptr<rtc::WebSocket>(m_ws)](auto data) {
+        if (!std::holds_alternative<std::string>(data)) return;
+
+        json message = json::parse(std::get<std::string>(data));
+        auto it = message.find("id");
+        if (it == message.end()) return;
+        auto id = it->get<std::string>();
+
+        it = message.find("type");
+        if (it == message.end()) return;
+        auto type = it->get<std::string>();
+
+        std::shared_ptr<rtc::PeerConnection> pc;
+        if (auto jt = m_peerConnectionMap.find(id); jt != m_peerConnectionMap.end()) {
+            pc = jt->second;
+        } else if (type == "offer") {
+            Log::info("[DataChannelClient] Answering to {}", id);
+            pc = createPeerConnection(wws, id);
+        } else {
+            return;
+        }
+        if (type == "offer" || type == "answer") {
+            auto sdp = message["description"].get<std::string>();
+            pc->setRemoteDescription(rtc::Description(sdp, type));
+            
+        } else if (type == "candidate") {
+            auto sdp = message["candidate"].get<std::string>();
+            auto mid = message["mid"].get<std::string>();
+            pc->addRemoteCandidate(rtc::Candidate(sdp, mid));
+        }
+    });
+
+    std::string fullUrl = serverUrl + "/" + m_localId;
+    m_ws->open(fullUrl);
+
+    Log::info("[DataChannelClient] Waiting for signaling connection...");
+    wsFuture.get();
+}
+
+void DataChannelClient::callPeer(const std::string& peerId) {
+    if (!m_ws || !m_ws->isOpen()) {
+        Log::error("[DataChannelClient] WebSocket is not connected");
+        return;
+    }
+
+    if (peerId.empty() || peerId == m_localId) {
+        Log::warn("[DataChannelClient] Invalid peer ID");
+        return;
+    }
+
+    Log::info("[DataChannelClient] Offering to {}", peerId);
+    auto pc = createPeerConnection(m_ws, peerId);
+
+    const std::string label = "test";
+    Log::info("[DataChannelClient] Creating DataChannel with label \"{}\"", label);
+    auto dc = pc->createDataChannel(label);
+
+    dc->onOpen([this, peerId, wdc = std::weak_ptr<rtc::DataChannel>(dc)]() {
+        Log::info("[DataChannelClient] DataChannel from {} open", peerId);
+        m_activePeerId = peerId;
+        m_connectedFlag = true;
+        m_connectionPromise.set_value();
+        if (m_onConnectedCallback) m_onConnectedCallback(peerId);
+        if (auto dc = wdc.lock()) dc->send("Hello from " + m_localId);
+    });
+
+    dc->onClosed([this, peerId]() {
+        Log::info("[DataChannelClient] DataChannel from {} closed", peerId);
+        if (m_activePeerId == peerId) m_activePeerId = std::nullopt;
+    });
+
+    dc->onMessage([this, peerId](auto data) {
+        if (std::holds_alternative<std::string>(data)) {
+            Log::info("[DataChannelClient] Message from {}: {}", peerId, std::get<std::string>(data));
+        } else {
+            Log::info("[DataChannelClient] Binary message from {}, size={}", peerId, std::get<rtc::binary>(data).size());
+        }
+    });
+
+    m_dataChannelMap.emplace(peerId, dc);
+}
+
+void DataChannelClient::sendMessage(const std::string& peerId, const std::string& message) {
+    auto it = m_dataChannelMap.find(peerId);
+    if (it == m_dataChannelMap.end()) {
+        Log::warn("[DataChannelClient] No DataChannel for peer {}", peerId);
+        return;
+    }
+
+    if (auto dc = it->second; dc && dc->isOpen()) {
+        dc->send(message);
+        Log::info("[DataChannelClient] Sent to {}: {}", peerId, message);
+    } else {
+        Log::warn("[DataChannelClient] DataChannel for {} is not open", peerId);
+    }
+}
+
+void DataChannelClient::close() {
+    Log::info("[DataChannelClient] Cleaning up...");
+    m_dataChannelMap.clear();
+    m_peerConnectionMap.clear();
+    m_activePeerId = std::nullopt;
+    m_connectedFlag = false;
+    if (m_ws) {
+        m_ws->close();
+        m_ws.reset();
+    }
+}
+
+std::string DataChannelClient::getLocalId() const {
+    return m_localId;
+}
+
+// ===================== 新增方法实现 =====================
+void DataChannelClient::setOnConnectedCallback(OnConnectedCallback callback) {
+    m_onConnectedCallback = std::move(callback);
+}
+
+std::optional<std::string> DataChannelClient::getActivePeerId() const {
+    return m_activePeerId;
+}
+
+bool DataChannelClient::waitForConnection(std::chrono::milliseconds timeout) {
+    if (m_connectedFlag) return true;
+    
+    // 重置 promise 用于等待
+    m_connectionPromise = std::promise<void>();
+    auto future = m_connectionPromise.get_future();
+    return future.wait_for(timeout) == std::future_status::ready;
+}
+
+std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
+    std::weak_ptr<rtc::WebSocket> wws, 
+    const std::string& id
+) {
+    auto pc = std::make_shared<rtc::PeerConnection>(m_config);
+
+    pc->onStateChange([](rtc::PeerConnection::State state) {
+        Log::info("[DataChannelClient] State: {}", peerConnectionStateToString(state));
+    });
+
+    pc->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+        Log::info("[DataChannelClient] Gathering State: {}", gatheringStateToString(state));
+    });
+
+    pc->onLocalDescription([wws, id](rtc::Description description) {
+        json message = {
+            {"id", id},
+            {"type", description.typeString()},
+            {"description", std::string(description)}
+        };
+        if (auto ws = wws.lock()) ws->send(message.dump());
+    });
+
+    pc->onLocalCandidate([wws, id](rtc::Candidate candidate) {
+        json message = {
+            {"id", id},
+            {"type", "candidate"},
+            {"candidate", std::string(candidate)},
+            {"mid", candidate.mid()}
+        };
+        if (auto ws = wws.lock()) ws->send(message.dump());
+    });
+
+    pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
+        Log::info("[DataChannelClient] DataChannel from {} received: {}", id, dc->label());
+
+        dc->onOpen([this, id, wdc = std::weak_ptr<rtc::DataChannel>(dc)]() {
+            Log::info("[DataChannelClient] DataChannel from {} open", id);
+            m_activePeerId = id;
+            m_connectedFlag = true;
+            m_connectionPromise.set_value();
+            if (m_onConnectedCallback) m_onConnectedCallback(id);
+            if (auto dc = wdc.lock()) dc->send("Hello from " + m_localId);
+        });
+
+        dc->onClosed([this, id]() {
+            Log::info("[DataChannelClient] DataChannel from {} closed", id);
+            if (m_activePeerId == id) m_activePeerId = std::nullopt;
+        });
+
+        dc->onMessage([this, id](auto data) {
+            if (std::holds_alternative<std::string>(data)) {
+                Log::info("[DataChannelClient] Message from {}: {}", id, std::get<std::string>(data));
+            } else {
+                Log::info("[DataChannelClient] Binary message from {}, size={}", id, std::get<rtc::binary>(data).size());
+            }
+        });
+
+        m_dataChannelMap.emplace(id, dc);
+    });
+
+    m_peerConnectionMap.emplace(id, pc);
+    return pc;
+}
+
+std::string DataChannelClient::randomId(size_t length) {
+    using std::chrono::high_resolution_clock;
+    static thread_local std::mt19937 rng(
+        static_cast<unsigned int>(high_resolution_clock::now().time_since_epoch().count())
+    );
+    static const std::string chars("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+    std::string id(length, '0');
+    std::uniform_int_distribution<int> dist(0, int(chars.size() - 1));
+    std::generate(id.begin(), id.end(), [&]() { return chars.at(dist(rng)); });
+    return id;
+}
+
+std::string DataChannelClient::peerConnectionStateToString(rtc::PeerConnection::State state) {
+    switch (state) {
+        case rtc::PeerConnection::State::New: return "New";
+        case rtc::PeerConnection::State::Connecting: return "Connecting";
+        case rtc::PeerConnection::State::Connected: return "Connected";
+        case rtc::PeerConnection::State::Disconnected: return "Disconnected";
+        case rtc::PeerConnection::State::Failed: return "Failed";
+        case rtc::PeerConnection::State::Closed: return "Closed";
+        default: return "Unknown";
+    }
+}
+
+std::string DataChannelClient::gatheringStateToString(rtc::PeerConnection::GatheringState state) {
+    switch (state) {
+        case rtc::PeerConnection::GatheringState::New: return "New";
+        case rtc::PeerConnection::GatheringState::InProgress: return "InProgress";
+        case rtc::PeerConnection::GatheringState::Complete: return "Complete";
+        default: return "Unknown";
+    }
+}
+
+void DataChannelClient::myCppLogCallback(rtc::LogLevel level, std::string message) {
+    switch (level) {
+        case rtc::LogLevel::Fatal:
+        case rtc::LogLevel::Error: Log::error("[RTC] {}", message); break;
+        case rtc::LogLevel::Warning: Log::warn("[RTC] {}", message); break;
+        case rtc::LogLevel::Info: Log::info("[RTC] {}", message); break;
+        case rtc::LogLevel::Debug: Log::debug("[RTC] {}", message); break;
+        case rtc::LogLevel::Verbose: Log::trace("[RTC] {}", message); break;
+        default: Log::info("[RTC] {}", message); break;
+    }
+}
+========== ./utilities/blocking_queue.h ==========
+Lines: 57
+
+#pragma once
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
+template<typename T>
+class BlockingQueue {
+public:
+
+    BlockingQueue() : m_stop(false) {}
+    ~BlockingQueue() { stop(); }
+    
+    void stop()
+    {
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_stop = true;
+        }
+        m_cv.notify_all();
+    }
+
+    void push(T item)
+    {
+        if (m_stop) return;
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_queue.push(std::move(item));
+        }
+        m_cv.notify_one();
+    }
+
+    T waitAndPop()
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        m_cv.wait(lock, [this] {
+            return m_stop || !m_queue.empty();
+        });
+
+        if (m_stop)
+        {
+            return T{};
+        }
+
+        T item = std::move(m_queue.front());
+        m_queue.pop();
+        return item;
+    }
+
+private:
+
+    std::queue<T> m_queue;
+    std::mutex m_mutex;
+    std::condition_variable m_cv;
+    std::atomic<bool> m_stop;
+};
+========== ./utilities/log.h ==========
+Lines: 101
+
+#pragma once
+#include <memory>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/async.h>
+
+
+class Log {
+public:
+    // 新增：日志模式枚举
+    enum class Mode {
+        Sync,   // 同步模式
+        Async   // 异步模式
+    };
+
+    // 统一初始化接口
+    // filename: 日志文件名
+    // mode: 同步或异步，默认异步
+    // level: 日志输出级别，默认 info (即 info/warn/error/critical 会输出，trace/debug 会被过滤)
+    static void init(const std::string& filename = "app.log", 
+                     Mode mode = Mode::Async,
+                     spdlog::level::level_enum level = spdlog::level::info) {
+        static bool initialized = false;
+        if (initialized) return;
+
+        try {
+            // 1. 创建 sinks (控制台 + 文件)
+            auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+            auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
+            
+            // 注意：sink 本身的级别设为最低，主要靠全局 logger 级别来过滤
+            console_sink->set_level(spdlog::level::trace);
+            file_sink->set_level(spdlog::level::trace);
+
+            std::vector<spdlog::sink_ptr> sinks { console_sink, file_sink };
+
+            // 2. 根据模式创建 logger
+            std::shared_ptr<spdlog::logger> logger;
+            
+            if (mode == Mode::Async) {
+                // 异步模式：初始化线程池
+                spdlog::init_thread_pool(8192, 1);
+                logger = std::make_shared<spdlog::async_logger>(
+                    "async_logger", 
+                    sinks.begin(), 
+                    sinks.end(),
+                    spdlog::thread_pool(), 
+                    spdlog::async_overflow_policy::block
+                );
+            } else {
+                // 同步模式
+                logger = std::make_shared<spdlog::logger>("sync_logger", sinks.begin(), sinks.end());
+            }
+
+            // 3. 设置默认 logger
+            spdlog::set_default_logger(logger);
+            
+            // 4. 设置格式
+            spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%t] [%l] %v");
+
+            // 5. 设置全局过滤级别 (核心改动在这里)
+            spdlog::set_level(level); 
+
+            initialized = true;
+            std::cout << "Log init success. Mode: " << (mode == Mode::Async ? "Async" : "Sync") 
+                      << ", Level: " << spdlog::level::to_string_view(level).data() << std::endl;
+        } catch (const spdlog::spdlog_ex &ex) {
+            std::cerr << "Log init failed: " << ex.what() << std::endl;
+        }
+    }
+
+    // 辅助函数：将 thread::id 转为 string
+    static std::string threadIdToString(const std::thread::id& id) {
+        std::ostringstream oss;
+        oss << id;
+        return oss.str();
+    }    
+
+    // 日志接口
+    template<typename... Args>
+    static void trace(const char* fmt, Args&&... args) { spdlog::trace(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void debug(const char* fmt, Args&&... args) { spdlog::debug(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void info(const char* fmt, Args&&... args) { spdlog::info(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void warn(const char* fmt, Args&&... args) { spdlog::warn(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void error(const char* fmt, Args&&... args) { spdlog::error(fmt, std::forward<Args>(args)...); }
+
+    template<typename... Args>
+    static void critical(const char* fmt, Args&&... args) { spdlog::critical(fmt, std::forward<Args>(args)...); }
+};
+
+
+=====================================
+Total files: 5
+Total lines: 609
