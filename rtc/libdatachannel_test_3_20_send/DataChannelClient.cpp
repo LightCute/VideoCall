@@ -103,8 +103,26 @@ void DataChannelClient::callPeer(const std::string& peerId) {
     Log::info("[DataChannelClient] Offering to {}", peerId);
     auto pc = createPeerConnection(m_ws, peerId);
 
-    auto video = rtc::Description::Video("video-stream", rtc::Description::Direction::SendRecv);
-    auto track = pc->addTrack(video);
+    auto it_client = m_clients.find(peerId);
+    if (it_client == m_clients.end()) {
+        Log::error("[DataChannelClient] Failed to find or create Client for peer {}", peerId);
+        return;
+    }
+    auto client = it_client->second;
+    // 生成唯一 SSRC（可以用你的 generateUniqueSSRC 函数）
+    uint32_t videoSsrc = generateUniqueSSRC(peerId + "_video");
+    uint32_t audioSsrc = generateUniqueSSRC(peerId + "_audio");
+
+    
+    auto videoTrackData = addVideo(pc, 102, videoSsrc, "video-stream", "stream-" + peerId, 
+    [this, peerId, wc = make_weak_ptr(client)]() {
+        m_MainThread.dispatch([this, wc, peerId]() {
+            if (auto c = wc.lock()) {
+                addToStream(c, true); // 复用 Example 的状态管理
+            }
+        });
+        Log::info("[DataChannelClient] Video track for {} is open", peerId);
+    });
 
     const std::string label = "test";
     Log::info("[DataChannelClient] Creating DataChannel with label \"{}\"", label);
@@ -138,14 +156,9 @@ void DataChannelClient::callPeer(const std::string& peerId) {
         }
     });
 
-    auto it = m_clients.find(peerId);
-    if (it != m_clients.end()) {
-        it->second->dataChannel = dc; // 直接设置已有 Client 的 dataChannel
-    } else {
-        // 理论上不应该走到这里，因为 createPeerConnection 已经创建了
-        auto client = std::make_shared<Client>(pc);
+    {
+        client->video = videoTrackData;
         client->dataChannel = dc;
-        m_clients.emplace(peerId, client);
     }
 }
 
