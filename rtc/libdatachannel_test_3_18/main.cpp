@@ -19,20 +19,20 @@ bool hasInput() {
 
 int main() {
     try {
-        DataChannelClient client;
+        DataChannelClient dataChannelClient;
 
         // 连接信令服务器
-        client.connectToServer("ws://120.79.210.6:8000");
-        Log::info("[Main] Local ID: {}", client.getLocalId());
+        dataChannelClient.connectToServer("ws://120.79.210.6:8000");
+        Log::info("[Main] Local ID: {}", dataChannelClient.getLocalId());
         Log::info("[Main] You can enter a peer ID to call, or wait for incoming connections.");
             std::string currentPeerId;  // 跟踪当前连接的 peer
         bool isConnecting = false;  // 跟踪是否正在连接中
         // 主循环：同时支持主动呼叫和被动接收
                while (true) {
             // ✅ 修复 1: 使用更准确的连接检测
-            if (client.hasActiveConnection()) {
+            if (dataChannelClient.hasActiveConnection()) {
                 // 获取已连接的 peer ID
-                auto connectedPeers = client.getConnectedPeers();
+                auto connectedPeers = dataChannelClient.getConnectedPeers();
                 if (!connectedPeers.empty()) {
                     currentPeerId = connectedPeers[0];
                     Log::info("[Main] Connected to peer: {}", currentPeerId);
@@ -45,15 +45,15 @@ int main() {
                         
                         if (msg.empty()) {
                             Log::info("[Main] Disconnecting...");
-                            client.close();
+                            dataChannelClient.close();
                             currentPeerId.clear();
                             isConnecting = false;
                             break;
                         }
                         
                         // ✅ 修复 2: 发送前检查 DataChannel 状态
-                        if (client.isDataChannelOpen(currentPeerId)) {
-                            client.sendMessage(currentPeerId, msg);
+                        if (dataChannelClient.isDataChannelOpen(currentPeerId)) {
+                            dataChannelClient.sendMessage(currentPeerId, msg);
                         } else {
                             Log::warn("[Main] DataChannel not open, cannot send!");
                         }
@@ -81,19 +81,19 @@ int main() {
                 }
                 
                 // ✅ 修复 4: 检查是否已连接到此 peer
-                if (client.isDataChannelOpen(peerId)) {
+                if (dataChannelClient.isDataChannelOpen(peerId)) {
                     Log::warn("[Main] Already connected to {}", peerId);
                     currentPeerId = peerId;
                     continue;
                 }
                 
                 // 发起呼叫
-                client.callPeer(peerId);
+                dataChannelClient.callPeer(peerId);
                 isConnecting = true;
                 Log::info("[Main] Called {}, waiting for connection...", peerId);
                 
                 // ✅ 修复 5: 等待连接完成或超时
-                if (client.waitForConnection(std::chrono::seconds(10))) {
+                if (dataChannelClient.waitForConnection(std::chrono::seconds(10))) {
                     Log::info("[Main] Connection established!");
                     isConnecting = false;
                 } else {
