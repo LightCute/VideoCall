@@ -11,6 +11,7 @@ datachannel_test_3_20_recv: \
   CMakeFiles/datachannel_test_3_20_recv.dir/fileparser.cpp.o \
   CMakeFiles/datachannel_test_3_20_recv.dir/stream.cpp.o \
   CMakeFiles/datachannel_test_3_20_recv.dir/ArgParser.cpp.o \
+  CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.o \
   third_party/libdatachannel/libdatachannel.so.0.24.1 \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstapp-1.0.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstbase-1.0.so \
@@ -81,6 +82,8 @@ CMakeFiles/datachannel_test_3_20_recv.dir/fileparser.cpp.o:
 CMakeFiles/datachannel_test_3_20_recv.dir/stream.cpp.o:
 
 CMakeFiles/datachannel_test_3_20_recv.dir/ArgParser.cpp.o:
+
+CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.o:
 
 third_party/libdatachannel/libdatachannel.so.0.24.1:
 

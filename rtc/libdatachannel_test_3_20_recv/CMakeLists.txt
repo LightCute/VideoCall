@@ -5,6 +5,7 @@ project(datachannel_test_3_20_recv VERSION 0.1 LANGUAGES CXX)
 # =========================
 # 基础配置
 # =========================
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # 帮助 IDE 索引
@@ -58,7 +59,8 @@ set(PROJECT_SOURCES
     
     # ✅ 2. 新增的文件 (确保 CMake 能看到它们)
     ThreadSafeQueue.h
-    GstVideoPlayer.h
+    GstMediaPlayer.cpp
+	GstMediaPlayer.h
 )
 
 # =========================

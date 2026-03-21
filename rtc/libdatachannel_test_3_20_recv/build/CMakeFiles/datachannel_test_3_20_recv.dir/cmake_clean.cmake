@@ -4,6 +4,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/datachannel_test_3_20_recv.dir/ArgParser.cpp.o.d"
   "CMakeFiles/datachannel_test_3_20_recv.dir/DataChannelClient.cpp.o"
   "CMakeFiles/datachannel_test_3_20_recv.dir/DataChannelClient.cpp.o.d"
+  "CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.o"
+  "CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.o.d"
   "CMakeFiles/datachannel_test_3_20_recv.dir/dispatchqueue.cpp.o"
   "CMakeFiles/datachannel_test_3_20_recv.dir/dispatchqueue.cpp.o.d"
   "CMakeFiles/datachannel_test_3_20_recv.dir/fileparser.cpp.o"

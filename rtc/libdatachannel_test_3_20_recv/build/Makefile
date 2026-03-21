@@ -586,6 +586,30 @@ DataChannelClient.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_recv.dir/build.make CMakeFiles/datachannel_test_3_20_recv.dir/DataChannelClient.cpp.s
 .PHONY : DataChannelClient.cpp.s
 
+GstMediaPlayer.o: GstMediaPlayer.cpp.o
+.PHONY : GstMediaPlayer.o
+
+# target to build an object file
+GstMediaPlayer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_recv.dir/build.make CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.o
+.PHONY : GstMediaPlayer.cpp.o
+
+GstMediaPlayer.i: GstMediaPlayer.cpp.i
+.PHONY : GstMediaPlayer.i
+
+# target to preprocess a source file
+GstMediaPlayer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_recv.dir/build.make CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.i
+.PHONY : GstMediaPlayer.cpp.i
+
+GstMediaPlayer.s: GstMediaPlayer.cpp.s
+.PHONY : GstMediaPlayer.s
+
+# target to generate assembly for a file
+GstMediaPlayer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/datachannel_test_3_20_recv.dir/build.make CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.s
+.PHONY : GstMediaPlayer.cpp.s
+
 dispatchqueue.o: dispatchqueue.cpp.o
 .PHONY : dispatchqueue.o
 
@@ -801,6 +825,9 @@ help:
 	@echo "... DataChannelClient.o"
 	@echo "... DataChannelClient.i"
 	@echo "... DataChannelClient.s"
+	@echo "... GstMediaPlayer.o"
+	@echo "... GstMediaPlayer.i"
+	@echo "... GstMediaPlayer.s"
 	@echo "... dispatchqueue.o"
 	@echo "... dispatchqueue.i"
 	@echo "... dispatchqueue.s"

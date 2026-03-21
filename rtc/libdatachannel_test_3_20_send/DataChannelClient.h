@@ -52,11 +52,18 @@ private:
     template <class T> std::weak_ptr<T> make_weak_ptr(std::shared_ptr<T> ptr) { return ptr; }
     void sendInitialNalus(std::shared_ptr<Stream> stream, std::shared_ptr<ClientTrackData> video);
     std::shared_ptr<ClientTrackData> addVideo(const std::shared_ptr<rtc::PeerConnection> pc, 
-    const uint8_t payloadType, 
-    const uint32_t ssrc, 
-    const std::string cname, 
-    const std::string msid, 
-    const std::function<void (void)> onOpen);
+        const uint8_t payloadType, 
+        const uint32_t ssrc, 
+        const std::string cname, 
+        const std::string msid, 
+        const std::function<void (void)> onOpen);
+
+    std::shared_ptr<ClientTrackData> addAudio(const std::shared_ptr<rtc::PeerConnection> pc, 
+        const uint8_t payloadType, 
+        const uint32_t ssrc, 
+        const std::string cname, 
+        const std::string msid, 
+        const std::function<void (void)> onOpen);
 
     uint32_t generateUniqueSSRC(const std::string& clientId);
     std::shared_ptr<Stream> createStream(

@@ -253,7 +253,7 @@ CMakeFiles/datachannel_test_3_20_recv.dir/stream.cpp.o: \
  /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include/rtc/rtcpsrreporter.hpp \
  /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/helpers.hpp \
  /usr/include/c++/13/shared_mutex \
- /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/GstVideoPlayer.h \
+ /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/GstMediaPlayer.h \
  /usr/include/gstreamer-1.0/gst/gst.h /usr/include/glib-2.0/glib.h \
  /usr/include/glib-2.0/glib/galloca.h /usr/include/glib-2.0/glib/gtypes.h \
  /usr/lib/x86_64-linux-gnu/glib-2.0/include/glibconfig.h \

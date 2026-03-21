@@ -54,6 +54,12 @@
   "output": "CMakeFiles/datachannel_test_3_20_recv.dir/ArgParser.cpp.o"
 },
 {
+  "directory": "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/build",
+  "command": "/usr/bin/c++ -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1 -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/json/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/spdlog/include -g -std=gnu++17 -o CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.o -c /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/GstMediaPlayer.cpp",
+  "file": "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/GstMediaPlayer.cpp",
+  "output": "CMakeFiles/datachannel_test_3_20_recv.dir/GstMediaPlayer.cpp.o"
+},
+{
   "directory": "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/build/third_party/libdatachannel",
   "command": "/usr/bin/c++ -DJUICE_STATIC -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1 -DRTC_EXPORTS -DRTC_SYSTEM_JUICE=0 -DRTC_SYSTEM_SRTP=0 -DUSE_GNUTLS=0 -DUSE_NICE=0 -Ddatachannel_EXPORTS -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include/rtc -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/src -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/usrsctp/usrsctplib -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/plog/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libsrtp/crypto/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libsrtp/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/libjuice/include -g -std=gnu++17 -fPIC -fvisibility=default -Wall -Wextra -o CMakeFiles/datachannel.dir/src/candidate.cpp.o -c /home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/src/candidate.cpp",
   "file": "/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/src/candidate.cpp",

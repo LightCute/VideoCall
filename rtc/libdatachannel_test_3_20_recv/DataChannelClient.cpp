@@ -263,26 +263,48 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         }
         auto client = it_client->second;
 
-        client->recvVideo = track;
-        Log::info("[PeerConnection] [{}] Saved incoming VIDEO track to Client", id);
+        bool isVideo = (track->description().type() == "video");
 
+        if (isVideo) {
+            client->recvVideo = track;
+            Log::info("[PeerConnection] [{}] Saved VIDEO track", id);
+            
+            // 设置 H.264 解包器
+            auto depacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
+            track->setMediaHandler(depacketizer);
+        } else {
+            client->recvAudio = track;
+            Log::info("[PeerConnection] [{}] Saved AUDIO track", id);
+            
+            auto depacketizer = std::make_shared<rtc::OpusRtpDepacketizer>();
+            track->setMediaHandler(depacketizer);
+            // 如果是 Opus，设置 Opus 解包器 (如果 libdatachannel 提供的话)
+            // 注意：如果是 RAW 音频或其他格式，可能不需要 Depacketizer，或者需要对应的 Depacketizer
+            // auto depacketizer = std::make_shared<rtc::OpusDepacketizer>(); 
+            // track->setMediaHandler(depacketizer);
+        }
 
-        Log::warn("[PeerConnection] [{}] Setting up H264RtpDepacketizer...", id);
-        auto depacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
-        track->setMediaHandler(depacketizer);
-        Log::warn("[PeerConnection] [{}] Depacketizer is set.", id);
+        bool haveVideo = (client->recvVideo != nullptr);
+        bool haveAudio = (client->recvAudio != nullptr);
+
+        if (!client->player) {
+            client->player = std::make_shared<GstMediaPlayer>();
+            // 先不 start，等数据来？或者现在就 start？建议现在 start，让 Pipeline 跑起来
+            client->player->start();
+            Log::info("[PeerConnection] [{}] Created GstMediaPlayer", id);
+        }
         // 3. 设置 Track 的回调（关键！）
         // 3.1 Track 打开回调
         track->onOpen([this, id, weak_client = std::weak_ptr<Client>(client)]() {
             Log::info("[PeerConnection] [{}] Incoming track opened", id);            
             // (可选) 在这里可以通知 UI 或更新状态
-            if (auto c = weak_client.lock()) {
-                // 创建播放器
-                c->player = std::make_shared<GstVideoPlayer>();
-                if (!c->player->start()) {
-                    Log::error("[PeerConnection] [{}] Failed to start GStreamer player", id);
-                }
-            }
+            // if (auto c = weak_client.lock()) {
+            //     // 创建播放器
+            //     c->player = std::make_shared<GstVideoPlayer>();
+            //     if (!c->player->start()) {
+            //         Log::error("[PeerConnection] [{}] Failed to start GStreamer player", id);
+            //     }
+            // }
         });
 
         // 3.2 Track 关闭回调
@@ -297,14 +319,23 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         });
 
         // 3.3 ✅ 核心：媒体数据接收回调（在这里处理解码/渲染）
-        track->onFrame([this, id, weak_client = std::weak_ptr<Client>(client)]
-                      (rtc::binary data, rtc::FrameInfo info) {
-            Log::debug("[PeerConnection] [{}] Received frame, size: {}, timestamp: {}", 
-                       id, data.size(), info.timestamp);
-            if (auto c = weak_client.lock()) {
-                if (c->player) {
-                    c->player->pushFrame(std::move(data));
-                }
+        track->onFrame([this, id, client, isVideo](rtc::binary data, rtc::FrameInfo info) {
+            if (!client->player) return;
+
+            if (data.empty()) {
+                Log::warn("[PeerConnection] [{}] {} frame is empty!", id, (isVideo ? "VIDEO" : "AUDIO"));
+                return;
+            }
+
+            if (isVideo) {
+                client->player->pushVideoFrame(std::move(data), info.timestamp);
+                // 视频日志可以少一点
+                static int v_cnt = 0;
+                if(++v_cnt % 30 == 0) Log::debug("[PeerConnection] [{}] Video OK, size={}", id, data.size());
+            } else {
+                // ✅✅✅ 音频：每次都打印，确保这里在执行！
+                Log::warn("[PeerConnection] [{}] 🔊 Pushing AUDIO, size={}, timestamp={}", id, data.size(), info.timestamp);
+                client->player->pushAudioFrame(std::move(data), info.timestamp);
             }
         });
 
