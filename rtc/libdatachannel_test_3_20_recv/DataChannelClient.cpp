@@ -276,17 +276,24 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         track->onOpen([this, id, weak_client = std::weak_ptr<Client>(client)]() {
             Log::info("[PeerConnection] [{}] Incoming track opened", id);            
             // (可选) 在这里可以通知 UI 或更新状态
-            m_MainThread.dispatch([weak_client]() {
-                if (auto c = weak_client.lock()) {
-                    // 例如：更新 Client 状态或触发 UI 刷新
+            if (auto c = weak_client.lock()) {
+                // 创建播放器
+                c->player = std::make_shared<GstVideoPlayer>();
+                if (!c->player->start()) {
+                    Log::error("[PeerConnection] [{}] Failed to start GStreamer player", id);
                 }
-            });
+            }
         });
 
         // 3.2 Track 关闭回调
-        track->onClosed([this, id]() {
+        track->onClosed([this, id, weak_client = std::weak_ptr<Client>(client)]() {
             Log::info("[PeerConnection] [{}] Incoming track closed", id);
             // (可选) 在这里可以通知 UI 或更新状态
+            if (auto c = weak_client.lock()) {
+                if (c->player) {
+                    c->player->stop();
+                }
+            }
         });
 
         // 3.3 ✅ 核心：媒体数据接收回调（在这里处理解码/渲染）
@@ -294,20 +301,13 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
                       (rtc::binary data, rtc::FrameInfo info) {
             Log::debug("[PeerConnection] [{}] Received frame, size: {}, timestamp: {}", 
                        id, data.size(), info.timestamp);
-
-        });
-        track->onMessage([this, id, mid = track->mid()](rtc::message_variant data) {
-            // 判断是二进制数据 (视频/音频帧都是二进制)
-            if (std::holds_alternative<rtc::binary>(data)) {
-                rtc::binary bin_data = std::get<rtc::binary>(data);
-                
-                Log::warn("[PeerConnection] [{}] 🟢 [onMessage] Received {} data! Size: {}", 
-                        id, mid, bin_data.size());
-
-                // 在这里处理数据 (送入解码器)
-                // processFrame(mid, bin_data);
+            if (auto c = weak_client.lock()) {
+                if (c->player) {
+                    c->player->pushFrame(std::move(data));
+                }
             }
         });
+
 
     });
 

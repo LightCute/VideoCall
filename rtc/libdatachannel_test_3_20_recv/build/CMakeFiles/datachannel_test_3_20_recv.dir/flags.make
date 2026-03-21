@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1
 
-CXX_INCLUDES = -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/json/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/spdlog/include
+CXX_INCLUDES = -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/libdatachannel/deps/json/include -I/home/light/work/Video_Prj/rtc/libdatachannel_test_3_20_recv/third_party/spdlog/include
 
 CXX_FLAGS = -g -std=gnu++17
 

@@ -1,9 +1,25 @@
 ========== 工程目录结构（仅含.h/.cpp）==========
 
 📂 .:
+  └─ ArgParser.cpp
+  └─ ArgParser.hpp
   └─ DataChannelClient.cpp
   └─ DataChannelClient.h
+  └─ GstVideoPlayer.h
+  └─ ThreadSafeQueue.h
+  └─ dispatchqueue.cpp
+  └─ dispatchqueue.hpp
+  └─ fileparser.cpp
+  └─ fileparser.hpp
+  └─ h264fileparser.cpp
+  └─ h264fileparser.hpp
+  └─ helpers.cpp
+  └─ helpers.hpp
   └─ main.cpp
+  └─ opusfileparser.cpp
+  └─ opusfileparser.hpp
+  └─ stream.cpp
+  └─ stream.hpp
 
 📂 ./utilities:
   └─ blocking_queue.h
@@ -13,8 +29,172 @@
 ========== 所有.h/.cpp文件内容 ==========
 
 
+========== ./GstVideoPlayer.h ==========
+Lines: 161
+
+#include <gst/gst.h>
+#include <thread>
+#include <atomic>
+#include "rtc/rtc.hpp" // 确保包含 rtc::binary 的定义
+
+class GstVideoPlayer {
+public:
+    GstVideoPlayer() : m_isRunning(false) {
+        gst_init(nullptr, nullptr);
+        m_pipeline = nullptr;
+        m_appsrc = nullptr;
+    }
+
+    ~GstVideoPlayer() {
+        stop();
+    }
+
+    // 启动播放器和流水线
+    bool start() {
+        if (m_isRunning) return true;
+
+        // 1. 创建 Pipeline
+        // 注意：
+        // appsrc: 我们的入口
+        // h264parse: 解析 H.264 流
+        // avdec_h264 / decodebin: 解码 (decodebin 自动选择)
+        // videoconvert: 格式转换
+        // autovideosink: 自动显示
+        // sync=false: 实时流，不做时钟同步，降低延迟
+        std::string pipelineDesc = 
+            "appsrc name=src emit-signals=false is-live=true format=GST_FORMAT_TIME ! "
+            "queue ! " // 加一个 queue 缓冲，防止抖动
+            "h264parse ! "
+            "decodebin ! "
+            "videoconvert ! "
+            "autovideosink sync=false";
+
+        GError* error = nullptr;
+        m_pipeline = gst_parse_launch(pipelineDesc.c_str(), &error);
+        if (error) {
+            g_printerr("[GstPlayer] Failed to create pipeline: %s\n", error->message);
+            g_error_free(error);
+            return false;
+        }
+
+        // 2. 获取 AppSrc
+        m_appsrc = gst_bin_get_by_name(GST_BIN(m_pipeline), "src");
+        if (!m_appsrc) {
+            g_printerr("[GstPlayer] Failed to get AppSrc\n");
+            return false;
+        }
+
+        // 3. 配置 AppSrc Caps
+        // 告诉 GStreamer 我们要喂的是 H.264 Byte Stream (Annex-B)
+        GstCaps* caps = gst_caps_new_simple(
+            "video/x-h264",
+            "stream-format", G_TYPE_STRING, "byte-stream",
+            "alignment", G_TYPE_STRING, "au",
+            nullptr
+        );
+        g_object_set(m_appsrc, "caps", caps, nullptr);
+        gst_caps_unref(caps);
+
+        // 4. 启动 Pipeline
+        gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
+
+        // 5. 启动工作线程
+        m_isRunning = true;
+        m_workerThread = std::thread(&GstVideoPlayer::workerLoop, this);
+
+        g_print("[GstPlayer] Started successfully\n");
+        return true;
+    }
+
+    // 供外部调用：推入帧数据 (非阻塞)
+    void pushFrame(rtc::binary data) {
+        if (!m_isRunning) return;
+        m_queue.push(std::move(data));
+    }
+
+    // 停止播放器
+    void stop() {
+        if (!m_isRunning) return;
+        
+        g_print("[GstPlayer] Stopping...\n");
+        
+        // 1. 停止队列，唤醒工作线程
+        m_queue.stop();
+
+        // 2. 等待工作线程退出
+        if (m_workerThread.joinable()) {
+            m_workerThread.join();
+        }
+
+        // 3. 停止 GStreamer
+        if (m_pipeline) {
+            gst_element_set_state(m_pipeline, GST_STATE_NULL);
+            gst_object_unref(m_pipeline);
+            m_pipeline = nullptr;
+            m_appsrc = nullptr;
+        }
+
+        m_isRunning = false;
+        g_print("[GstPlayer] Stopped\n");
+    }
+
+private:
+    // 工作线程主循环
+    void workerLoop() {
+        g_print("[GstPlayer] Worker thread started\n");
+        
+        rtc::binary data;
+        
+        // 循环从队列取数据
+        while (m_queue.pop(data)) {
+            if (data.empty()) continue;
+            
+            pushToGst(data);
+        }
+        
+        g_print("[GstPlayer] Worker thread finished\n");
+    }
+
+    // 将数据真正推给 GStreamer
+    void pushToGst(const rtc::binary& data) {
+        if (!m_appsrc || !m_isRunning) return;
+
+        // 1. 分配 GstBuffer
+        GstBuffer* buffer = gst_buffer_new_allocate(nullptr, data.size(), nullptr);
+        if (!buffer) return;
+
+        // 2. 拷贝数据
+        GstMapInfo map;
+        if (gst_buffer_map(buffer, &map, GST_MAP_WRITE)) {
+            memcpy(map.data, data.data(), data.size());
+            gst_buffer_unmap(buffer, &map);
+        } else {
+            gst_buffer_unref(buffer);
+            return;
+        }
+
+        // 3. 推送到 AppSrc
+        GstFlowReturn ret;
+        g_signal_emit_by_name(m_appsrc, "push-buffer", buffer, &ret);
+        
+        if (ret != GST_FLOW_OK) {
+            // 非致命错误，可能是网络抖动或正在关闭
+            // g_printerr("[GstPlayer] Push failed: %d\n", ret);
+        }
+
+        gst_buffer_unref(buffer);
+    }
+
+    // 成员变量
+    GstElement* m_pipeline;
+    GstElement* m_appsrc;
+    
+    ThreadSafeQueue<rtc::binary> m_queue;
+    std::thread m_workerThread;
+    std::atomic<bool> m_isRunning;
+};
 ========== ./main.cpp ==========
-Lines: 81
+Lines: 115
 
 #include "DataChannelClient.h"
 #include <iostream>
@@ -37,57 +217,89 @@ bool hasInput() {
 
 int main() {
     try {
-        DataChannelClient client;
+        DataChannelClient dataChannelClient;
 
         // 连接信令服务器
-        client.connectToServer("ws://120.79.210.6:8000");
-        std::cout << "Local ID: " << client.getLocalId() << std::endl;
-        std::cout << "\nWaiting for connection... (You can also enter a peer ID to call)\n" << std::endl;
-
+        dataChannelClient.connectToServer("ws://120.79.210.6:8000");
+        Log::info("[Main] Local ID: {}", dataChannelClient.getLocalId());
+        Log::info("[Main] You can enter a peer ID to call, or wait for incoming connections.");
+            std::string currentPeerId;  // 跟踪当前连接的 peer
+        bool isConnecting = false;  // 跟踪是否正在连接中
         // 主循环：同时支持主动呼叫和被动接收
-        while (true) {
-            // 检查是否已经有连接（无论是主动还是被动）
-            if (auto activePeer = client.getActivePeerId()) {
-                std::cout << "\n--- Connected to " << *activePeer << " ---" << std::endl;
-                
-                // 消息发送循环
-                std::string msg;
-                while (true) {
-                    std::cout << "Enter message (empty to disconnect): ";
-                    std::getline(std::cin, msg);
+               while (true) {
+            // ✅ 修复 1: 使用更准确的连接检测
+            if (dataChannelClient.hasActiveConnection()) {
+                // 获取已连接的 peer ID
+                auto connectedPeers = dataChannelClient.getConnectedPeers();
+                if (!connectedPeers.empty()) {
+                    currentPeerId = connectedPeers[0];
+                    Log::info("[Main] Connected to peer: {}", currentPeerId);
                     
-                    if (msg.empty()) {
-                        std::cout << "Disconnecting..." << std::endl;
-                        client.close();
-                        break;
+                    // 消息发送循环
+                    while (true) {
+                        Log::info("[Main] Waiting for user input (empty to disconnect)...");
+                        std::string msg;
+                        std::getline(std::cin, msg);
+                        
+                        if (msg.empty()) {
+                            Log::info("[Main] Disconnecting...");
+                            dataChannelClient.close();
+                            currentPeerId.clear();
+                            isConnecting = false;
+                            break;
+                        }
+                        
+                        // ✅ 修复 2: 发送前检查 DataChannel 状态
+                        if (dataChannelClient.isDataChannelOpen(currentPeerId)) {
+                            dataChannelClient.sendMessage(currentPeerId, msg);
+                        } else {
+                            Log::warn("[Main] DataChannel not open, cannot send!");
+                        }
                     }
-                    
-                    client.sendMessage(*activePeer, msg);
+                    continue;
                 }
-                
-                // 断开后重置状态，等待下一次连接
-                std::cout << "\nWaiting for new connection...\n" << std::endl;
+            }
+
+            // ✅ 修复 3: 防止重复呼叫
+            if (isConnecting) {
+                Log::info("[Main] Connecting to peer, please wait...");
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 continue;
             }
 
-            // 检查是否有用户输入（主动呼叫）
+            // 检查用户输入
             if (hasInput()) {
                 std::string peerId;
-                std::cout << "Enter remote ID to call: ";
                 std::cin >> peerId;
-                std::cin.ignore(); // 忽略换行符
+                std::cin.ignore();
                 
                 if (peerId.empty()) {
-                    std::cout << "Exiting..." << std::endl;
+                    Log::info("[Main] Exiting...");
                     break;
                 }
                 
+                // ✅ 修复 4: 检查是否已连接到此 peer
+                if (dataChannelClient.isDataChannelOpen(peerId)) {
+                    Log::warn("[Main] Already connected to {}", peerId);
+                    currentPeerId = peerId;
+                    continue;
+                }
+                
                 // 发起呼叫
-                client.callPeer(peerId);
-                std::cout << "Calling " << peerId << ", waiting for connection..." << std::endl;
+                dataChannelClient.callPeer(peerId);
+                isConnecting = true;
+                Log::info("[Main] Called {}, waiting for connection...", peerId);
+                
+                // ✅ 修复 5: 等待连接完成或超时
+                if (dataChannelClient.waitForConnection(std::chrono::seconds(10))) {
+                    Log::info("[Main] Connection established!");
+                    isConnecting = false;
+                } else {
+                    Log::error("[Main] Connection timeout!");
+                    isConnecting = false;
+                }
             }
 
-            // 短暂休眠，避免 CPU 占用过高
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
@@ -96,9 +308,186 @@ int main() {
         Log::error("[Main] Exception: {}", e.what());
         return -1;
     }
+
+    spdlog::shutdown();
 }
+========== ./opusfileparser.cpp ==========
+Lines: 14
+
+/**
+ * libdatachannel streamer example
+ * Copyright (c) 2020 Filip Klembara (in2core)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+#include "opusfileparser.hpp"
+
+using namespace std;
+
+OPUSFileParser::OPUSFileParser(string directory, bool loop, uint32_t samplesPerSecond): FileParser(directory, ".opus", samplesPerSecond, loop) { }
+
+========== ./ArgParser.cpp ==========
+Lines: 66
+
+/**
+ * libdatachannel streamer example
+ * Copyright (c) 2020 Filip Klembara (in2core)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+#include "ArgParser.hpp"
+#include <iostream>
+
+ArgParser::ArgParser(std::vector<std::pair<std::string, std::string>> options, std::vector<std::pair<std::string, std::string>> flags) {
+    for(auto option: options) {
+        this->options.insert(option.first);
+        this->options.insert(option.second);
+        shortToLongMap.emplace(option.first, option.second);
+        shortToLongMap.emplace(option.second, option.second);
+    }
+    for(auto flag: flags) {
+        this->flags.insert(flag.first);
+        this->flags.insert(flag.second);
+        shortToLongMap.emplace(flag.first, flag.second);
+        shortToLongMap.emplace(flag.second, flag.second);
+    }
+}
+
+std::optional<std::string> ArgParser::toKey(std::string prefixedKey) {
+    if (prefixedKey.find("--") == 0) {
+        return prefixedKey.substr(2, prefixedKey.length());
+    } else if (prefixedKey.find("-") == 0) {
+        return prefixedKey.substr(1, prefixedKey.length());
+    } else {
+        return std::nullopt;
+    }
+}
+
+bool ArgParser::parse(int argc, char **argv, std::function<bool (std::string, std::string)> onOption, std::function<bool (std::string)> onFlag) {
+    std::optional<std::string> currentOption = std::nullopt;
+    for(int i = 1; i < argc; i++) {
+        std::string current = argv[i];
+        auto optKey = toKey(current);
+        if (!currentOption.has_value() && optKey.has_value() && flags.find(optKey.value()) != flags.end()) {
+            auto check = onFlag(shortToLongMap.at(optKey.value()));
+            if (!check) {
+                return false;
+            }
+        } else if (!currentOption.has_value() && optKey.has_value() && options.find(optKey.value()) != options.end()) {
+            currentOption = optKey.value();
+        } else if (currentOption.has_value()) {
+            auto check = onOption(shortToLongMap.at(currentOption.value()), current);
+            if (!check) {
+                return false;
+            }
+            currentOption = std::nullopt;
+        } else {
+            std::cerr << "Unrecognized option " << current << std::endl;
+            return false;
+        }
+    }
+    if (currentOption.has_value()) {
+        std::cerr << "Missing value for " << currentOption.value() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+========== ./helpers.cpp ==========
+Lines: 83
+
+/**
+ * libdatachannel streamer example
+ * Copyright (c) 2020 Filip Klembara (in2core)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+#include "helpers.hpp"
+
+#include <ctime>
+
+#ifdef _MSC_VER
+// taken from https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows
+#include <windows.h>
+#include <winsock2.h> // for struct timeval
+
+struct timezone {
+	int tz_minuteswest;
+	int tz_dsttime;
+};
+
+int gettimeofday(struct timeval *tv, struct timezone *tz) {
+	if (tv) {
+		FILETIME filetime; /* 64-bit value representing the number of 100-nanosecond intervals since
+		                      January 1, 1601 00:00 UTC */
+		ULARGE_INTEGER x;
+		ULONGLONG usec;
+		static const ULONGLONG epoch_offset_us =
+		    11644473600000000ULL; /* microseconds betweeen Jan 1,1601 and Jan 1,1970 */
+
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+		GetSystemTimePreciseAsFileTime(&filetime);
+#else
+		GetSystemTimeAsFileTime(&filetime);
+#endif
+		x.LowPart = filetime.dwLowDateTime;
+		x.HighPart = filetime.dwHighDateTime;
+		usec = x.QuadPart / 10 - epoch_offset_us;
+		tv->tv_sec = long(usec / 1000000ULL);
+		tv->tv_usec = long(usec % 1000000ULL);
+	}
+	if (tz) {
+		TIME_ZONE_INFORMATION timezone;
+		GetTimeZoneInformation(&timezone);
+		tz->tz_minuteswest = timezone.Bias;
+		tz->tz_dsttime = 0;
+	}
+	return 0;
+}
+#else
+#include <sys/time.h>
+#endif
+
+using namespace std;
+using namespace rtc;
+
+ClientTrackData::ClientTrackData(shared_ptr<Track> track, shared_ptr<RtcpSrReporter> sender) {
+	this->track = track;
+	this->sender = sender;
+}
+
+void Client::setState(State state) {
+	std::unique_lock lock(_mutex);
+	this->state = state;
+}
+
+Client::State Client::getState() {
+	std::shared_lock lock(_mutex);
+	return state;
+}
+
+ClientTrack::ClientTrack(string id, shared_ptr<ClientTrackData> trackData) {
+	this->id = id;
+	this->trackData = trackData;
+}
+
+uint64_t currentTimeInMicroSeconds() {
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	return uint64_t(time.tv_sec) * 1000 * 1000 + time.tv_usec;
+}
+
 ========== ./DataChannelClient.h ==========
-Lines: 82
+Lines: 87
 
 #pragma once
 
@@ -110,80 +499,384 @@ Lines: 82
 #include <future>
 #include <optional>
 #include <functional>
+#include <thread>
+#include <atomic>
 #include "utilities/log.h"
-
+#include "h264fileparser.hpp"
+#include "helpers.hpp"
 class DataChannelClient {
 public:
-    // 定义连接状态回调类型
     using OnConnectedCallback = std::function<void(const std::string& peerId)>;
 
     DataChannelClient();
     ~DataChannelClient();
 
-    // 禁止拷贝和移动
     DataChannelClient(const DataChannelClient&) = delete;
     DataChannelClient& operator=(const DataChannelClient&) = delete;
     DataChannelClient(DataChannelClient&&) = delete;
     DataChannelClient& operator=(DataChannelClient&&) = delete;
 
-    // 连接信令服务器
     void connectToServer(const std::string& serverUrl);
-
-    // 向指定 Peer 发送 Offer 并建立连接
     void callPeer(const std::string& peerId);
-
-    // 向指定 Peer 发送文本消息
     void sendMessage(const std::string& peerId, const std::string& message);
-
-    // 关闭所有连接并清理资源
     void close();
-
-    // 获取本地生成的 ID
     std::string getLocalId() const;
 
-    // ===================== 新增接口 =====================
-    // 设置连接成功回调（无论是主动还是被动连接）
-    void setOnConnectedCallback(OnConnectedCallback callback);
-
-    // 获取当前活跃的 Peer ID（如果有）
-    std::optional<std::string> getActivePeerId() const;
-
-    // 等待任意连接建立（超时返回）
     bool waitForConnection(std::chrono::milliseconds timeout = std::chrono::milliseconds(100));
 
+    bool hasActiveConnection() const;
+    std::vector<std::string> getConnectedPeers() const;
+    bool isDataChannelOpen(const std::string& peerId) const;
+
 private:
-    // 创建并配置 PeerConnection
     std::shared_ptr<rtc::PeerConnection> createPeerConnection(
         std::weak_ptr<rtc::WebSocket> wws, 
         const std::string& id
     );
-
-    // 生成随机 ID
     static std::string randomId(size_t length);
-
-    // 枚举转字符串辅助函数
     static std::string peerConnectionStateToString(rtc::PeerConnection::State state);
     static std::string gatheringStateToString(rtc::PeerConnection::GatheringState state);
-
-    // RTC 日志回调
     static void myCppLogCallback(rtc::LogLevel level, std::string message);
 
-    // ===================== 新增成员变量 =====================
-    OnConnectedCallback m_onConnectedCallback; // 连接成功回调
-    std::optional<std::string> m_activePeerId; // 当前活跃的 Peer ID
-    std::promise<void> m_connectionPromise;     // 用于等待连接建立
-    std::atomic<bool> m_connectedFlag{false};   // 连接状态标志
+    void addToStream(std::shared_ptr<Client> client, bool isAddingVideo);
+    void startStream();
+    template <class T> std::weak_ptr<T> make_weak_ptr(std::shared_ptr<T> ptr) { return ptr; }
+    void sendInitialNalus(std::shared_ptr<Stream> stream, std::shared_ptr<ClientTrackData> video);
+    std::shared_ptr<ClientTrackData> addVideo(const std::shared_ptr<rtc::PeerConnection> pc, 
+    const uint8_t payloadType, 
+    const uint32_t ssrc, 
+    const std::string cname, 
+    const std::string msid, 
+    const std::function<void (void)> onOpen);
 
-    // 核心成员变量
+    uint32_t generateUniqueSSRC(const std::string& clientId);
+    std::shared_ptr<Stream> createStream(
+    const std::string h264Samples, 
+    const unsigned fps, 
+    const std::string opusSamples);
+
+
+    std::shared_ptr<std::promise<void>> m_connectionPromisePtr;
+    std::atomic<bool> m_connectedFlag{false};
+
     std::string m_localId;
     rtc::Configuration m_config;
     std::shared_ptr<rtc::WebSocket> m_ws;
-    std::unordered_map<std::string, std::shared_ptr<rtc::PeerConnection>> m_peerConnectionMap;
-    std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> m_dataChannelMap;
     std::promise<void> m_wsPromise;
+
+    // 视频传输成员变量
+    std::shared_ptr<rtc::Track> videoTrack;
+    std::shared_ptr<rtc::RtpPacketizationConfig> rtpConfig;
+    std::shared_ptr<rtc::H264RtpPacketizer> packetizer;
+    std::shared_ptr<H264FileParser> h264Parser;
+    std::thread videoSendThread;
+    std::atomic<bool> sendingVideo{false};
+
+    std::unordered_map<std::string, std::shared_ptr<Client>> m_clients;
+    std::optional<std::shared_ptr<Stream>> m_avStream;
+    DispatchQueue m_MainThread;
 };
+========== ./ThreadSafeQueue.h ==========
+Lines: 58
+
+#pragma once
+
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <memory>
+#include <atomic>
+
+template<typename T>
+class ThreadSafeQueue {
+public:
+    ThreadSafeQueue() : m_stopped(false) {}
+
+    // 生产：推入数据
+    void push(T item) {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_stopped) return;
+        m_queue.push(std::move(item));
+        m_cv.notify_one();
+    }
+
+    // 消费：弹出数据，如果队列为空且没停止则阻塞
+    // 返回 false 表示队列已停止，应该退出线程
+    bool pop(T& out) {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        
+        // 等待直到有数据 或者 被要求停止
+        m_cv.wait(lock, [this]() {
+            return !m_queue.empty() || m_stopped;
+        });
+
+        if (m_stopped && m_queue.empty()) {
+            return false;
+        }
+
+        out = std::move(m_queue.front());
+        m_queue.pop();
+        return true;
+    }
+
+    // 停止队列，唤醒所有等待的线程
+    void stop() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_stopped = true;
+        m_cv.notify_all();
+    }
+
+    bool empty() const {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_queue.empty();
+    }
+
+private:
+    mutable std::mutex m_mutex;
+    std::condition_variable m_cv;
+    std::queue<T> m_queue;
+    bool m_stopped;
+};
+========== ./h264fileparser.cpp ==========
+Lines: 71
+
+/**
+ * libdatachannel streamer example
+ * Copyright (c) 2020 Filip Klembara (in2core)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+#include "h264fileparser.hpp"
+#include "rtc/rtc.hpp"
+
+#include <fstream>
+#include <cstring>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
+
+using namespace std;
+
+H264FileParser::H264FileParser(string directory, uint32_t fps, bool loop): FileParser(directory, ".h264", fps, loop) { }
+
+void H264FileParser::loadNextSample() {
+    FileParser::loadNextSample();
+
+    size_t i = 0;
+    while (i < sample.size()) {
+        assert(i + 4 < sample.size());
+        auto lengthPtr = (uint32_t *) (sample.data() + i);
+        uint32_t length;
+        std::memcpy(&length, lengthPtr, sizeof(uint32_t));
+        length = ntohl(length);
+        auto naluStartIndex = i + 4;
+        auto naluEndIndex = naluStartIndex + length;
+        assert(naluEndIndex <= sample.size());
+        auto header = reinterpret_cast<rtc::NalUnitHeader *>(sample.data() + naluStartIndex);
+        auto type = header->unitType();
+        switch (type) {
+            case 7:
+                previousUnitType7 = {sample.begin() + i, sample.begin() + naluEndIndex};
+                break;
+            case 8:
+                previousUnitType8 = {sample.begin() + i, sample.begin() + naluEndIndex};;
+                break;
+            case 5:
+                previousUnitType5 = {sample.begin() + i, sample.begin() + naluEndIndex};;
+                break;
+        }
+        i = naluEndIndex;
+    }
+}
+
+vector<std::byte> H264FileParser::initialNALUS() {
+    vector<std::byte> units{};
+    if (previousUnitType7.has_value()) {
+        auto nalu = previousUnitType7.value();
+        units.insert(units.end(), nalu.begin(), nalu.end());
+    }
+    if (previousUnitType8.has_value()) {
+        auto nalu = previousUnitType8.value();
+        units.insert(units.end(), nalu.begin(), nalu.end());
+    }
+    if (previousUnitType5.has_value()) {
+        auto nalu = previousUnitType5.value();
+        units.insert(units.end(), nalu.begin(), nalu.end());
+    }
+    return units;
+}
+
+========== ./fileparser.cpp ==========
+Lines: 70
+
+/**
+ * libdatachannel streamer example
+ * Copyright (c) 2020 Filip Klembara (in2core)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+#include "fileparser.hpp"
+#include <fstream>
+
+using namespace std;
+
+FileParser::FileParser(string directory, string extension, uint32_t samplesPerSecond, bool loop) {
+    this->directory = directory;
+    this->extension = extension;
+    this->loop = loop;
+    this->sampleDuration_us = 1000 * 1000 / samplesPerSecond;
+}
+
+FileParser::~FileParser() {
+	stop();
+}
+
+void FileParser::start() {
+    sampleTime_us = std::numeric_limits<uint64_t>::max() - sampleDuration_us + 1;
+    loadNextSample();
+}
+
+void FileParser::stop() {
+    sample = {};
+    sampleTime_us = 0;
+    counter = -1;
+}
+
+void FileParser::loadNextSample() {
+    string frame_id = to_string(++counter);
+
+    string url = directory + "/sample-" + frame_id + extension;
+    ifstream source(url, ios_base::binary);
+    if (!source) {
+        if (loop && counter > 0) {
+            loopTimestampOffset = sampleTime_us;
+            counter = -1;
+            loadNextSample();
+            return;
+        }
+        sample = {};
+        return;
+    }
+
+    vector<char> contents((std::istreambuf_iterator<char>(source)), std::istreambuf_iterator<char>());
+    auto *b = reinterpret_cast<const std::byte*>(contents.data());
+    sample.assign(b, b + contents.size());
+    sampleTime_us += sampleDuration_us;
+}
+
+rtc::binary FileParser::getSample() {
+	return sample;
+}
+
+uint64_t FileParser::getSampleTime_us() {
+	return sampleTime_us;
+}
+
+uint64_t FileParser::getSampleDuration_us() {
+	return sampleDuration_us;
+}
+
+
+========== ./dispatchqueue.cpp ==========
+Lines: 85
+
+/**
+ * libdatachannel streamer example
+ * Copyright (c) 2020 Filip Klembara (in2core)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+
+#include "dispatchqueue.hpp"
+
+DispatchQueue::DispatchQueue(std::string name, size_t threadCount) :
+    name{std::move(name)}, threads(threadCount) {
+    for(size_t i = 0; i < threads.size(); i++)
+    {
+        threads[i] = std::thread(&DispatchQueue::dispatchThreadHandler, this);
+    }
+}
+
+DispatchQueue::~DispatchQueue() {
+    // Signal to dispatch threads that it's time to wrap up
+    std::unique_lock<std::mutex> lock(lockMutex);
+    quit = true;
+    lock.unlock();
+    condition.notify_all();
+
+    // Wait for threads to finish before we exit
+    for(size_t i = 0; i < threads.size(); i++)
+    {
+        if(threads[i].joinable())
+        {
+            threads[i].join();
+        }
+    }
+}
+
+void DispatchQueue::removePending() {
+    std::unique_lock<std::mutex> lock(lockMutex);
+    queue = {};
+}
+
+void DispatchQueue::dispatch(const fp_t& op) {
+    std::unique_lock<std::mutex> lock(lockMutex);
+    queue.push(op);
+
+    // Manual unlocking is done before notifying, to avoid waking up
+    // the waiting thread only to block again (see notify_one for details)
+    lock.unlock();
+    condition.notify_one();
+}
+
+void DispatchQueue::dispatch(fp_t&& op) {
+    std::unique_lock<std::mutex> lock(lockMutex);
+    queue.push(std::move(op));
+
+    // Manual unlocking is done before notifying, to avoid waking up
+    // the waiting thread only to block again (see notify_one for details)
+    lock.unlock();
+    condition.notify_one();
+}
+
+void DispatchQueue::dispatchThreadHandler(void) {
+    std::unique_lock<std::mutex> lock(lockMutex);
+    do {
+        //Wait until we have data or a quit signal
+        condition.wait(lock, [this]{
+            return (queue.size() || quit);
+        });
+
+        //after wait, we own the lock
+        if(!quit && queue.size())
+        {
+            auto op = std::move(queue.front());
+            queue.pop();
+
+            //unlock now that we're done messing with the queue
+            lock.unlock();
+
+            op();
+
+            lock.lock();
+        }
+    } while (!quit);
+}
+
 ========== ./DataChannelClient.cpp ==========
-Lines: 288
+Lines: 604
 
 #include "DataChannelClient.h"
 #include <algorithm>
@@ -191,12 +884,14 @@ Lines: 288
 #include <random>
 #include <stdexcept>
 #include <thread>
-#include <atomic>
+#include "opusfileparser.hpp"
 
 using namespace std::chrono_literals;
 using nlohmann::json;
 
-DataChannelClient::DataChannelClient() {
+DataChannelClient::DataChannelClient() 
+    : m_MainThread("MainThread")
+{
     Log::init("app.log", Log::Mode::Async, spdlog::level::trace);
     Log::info("[DataChannelClient] Starting, thread id: [{}]", Log::threadIdToString(std::this_thread::get_id()));
     rtc::InitLogger(rtc::LogLevel::Debug, myCppLogCallback);
@@ -211,7 +906,7 @@ DataChannelClient::~DataChannelClient() {
 
 void DataChannelClient::connectToServer(const std::string& serverUrl) {
     if (m_ws && m_ws->isOpen()) {
-        Log::warn("[DataChannelClient] WebSocket is already connected");
+        Log::warn("[WebSocket] WebSocket is already connected");
         return;
     }
 
@@ -220,17 +915,17 @@ void DataChannelClient::connectToServer(const std::string& serverUrl) {
     auto wsFuture = m_wsPromise.get_future();
 
     m_ws->onOpen([this]() {
-        Log::info("[DataChannelClient] WebSocket connected, signaling ready");
+        Log::info("[WebSocket] WebSocket connected, signaling ready");
         m_wsPromise.set_value();
     });
 
     m_ws->onError([this](std::string s) {
-        Log::error("[DataChannelClient] WebSocket error: {}", s);
+        Log::error("[WebSocket] WebSocket error: {}", s);
         m_wsPromise.set_exception(std::make_exception_ptr(std::runtime_error(s)));
     });
 
     m_ws->onClosed([this]() {
-        Log::info("[DataChannelClient] WebSocket closed");
+        Log::info("[WebSocket] WebSocket closed");
     });
 
     m_ws->onMessage([this, wws = std::weak_ptr<rtc::WebSocket>(m_ws)](auto data) {
@@ -246,10 +941,10 @@ void DataChannelClient::connectToServer(const std::string& serverUrl) {
         auto type = it->get<std::string>();
 
         std::shared_ptr<rtc::PeerConnection> pc;
-        if (auto jt = m_peerConnectionMap.find(id); jt != m_peerConnectionMap.end()) {
-            pc = jt->second;
+        if (auto jt = m_clients.find(id); jt != m_clients.end()) {
+            pc = jt->second->peerConnection;
         } else if (type == "offer") {
-            Log::info("[DataChannelClient] Answering to {}", id);
+            Log::info("[WebSocket] Answering to {}", id);
             pc = createPeerConnection(wws, id);
         } else {
             return;
@@ -257,7 +952,6 @@ void DataChannelClient::connectToServer(const std::string& serverUrl) {
         if (type == "offer" || type == "answer") {
             auto sdp = message["description"].get<std::string>();
             pc->setRemoteDescription(rtc::Description(sdp, type));
-            
         } else if (type == "candidate") {
             auto sdp = message["candidate"].get<std::string>();
             auto mid = message["mid"].get<std::string>();
@@ -268,8 +962,9 @@ void DataChannelClient::connectToServer(const std::string& serverUrl) {
     std::string fullUrl = serverUrl + "/" + m_localId;
     m_ws->open(fullUrl);
 
-    Log::info("[DataChannelClient] Waiting for signaling connection...");
+    Log::info("[WebSocket] Waiting for signaling connection...");
     wsFuture.get();
+    Log::info("[WebSocket] Waiting for signaling connected...");
 }
 
 void DataChannelClient::callPeer(const std::string& peerId) {
@@ -283,25 +978,36 @@ void DataChannelClient::callPeer(const std::string& peerId) {
         return;
     }
 
+    m_connectionPromisePtr = std::make_shared<std::promise<void>>();
+    m_connectedFlag = false;
     Log::info("[DataChannelClient] Offering to {}", peerId);
     auto pc = createPeerConnection(m_ws, peerId);
+
+    auto video = rtc::Description::Video("video-stream", rtc::Description::Direction::SendRecv);
+    auto track = pc->addTrack(video);
 
     const std::string label = "test";
     Log::info("[DataChannelClient] Creating DataChannel with label \"{}\"", label);
     auto dc = pc->createDataChannel(label);
 
+
+
     dc->onOpen([this, peerId, wdc = std::weak_ptr<rtc::DataChannel>(dc)]() {
         Log::info("[DataChannelClient] DataChannel from {} open", peerId);
-        m_activePeerId = peerId;
         m_connectedFlag = true;
-        m_connectionPromise.set_value();
-        if (m_onConnectedCallback) m_onConnectedCallback(peerId);
+        if (m_connectionPromisePtr) {
+            try {
+                m_connectionPromisePtr->set_value();
+            } catch (const std::future_error& e) {
+                Log::warn("[DataChannelClient] Promise already set: {}", e.what());
+            }
+        }
+        
         if (auto dc = wdc.lock()) dc->send("Hello from " + m_localId);
     });
 
     dc->onClosed([this, peerId]() {
         Log::info("[DataChannelClient] DataChannel from {} closed", peerId);
-        if (m_activePeerId == peerId) m_activePeerId = std::nullopt;
     });
 
     dc->onMessage([this, peerId](auto data) {
@@ -312,19 +1018,33 @@ void DataChannelClient::callPeer(const std::string& peerId) {
         }
     });
 
-    m_dataChannelMap.emplace(peerId, dc);
+    auto it = m_clients.find(peerId);
+    if (it != m_clients.end()) {
+        it->second->dataChannel = dc; // 直接设置已有 Client 的 dataChannel
+    } else {
+        // 理论上不应该走到这里，因为 createPeerConnection 已经创建了
+        auto client = std::make_shared<Client>(pc);
+        client->dataChannel = dc;
+        m_clients.emplace(peerId, client);
+    }
 }
 
 void DataChannelClient::sendMessage(const std::string& peerId, const std::string& message) {
-    auto it = m_dataChannelMap.find(peerId);
-    if (it == m_dataChannelMap.end()) {
+    auto it = m_clients.find(peerId);
+    if (it == m_clients.end()) {
         Log::warn("[DataChannelClient] No DataChannel for peer {}", peerId);
         return;
     }
 
-    if (auto dc = it->second; dc && dc->isOpen()) {
-        dc->send(message);
-        Log::info("[DataChannelClient] Sent to {}: {}", peerId, message);
+    auto& client = it->second;
+    if (client->dataChannel.has_value() && client->dataChannel.value()->isOpen()) {
+        auto dc = client->dataChannel.value();
+        if (dc->isOpen()) {
+            dc->send(message);
+            Log::info("[DataChannelClient] Sent to {}: {}", peerId, message);
+        } else {
+            Log::warn("[DataChannelClient] DataChannel for {} is not open", peerId);
+        }
     } else {
         Log::warn("[DataChannelClient] DataChannel for {} is not open", peerId);
     }
@@ -332,9 +1052,15 @@ void DataChannelClient::sendMessage(const std::string& peerId, const std::string
 
 void DataChannelClient::close() {
     Log::info("[DataChannelClient] Cleaning up...");
-    m_dataChannelMap.clear();
-    m_peerConnectionMap.clear();
-    m_activePeerId = std::nullopt;
+    for (auto& [id, client] : m_clients) {
+        if (client->dataChannel.has_value() && client->dataChannel.value()) {
+            client->dataChannel.value()->close();
+        }
+        if (client->peerConnection) {
+            client->peerConnection->close();
+        }
+    }
+    m_clients.clear();
     m_connectedFlag = false;
     if (m_ws) {
         m_ws->close();
@@ -346,21 +1072,20 @@ std::string DataChannelClient::getLocalId() const {
     return m_localId;
 }
 
-// ===================== 新增方法实现 =====================
-void DataChannelClient::setOnConnectedCallback(OnConnectedCallback callback) {
-    m_onConnectedCallback = std::move(callback);
-}
 
-std::optional<std::string> DataChannelClient::getActivePeerId() const {
-    return m_activePeerId;
-}
 
 bool DataChannelClient::waitForConnection(std::chrono::milliseconds timeout) {
-    if (m_connectedFlag) return true;
+    if (m_connectedFlag) {
+        Log::info("[DataChannelClient] Already connected!");
+        return true;
+    }
     
-    // 重置 promise 用于等待
-    m_connectionPromise = std::promise<void>();
-    auto future = m_connectionPromise.get_future();
+    if (!m_connectionPromisePtr) {
+        Log::error("[DataChannelClient] No promise set!");
+        return false;
+    }
+    
+    auto future = m_connectionPromisePtr->get_future();
     return future.wait_for(timeout) == std::future_status::ready;
 }
 
@@ -369,25 +1094,34 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
     const std::string& id
 ) {
     auto pc = std::make_shared<rtc::PeerConnection>(m_config);
+    Log::info("[PeerConnection] Created PC for peer: {}", id);
+
 
     pc->onStateChange([](rtc::PeerConnection::State state) {
-        Log::info("[DataChannelClient] State: {}", peerConnectionStateToString(state));
+        Log::info("[PeerConnection] State: {}", peerConnectionStateToString(state));
     });
 
     pc->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-        Log::info("[DataChannelClient] Gathering State: {}", gatheringStateToString(state));
+        Log::info("[PeerConnection] Gathering State: {}", gatheringStateToString(state));
     });
 
     pc->onLocalDescription([wws, id](rtc::Description description) {
+        Log::info("[PeerConnection] [{}] Generated local {}: {} bytes", 
+            id, description.typeString(), std::string(description).size());
         json message = {
             {"id", id},
             {"type", description.typeString()},
             {"description", std::string(description)}
         };
-        if (auto ws = wws.lock()) ws->send(message.dump());
+        if (auto ws = wws.lock()) {
+            ws->send(message.dump());
+            Log::info("[PeerConnection] [{}] Sent local description to signaling server", message.dump()); // 只打印前100字符
+        }
     });
 
     pc->onLocalCandidate([wws, id](rtc::Candidate candidate) {
+        Log::debug("[PeerConnection] [{}] ICE Candidate: {} (mid={})", 
+                   id, std::string(candidate), candidate.mid());
         json message = {
             {"id", id},
             {"type", "candidate"},
@@ -397,35 +1131,99 @@ std::shared_ptr<rtc::PeerConnection> DataChannelClient::createPeerConnection(
         if (auto ws = wws.lock()) ws->send(message.dump());
     });
 
+    pc->onTrack([this, id, weak_pc = std::weak_ptr<rtc::PeerConnection>(pc)](std::shared_ptr<rtc::Track> track) {
+        Log::info("[PeerConnection] [{}] Received track, mid: {}", 
+            id, track->mid());
+
+        // 2. 线程安全地保存 Track 到 Client
+        auto it_client = m_clients.find(id);
+        if (it_client == m_clients.end()) {
+            Log::error("[PeerConnection] [{}] Client not found for incoming track", id);
+            return;
+        }
+        auto client = it_client->second;
+
+        client->recvVideo = track;
+        Log::info("[PeerConnection] [{}] Saved incoming VIDEO track to Client", id);
+
+
+        Log::warn("[PeerConnection] [{}] Setting up H264RtpDepacketizer...", id);
+        auto depacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
+        track->setMediaHandler(depacketizer);
+        Log::warn("[PeerConnection] [{}] Depacketizer is set.", id);
+        // 3. 设置 Track 的回调（关键！）
+        // 3.1 Track 打开回调
+        track->onOpen([this, id, weak_client = std::weak_ptr<Client>(client)]() {
+            Log::info("[PeerConnection] [{}] Incoming track opened", id);            
+            // (可选) 在这里可以通知 UI 或更新状态
+            if (auto c = weak_client.lock()) {
+                // 创建播放器
+                c->player = std::make_shared<GstVideoPlayer>();
+                if (!c->player->start()) {
+                    Log::error("[PeerConnection] [{}] Failed to start GStreamer player", id);
+                }
+            }
+        });
+
+        // 3.2 Track 关闭回调
+        track->onClosed([this, id]() {
+            Log::info("[PeerConnection] [{}] Incoming track closed", id);
+            // (可选) 在这里可以通知 UI 或更新状态
+            if (auto c = weak_client.lock()) {
+                if (c->player) {
+                    c->player->stop();
+                }
+            }
+        });
+
+        // 3.3 ✅ 核心：媒体数据接收回调（在这里处理解码/渲染）
+        track->onFrame([this, id, weak_client = std::weak_ptr<Client>(client)]
+                      (rtc::binary data, rtc::FrameInfo info) {
+            Log::debug("[PeerConnection] [{}] Received frame, size: {}, timestamp: {}", 
+                       id, data.size(), info.timestamp);
+            if (auto c = weak_client.lock()) {
+                if (c->player) {
+                    c->player->pushFrame(std::move(data));
+                }
+            }
+        });
+
+
+    });
+
     pc->onDataChannel([this, id](std::shared_ptr<rtc::DataChannel> dc) {
-        Log::info("[DataChannelClient] DataChannel from {} received: {}", id, dc->label());
+        Log::info("[PeerConnection] DataChannel from {} received: {}", id, dc->label());
+
 
         dc->onOpen([this, id, wdc = std::weak_ptr<rtc::DataChannel>(dc)]() {
-            Log::info("[DataChannelClient] DataChannel from {} open", id);
-            m_activePeerId = id;
+            Log::info("[PeerConnection] DataChannel from {} open", id);
             m_connectedFlag = true;
-            m_connectionPromise.set_value();
-            if (m_onConnectedCallback) m_onConnectedCallback(id);
             if (auto dc = wdc.lock()) dc->send("Hello from " + m_localId);
         });
 
         dc->onClosed([this, id]() {
-            Log::info("[DataChannelClient] DataChannel from {} closed", id);
-            if (m_activePeerId == id) m_activePeerId = std::nullopt;
+            Log::info("[PeerConnection] DataChannel from {} closed", id);
         });
 
         dc->onMessage([this, id](auto data) {
             if (std::holds_alternative<std::string>(data)) {
-                Log::info("[DataChannelClient] Message from {}: {}", id, std::get<std::string>(data));
+                Log::info("[PeerConnection] Message from {}: {}", id, std::get<std::string>(data));
             } else {
-                Log::info("[DataChannelClient] Binary message from {}, size={}", id, std::get<rtc::binary>(data).size());
+                Log::info("[PeerConnection] Binary message from {}, size={}", id, std::get<rtc::binary>(data).size());
             }
         });
 
-        m_dataChannelMap.emplace(id, dc);
+        auto it = m_clients.find(id);
+        if (it != m_clients.end()) {
+            it->second->dataChannel = dc;
+        }
     });
 
-    m_peerConnectionMap.emplace(id, pc);
+    auto it = m_clients.find(id);
+    if (it == m_clients.end()) {
+        auto client = std::make_shared<Client>(pc);
+        m_clients.emplace(id, client);
+    }
     return pc;
 }
 
@@ -473,6 +1271,332 @@ void DataChannelClient::myCppLogCallback(rtc::LogLevel level, std::string messag
         default: Log::info("[RTC] {}", message); break;
     }
 }
+
+
+bool DataChannelClient::hasActiveConnection() const {
+    for (const auto& [id, client] : m_clients) {
+        if (client->dataChannel.has_value() && 
+            client->dataChannel.value() && 
+            client->dataChannel.value()->isOpen()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<std::string> DataChannelClient::getConnectedPeers() const {
+    std::vector<std::string> connected;
+    for (const auto& [id, client] : m_clients) {
+        if (client->dataChannel.has_value() && 
+            client->dataChannel.value() && 
+            client->dataChannel.value()->isOpen()) {
+            connected.push_back(id);
+        }
+    }
+    return connected;
+}
+
+bool DataChannelClient::isDataChannelOpen(const std::string& peerId) const {
+    auto it = m_clients.find(peerId);
+    if (it == m_clients.end()) return false;
+    
+    const auto& client = it->second;
+    return client->dataChannel.has_value() && 
+           client->dataChannel.value() && 
+           client->dataChannel.value()->isOpen();
+}
+
+
+
+
+
+
+
+//---------------------------------------------------------
+
+
+std::shared_ptr<ClientTrackData> DataChannelClient::addVideo(const std::shared_ptr<rtc::PeerConnection> pc, 
+    const uint8_t payloadType, 
+    const uint32_t ssrc, 
+    const std::string cname, 
+    const std::string msid, 
+    const std::function<void (void)> onOpen) {
+    auto video = rtc::Description::Video(cname, rtc::Description::Direction::SendRecv);
+    video.addH264Codec(payloadType);
+    video.addSSRC(ssrc, cname, msid, cname);
+    auto track = pc->addTrack(video);
+    // create RTP configuration
+    auto rtpConfig = std::make_shared<rtc::RtpPacketizationConfig>(ssrc, cname, payloadType, rtc::H264RtpPacketizer::ClockRate);
+    // create packetizer
+    auto packetizer = std::make_shared<rtc::H264RtpPacketizer>(rtc::NalUnit::Separator::Length, rtpConfig);
+    // add RTCP SR handler
+    auto srReporter = std::make_shared<rtc::RtcpSrReporter>(rtpConfig);
+    packetizer->addToChain(srReporter);
+    // add RTCP NACK handler
+    auto nackResponder = std::make_shared<rtc::RtcpNackResponder>();
+    packetizer->addToChain(nackResponder);
+    // set handler
+    track->setMediaHandler(packetizer);
+    track->onOpen(onOpen);
+    auto trackData = std::make_shared<ClientTrackData>(track, srReporter);
+    return trackData;
+}
+
+
+
+
+
+
+//----------------------------------------------------
+
+
+
+/// Start stream
+void DataChannelClient::startStream() {
+    std::shared_ptr<Stream> stream;
+    if (m_avStream.has_value()) {
+        stream = m_avStream.value();
+        if (stream->isRunning) {
+            // stream is already running
+            return;
+        }
+    } else {
+        stream = createStream("samples/h264", 30, "samples/opus");
+        m_avStream = stream;
+    }
+    stream->start();
+}
+
+/// Add client to stream
+/// @param client Client
+/// @param adding_video True if adding video
+void DataChannelClient::addToStream(std::shared_ptr<Client> client, bool isAddingVideo) {
+    if (client->getState() == Client::State::Waiting) {
+        client->setState(isAddingVideo ? Client::State::WaitingForAudio : Client::State::WaitingForVideo);
+    } else if ((client->getState() == Client::State::WaitingForAudio && !isAddingVideo)
+               || (client->getState() == Client::State::WaitingForVideo && isAddingVideo)) {
+
+        // Audio and video tracks are collected now
+        assert(client->video.has_value() && client->audio.has_value());
+        auto video = client->video.value();
+
+        if (m_avStream.has_value()) {
+            sendInitialNalus(m_avStream.value(), video);
+        }
+
+        client->setState(Client::State::Ready);
+    }
+    if (client->getState() == Client::State::Ready) {
+        startStream();
+    }
+}
+
+
+
+
+/// Create stream
+std::shared_ptr<Stream> DataChannelClient::createStream(
+    const std::string h264Samples, 
+    const unsigned fps, 
+    const std::string opusSamples) {
+    // video source
+    auto video = std::make_shared<H264FileParser>(h264Samples, fps, true);
+    // audio source
+    auto audio = std::make_shared<OPUSFileParser>(opusSamples, true);
+
+    auto stream = std::make_shared<Stream>(video, audio);
+    // set callback responsible for sample sending
+    stream->onSample([this, ws = make_weak_ptr(stream)](Stream::StreamSourceType type, uint64_t sampleTime, rtc::binary sample) {
+        std::vector<ClientTrack> tracks{};
+        std::string streamType = type == Stream::StreamSourceType::Video ? "video" : "audio";
+        // get track for given type
+        std::function<std::optional<std::shared_ptr<ClientTrackData>> (std::shared_ptr<Client>)> getTrackData = [type](std::shared_ptr<Client> client) {
+            return type == Stream::StreamSourceType::Video ? client->video : client->audio;
+        };
+        // get all clients with Ready state
+        for(auto id_client: m_clients) {
+            auto id = id_client.first;
+            auto client = id_client.second;
+            auto optTrackData = getTrackData(client);
+            if (client->getState() == Client::State::Ready && optTrackData.has_value()) {
+                auto trackData = optTrackData.value();
+                tracks.push_back(ClientTrack(id, trackData));
+            }
+        }
+        if (!tracks.empty()) {
+            for (auto clientTrack: tracks) {
+                auto client = clientTrack.id;
+                auto trackData = clientTrack.trackData;
+
+                std::cout << "Sending " << streamType << " sample with size: " << std::to_string(sample.size()) << " to " << client << std::endl;
+                try {
+                    // send sample
+                    trackData->track->sendFrame(sample, std::chrono::duration<double, std::micro>(sampleTime));
+                } catch (const std::exception &e) {
+                    std::cerr << "Unable to send "<< streamType << " packet: " << e.what() << std::endl;
+                }
+            }
+        }
+        m_MainThread.dispatch([this,ws]() {
+            if (m_clients.empty()) {
+                // we have no clients, stop the stream
+                if (auto stream = ws.lock()) {
+                    stream->stop();
+                }
+            }
+        });
+    });
+    return stream;
+}
+
+
+/// Send previous key frame so browser can show something to user
+/// @param stream Stream
+/// @param video Video track data
+void DataChannelClient::sendInitialNalus(std::shared_ptr<Stream> stream, std::shared_ptr<ClientTrackData> video) {
+    auto h264 = dynamic_cast<H264FileParser *>(stream->video.get());
+    auto initialNalus = h264->initialNALUS();
+
+    // send previous NALU key frame so users don't have to wait to see stream works
+    if (!initialNalus.empty()) {
+        const double frameDuration_s = double(h264->getSampleDuration_us()) / (1000 * 1000);
+        const uint32_t frameTimestampDuration = video->sender->rtpConfig->secondsToTimestamp(frameDuration_s);
+        video->sender->rtpConfig->timestamp = video->sender->rtpConfig->startTimestamp - frameTimestampDuration * 2;
+        video->track->send(initialNalus);
+        video->sender->rtpConfig->timestamp += frameTimestampDuration;
+        // Send initial NAL units again to start stream in firefox browser
+        video->track->send(initialNalus);
+    }
+}
+
+
+uint32_t DataChannelClient::generateUniqueSSRC(const std::string& clientId) {
+    // 方法 1: 基于客户端 ID 哈希
+    std::hash<std::string> hasher;
+    return hasher(clientId) & 0xFFFFFFFF;
+    
+    // 方法 2: 随机生成
+    // std::random_device rd;
+    // std::mt19937 gen(rd());
+    // std::uniform_int_distribution<uint32_t> dist(1, 0xFFFFFFFE);
+    // return dist(gen);
+}
+
+
+========== ./stream.cpp ==========
+Lines: 110
+
+/**
+ * libdatachannel streamer example
+ * Copyright (c) 2020 Filip Klembara (in2core)
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+#include "stream.hpp"
+#include "helpers.hpp"
+
+#ifdef _WIN32
+// taken from https://stackoverflow.com/questions/5801813/c-usleep-is-obsolete-workarounds-for-windows-mingw
+#include <windows.h>
+
+void usleep(__int64 usec)
+{
+    HANDLE timer;
+    LARGE_INTEGER ft;
+
+    ft.QuadPart = -(10*usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+
+    timer = CreateWaitableTimer(NULL, TRUE, NULL);
+    SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+    WaitForSingleObject(timer, INFINITE);
+    CloseHandle(timer);
+}
+#else
+#include <unistd.h>
+#endif
+
+Stream::Stream(std::shared_ptr<StreamSource> video, std::shared_ptr<StreamSource> audio):
+	std::enable_shared_from_this<Stream>(), video(video), audio(audio) { }
+
+Stream::~Stream() {
+    stop();
+}
+
+std::pair<std::shared_ptr<StreamSource>, Stream::StreamSourceType> Stream::unsafePrepareForSample() {
+    std::shared_ptr<StreamSource> ss;
+    StreamSourceType sst;
+    uint64_t nextTime;
+    if (audio->getSampleTime_us() < video->getSampleTime_us()) {
+        ss = audio;
+        sst = StreamSourceType::Audio;
+        nextTime = audio->getSampleTime_us();
+    } else {
+        ss = video;
+        sst = StreamSourceType::Video;
+        nextTime = video->getSampleTime_us();
+    }
+
+    auto currentTime = currentTimeInMicroSeconds();
+
+    auto elapsed = currentTime - startTime;
+    if (nextTime > elapsed) {
+        auto waitTime = nextTime - elapsed;
+        mutex.unlock();
+        usleep(waitTime);
+        mutex.lock();
+    }
+    return {ss, sst};
+}
+
+void Stream::sendSample() {
+    std::lock_guard lock(mutex);
+    if (!isRunning) {
+        return;
+    }
+    auto ssSST = unsafePrepareForSample();
+    auto ss = ssSST.first;
+    auto sst = ssSST.second;
+    auto sample = ss->getSample();
+    sampleHandler(sst, ss->getSampleTime_us(), sample);
+    ss->loadNextSample();
+    dispatchQueue.dispatch([this]() {
+        this->sendSample();
+    });
+}
+
+void Stream::onSample(std::function<void (StreamSourceType, uint64_t, rtc::binary)> handler) {
+    sampleHandler = handler;
+}
+
+void Stream::start() {
+    std::lock_guard lock(mutex);
+    if (isRunning) {
+        return;
+    }
+    _isRunning = true;
+    startTime = currentTimeInMicroSeconds();
+    audio->start();
+    video->start();
+    dispatchQueue.dispatch([this]() {
+        this->sendSample();
+    });
+}
+
+void Stream::stop() {
+    std::lock_guard lock(mutex);
+    if (!isRunning) {
+        return;
+    }
+    _isRunning = false;
+    dispatchQueue.removePending();
+    audio->stop();
+    video->stop();
+};
+
+
 ========== ./utilities/blocking_queue.h ==========
 Lines: 57
 
@@ -640,5 +1764,5 @@ public:
 
 
 =====================================
-Total files: 5
-Total lines: 609
+Total files: 14
+Total lines: 1682

@@ -12,6 +12,11 @@ datachannel_test_3_20_recv: \
   CMakeFiles/datachannel_test_3_20_recv.dir/stream.cpp.o \
   CMakeFiles/datachannel_test_3_20_recv.dir/ArgParser.cpp.o \
   third_party/libdatachannel/libdatachannel.so.0.24.1 \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstapp-1.0.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstbase-1.0.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstreamer-1.0.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgobject-2.0.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libglib-2.0.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/libstdc++.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libm.so \
@@ -41,7 +46,17 @@ datachannel_test_3_20_recv: \
   /lib/x86_64-linux-gnu/libssl.so.3 \
   /lib/x86_64-linux-gnu/libcrypto.so.3 \
   /lib/x86_64-linux-gnu/libm.so.6 \
-  /lib64/ld-linux-x86-64.so.2
+  /lib64/ld-linux-x86-64.so.2 \
+  /lib/x86_64-linux-gnu/libgmodule-2.0.so.0 \
+  /lib/x86_64-linux-gnu/libunwind.so.8 \
+  /lib/x86_64-linux-gnu/libdw.so.1 \
+  /lib/x86_64-linux-gnu/libffi.so.8 \
+  /lib/x86_64-linux-gnu/libpcre2-8.so.0 \
+  /lib/x86_64-linux-gnu/liblzma.so.5 \
+  /lib/x86_64-linux-gnu/libelf.so.1 \
+  /lib/x86_64-linux-gnu/libz.so.1 \
+  /lib/x86_64-linux-gnu/libzstd.so.1 \
+  /lib/x86_64-linux-gnu/libbz2.so.1.0
 
 /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/Scrt1.o:
 
@@ -68,6 +83,16 @@ CMakeFiles/datachannel_test_3_20_recv.dir/stream.cpp.o:
 CMakeFiles/datachannel_test_3_20_recv.dir/ArgParser.cpp.o:
 
 third_party/libdatachannel/libdatachannel.so.0.24.1:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstapp-1.0.so:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstbase-1.0.so:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgstreamer-1.0.so:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libgobject-2.0.so:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libglib-2.0.so:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/libstdc++.so:
 
@@ -128,3 +153,23 @@ third_party/libdatachannel/libdatachannel.so.0.24.1:
 /lib/x86_64-linux-gnu/libm.so.6:
 
 /lib64/ld-linux-x86-64.so.2:
+
+/lib/x86_64-linux-gnu/libgmodule-2.0.so.0:
+
+/lib/x86_64-linux-gnu/libunwind.so.8:
+
+/lib/x86_64-linux-gnu/libdw.so.1:
+
+/lib/x86_64-linux-gnu/libffi.so.8:
+
+/lib/x86_64-linux-gnu/libpcre2-8.so.0:
+
+/lib/x86_64-linux-gnu/liblzma.so.5:
+
+/lib/x86_64-linux-gnu/libelf.so.1:
+
+/lib/x86_64-linux-gnu/libz.so.1:
+
+/lib/x86_64-linux-gnu/libzstd.so.1:
+
+/lib/x86_64-linux-gnu/libbz2.so.1.0:

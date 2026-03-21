@@ -14,6 +14,7 @@
 
 #include <shared_mutex>
 
+#include "GstVideoPlayer.h"
 struct ClientTrackData {
     std::shared_ptr<rtc::Track> track;
     std::shared_ptr<rtc::RtcpSrReporter> sender;
@@ -42,6 +43,9 @@ struct Client {
     std::optional<std::shared_ptr<rtc::Track>> recvVideo;
     std::optional<std::shared_ptr<rtc::Track>> recvAudio;
     std::optional<std::shared_ptr<rtc::DataChannel>> dataChannel;
+
+
+    std::shared_ptr<GstVideoPlayer> player;
 
     void setState(State state);
     State getState();

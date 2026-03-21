@@ -14,7 +14,7 @@ for root, dirs, files in os.walk("."):
     dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
     
     # 筛选当前目录下的.h/.cpp文件
-    cpp_h_files = [f for f in files if f.endswith((".cpp", ".h"))]
+    cpp_h_files = [f for f in files if f.endswith((".cpp", ".h", ".hpp" , ".c"))]
     if cpp_h_files:  # 只记录有有效文件的目录
         dir_structure[root] = sorted(cpp_h_files)  # 排序让文件列表更整洁
 
